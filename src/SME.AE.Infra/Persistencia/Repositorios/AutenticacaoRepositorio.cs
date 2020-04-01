@@ -2,29 +2,28 @@
 using System.Linq;
 using Dapper;
 using SME.AE.Aplicacao.Autenticacao.Queries;
-using SME.AE.Infra.Persistencia.Queries;
+using SME.AE.Infra.Persistencia.Consultas;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class AutenticarRepositorio
+    public class AutenticacaoRepositorio
     {
-        private readonly EolDataContext _context;
-        public AutenticarRepositorio(EolDataContext context)
+        private readonly EolContextoDatabase _context;
+        public AutenticacaoRepositorio(EolContextoDatabase context)
         {
             _context = context;
         }
 
-
-        public AutenticacaoQueryResult BuscarAlunoPorResponsavel(string cpfResponsavel, DateTime dataNascimentoAluno)
+        public AutenticacaoQueryResult BuscarAlunoPorResponsavel(string cpf, DateTime dataNascimentoAluno)
         {
             return
            _context
            .Connection
            .Query<AutenticacaoQueryResult>(
-               QueriesAutenticar.ObterAlunosDoResponsavel,
+               AutenticacaoConsultas.ObterAlunosDoResponsavel,
                new
                {
-                   cpfResponsavel,
+                   cpfResponsavel = cpf,
                    dataNascimentoAluno
                })
                .FirstOrDefault();
