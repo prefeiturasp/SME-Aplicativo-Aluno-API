@@ -2,8 +2,9 @@
 using SME.AE.Infra.Interfaces;
 using System;
 using Microsoft.Extensions.Configuration;
-using SME.AE.Aplicacao.Compartilhado;
+using SME.AE.Aplicacao.Comum;
 using System.Data;
+using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Infra.Persistencia
 {
