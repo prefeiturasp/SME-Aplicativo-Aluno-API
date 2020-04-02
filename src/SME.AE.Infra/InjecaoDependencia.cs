@@ -26,9 +26,9 @@ namespace SME.AE.Infra
                     b => b.MigrationsAssembly(typeof(AplicacaoContext).Assembly.FullName)));
 
             services.AddScoped<IAplicacaoContext>(provider => provider.GetService<AplicacaoContext>());
-
-            services.AddDefaultIdentity<UsuarioAplicacao>()
-                .AddEntityFrameworkStores<AplicacaoContext>();
+            services.AddScoped<IExemploRepository>(provider => provider.GetService<ExemploRepository>());
+            
+            services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
             if (environment.IsEnvironment("Test"))
             {
