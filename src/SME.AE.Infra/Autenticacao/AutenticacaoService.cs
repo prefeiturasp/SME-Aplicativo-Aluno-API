@@ -1,8 +1,8 @@
 ﻿using SME.AE.Aplicacao.Comum.Interfaces;
-using SME.AE.Aplicacao.Comum.Modelos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Infra.Autenticacao
 {

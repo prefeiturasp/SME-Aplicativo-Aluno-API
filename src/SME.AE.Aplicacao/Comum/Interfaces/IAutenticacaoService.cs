@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces
 {
