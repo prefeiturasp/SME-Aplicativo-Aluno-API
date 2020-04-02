@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class AutenticacaoController : ControllerBase
+    public class AutenticacaoController : ApiController
     {
+        [HttpPost]
+        public async Task<ActionResult<RespostaAutenticar>> Autenticar([FromBody] Usuario usuario)
+        {
+            return Ok(await CriarUsuarioUseCase.Executar(Mediator));
+        }
     }
 }

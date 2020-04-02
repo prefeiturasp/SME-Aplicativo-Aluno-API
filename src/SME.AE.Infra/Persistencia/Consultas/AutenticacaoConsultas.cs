@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Infra.Persistencia.Queries
+namespace SME.AE.Infra.Persistencia.Consultas
 {
-    public static class QueriesAutenticar
+    public static class AutenticacaoConsultas
     {
         internal static string ObterAlunosDoResponsavel = @"
             SELECT Aluno.DataNascimento

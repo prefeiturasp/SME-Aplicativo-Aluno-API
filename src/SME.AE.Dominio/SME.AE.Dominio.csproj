@@ -9,7 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Enumeradores\" />
+    <Folder Include="Enumeradores" />
+    <Folder Include="Excecoes" />
   </ItemGroup>
 
 </Project>
