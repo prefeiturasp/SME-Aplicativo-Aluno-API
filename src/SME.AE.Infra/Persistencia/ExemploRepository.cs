@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using Dapper;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces;
@@ -9,11 +10,11 @@ namespace SME.AE.Infra.Persistencia
 {
     public class ExemploRepository : IExemploRepository
     {
-        public IEnumerable<string> ObterNomesDeExemplos()
+        public async Task<IEnumerable<string>> ObterNomesDeExemplos()
         {
             using (SqlConnection conexao = new SqlConnection(ConnectionStrings.ConexaoEol))
             {
-                return conexao.Query<string>(AutenticacaoConsultas.ObterAlunosDoResponsavel);
+                return await conexao.QueryAsync<string>(AutenticacaoConsultas.ObterAlunosDoResponsavel);
             }
         }
     }

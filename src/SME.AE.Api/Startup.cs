@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +13,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SME.AE.Api.Filtros;
+using SME.AE.Aplicacao;
+using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
+using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Middlewares;
+using SME.AE.Infra;
 
 namespace SME.AE.Api
 {
@@ -22,9 +30,11 @@ namespace SME.AE.Api
         }
 
         public IConfiguration Configuration { get; }
-
+        
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddInfrastructure();
+            services.AddApplication();
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))
                 .AddNewtonsoftJson();

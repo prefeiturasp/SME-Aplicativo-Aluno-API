@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
 using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;

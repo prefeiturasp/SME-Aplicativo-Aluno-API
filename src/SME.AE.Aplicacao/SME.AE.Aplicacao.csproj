@@ -10,6 +10,7 @@
     <Compile Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <Compile Remove="Autenticacao\**" />
     <Compile Remove="CasoDeUso\Exemplo\**" />
+    <Compile Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
     <EmbeddedResource Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <EmbeddedResource Remove="Autenticacao\**" />
     <EmbeddedResource Remove="CasoDeUso\Exemplo\**" />
+    <EmbeddedResource Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +26,7 @@
     <None Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <None Remove="Autenticacao\**" />
     <None Remove="CasoDeUso\Exemplo\**" />
+    <None Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
   <ItemGroup>
