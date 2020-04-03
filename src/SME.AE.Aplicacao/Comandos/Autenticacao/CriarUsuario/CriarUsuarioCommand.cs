@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +9,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 {
     public class CriarUsuarioCommand : IRequest<RespostaAutenticar>
     {
+        public string Cpf { get; set; }
+        public DateTime dataNascimento { get; set; }
     }
 
     public class CriarUsuarioCommandCommandHandler : IRequestHandler<CriarUsuarioCommand, RespostaAutenticar>
