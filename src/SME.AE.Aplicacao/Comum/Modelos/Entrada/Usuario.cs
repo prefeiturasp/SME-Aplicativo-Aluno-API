@@ -6,7 +6,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
 {
     public class Usuario
     {
-        public string cpf { get; set; }
-        public DateTime dataNascimento { get; set; }
+        public string Cpf { get; set; }
+        public DateTime DataNascimento { get; set; }
+        public string Grupo { get; set; }
     }
 }
