@@ -9,7 +9,12 @@ namespace SME.AE.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AutenticacaoController : ControllerBase
+    public class AutenticacaoController : ApiController
     {
+        [HttpPost]
+        public async Task<ActionResult<RespostaAutenticar>> Autenticar([FromBody] Usuario usuario)
+        {
+            return Ok(await CriarUsuarioUseCase.Executar(Mediator, usuario));
+        }
     }
 }

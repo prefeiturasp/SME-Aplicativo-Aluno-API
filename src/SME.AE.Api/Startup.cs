@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using MediatR;
+using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,8 +35,15 @@ namespace SME.AE.Api
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddInfrastructure();
-            services.AddApplication();
+            services.AddCors();
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<GzipCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
+            });
+
+            InjecaoDependencia.AddApplication(services);
+
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))
                 .AddNewtonsoftJson();

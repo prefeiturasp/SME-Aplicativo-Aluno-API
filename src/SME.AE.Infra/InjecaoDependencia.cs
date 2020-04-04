@@ -26,9 +26,10 @@ namespace SME.AE.Infra
                     ConnectionStrings.Conexao,
                     b => b.MigrationsAssembly(typeof(AplicacaoContext).Assembly.FullName)));
 
-            services.AddTransient(typeof(IAplicacaoContext), typeof(AplicacaoContext));
-            services.AddTransient(typeof(IExemploRepository), typeof(ExemploRepository));
-            
+            services.AddScoped<IAplicacaoContext>(provider => provider.GetService<AplicacaoContext>());
+            services.AddScoped<IExemploRepository>(provider => provider.GetService<ExemploRepository>());
+            services.AddScoped<IAutenticacaoRepositorio>(provider => provider.GetService<AutenticacaoRepositorio>());
+
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
