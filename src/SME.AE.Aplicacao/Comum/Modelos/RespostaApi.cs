@@ -20,7 +20,9 @@ namespace SME.AE.Aplicacao.Comum.Modelos
             Data = null;
         }
 
-        
+        public RespostaApi()
+        {
+        }
 
         public bool Ok { get; set; }
 

@@ -1,29 +1,18 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using MediatR;
+using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao;
-using SME.AE.Aplicacao.CasoDeUso;
-using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
-using SME.AE.Aplicacao.Comum.Interfaces;
-using SME.AE.Aplicacao.Comum.Middlewares;
-using SME.AE.Infra;
+using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Api
 {

@@ -1,6 +1,7 @@
 ﻿using FluentValidation.Results;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Threading;
