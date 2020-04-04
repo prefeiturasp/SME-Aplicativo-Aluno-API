@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "teste", "teste", "{8085AAA6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.AE.Aplicacao", "src\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj", "{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.AE.Aplicacao.Teste", "SME.AE.Aplicacao.Teste\SME.AE.Aplicacao.Teste.csproj", "{472FE83C-D5FB-4BDA-9C9F-439191866979}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.AE.Aplicacao.Teste", "SME.AE.Aplicacao.Teste\SME.AE.Aplicacao.Teste.csproj", "{472FE83C-D5FB-4BDA-9C9F-439191866979}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +39,10 @@ Global
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
