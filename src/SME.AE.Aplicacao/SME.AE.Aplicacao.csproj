@@ -6,10 +6,12 @@
 
   <ItemGroup>
     <Compile Remove="Compartilhado\**" />
+    <Compile Remove="Comum\Modelos\Resposta\**" />
     <Compile Remove="Comum\Interfaces\IDateTime.cs" />
     <Compile Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <Compile Remove="Autenticacao\**" />
     <Compile Remove="CasoDeUso\Exemplo\**" />
+    <Compile Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +19,7 @@
     <EmbeddedResource Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <EmbeddedResource Remove="Autenticacao\**" />
     <EmbeddedResource Remove="CasoDeUso\Exemplo\**" />
+    <EmbeddedResource Remove="Comum\Modelos\Resposta\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,12 +27,16 @@
     <None Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <None Remove="Autenticacao\**" />
     <None Remove="CasoDeUso\Exemplo\**" />
+    <None Remove="Comum\Modelos\Resposta\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    <PackageReference Include="coverlet.collector" Version="1.2.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FluentValidation" Version="8.6.2" />
     <PackageReference Include="MediatR" Version="8.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
@@ -45,12 +52,15 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="3.1.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="Rocket.EntityFrameworkCore.InMemory" Version="5.0.0.26" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

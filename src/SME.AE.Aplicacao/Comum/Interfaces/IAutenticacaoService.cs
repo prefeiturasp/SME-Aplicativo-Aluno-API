@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces
@@ -8,5 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces
         Task<string> ObterNomeUsuarioAsync(string userId);
 
         Task<(RespostaApi resposta, string id)> CriarUsuarioAsync(string cpf, string senha);
+
+        Task<bool> ValidarUsuarioEol(string cpf, DateTime dataNascimentoAluno);
     }
 }

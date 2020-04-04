@@ -13,8 +13,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             RuleFor(v => v.Cpf).Length(11).WithMessage("O campo CPF deve ter 11 caracteres");
             RuleFor(v => v.Cpf).ValidarCpf().WithMessage("CPF Inválido");
 
-            RuleFor(v => v.dataNascimento).NotNull().WithMessage("O campo Data de Nascimento é obrigatório");
-            RuleFor(v => v.dataNascimento).DataNascimentoEhValida().WithMessage("Data de nascimento inválida");
+            RuleFor(v => v.DataNascimento).NotNull().WithMessage("O campo Data de Nascimento é obrigatório");
+            RuleFor(v => v.DataNascimento).DataNascimentoEhValida().WithMessage("Data de nascimento inválida");
         }
     }
 }
