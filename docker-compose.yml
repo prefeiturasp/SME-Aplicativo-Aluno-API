@@ -1,0 +1,42 @@
+﻿version: '3'
+services:
+  web:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: smeae_container
+    build: .
+    ports:
+      - "5001:5001"
+    links:
+      - postgres
+  
+  postgres:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+  
+  pgadmin:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+
+volumes:
+  postgres:
+  pgadmin:

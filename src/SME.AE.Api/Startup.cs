@@ -1,21 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SME.AE.Api.Filtros;
+using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Api
@@ -28,7 +24,7 @@ namespace SME.AE.Api
         }
 
         public IConfiguration Configuration { get; }
-
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
@@ -37,6 +33,8 @@ namespace SME.AE.Api
                 options.Providers.Add<GzipCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
+
+            InjecaoDependencia.AddApplication(services);
 
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))

@@ -18,28 +18,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SME.AE.Api\SME.AE.Api.csproj" />
     <ProjectReference Include="..\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj" />
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\**" />
     <Compile Remove="Persistencia\Repositorios\**" />
-    <Compile Remove="Migrations\20200326124709_InitialCreate.cs" />
-    <Compile Remove="Migrations\20200326124709_InitialCreate.Designer.cs" />
-    <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Migrations\**" />
     <EmbeddedResource Remove="Persistencia\Repositorios\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Migrations\**" />
     <None Remove="Persistencia\Repositorios\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations" />
   </ItemGroup>
 
 </Project>

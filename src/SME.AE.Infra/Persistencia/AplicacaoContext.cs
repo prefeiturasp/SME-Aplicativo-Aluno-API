@@ -14,19 +14,11 @@ namespace SME.AE.Infra.Persistencia
 {
     public class AplicacaoContext : ApiAuthorizationDbContext<UsuarioAplicacao>, IAplicacaoContext
     {
-        private readonly IUsuarioAtualService _currentUserService;
-        
         public AplicacaoContext(
             DbContextOptions options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions,
-            IUsuarioAtualService currentUserService) : base(options, operationalStoreOptions)
+            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
-            _currentUserService = currentUserService;
         }
-
-        // Exemplo de declaracao de DataSet
-        // public DbSet<TodoItem> TodoItems { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
@@ -40,11 +32,11 @@ namespace SME.AE.Infra.Persistencia
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedBy = _currentUserService.IdUsuario;
+                        // entry.Entity.CreatedBy = _currentUserService.IdUsuario;
                         entry.Entity.Created = DateTime.Now;
                         break;
                     case EntityState.Modified:
-                        entry.Entity.LastModifiedBy = _currentUserService.IdUsuario;
+                        // entry.Entity.LastModifiedBy = _currentUserService.IdUsuario;
                         entry.Entity.LastModified = DateTime.Now;
                         break;
                 }

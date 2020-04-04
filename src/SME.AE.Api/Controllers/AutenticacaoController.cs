@@ -13,7 +13,7 @@ namespace SME.AE.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<RespostaAutenticar>> Autenticar([FromBody] Usuario usuario)
         {
-            return Ok(await CriarUsuarioUseCase.Executar(Mediator));
+            return Ok(await CriarUsuarioUseCase.Executar(Mediator, usuario));
         }
     }
 }

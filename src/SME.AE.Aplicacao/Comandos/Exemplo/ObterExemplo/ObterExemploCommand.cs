@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -23,7 +24,7 @@ namespace SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo
 
         public async Task<IEnumerable<string>> Handle(ObterExemploCommand request, CancellationToken cancellationToken)
         {
-            return _repository.ObterNomesDeExemplos();
+            return await _repository.ObterNomesDeExemplos();
         }
     }
 }
