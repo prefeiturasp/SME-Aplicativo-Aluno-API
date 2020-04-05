@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Infra;
 
 namespace SME.AE.Api
 {
@@ -34,7 +35,8 @@ namespace SME.AE.Api
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
 
-            InjecaoDependencia.AddApplication(services);
+            services.AddInfrastructure();
+            services.AddApplication();
 
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))

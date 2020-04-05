@@ -19,9 +19,9 @@ namespace SME.AE.Infra.Autenticacao
         }
 
 
-        public async Task<bool> ValidarUsuarioEol(string cpf, DateTime dataNascimentoAluno)
+        public async Task<RetornoUsuarioEol> SelecionarResponsavel(string cpf, DateTime dataNascimentoAluno)
         {
-            return await _autenticaacoRepositorio.ValidarUsuarioEol(cpf, dataNascimentoAluno);
+            return await _autenticaacoRepositorio.SelecionarResponsavel(cpf, dataNascimentoAluno);
         }
 
         public async Task<string> ObterNomeUsuarioAsync(string id)

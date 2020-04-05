@@ -1,15 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-
 using System.Collections.Generic;
 using System.Security.Claims;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Test;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra.Autenticacao;
@@ -26,9 +22,9 @@ namespace SME.AE.Infra
                     ConnectionStrings.Conexao,
                     b => b.MigrationsAssembly(typeof(AplicacaoContext).Assembly.FullName)));
 
-            services.AddScoped<IAplicacaoContext>(provider => provider.GetService<AplicacaoContext>());
-            services.AddScoped<IExemploRepository>(provider => provider.GetService<ExemploRepository>());
-            services.AddScoped<IAutenticacaoRepositorio>(provider => provider.GetService<AutenticacaoRepositorio>());
+            services.AddTransient(typeof(IAplicacaoContext), typeof(AplicacaoContext));
+            services.AddTransient(typeof(IExemploRepository), typeof(ExemploRepository));
+            services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 

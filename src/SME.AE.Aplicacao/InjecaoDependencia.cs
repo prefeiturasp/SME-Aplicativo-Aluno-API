@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using MediatR;
@@ -8,30 +6,36 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
-using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
-using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
+using static SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario.AutenticarUsuarioCommand;
 
 namespace SME.AE.Aplicacao
 {
-    public static class InjecaoDependencia 
+    public static class InjecaoDependencia
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            //services.AddFluentValidation(Assembly.GetExecutingAssembly());
+            services.AddFluentValidation(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
-            ////var config = new MapperConfiguration(cfg =>
-            ////{
-            ////    cfg.CreateMap<IAplicacaoContext, AplicacaoContext>
-            ////})
-
+            // Pipeline Filters
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidacaoRequisicaoMiddleware<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExcecaoMiddleware<,>));
 
-            //services.AddScoped(provider => provider.GetService<ObterExemploUseCase>());
+            // Services
+
+            // Use Cases
+            services.AddScoped(provider => provider.GetService<ObterExemploUseCase>());
+            services.AddScoped(provider => provider.GetService<AutenticarUsuarioUseCase>());
+
+            // Command Handlers
+            services.AddMediatR(typeof(ObterExemploCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterExemploCommandHandler).GetTypeInfo().Assembly);
+
+            services.AddMediatR(typeof(AutenticarUsuarioCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(AutenticarUsuarioCommandHandler).GetTypeInfo().Assembly);
 
             return services;
         }
