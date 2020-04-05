@@ -10,5 +10,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string Cpf { get; set; }
         public string Email { get; set; }
         public string Nome { get; set; }
+        public DateTime DataNascimento { get; set; }
+        public int TipoSigilo { get; set; }
     }
 }

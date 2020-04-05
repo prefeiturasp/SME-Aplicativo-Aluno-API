@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System;
 using SME.AE.Aplicacao.Comum.Modelos;
+using System.Collections.Generic;
 
 namespace SME.AE.Infra.Autenticacao
 {
@@ -19,9 +20,9 @@ namespace SME.AE.Infra.Autenticacao
         }
 
 
-        public async Task<RetornoUsuarioEol> SelecionarResponsavel(string cpf, DateTime dataNascimentoAluno)
+        public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
         {
-            return await _autenticaacoRepositorio.SelecionarResponsavel(cpf, dataNascimentoAluno);
+            return await _autenticaacoRepositorio.SelecionarAlunosResponsavel(cpf);
         }
 
         public async Task<string> ObterNomeUsuarioAsync(string id)
