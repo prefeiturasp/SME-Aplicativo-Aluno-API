@@ -8,6 +8,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces
 {
     public interface IAutenticacaoRepositorio
     {
-        Task<RetornoUsuarioEol> SelecionarResponsavel(string cpf, DateTime dataNascimentoAluno);
+        Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf);
     }
 }

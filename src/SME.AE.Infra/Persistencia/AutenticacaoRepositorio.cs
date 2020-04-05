@@ -4,6 +4,7 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -11,12 +12,12 @@ namespace SME.AE.Infra.Persistencia
 {
     public class AutenticacaoRepositorio : IAutenticacaoRepositorio
     {
-        private readonly string whereReponsavelAluno = @"WHERE responsavel.cd_cpf_responsavel = @cpf " +
-            "AND aluno.dt_nascimento_aluno = @dataNascimentoAluno";
-        public async Task<RetornoUsuarioEol> SelecionarResponsavel(string cpf, DateTime dataNascimentoAluno)
+        //colocar situação
+        private readonly string whereReponsavelAluno = @"WHERE responsavel.cd_cpf_responsavel = @cpf AND responsavel.dt_fim IS NULL";
+        public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
         {
             using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-            return await conexao.QueryFirstOrDefaultAsync<RetornoUsuarioEol>($"{AutenticacaoConsultas.ObterResponsavel}{whereReponsavelAluno}", new { cpf, dataNascimentoAluno });
+            return await conexao.QueryAsync<RetornoUsuarioEol>($"{AutenticacaoConsultas.ObterResponsavel}{whereReponsavelAluno}", new { cpf });
         }
     }
 }

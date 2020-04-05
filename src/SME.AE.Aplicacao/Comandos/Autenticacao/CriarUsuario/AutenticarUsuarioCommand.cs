@@ -1,9 +1,11 @@
 ﻿using FluentValidation.Results;
 using MediatR;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,15 +40,41 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 ValidationResult validacao = validator.Validate(request);
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
-                //validar usuário se usuário existe
-                var usuario = await _autenticacaoService.SelecionarResponsavel(request.Cpf, request.DataNascimento);
-                if (usuario == null)
+
+                //selecionar alunos do responsável buscando apenas pelo cpf
+                var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
+                if (usuarioAlunos == null || !usuarioAlunos.Any())
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Esse CPF ou Data de Nascimento são inválidos"));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
-                //usuario = new RespostaAutenticar({ Cpf = "12345678900", Email = "jose@silva.com", Id = 1, Nome = "José da Silva Pereira", Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" });
+                if (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento))
+                {
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
+                    return RespostaApi.Falha(validacao.Errors);
+
+                }
+
+                var usuario = usuarioAlunos.FirstOrDefault(w => w.DataNascimento == request.DataNascimento);
+                if (usuario.TipoSigilo == (int)AlunoTipoSigilo.Restricao)
+                {
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
+                    return RespostaApi.Falha(validacao.Errors);
+                }
+
+                return MapearResposta(usuario);
+            }
+
+            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol)
+            {
+                RespostaAutenticar usuario = new RespostaAutenticar
+                {
+                    Cpf = usuarioEol.Cpf,
+                    Email = usuarioEol.Email,
+                    Id = usuarioEol.Id,
+                    Nome = usuarioEol.Nome
+                };
                 return RespostaApi.Sucesso(usuario);
             }
         }
