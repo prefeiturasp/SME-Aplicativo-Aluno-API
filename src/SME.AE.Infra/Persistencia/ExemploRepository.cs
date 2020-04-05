@@ -14,7 +14,7 @@ namespace SME.AE.Infra.Persistencia
         {
             using (SqlConnection conexao = new SqlConnection(ConnectionStrings.ConexaoEol))
             {
-                return await conexao.QueryAsync<string>(AutenticacaoConsultas.ObterAlunosDoResponsavel);
+                return await conexao.QueryAsync<string>(AutenticacaoConsultas.ObterResponsavel);
             }
         }
     }

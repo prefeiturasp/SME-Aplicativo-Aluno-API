@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
+﻿namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
-    public class RespostaAutenticar : RespostaApi
+    public class RespostaAutenticar 
     {
         public int Id { get; set; }
         public string Nome { get; set; }

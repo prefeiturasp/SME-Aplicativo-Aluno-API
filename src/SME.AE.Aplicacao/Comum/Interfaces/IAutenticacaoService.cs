@@ -10,6 +10,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces
 
         Task<(RespostaApi resposta, string id)> CriarUsuarioAsync(string cpf, string senha);
 
-        Task<bool> ValidarUsuarioEol(string cpf, DateTime dataNascimentoAluno);
+        Task<RetornoUsuarioEol> SelecionarResponsavel(string cpf, DateTime dataNascimentoAluno);
     }
 }

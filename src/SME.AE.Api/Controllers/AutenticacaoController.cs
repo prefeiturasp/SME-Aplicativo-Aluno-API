@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Api.Controllers
 {
@@ -11,9 +11,9 @@ namespace SME.AE.Api.Controllers
     public class AutenticacaoController : ApiController
     {
         [HttpPost]
-        public async Task<ActionResult<RespostaAutenticar>> Autenticar([FromBody] Usuario usuario)
+        public async Task<ActionResult<RespostaApi>> Autenticar([FromBody] Usuario usuario)
         {
-            return Ok(await CriarUsuarioUseCase.Executar(Mediator, usuario));
+            return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, usuario));
         }
     }
 }

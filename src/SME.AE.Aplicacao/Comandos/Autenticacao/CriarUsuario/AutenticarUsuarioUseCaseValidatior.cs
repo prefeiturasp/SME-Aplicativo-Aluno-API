@@ -1,13 +1,10 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
+namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
-    class CriarUsuarioUseCaseValidatior : AbstractValidator<CriarUsuarioCommand>
+    class AutenticarUsuarioUseCaseValidatior : AbstractValidator<AutenticarUsuarioCommand>
     {
-        public CriarUsuarioUseCaseValidatior()
+        public AutenticarUsuarioUseCaseValidatior()
         {
             RuleFor(v => v.Cpf).NotNull().WithMessage("O campo CPF é obrigatório");
             RuleFor(v => v.Cpf).Length(11).WithMessage("O campo CPF deve ter 11 caracteres");

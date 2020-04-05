@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "teste", "teste", "{8085AAA6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.AE.Aplicacao", "src\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj", "{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.AE.Aplicacao.Teste", "SME.AE.Aplicacao.Teste\SME.AE.Aplicacao.Teste.csproj", "{472FE83C-D5FB-4BDA-9C9F-439191866979}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.AE.Aplicacao.Teste", "teste\SME.AE.Aplicacao.Teste\SME.AE.Aplicacao.Teste.csproj", "{472FE83C-D5FB-4BDA-9C9F-439191866979}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +39,10 @@ Global
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{472FE83C-D5FB-4BDA-9C9F-439191866979}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +52,7 @@ Global
 		{1A8CDB70-5DF9-47E8-883F-7508C4CACDD8} = {9CD31609-080F-48B8-A3E3-C03C66A8FB5C}
 		{F044FF5F-6872-4E86-AFE8-C4AF01FA0B57} = {9CD31609-080F-48B8-A3E3-C03C66A8FB5C}
 		{AF2B4B83-16BD-4737-9E2F-EFB3936BE60A} = {9CD31609-080F-48B8-A3E3-C03C66A8FB5C}
+		{472FE83C-D5FB-4BDA-9C9F-439191866979} = {8085AAA6-608C-4641-9401-5AD2CFC3B0B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EC3FDA1E-C48F-4F57-B5A2-3674F65AB083}
