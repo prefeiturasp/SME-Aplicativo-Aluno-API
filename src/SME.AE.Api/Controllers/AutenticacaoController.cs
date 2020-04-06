@@ -2,14 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Castle.DynamicProxy.Generators;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SME.AE.Aplicacao.CasoDeUso.Usuario;
 
 namespace SME.AE.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AutenticacaoController : ControllerBase
+    public class AutenticacaoController : ApiController
     {
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha)
+        {
+            // TODO Finalizar este metodo de autenticacao, iniciei apenas para facilitar
+            return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha));
+        }
     }
 }

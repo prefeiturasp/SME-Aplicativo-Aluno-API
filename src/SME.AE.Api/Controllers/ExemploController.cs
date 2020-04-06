@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.CasoDeUso.Exemplo;
 
 namespace SME.AE.Api.Controllers
 {

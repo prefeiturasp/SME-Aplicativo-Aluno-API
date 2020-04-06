@@ -9,23 +9,18 @@
     <Compile Remove="Comum\Interfaces\IDateTime.cs" />
     <Compile Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <Compile Remove="Autenticacao\**" />
-    <Compile Remove="CasoDeUso\Exemplo\**" />
-    <Compile Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Compartilhado\**" />
     <EmbeddedResource Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <EmbeddedResource Remove="Autenticacao\**" />
-    <EmbeddedResource Remove="CasoDeUso\Exemplo\**" />
-    <EmbeddedResource Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Compartilhado\**" />
     <None Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <None Remove="Autenticacao\**" />
-    <None Remove="CasoDeUso\Exemplo\**" />
     <None Remove="Comandos\EntidadeXXXX\**" />
   </ItemGroup>
 
@@ -56,6 +51,10 @@
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
 </Project>

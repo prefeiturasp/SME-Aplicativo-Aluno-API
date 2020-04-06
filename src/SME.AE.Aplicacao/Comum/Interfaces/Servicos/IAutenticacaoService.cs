@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Modelos;
 
-namespace SME.AE.Aplicacao.Comum.Interfaces
+namespace SME.AE.Aplicacao.Comum.Interfaces.Servicos
 {
     public interface IAutenticacaoService
     {

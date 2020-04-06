@@ -5,7 +5,7 @@ using MediatR;
 using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
 using SME.AE.Aplicacao.Comum.Interfaces;
 
-namespace SME.AE.Aplicacao.CasoDeUso
+namespace SME.AE.Aplicacao.CasoDeUso.Exemplo
 {
     public class ObterExemploUseCase
     {

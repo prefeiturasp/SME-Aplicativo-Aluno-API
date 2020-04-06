@@ -23,23 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Persistencia\Repositorios\**" />
     <Compile Remove="Migrations\20200326124709_InitialCreate.cs" />
     <Compile Remove="Migrations\20200326124709_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="Persistencia\Repositorios\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Persistencia\Repositorios\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Interfaces" />
-    <Folder Include="Migrations" />
   </ItemGroup>
 
 </Project>

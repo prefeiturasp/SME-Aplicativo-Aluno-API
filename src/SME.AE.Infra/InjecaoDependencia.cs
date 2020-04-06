@@ -10,10 +10,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Aplicacao.Comum.Interfaces.Geral;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
+using SME.AE.Infra.Persistencia.Repositorios;
 
 namespace SME.AE.Infra
 {
@@ -28,6 +31,7 @@ namespace SME.AE.Infra
 
             services.AddTransient(typeof(IAplicacaoContext), typeof(AplicacaoContext));
             services.AddTransient(typeof(IExemploRepository), typeof(ExemploRepository));
+            services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
             
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
