@@ -1,18 +1,30 @@
 ﻿using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using System;
+using SME.AE.Aplicacao.Comum.Modelos;
+using System.Collections.Generic;
 
 namespace SME.AE.Infra.Autenticacao
 {
     public class AutenticacaoService : IAutenticacaoService
     {
         private readonly UserManager<UsuarioAplicacao> _userManager;
+        private readonly IAutenticacaoRepositorio _autenticaacoRepositorio;
 
-        public AutenticacaoService(UserManager<UsuarioAplicacao> userManager)
+        public AutenticacaoService(UserManager<UsuarioAplicacao> userManager, IAutenticacaoRepositorio autenticaacoRepositorio)
         {
             _userManager = userManager;
+            _autenticaacoRepositorio = autenticaacoRepositorio;
+        }
+
+
+        public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
+        {
+            return await _autenticaacoRepositorio.SelecionarAlunosResponsavel(cpf);
         }
 
         public async Task<string> ObterNomeUsuarioAsync(string id)

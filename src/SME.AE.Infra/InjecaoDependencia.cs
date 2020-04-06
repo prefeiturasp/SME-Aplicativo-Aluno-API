@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Security.Claims;
 using IdentityModel;
@@ -11,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
@@ -30,9 +30,9 @@ namespace SME.AE.Infra
                     b => b.MigrationsAssembly(typeof(AplicacaoContext).Assembly.FullName)));
 
             services.AddTransient(typeof(IAplicacaoContext), typeof(AplicacaoContext));
-            services.AddTransient(typeof(IExemploRepository), typeof(ExemploRepository));
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
-            
+            services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
+
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();

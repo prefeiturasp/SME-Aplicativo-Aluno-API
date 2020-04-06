@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using MediatR;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using SME.AE.Aplicacao.CasoDeUso;
-using SME.AE.Aplicacao.CasoDeUso.Exemplo;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
-using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
+using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
+using static SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario.AutenticarUsuarioCommand;
 
 namespace SME.AE.Aplicacao
 {
-    public static class InjecaoDependencia 
+    public static class InjecaoDependencia
     {
         public static IServiceCollection AddFluentValidation(this IServiceCollection services, Assembly assembly)
         {
@@ -69,20 +66,19 @@ namespace SME.AE.Aplicacao
 
         private static void AddCasosDeUso(IServiceCollection services)
         {
-            services.AddScoped(provider => provider.GetService<ObterExemploUseCase>());
             services.AddScoped(provider => provider.GetService<AutenticarUsuarioUseCase>());
         }
 
         private static void AddComandos(IServiceCollection services)
         {
-            services.AddMediatR(typeof(ObterExemploCommand).GetTypeInfo().Assembly);
-            services.AddMediatR(typeof(ObterExemploCommandHandler).GetTypeInfo().Assembly);
-            
             services.AddMediatR(typeof(ObterUsuarioPorCpfCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(ObterUsuarioPorCpfCommandHandler).GetTypeInfo().Assembly);
 
             services.AddMediatR(typeof(CriarTokenCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(CriarTokenCommandHandler).GetTypeInfo().Assembly);
+            
+            services.AddMediatR(typeof(AutenticarUsuarioCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(AutenticarUsuarioCommandHandler).GetTypeInfo().Assembly);
         }
     }
 }
