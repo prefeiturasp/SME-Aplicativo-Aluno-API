@@ -1,19 +1,26 @@
-﻿using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Castle.DynamicProxy.Generators;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 
 namespace SME.AE.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
-    [ApiController]
     public class AutenticacaoController : ApiController
     {
         [HttpPost]
-        public async Task<ActionResult<RespostaApi>> Autenticar([FromBody] Usuario usuario)
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha)
         {
-            return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, usuario));
+            // TODO Finalizar este metodo de autenticacao, iniciei apenas para facilitar
+            return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha));
         }
     }
 }
