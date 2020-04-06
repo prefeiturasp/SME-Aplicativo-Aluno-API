@@ -2,9 +2,9 @@
 
 namespace SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo
 {
-    public class ObterExemploUseCaseValidator : AbstractValidator<ObterExemploCommand>
+    public class ObterExemploCommandValidator : AbstractValidator<ObterExemploCommand>
     {
-        public ObterExemploUseCaseValidator()
+        public ObterExemploCommandValidator()
         {
             RuleFor(v => v).NotNull();
         }

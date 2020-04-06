@@ -1,14 +1,19 @@
 ﻿version: '3'
 services:
-  web:
-    env_file:
-      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
-    container_name: smeae_container
-    build: .
-    ports:
-      - "5001:5001"
-    links:
-      - postgres
+#  web:
+#    env_file:
+#      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+#    container_name: smeae_container
+#    build: .
+#    ports:
+#      - "5001:5001"
+#      - "5000:5000"
+#    links:
+#      - postgres
+#    networks:
+#      - default
+#    depends_on:
+#      - flyway
   
   postgres:
     env_file:
@@ -23,7 +28,9 @@ services:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
-  
+    networks:
+      - default
+        
   pgadmin:
     env_file:
       - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
@@ -36,7 +43,22 @@ services:
       - pgadmin:/root/.pgadmin
     ports:
       - "${PGADMIN_PORT:-5050}:80"
-
+    networks:
+      - default
+      
+  flyway:
+    container_name: flyway
+    image: boxfuse/flyway:5.2.4
+    command: -url=jdbc:postgresql://postgres_container:5432/smeae?user=${POSTGRES_USER:-postgres}&password=${POSTGRES_PASSWORD:-postgres} -locations='filesystem:/opt/scripts' -outOfOrder=false migrate
+    volumes:
+      - ./scripts:/opt/scripts
+    depends_on:
+      - postgres
+        
 volumes:
   postgres:
   pgadmin:
+
+networks:
+  default:
+    driver: bridge

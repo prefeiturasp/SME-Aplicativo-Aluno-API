@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Interfaces.Geral;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
 namespace SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo
 {

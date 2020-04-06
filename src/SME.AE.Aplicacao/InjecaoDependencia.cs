@@ -7,7 +7,11 @@ using MediatR;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.CasoDeUso.Exemplo;
+using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
+using SME.AE.Aplicacao.Comandos.Token.Criar;
+using SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 
@@ -15,28 +19,6 @@ namespace SME.AE.Aplicacao
 {
     public static class InjecaoDependencia 
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
-        {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddFluentValidation(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly());
-            
-            // Pipeline Filters
-            services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidacaoRequisicaoMiddleware<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExcecaoMiddleware<,>));
-            
-            // Services
-            
-            // Use Cases
-            services.AddScoped(provider => provider.GetService<ObterExemploUseCase>());
-
-            // Command Handlers
-            services.AddMediatR(typeof(ObterExemploCommand).GetTypeInfo().Assembly);
-            services.AddMediatR(typeof(ObterExemploCommandHandler).GetTypeInfo().Assembly);
-
-            return services;
-        }
-
         public static IServiceCollection AddFluentValidation(this IServiceCollection services, Assembly assembly)
         {
             var validatorType = typeof(IValidator<>);
@@ -61,6 +43,46 @@ namespace SME.AE.Aplicacao
             }
 
             return services;
+        }
+
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddFluentValidation(Assembly.GetExecutingAssembly());
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            
+            AddFiltros(services);
+            AddServices(services);
+            AddCasosDeUso(services);
+            AddComandos(services);
+            
+            return services;
+        }
+
+        private static void AddServices(IServiceCollection services) {}
+
+        private static void AddFiltros(IServiceCollection services)
+        {
+            services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidacaoRequisicaoMiddleware<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExcecaoMiddleware<,>));
+        }
+
+        private static void AddCasosDeUso(IServiceCollection services)
+        {
+            services.AddScoped(provider => provider.GetService<ObterExemploUseCase>());
+            services.AddScoped(provider => provider.GetService<AutenticarUsuarioUseCase>());
+        }
+
+        private static void AddComandos(IServiceCollection services)
+        {
+            services.AddMediatR(typeof(ObterExemploCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterExemploCommandHandler).GetTypeInfo().Assembly);
+            
+            services.AddMediatR(typeof(ObterUsuarioPorCpfCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterUsuarioPorCpfCommandHandler).GetTypeInfo().Assembly);
+
+            services.AddMediatR(typeof(CriarTokenCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(CriarTokenCommandHandler).GetTypeInfo().Assembly);
         }
     }
 }
