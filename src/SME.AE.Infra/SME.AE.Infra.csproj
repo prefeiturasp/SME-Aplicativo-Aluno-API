@@ -22,19 +22,4 @@
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Migrations\**" />
-    <Compile Remove="Persistencia\Repositorios\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="Migrations\**" />
-    <EmbeddedResource Remove="Persistencia\Repositorios\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Migrations\**" />
-    <None Remove="Persistencia\Repositorios\**" />
-  </ItemGroup>
-
 </Project>

@@ -8,6 +8,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.AE.Aplicacao.Comum.Interfaces.Geral;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
