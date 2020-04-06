@@ -10,16 +10,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Logging;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao;
-using SME.AE.Aplicacao.CasoDeUso;
-using SME.AE.Aplicacao.Comandos.Exemplo.ObterExemplo;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Infra;
@@ -38,6 +39,12 @@ namespace SME.AE.Api
         public void ConfigureServices(IServiceCollection services)
         {
             AddAuthentication(services);
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<GzipCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
+            });
+
             services.AddInfrastructure();
             services.AddApplication();
             
@@ -49,6 +56,12 @@ namespace SME.AE.Api
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))
                 .AddNewtonsoftJson();
+            
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
+            });
         }
 
         private void AddAuthentication(IServiceCollection services)
@@ -78,6 +91,13 @@ namespace SME.AE.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhemento Escolar V1");
+            });
 
             app
                 .UseCors(x => x

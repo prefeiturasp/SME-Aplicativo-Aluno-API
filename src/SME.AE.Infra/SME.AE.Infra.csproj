@@ -22,14 +22,4 @@
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Migrations\20200326124709_InitialCreate.cs" />
-    <Compile Remove="Migrations\20200326124709_InitialCreate.Designer.cs" />
-    <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces" />
-  </ItemGroup>
-
 </Project>

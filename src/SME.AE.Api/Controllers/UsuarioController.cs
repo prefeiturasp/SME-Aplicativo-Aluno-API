@@ -10,7 +10,6 @@ namespace SME.AE.Api.Controllers
     public class UsuarioController : ApiController
     {
         [HttpGet]
-        [AllowAnonymous]
         public async Task<ActionResult<Usuario>> ObterPorCpf([FromQuery] string cpf)
         {
             Usuario usuario;

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Modelos;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Servicos
@@ -8,5 +10,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Servicos
         Task<string> ObterNomeUsuarioAsync(string userId);
 
         Task<(RespostaApi resposta, string id)> CriarUsuarioAsync(string cpf, string senha);
+
+        Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf);
     }
 }
