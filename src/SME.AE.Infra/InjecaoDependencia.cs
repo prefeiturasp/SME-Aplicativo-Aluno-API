@@ -32,6 +32,7 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IAplicacaoContext), typeof(AplicacaoContext));
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
             services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
+            services.AddTransient(typeof(INotificacaoRepository), typeof(NotificacaoRepository));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 

@@ -13,4 +13,8 @@
     <Folder Include="Excecoes" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
+  </ItemGroup>
+
 </Project>
