@@ -4,12 +4,17 @@ using AutoMapper;
 using MediatR;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
+using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
+using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
+using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
+using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
 using static SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario.AutenticarUsuarioCommand;
 
 namespace SME.AE.Aplicacao
@@ -67,18 +72,35 @@ namespace SME.AE.Aplicacao
         private static void AddCasosDeUso(IServiceCollection services)
         {
             services.AddScoped(provider => provider.GetService<AutenticarUsuarioUseCase>());
+            services.AddScoped(provider => provider.GetService<CriarNotificacaoUseCase>());
+            services.AddScoped(provider => provider.GetService<AtualizarNotificacaoUseCase>());
+            services.AddScoped(provider => provider.GetService<ObterNotificacaoPorGrupoUseCase>());
+            services.AddScoped(provider => provider.GetService<RemoverNotificacaoUseCase>());
         }
 
         private static void AddComandos(IServiceCollection services)
         {
+            // Usuario
             services.AddMediatR(typeof(ObterUsuarioPorCpfCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(ObterUsuarioPorCpfCommandHandler).GetTypeInfo().Assembly);
 
+            // Token
             services.AddMediatR(typeof(CriarTokenCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(CriarTokenCommandHandler).GetTypeInfo().Assembly);
             
+            // Autenticacao
             services.AddMediatR(typeof(AutenticarUsuarioCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(AutenticarUsuarioCommandHandler).GetTypeInfo().Assembly);
+            
+            // Notificacao
+            services.AddMediatR(typeof(CriarNotificacaoCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(CriarNotificacaoCommandHandler).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(AtualizarNotificacaoCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(AtualizarNotificacaoCommandHandler).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterNotificacaoPorGrupoCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterNotificacaoPorGrupoCommandHandler).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(RemoverNotificacaoCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(RemoverNotificacaoCommandHandler).GetTypeInfo().Assembly);
         }
     }
 }

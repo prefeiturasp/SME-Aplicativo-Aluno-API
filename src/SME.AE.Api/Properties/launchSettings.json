@@ -19,7 +19,8 @@
         "AEConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "EolConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "SgpConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
-        "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;"
+        "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
+        "ChaveIntegracao": "***REMOVED***"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
