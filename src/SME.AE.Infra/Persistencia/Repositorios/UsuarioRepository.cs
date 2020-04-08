@@ -20,7 +20,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.ConexaoEol))
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
 
@@ -34,6 +34,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
+                // TODO adicionar sentry
                 return null;
             }
 
