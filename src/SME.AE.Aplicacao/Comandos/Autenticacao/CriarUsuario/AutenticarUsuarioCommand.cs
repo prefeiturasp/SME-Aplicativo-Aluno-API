@@ -75,7 +75,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     Cpf = usuarioEol.Cpf,
                     Email = usuarioEol.Email,
                     Id = usuarioEol.Id,
-                    Nome = usuarioEol.Nome
+                    Nome = usuarioEol.Nome,
+                    Token = ""
                 };
                 return RespostaApi.Sucesso(usuario);
             }
