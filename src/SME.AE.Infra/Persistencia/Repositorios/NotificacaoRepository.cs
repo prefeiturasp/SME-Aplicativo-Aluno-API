@@ -42,7 +42,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<Notificacao> ObterPorId(long id)
         {
             IEnumerable<Notificacao> list = null;
-            
+
             try
             {
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
