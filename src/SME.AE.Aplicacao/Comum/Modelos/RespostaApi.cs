@@ -11,7 +11,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
             Ok = ok;
             Erros = erros.ToArray();
             Data = data;
-        }
+                   }
 
         internal RespostaApi(bool ok, IList<ValidationFailure> erros)
         {
