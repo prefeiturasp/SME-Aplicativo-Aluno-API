@@ -11,7 +11,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
     {
         public static async Task<RespostaApi> Executar(IMediator mediator, Comum.Modelos.Entrada.Usuario usuario)
         {
-            return await mediator.Send(new AutenticarUsuarioCommand(usuario.Cpf, usuario.DataNascimento));
+            return await mediator.Send(new AutenticarUsuarioCommand(usuario.Cpf, usuario.DataNascimento.ToString()));
         }
     }
 }
