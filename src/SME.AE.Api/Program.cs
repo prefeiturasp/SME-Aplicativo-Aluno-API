@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -22,12 +23,13 @@ namespace SME.AE.Api
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseStartup<Startup>()
-                        .UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
-                });
+            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder
+                    .UseKestrel()
+                    .UseUrls("http://0.0.0.0:5000;https://0.0.0.0:5001;")
+                    .UseStartup<Startup>()
+                    .UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
+            });
     }
 }

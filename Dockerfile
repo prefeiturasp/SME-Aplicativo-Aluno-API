@@ -12,8 +12,10 @@ ENV SentryDsn=$SentryDsn
 
 ADD . /src
 WORKDIR /src
-RUN dotnet publish -c Release && \  
-    cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.1/publish /app
+RUN dotnet restore && \  
+    dotnet publish -c Release && \  
+    cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.1/publish /app && \ 
+    rm -Rf /src
 
-EXPOSE 5001 5000
-ENTRYPOINT ["dotnet", "/app/SME.AE.Api.dll"]
+EXPOSE 5000-5001
+ENTRYPOINT ["/app/SME.AE.Api"]

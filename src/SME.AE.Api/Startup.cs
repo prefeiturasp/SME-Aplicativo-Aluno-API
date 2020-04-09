@@ -104,7 +104,7 @@ namespace SME.AE.Api
                     .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod())
-                .UseHttpsRedirection()
+                // .UseHttpsRedirection()
                 .UseAuthentication()
                 .UseRouting()
                 .UseAuthorization()
