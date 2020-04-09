@@ -3,6 +3,7 @@ using MediatR;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 {
@@ -15,7 +16,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             // 3. Verificar se a senha bate com a data de nascimento de um dos alunos
             // 4. Gerar token
             var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
-            string token = await mediator.Send(new CriarTokenCommand(cpf));
+            if (resposta.Ok)
+            {
+                var token = await mediator.Send(new CriarTokenCommand(cpf));
+                var data = ((RespostaAutenticar)resposta.Data);
+                data.Token = token;
+                resposta.Data = data;
+            }
+
             return resposta;
         }
     }
