@@ -12,8 +12,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AutenticacaoRepositorio : IAutenticacaoRepositorio
     {
-        //colocar situação
-        private readonly string whereReponsavelAluno = @"WHERE responsavel.cd_cpf_responsavel = @cpf AND responsavel.dt_fim IS NULL";
+        private readonly string whereReponsavelAluno = @"WHERE responsavel.cd_cpf_responsavel = @cpf AND responsavel.dt_fim IS NULL  AND responsavel.cd_cpf_responsavel IS NOT NULL";
         public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
         {
             using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);

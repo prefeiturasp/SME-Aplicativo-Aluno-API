@@ -15,10 +15,10 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
     public class AutenticarUsuarioCommand : IRequest<RespostaApi>
     {
-        public AutenticarUsuarioCommand(string cpf, DateTime dataNascimento)
+        public AutenticarUsuarioCommand(string cpf, string dataNascimento)
         {
             Cpf = cpf;
-            DataNascimento = dataNascimento;
+            DataNascimento = Convert.ToDateTime(dataNascimento);
         }
 
         public string Cpf { get; set; }
@@ -75,7 +75,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     Cpf = usuarioEol.Cpf,
                     Email = usuarioEol.Email,
                     Id = usuarioEol.Id,
-                    Nome = usuarioEol.Nome
+                    Nome = usuarioEol.Nome,
+                    Token = ""
                 };
                 return RespostaApi.Sucesso(usuario);
             }
