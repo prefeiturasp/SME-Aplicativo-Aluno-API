@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
         public AutenticarUsuarioCommand(string cpf, string dataNascimento)
         {
             Cpf = cpf;
-            DataNascimento = Convert.ToDateTime(dataNascimento);
+            DataNascimento = DateTime.ParseExact(dataNascimento, "ddMMyyyy", CultureInfo.InvariantCulture);
         }
 
         public string Cpf { get; set; }
@@ -55,7 +56,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 {
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
                     return RespostaApi.Falha(validacao.Errors);
-
                 }
 
                 var usuario = usuarioAlunos.FirstOrDefault(w => w.DataNascimento == request.DataNascimento);
