@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Aluno
 {
-    public class DadosAlunoComando : IRequest<IEnumerable<Dominio.Entidades.Aluno>>
+    public class DadosAlunoCommand : IRequest<IEnumerable<Dominio.Entidades.Aluno>>
     {
-        public DadosAlunoComando(string cpf)
+        public DadosAlunoCommand(string cpf)
         {
             Cpf = cpf;
 
@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
 
         public string Cpf { get; set; }
 
-        public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoComando,  IEnumerable<Dominio.Entidades.Aluno>>
+        public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoCommand,  IEnumerable<Dominio.Entidades.Aluno>>
         {
             private readonly IAlunoRepositorio _repository;
 
@@ -28,7 +28,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                 _repository = repository;
             }
             public async Task<IEnumerable<Dominio.Entidades.Aluno>> Handle
-             (DadosAlunoComando request, CancellationToken cancellationToken)
+             (DadosAlunoCommand request, CancellationToken cancellationToken)
             {
                 var resultado = await _repository.ObterDadosAlunos(request.Cpf);
                 return resultado;

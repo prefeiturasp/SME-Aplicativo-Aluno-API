@@ -11,12 +11,21 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-   public class AlunoRepositorio : IAlunoRepositorio
+    public class AlunoRepositorio : IAlunoRepositorio
     {
         public async Task<IEnumerable<Aluno>> ObterDadosAlunos(string cpf)
         {
-            using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-            return await conexao.QueryAsync<Aluno>(AlunoConsultas.ObterDadosAlunos);
+            try
+            {
+                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                IEnumerable<Aluno> listaAlunos = await conexao.QueryAsync<Aluno>(AlunoConsultas.ObterDadosAlunos);
+                return listaAlunos;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
     }
 }
