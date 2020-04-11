@@ -10,7 +10,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Aluno
 {
    public class DadosDoAlunoUseCase
     {
-        public static async Task<IEnumerable<Dominio.Entidades.Aluno>> Executar(IMediator mediator, string cpf)
+        public static async Task<RespostaApi> Executar(IMediator mediator, string cpf)
         {
             return await mediator.Send(new DadosAlunoCommand(cpf));
         }

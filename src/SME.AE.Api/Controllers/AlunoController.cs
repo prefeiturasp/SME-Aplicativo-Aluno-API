@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Api.Controllers
@@ -16,7 +17,7 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IEnumerable<Aluno>> ObterDadosAlunos([FromQuery] string cpf)
+        public async Task<RespostaApi> ObterDadosAlunos([FromQuery] string cpf)
         {
             // TODO Pegar o Token
             return await DadosDoAlunoUseCase.Executar(Mediator, cpf);
