@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation.Results;
+using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Aluno
 {
-    public class DadosAlunoCommand : IRequest<IEnumerable<Dominio.Entidades.Aluno>>
+    public class DadosAlunoCommand : IRequest<RespostaApi>
     {
         public DadosAlunoCommand(string cpf)
         {
@@ -19,7 +20,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
 
         public string Cpf { get; set; }
 
-        public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoCommand,  IEnumerable<Dominio.Entidades.Aluno>>
+        public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoCommand, RespostaApi>
         {
             private readonly IAlunoRepositorio _repository;
 
@@ -27,11 +28,18 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             {
                 _repository = repository;
             }
-            public async Task<IEnumerable<Dominio.Entidades.Aluno>> Handle
+            public async Task<RespostaApi> Handle
              (DadosAlunoCommand request, CancellationToken cancellationToken)
             {
+
+                var validator = new DadosAlunoUseCaseValidation();
+                ValidationResult validacao = validator.Validate(request);
+                if (!validacao.IsValid)
+                    return RespostaApi.Falha(validacao.Errors);
+
                 var resultado = await _repository.ObterDadosAlunos(request.Cpf);
-                return resultado;
+
+                return RespostaApi.Sucesso(resultado);
             }
 
         }

@@ -45,10 +45,6 @@ namespace SME.AE.Infra.Persistencia.Consultas
 		  and tesc.tp_escola in (1,2,3,4,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,29,30,31)
             inner join v_cadastro_unidade_educacao(nolock) dre
 			  on dre.cd_unidade_educacao = vue.cd_unidade_administrativa_referencia
-		   inner join turma_escola(nolock) te on te.cd_turma_escola = mte.cd_turma_escola
-			where  responsavel.dt_fim is null
-			    
-                and responsavel.cd_cpf_responsavel is not null
-				and responsavel.cd_cpf_responsavel in (  11675973890, 29272544866, 23909035841 );";
+		   inner join turma_escola(nolock) te on te.cd_turma_escola = mte.cd_turma_escola ";
 	}
 }
