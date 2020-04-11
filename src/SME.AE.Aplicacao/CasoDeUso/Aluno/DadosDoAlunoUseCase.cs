@@ -12,7 +12,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Aluno
     {
         public static async Task<IEnumerable<Dominio.Entidades.Aluno>> Executar(IMediator mediator, string cpf)
         {
-            return await mediator.Send(new DadosAlunoComando(cpf));
+            return await mediator.Send(new DadosAlunoCommand(cpf));
         }
     }
 }
