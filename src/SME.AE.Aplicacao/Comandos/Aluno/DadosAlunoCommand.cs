@@ -4,6 +4,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,12 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     return RespostaApi.Falha(validacao.Errors);
 
                 var resultado = await _repository.ObterDadosAlunos(request.Cpf);
+
+                if (resultado == null || !resultado.Any())
+                {
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
+                    return RespostaApi.Falha(validacao.Errors);
+                }
 
                 return RespostaApi.Sucesso(resultado);
             }
