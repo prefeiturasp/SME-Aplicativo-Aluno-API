@@ -6,17 +6,17 @@ namespace SME.AE.Infra.Persistencia.Consultas
 {
   public static  class AlunoConsultas
     {
-		internal static string ObterDadosAlunos = @"SELECT 
-			 aluno.cd_aluno CodigoEol,
+		internal static string ObterDadosAlunos = @"
+          SELECT 
+		    
+             aluno.cd_aluno CodigoEol,
 			 aluno.nm_aluno Nome,
 			 aluno.nm_social_aluno NomeSocial,
-			  concat(rtrim(ltrim(tesc.sg_tp_escola)), ' ',
-					ltrim(rtrim(vue.nm_unidade_educacao)))                                     Escola,
+			 rtrim(ltrim(tesc.sg_tp_escola)) DescricaoTipoEscola,
+		     ltrim(rtrim(vue.nm_unidade_educacao))     Escola,
 			 dre.nm_exibicao_unidade SiglaDre,
 			 te.dc_turma_escola Turma,
-			 tesc.tp_escola TipoEscola
-
-
+			 tesc.tp_escola CodigoTipoEscola
 
 			FROM v_aluno_cotic aluno
 			INNER JOIN responsavel_aluno responsavel
