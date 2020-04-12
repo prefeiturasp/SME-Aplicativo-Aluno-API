@@ -2,6 +2,7 @@
 using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,30 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
-                return RespostaApi.Sucesso(resultado);
+
+                var tipoEscola =
+                    resultado
+                    .GroupBy(g => new { g.CodigoTipoEscola, g.DescricaoTipoEscola })
+                    .Select(s => new ListaEscola
+                    {
+                        CodigoTipoEscola = s.Key.CodigoTipoEscola,
+                        DescricaoTipoEscola = s.Key.DescricaoTipoEscola,
+                        Alunos = resultado
+                                .Where(w => w.CodigoTipoEscola == s.Key.CodigoTipoEscola)
+                                .Select(a => new Dominio.Entidades.Aluno
+                                {
+                                    CodigoEol = a.CodigoEol,
+                                    Nome = a.Nome,
+                                    NomeSocial = a.NomeSocial,
+                                    CodigoTipoEscola = a.CodigoTipoEscola,
+                                    DescricaoTipoEscola = a.DescricaoTipoEscola,
+                                    Escola = a.Escola,
+                                    SiglaDre = a.SiglaDre,
+                                    Turma = a.Turma,
+                                })
+                    });
+
+                return RespostaApi.Sucesso(tipoEscola);
             }
 
         }
