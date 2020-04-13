@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
         "AEConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgrestrue;",
-        "EolConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;=10.49.16.60;Database=se1426;User Id=user_se1426_cotic;Password=3ol_c0tic@;Poolin;",
+        "EolConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;",
         "SgpConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "***REMOVED***"
