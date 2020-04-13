@@ -16,7 +16,7 @@ namespace SME.AE.Api.Controllers
     public class AlunoController : ApiController
     {
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<RespostaApi> ObterDadosAlunos([FromQuery] string cpf)
         {
             // TODO Pegar o Token
