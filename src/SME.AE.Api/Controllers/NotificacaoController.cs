@@ -34,12 +34,12 @@ namespace SME.AE.Api.Controllers
         {
             return await RemoverNotificacaoUseCase.Executar(Mediator, notificacao);
         }
-        
-        [HttpGet]
+
+        [HttpGet("{cpf}")]
         [Authorize]
-        public async Task<IEnumerable<Notificacao>> ObterPorGrupo([FromQuery] string grupo)
+        public async Task<IEnumerable<Notificacao>> ObterDoUsuarioLogado(string cpf)
         {
-            return await ObterNotificacaoPorGrupoUseCase.Executar(Mediator, grupo);
+            return await ObterDoUsuarioLogadoUseCase.Executar(Mediator, User.Identity.Name);
         }
     }
 }

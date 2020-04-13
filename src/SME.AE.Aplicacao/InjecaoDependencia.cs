@@ -72,10 +72,13 @@ namespace SME.AE.Aplicacao
         private static void AddCasosDeUso(IServiceCollection services)
         {
             services.AddScoped(provider => provider.GetService<AutenticarUsuarioUseCase>());
+            
+            // Notificacao
             services.AddScoped(provider => provider.GetService<CriarNotificacaoUseCase>());
             services.AddScoped(provider => provider.GetService<AtualizarNotificacaoUseCase>());
             services.AddScoped(provider => provider.GetService<ObterNotificacaoPorGrupoUseCase>());
             services.AddScoped(provider => provider.GetService<RemoverNotificacaoUseCase>());
+            services.AddScoped(provider => provider.GetService<ObterDoUsuarioLogadoUseCase>());
         }
 
         private static void AddComandos(IServiceCollection services)
