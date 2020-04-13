@@ -61,6 +61,11 @@ namespace SME.AE.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
+                    In = ParameterLocation.Header,
+                    Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.", 
+                    Name = "Authorization", Type = SecuritySchemeType.ApiKey
+                });
             });
         }
 
