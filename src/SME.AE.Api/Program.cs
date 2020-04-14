@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -26,7 +27,13 @@ namespace SME.AE.Api
             Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder
-                    .UseKestrel()
+                    .UseKestrel(c =>
+                    {
+                        c.ConfigureHttpsDefaults(opt =>
+                        {
+                            opt.SslProtocols = SslProtocols.Tls;
+                        });
+                    })
                     .UseUrls("http://0.0.0.0:5000;https://0.0.0.0:5001;")
                     .UseStartup<Startup>()
                     .UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
