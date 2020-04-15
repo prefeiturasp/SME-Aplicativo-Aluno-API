@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Npgsql;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
@@ -109,6 +110,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
 
