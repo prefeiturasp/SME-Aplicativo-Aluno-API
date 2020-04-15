@@ -95,6 +95,49 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "notificacao",
+					"item": [
+						{
+							"name": "CriarNotificacao",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "x-integration-key",
+										"value": "{{x-integration-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"mensagem\": \"Mensagem de teste\",\r\n  \"titulo\": \"Titulo\",\r\n  \"grupo\": \"Geral\",\r\n  \"dataEnvio\": \"2020-04-06T20:41:18.636Z\",\r\n  \"dataExpiracao\": \"2020-04-10T20:41:18.636Z\",\r\n  \"criadoEm\": \"2020-04-06T20:41:18.636Z\",\r\n  \"criadoPor\": \"corongavairus\"\r\n}"
+								},
+								"url": {
+									"raw": "https://localhost:5001/api/v1/notificacao",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "5001",
+									"path": [
+										"api",
+										"v1",
+										"notificacao"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -124,8 +167,14 @@
 	],
 	"variable": [
 		{
-			"id": "ca40d20a-523e-46cc-ab50-b977a341e8f8",
+			"id": "6f7630b0-3534-4428-b24f-3bcd0adc0997",
 			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "bc93499a-be53-463b-ab7d-f7edfe2e7195",
+			"key": "x-integration-key",
 			"value": "",
 			"type": "string"
 		}

@@ -101,8 +101,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     conn.Open();
                     notificacao.CriadoEm = DateTime.Now;
                     var resultado = await conn.ExecuteAsync(
-                        @"INSERT INTO notificacao(mensagem, titulo, grupo, dataEnvio, dataExpiracao, criadoEm, alteradoEm, alteradoPor) 
-                            VALUES(@Mensagem, @Titulo, @Grupo, @DataEnvio, @DataExpiracao, @CriadoEm, @AlteradoEm,  @AlteradoPor)", 
+                        @"INSERT INTO notificacao(mensagem, titulo, grupo, dataEnvio, dataExpiracao, criadoEm, criadoPor, alteradoEm, alteradoPor) 
+                            VALUES(@Mensagem, @Titulo, @Grupo, @DataEnvio, @DataExpiracao, @CriadoEm, @CriadoPor, @AlteradoEm,  @AlteradoPor)", 
                         notificacao);
                     notificacao.Id = resultado;
                     conn.Close();
