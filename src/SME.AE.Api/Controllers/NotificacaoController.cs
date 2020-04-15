@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Api.Controllers
@@ -30,10 +31,19 @@ namespace SME.AE.Api.Controllers
         [HttpDelete]
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
-        public async Task<bool> Remover([FromBody] SME.AE.Dominio.Entidades.Notificacao notificacao)
+        public async Task<RespostaApi> Remover([FromBody] long[] ids)
         {
-            return await RemoverNotificacaoUseCase.Executar(Mediator, notificacao);
+            return await RemoverNotificacaoEmLoteUseCase.Executar(Mediator, ids);
         }
+
+        [AllowAnonymous]
+        [ChaveIntegracaoFiltro]
+        [HttpDelete("{id}")]
+        public async Task<bool> RemoverPorID([FromBody] int id)
+        {
+            return await RemoveNotificacaoPorIdUseCase.Executar(Mediator, id);
+        }
+
 
         [HttpGet("{cpf}")]
         [Authorize]
