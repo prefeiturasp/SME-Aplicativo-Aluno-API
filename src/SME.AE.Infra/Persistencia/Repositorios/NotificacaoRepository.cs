@@ -35,7 +35,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                SentrySdk.CaptureException(ex);
                 return list;
             }
 
@@ -60,7 +60,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                SentrySdk.CaptureException(ex);
                 return null;
             }
 
@@ -85,7 +85,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                SentrySdk.CaptureException(ex);
                 return null;
             }
 
@@ -124,13 +124,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
-                    await conn.UpdateAsync(notificacao);
+                    await conn.ExecuteAsync(
+                        @"UPDATE notificacao set mensagem=@Mensagem, titulo=@Titulo, grupo=@Grupo, 
+                                    dataEnvio=@DataEnvio, dataExpiracao=@DataExpiracao, criadoEm=@CriadoEm, 
+                                    criadoPor=@CriadoPor, alteradoEm=@AlteradoEm, alteradoPor=@AlteradoPor 
+                               WHERE id=@Id", 
+                        notificacao);
                     conn.Close();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                SentrySdk.CaptureException(ex);
                 return null;
             }
 
@@ -154,7 +159,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                SentrySdk.CaptureException(ex);
                 return resultado;
             }
 
