@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
@@ -35,6 +36,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 
@@ -16,6 +17,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
         }

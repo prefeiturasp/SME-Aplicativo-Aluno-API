@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sentry;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.Comum.Config;
 
@@ -25,6 +26,7 @@ namespace SME.AE.Api.Controllers
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
             
