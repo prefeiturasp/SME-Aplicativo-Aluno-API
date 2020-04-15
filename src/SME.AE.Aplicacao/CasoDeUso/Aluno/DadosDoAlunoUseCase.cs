@@ -3,9 +3,12 @@ using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 using Sentry;
+using Xunit.Sdk;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Aluno
 {
@@ -15,7 +18,12 @@ namespace SME.AE.Aplicacao.CasoDeUso.Aluno
         {
             try
             {
-                return await mediator.Send(new DadosAlunoCommand(cpf));
+                RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpf));
+                
+                if(!resposta.Ok)
+                    throw new Exception(resposta.Erros.Join());
+                
+                return resposta;
             }
             catch (Exception ex)
             {
