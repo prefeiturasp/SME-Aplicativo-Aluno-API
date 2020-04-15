@@ -20,12 +20,12 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
         public AutenticarUsuarioCommand(string cpf, string dataNascimento)
         {
             Cpf = cpf;
+            dataNascimento = Regex.Replace(dataNascimento, @"\-\/", "");
             DataNascimento = DateTime.ParseExact(dataNascimento, "ddMMyyyy", CultureInfo.InvariantCulture);
         }
 
         public string Cpf { get; set; }
         public DateTime DataNascimento { get; set; }
-
 
         public class AutenticarUsuarioCommandHandler : IRequestHandler<AutenticarUsuarioCommand, RespostaApi>
         {
@@ -53,9 +53,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
-                if (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento))
+                if (usuarioAlunos.Count(a => a.DataNascimento == request.DataNascimento) == 0)
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "CPF não consta como responsável."));
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
