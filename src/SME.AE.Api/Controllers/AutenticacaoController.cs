@@ -19,8 +19,14 @@ namespace SME.AE.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha)
         {
-            // TODO Finalizar este metodo de autenticacao, iniciei apenas para facilitar
-            return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha));
+            try
+            {
+                return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(601, ex.Message);
+            }
         }
     }
 }

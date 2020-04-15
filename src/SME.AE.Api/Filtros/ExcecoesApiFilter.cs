@@ -57,7 +57,6 @@ namespace SME.AE.Api.Filtros
             };
 
             context.Result = new NotFoundObjectResult(details);
-
             context.ExceptionHandled = true;
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
@@ -9,7 +10,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
     {
         public static async Task<Dominio.Entidades.Notificacao> Executar(IMediator mediator, Dominio.Entidades.Notificacao notificacao)
         {
-            return await mediator.Send(new CriarNotificacaoCommand(notificacao));
+            try
+            {
+                return await mediator.Send(new CriarNotificacaoCommand(notificacao));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

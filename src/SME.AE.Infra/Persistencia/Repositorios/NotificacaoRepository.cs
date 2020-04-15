@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -28,6 +29,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {
                         Grupo = grupo
                     });
+                    conn.Close();
                 }
             }
             catch (Exception ex)
@@ -52,6 +54,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {
                         Id = id
                     });
+                    conn.Close();
                 }
             }
             catch (Exception ex)
@@ -62,6 +65,31 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             return list.FirstOrDefault();
         }
+        
+        public async Task<IEnumerable> ObterGruposDoResponsavel(string cpf)
+        {
+            IEnumerable list = null;
+
+            try
+            {
+                await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
+                {
+                    conn.Open();
+                    list = await conn.QueryAsync(NotificacaoConsultas.GruposDoResponsavel, new
+                    {
+                        cpf = cpf
+                    });
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return null;
+            }
+
+            return list;
+        }
 
         public async Task<Notificacao> Criar(Notificacao notificacao)
         {
@@ -71,14 +99,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 {
                     conn.Open();
                     notificacao.CriadoEm = DateTime.Now;
-                    var resultado = await conn.InsertAsync(notificacao);
+                    var resultado = await conn.ExecuteAsync(
+                        @"INSERT INTO notificacao(mensagem, titulo, grupo, dataEnvio, dataExpiracao, criadoEm, alteradoEm, alteradoPor) 
+                            VALUES(@Mensagem, @Titulo, @Grupo, @DataEnvio, @DataExpiracao, @CriadoEm, @AlteradoEm,  @AlteradoPor)", 
+                        notificacao);
                     notificacao.Id = resultado;
+                    conn.Close();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return null;
+                throw ex;
             }
 
             return notificacao;
@@ -91,7 +122,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
-                    var resultado = await conn.UpdateAsync(notificacao);
+                    await conn.UpdateAsync(notificacao);
+                    conn.Close();
                 }
             }
             catch (Exception ex)
@@ -113,6 +145,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 {
                     conn.Open();
                     resultado = await conn.DeleteAsync(notificacao);
+                    conn.Close();
                 }
             }
             catch (Exception ex)
