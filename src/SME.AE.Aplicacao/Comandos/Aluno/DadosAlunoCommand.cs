@@ -33,9 +33,9 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             public async Task<RespostaApi> Handle
              (DadosAlunoCommand request, CancellationToken cancellationToken)
             {
-
                 var validator = new DadosAlunoUseCaseValidation();
                 ValidationResult validacao = validator.Validate(request);
+                
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
@@ -46,8 +46,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
                     return RespostaApi.Falha(validacao.Errors);
                 }
-
-
+                
                 var tipoEscola =
                     resultado
                     .GroupBy(g => new { g.CodigoTipoEscola, g.DescricaoTipoEscola })

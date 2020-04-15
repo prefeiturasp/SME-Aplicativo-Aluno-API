@@ -1,10 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SME.AE.Dominio.Entidades
 {
-   [Table("notificacao")]
-    public  class Notificacao 
+    public class Notificacao
     {
         public long Id { get; set; }
         public string Mensagem { get; set; }

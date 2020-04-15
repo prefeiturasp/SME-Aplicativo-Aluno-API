@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
@@ -27,8 +29,16 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
         public async Task<Dominio.Entidades.Notificacao> Handle
             (CriarNotificacaoCommand request, CancellationToken cancellationToken)
         {
-            var resultado = await _repository.Criar(request.Notificacao);
-            return resultado;
+            try
+            {
+                var resultado = await _repository.Criar(request.Notificacao);
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }
