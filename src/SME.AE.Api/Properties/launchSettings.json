@@ -1,27 +1,35 @@
 {
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:53099",
+      "sslPort": 44306
+    }
+  },
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "SME.AE.Api": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
-        "AEConnection": "***REMOVED***",
-        "EolConnection": "***REMOVED***",
+        "AEConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgrestrue;",
+        "EolConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;",
         "SgpConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "***REMOVED***"
       },
-      "applicationUrl": "http://localhost:5000;https://localhost:5001;"
+      "applicationUrl": "https://0.0.0.0:5001;http://0.0.0.0:5000"
     },
     "Docker": {
       "commandName": "Docker",
-      "launchBrowser": false,
+      "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": false
     }
   }
 }
