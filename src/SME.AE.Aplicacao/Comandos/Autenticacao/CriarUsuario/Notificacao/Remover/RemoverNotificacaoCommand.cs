@@ -36,7 +36,6 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
           
             for (int i = 0;  i < request.Ids.Length; i++)
             {
-               // long id = long.Parse(request.Ids[i].);
                 var notificacao =  await _repository.ObterPorId(request.Ids[i]);
                 if (notificacao == null)
                 {
