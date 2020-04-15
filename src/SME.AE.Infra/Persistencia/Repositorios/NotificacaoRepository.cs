@@ -146,7 +146,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
-                    resultado = await conn.DeleteAsync(notificacao);
+
+                    var retorno = await conn.ExecuteAsync(
+                        @"DELETE FROM notificacao where id = @ID", notificacao);
                     conn.Close();
                 }
             }
