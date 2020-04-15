@@ -27,6 +27,7 @@ using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Infra;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace SME.AE.Api
 {

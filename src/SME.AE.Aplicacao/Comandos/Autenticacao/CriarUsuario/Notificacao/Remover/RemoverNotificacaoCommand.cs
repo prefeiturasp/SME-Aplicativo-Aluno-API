@@ -9,7 +9,7 @@ using SME.AE.Aplicacao.Comum.Modelos;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
 {
-    public class RemoverNotificacaoCommand : IRequest<string>
+    public class RemoverNotificacaoCommand : IRequest<string[]>
     {
         public long[] Ids { get; set; }
 
@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
         }
     }
 
-    public class RemoverNotificacaoCommandHandler : IRequestHandler<RemoverNotificacaoCommand, string>
+    public class RemoverNotificacaoCommandHandler : IRequestHandler<RemoverNotificacaoCommand, string[]>
     {
         private readonly INotificacaoRepository _repository;
         
@@ -29,15 +29,17 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
         }
 
 
-        public async Task<string> Handle(RemoverNotificacaoCommand request, CancellationToken cancellationToken)
+        public async Task<string[]> Handle(RemoverNotificacaoCommand request, CancellationToken cancellationToken)
         {
             var erros = new StringBuilder();
-            foreach (long id in request.Ids)
+            string[] errosArray = new string[request.Ids.Length];
+          
+            for (int i = 0;  i < request.Ids.Length; i++)
             {
-                var notificacao =  await _repository.ObterPorId(id);
+                var notificacao =  await _repository.ObterPorId(request.Ids[i]);
                 if (notificacao == null)
                 {
-                    erros.Append($"<li>{id} - comunicado não encontrado</li>");
+                    errosArray.SetValue($"{request.Ids[i]} - Notificação não encontrada", i);
                 }
                     
                 else
@@ -48,11 +50,11 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
                     }
                     catch
                     {
-                        erros.Append($"<li>{id} - {notificacao.Titulo}</li>");
+                        erros.Append($"<li>{request.Ids[i]} - {notificacao.Titulo}</li>");
                     }
                 }
             }
-            return erros.ToString();
+            return errosArray;
         }
     }
 }
