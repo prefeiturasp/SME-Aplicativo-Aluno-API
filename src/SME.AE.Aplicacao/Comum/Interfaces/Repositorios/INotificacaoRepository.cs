@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SME.AE.Dominio.Entidades;
 
@@ -15,5 +16,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         public Task<Notificacao> Atualizar(Notificacao notificacao);
         
         public Task<bool> Remover(Notificacao notificacao);
+
+        public Task<IEnumerable> ObterGruposDoResponsavel(string cpf);
     }
 }

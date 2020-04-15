@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore.Internal;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -11,18 +13,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
     {
         public static async Task<RespostaApi> Executar(IMediator mediator, string cpf, string senha)
         {
-            // 1. Verificar se o usuario existe na base do EOL (responsavel legal)
-            // 2. Obter os alunos relacionados ao responsavel legal
-            // 3. Verificar se a senha bate com a data de nascimento de um dos alunos
-            // 4. Gerar token
             var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
-            if (resposta.Ok)
-            {
-                var token = await mediator.Send(new CriarTokenCommand(cpf));
-                var data = ((RespostaAutenticar)resposta.Data);
-                data.Token = token;
-                resposta.Data = data;
-            }
+
+            if (!resposta.Ok)
+                throw new Exception(resposta.Erros.Join());
+            
+            var token = await mediator.Send(new CriarTokenCommand(cpf));
+            var data = ((RespostaAutenticar)resposta.Data);
+            data.Token = token;
+            resposta.Data = data;
 
             return resposta;
         }

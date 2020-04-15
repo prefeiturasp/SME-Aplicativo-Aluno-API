@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Api.Controllers
@@ -10,7 +11,7 @@ namespace SME.AE.Api.Controllers
     public class HealthController : ApiController
     {
         [HttpGet]
-        [AllowAnonymous]
+        [ChaveIntegracaoFiltro]
         public async Task<Object> check()
         {
             bool isEolConnOk = false;

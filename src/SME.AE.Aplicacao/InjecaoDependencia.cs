@@ -11,6 +11,7 @@ using SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
+using SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel;
 using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
@@ -104,6 +105,8 @@ namespace SME.AE.Aplicacao
             services.AddMediatR(typeof(ObterNotificacaoPorGrupoCommandHandler).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(RemoverNotificacaoCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(RemoverNotificacaoCommandHandler).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterGrupoNotificacaoPorResponsavelCommand).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(ObterGrupoNotificacaoPorResponsavelCommandHandler).GetTypeInfo().Assembly);
         }
     }
 }

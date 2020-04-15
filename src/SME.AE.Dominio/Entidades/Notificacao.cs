@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace SME.AE.Dominio.Entidades
 {
     public class Notificacao
     {
+        [Key]
         public long Id { get; set; }
         public string Mensagem { get; set; }
         public string Titulo { get; set; }
