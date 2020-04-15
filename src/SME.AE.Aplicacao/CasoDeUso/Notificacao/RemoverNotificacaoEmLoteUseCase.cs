@@ -13,15 +13,11 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
         {
             RespostaApi resposta = new RespostaApi();
             resposta.Ok = true;
-            var erros = await mediator.Send(new RemoverNotificacaoCommand(id));
-            erros.Trim();
-            if (erros.Length > 1)
+            resposta.Erros = await mediator.Send(new RemoverNotificacaoCommand(id));
+            if(resposta.Erros[0] != null)
             {
                 resposta.Ok = false;
-                resposta.Erros.SetValue(erros, 1);
-                return resposta;
             }
-
             return resposta;
         }
     }
