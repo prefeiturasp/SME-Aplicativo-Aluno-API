@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Api.Controllers
@@ -47,11 +48,11 @@ namespace SME.AE.Api.Controllers
         [HttpDelete]
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
-        public async Task<ObjectResult> Remover([FromBody] SME.AE.Dominio.Entidades.Notificacao notificacao)
+        public async Task<ActionResult> Remover([FromBody] long[] ids)
         {
             try
             {
-                return Ok(await RemoverNotificacaoUseCase.Executar(Mediator, notificacao));
+                return Ok(await RemoverNotificacaoEmLoteUseCase.Executar(Mediator, ids));
             }
             catch (Exception ex)
             {
@@ -60,7 +61,23 @@ namespace SME.AE.Api.Controllers
             }
         }
 
-        [HttpGet]
+        [AllowAnonymous]
+        [ChaveIntegracaoFiltro]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> RemoverPorID([FromBody] int id)
+        {
+            try
+            {
+                return Ok(await RemoveNotificacaoPorIdUseCase.Executar(Mediator, id));
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return StatusCode(601, ex.Message);
+            }
+        }
+        
+        [HttpGet("{cpf}")]
         [Authorize]
         public async Task<ObjectResult> ObterDoUsuarioLogado()
         {

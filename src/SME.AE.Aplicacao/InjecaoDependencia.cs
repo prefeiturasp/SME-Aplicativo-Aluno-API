@@ -78,7 +78,7 @@ namespace SME.AE.Aplicacao
             services.AddScoped(provider => provider.GetService<CriarNotificacaoUseCase>());
             services.AddScoped(provider => provider.GetService<AtualizarNotificacaoUseCase>());
             services.AddScoped(provider => provider.GetService<ObterNotificacaoPorGrupoUseCase>());
-            services.AddScoped(provider => provider.GetService<RemoverNotificacaoUseCase>());
+            services.AddScoped(provider => provider.GetService<RemoverNotificacaoEmLoteUseCase>());
             services.AddScoped(provider => provider.GetService<ObterDoUsuarioLogadoUseCase>());
         }
 
