@@ -27,6 +27,7 @@ using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Infra;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace SME.AE.Api
 {
@@ -41,6 +42,21 @@ namespace SME.AE.Api
         
         public void ConfigureServices(IServiceCollection services)
         {
+           
+                // If using Kestrel:
+                //services.Configure<KestrelServerOptions>(options =>
+                //{
+                //    options.AllowSynchronousIO = true;
+                //});
+
+                //// If using IIS:
+                //services.Configure<IISServerOptions>(options =>
+                //{
+                //    options.AllowSynchronousIO = true;
+                //});
+            
+
+
             AddAuthentication(services);
             services.AddResponseCompression(options =>
             {
