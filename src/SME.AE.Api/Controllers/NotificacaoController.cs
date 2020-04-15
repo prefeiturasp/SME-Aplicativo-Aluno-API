@@ -77,7 +77,7 @@ namespace SME.AE.Api.Controllers
             }
         }
         
-        [HttpGet("{cpf}")]
+        [HttpGet]
         [Authorize]
         public async Task<ObjectResult> ObterDoUsuarioLogado()
         {
