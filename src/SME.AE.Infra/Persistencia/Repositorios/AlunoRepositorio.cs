@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
@@ -24,6 +25,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
 

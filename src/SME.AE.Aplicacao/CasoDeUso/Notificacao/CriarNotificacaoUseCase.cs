@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 
@@ -9,7 +11,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
     {
         public static async Task<Dominio.Entidades.Notificacao> Executar(IMediator mediator, Dominio.Entidades.Notificacao notificacao)
         {
-            return await mediator.Send(new CriarNotificacaoCommand(notificacao));
+            try
+            {
+                return await mediator.Send(new CriarNotificacaoCommand(notificacao));
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }

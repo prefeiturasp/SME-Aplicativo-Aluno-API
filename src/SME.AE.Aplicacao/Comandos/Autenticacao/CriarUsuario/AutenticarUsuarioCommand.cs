@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;

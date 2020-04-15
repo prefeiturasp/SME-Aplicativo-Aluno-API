@@ -17,10 +17,16 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<RespostaApi> ObterDadosAlunos([FromQuery] string cpf)
+        public async Task<ActionResult> ObterDadosAlunos([FromQuery] string cpf)
         {
-            // TODO Pegar o Token
-            return await DadosDoAlunoUseCase.Executar(Mediator, cpf);
+            try
+            {
+                return Ok(await DadosDoAlunoUseCase.Executar(Mediator, cpf));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(601, ex.Message);
+            }
         }
     }
 }

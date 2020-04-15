@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Aluno
 {
@@ -12,7 +13,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Aluno
     {
         public static async Task<RespostaApi> Executar(IMediator mediator, string cpf)
         {
-            return await mediator.Send(new DadosAlunoCommand(cpf));
+            try
+            {
+                return await mediator.Send(new DadosAlunoCommand(cpf));
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }
