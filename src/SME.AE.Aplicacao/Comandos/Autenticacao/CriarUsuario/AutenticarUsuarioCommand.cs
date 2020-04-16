@@ -55,7 +55,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 if (usuarioAlunos.Count(a => a.DataNascimento == request.DataNascimento) == 0)
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "CPF não consta como responsável."));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida"));
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
