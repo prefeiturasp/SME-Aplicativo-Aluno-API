@@ -25,7 +25,7 @@ namespace SME.AE.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(601, ex.Message);
+                return StatusCode(400, ex.Message);
             }
         }
     }

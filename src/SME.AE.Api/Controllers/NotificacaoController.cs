@@ -25,7 +25,7 @@ namespace SME.AE.Api.Controllers
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return StatusCode(601, ex.Message);
+                return StatusCode(400, ex.Message);
             }
         }
         
@@ -41,7 +41,7 @@ namespace SME.AE.Api.Controllers
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return StatusCode(601, ex.Message);
+                return StatusCode(400, ex.Message);
             }
         }
         
@@ -57,7 +57,7 @@ namespace SME.AE.Api.Controllers
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return StatusCode(601, ex.Message);
+                return StatusCode(400, ex.Message);
             }
         }
 
@@ -73,7 +73,7 @@ namespace SME.AE.Api.Controllers
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return StatusCode(601, ex.Message);
+                return StatusCode(400, ex.Message);
             }
         }
         
@@ -88,7 +88,7 @@ namespace SME.AE.Api.Controllers
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return StatusCode(601, ex.Message);
+                return StatusCode(400, ex.Message);
             }
         }
     }
