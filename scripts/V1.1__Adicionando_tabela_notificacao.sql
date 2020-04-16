@@ -1,5 +1,5 @@
 CREATE TABLE public.Notificacao(
-   Id bigint not null generated always as identity,
+   Id bigint not null,
    Titulo varchar(50) not null,
    Mensagem varchar(2048),
    Grupo varchar(128),
