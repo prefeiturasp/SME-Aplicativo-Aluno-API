@@ -29,7 +29,7 @@ namespace SME.AE.Api.Controllers
             }
         }
         
-        [HttpPut]
+        [HttpPut("{id}")]
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
         public async Task<ObjectResult> Atualizar([FromBody] SME.AE.Dominio.Entidades.Notificacao notificacao)
