@@ -6,5 +6,11 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     public interface IUsuarioRepository
     {
         Task<Usuario> ObterPorCpf(string cpf);
+        Task Criar(Usuario usuario);
+        Task AtualizaUltimoLoginUsuario(string cpf);
+        Task ExcluirUsuario(string cpf);
+
+
+
     }
 }
