@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
@@ -31,17 +32,21 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
         {
             private readonly IAplicacaoContext _context;
             private readonly IAutenticacaoService _autenticacaoService;
+            private readonly IUsuarioRepository _repository;
 
-            public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService)
+            public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository)
             {
                 _context = context;
                 _autenticacaoService = autenticacaoService;
+
+                _repository = repository;
             }
 
             public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
             {
                 var validator = new AutenticarUsuarioUseCaseValidatior();
                 ValidationResult validacao = validator.Validate(request);
+                var usuarioRetorno = _repository.ObterPorCpf(request.Cpf).Result;
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
@@ -50,12 +55,14 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 if (usuarioAlunos == null || !usuarioAlunos.Any())
                 {
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
+                    ExcluiUsuarioSeExistir(request, usuarioRetorno);
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
                 if (usuarioAlunos.Count(a => a.DataNascimento == request.DataNascimento) == 0)
                 {
                     validacao.Errors.Add(new ValidationFailure("Usuário", "CPF não consta como responsável."));
+                    ExcluiUsuarioSeExistir(request, usuarioRetorno);
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
@@ -66,7 +73,41 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
+                CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
+
                 return MapearResposta(usuario);
+            }
+
+            private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
+            {
+                if (usuarioRetorno != null)
+                {
+                    _repository.AtualizaUltimoLoginUsuario(request.Cpf);
+                }
+
+                else
+                {
+                   _repository.Criar(MapearDominioUsuario(usuario));
+                }
+            }
+
+            private void ExcluiUsuarioSeExistir(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno)
+            {
+                if (usuarioRetorno != null)
+                    _repository.ExcluirUsuario(request.Cpf);
+            }
+
+            private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol)
+            {
+                var usuario = new Dominio.Entidades.Usuario();
+                usuario.Cpf = usuarioEol.Cpf;
+                usuario.Nome = usuarioEol.Nome;
+                usuario.Email = usuarioEol.Email;
+                usuario.Excluido = false;
+                usuario.UltimoLogin = DateTime.Now;
+
+                return usuario;
+
             }
 
             private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol)
