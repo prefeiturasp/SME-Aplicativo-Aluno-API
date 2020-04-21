@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -61,11 +62,13 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                                     CodigoEol = a.CodigoEol,
                                     Nome = a.Nome,
                                     NomeSocial = a.NomeSocial,
+                                    DataNascimento = a.DataNascimento.Date,
                                     CodigoTipoEscola = a.CodigoTipoEscola,
                                     DescricaoTipoEscola = a.DescricaoTipoEscola,
                                     Escola = a.Escola,
                                     SiglaDre = a.SiglaDre,
                                     Turma = a.Turma,
+                                    SituacaoMatricula = a.SituacaoMatricula
                                 })
                     });
 
