@@ -35,8 +35,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                // TODO adicionar sentry
+                SentrySdk.CaptureException(ex);
                 return null;
             }
 
@@ -50,10 +49,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
-                    usuario.CriadoEm = DateTime.Now;
                     await conn.ExecuteAsync(
                         @"INSERT INTO usuario( cpf, nome, email, ultimoLogin, criadoEm, excluido) 
-                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin, @CriadoEm, @Excluido)",
+                            VALUES(@Cpf, @Nome, @Email, now(), now(), @Excluido)",
                         usuario);
                     conn.Close();
                 }
@@ -73,9 +71,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
-                    var dataUltimoLogin = DateTime.Now;
                     await conn.ExecuteAsync(
-                        "update usuario set ultimologin = @dataUltimoLogin  where cpf = @cpf", new { cpf, dataUltimoLogin });
+                        "update usuario set ultimologin = now()  where cpf = @cpf", new { cpf, });
                     conn.Close();
                 }
             }
@@ -90,13 +87,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task ExcluirUsuario(string cpf)
         {
-            try 
+            try
             {
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
                     await conn.ExecuteAsync(
-                        "update usuario set excluido = true  where cpf = @cpf", new { cpf });
+                        "update usuario set excluido = true , ultimoLogin = now()  where cpf = @cpf", new { cpf });
                     conn.Close();
                 }
             }
