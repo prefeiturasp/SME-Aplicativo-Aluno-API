@@ -68,7 +68,8 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                                     Escola = a.Escola,
                                     SiglaDre = a.SiglaDre,
                                     Turma = a.Turma,
-                                    SituacaoMatricula = a.SituacaoMatricula
+                                    SituacaoMatricula = a.SituacaoMatricula,
+                                    DataSituacaoMatricula = a.DataSituacaoMatricula
                                 })
                     });
 
