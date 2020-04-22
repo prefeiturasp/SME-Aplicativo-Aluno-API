@@ -26,7 +26,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
-                    list = await conn.QueryAsync<Notificacao>(NotificacaoConsultas.Select + "WHERE Grupo = @Grupo", new
+                    list = await conn.QueryAsync<Notificacao>(
+                        NotificacaoConsultas.Select 
+                        + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')", new
                     {
                         Grupo = grupo
                     });
@@ -67,19 +69,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return list.FirstOrDefault();
         }
         
-        public async Task<IEnumerable> ObterGruposDoResponsavel(string cpf)
+        // TODO Refatorar para montar a query aqui ao inves de receber por parametro
+        public async Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos)
         {
-            IEnumerable list = null;
+            IDictionary<string,object> list = null;
 
             try
             {
                 await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
                 {
                     conn.Open();
-                    list = await conn.QueryAsync(NotificacaoConsultas.GruposDoResponsavel, new
-                    {
-                        cpf = cpf
-                    });
+                    var query = "select top 1 " + grupos + NotificacaoConsultas.GruposDoResponsavel;
+                    var resultado = await conn.QueryAsync(query, new { cpf = cpf });
+
+                    if (resultado.Any())
+                        list = resultado.First() as IDictionary<string, object>;
+                    
                     conn.Close();
                 }
             }
