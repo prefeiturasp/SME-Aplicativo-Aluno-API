@@ -16,8 +16,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
-        "AEConnection": "***REMOVED***MinPoolSize=1;MaxPoolSize=20;",
-        "EolConnection": "***REMOVED***Encrypt=False;TrustServerCertificate=True;",
+        "AEConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgrestrue;",
+        "EolConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;",
         "SgpConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "***REMOVED***"
