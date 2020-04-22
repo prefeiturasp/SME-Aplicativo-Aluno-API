@@ -8,7 +8,7 @@ namespace SME.AE.Infra.Persistencia.Consultas
     {
 		internal static string ObterDadosAlunos = @"
           SELECT 
-		              aluno.cd_aluno CodigoEol,
+		     aluno.cd_aluno CodigoEol,
 			 aluno.nm_aluno Nome,
 			 aluno.nm_social_aluno NomeSocial,
 			 aluno.dt_nascimento_aluno DataNascimento,
@@ -17,7 +17,9 @@ namespace SME.AE.Infra.Persistencia.Consultas
 			 dre.nm_exibicao_unidade SiglaDre,
 			 te.dc_turma_escola Turma,
 			 tesc.tp_escola CodigoTipoEscola,
-			 mte.cd_situacao_aluno SituacaoMatricula
+			 mte.SituacaoMatricula SituacaoMatricula,
+			 mte.dt_situacao_aluno DataSituacaoMatricula
+
 
 			FROM v_aluno_cotic aluno
 			INNER JOIN responsavel_aluno responsavel
@@ -35,7 +37,15 @@ namespace SME.AE.Infra.Persistencia.Consultas
 			   inner join(
 						   select cd_matricula,
 								  cd_turma_escola,
-								  cd_situacao_aluno
+								  cd_situacao_aluno,
+								  dt_situacao_aluno,
+								    CASE
+                                     WHEN cd_situacao_aluno = 1 THEN 'Ativo'
+									 WHEN cd_situacao_aluno = 6 THEN 'Pendente de Rematrícula'
+                                     WHEN cd_situacao_aluno = 10 THEN 'Rematriculado'
+                                     WHEN cd_situacao_aluno = 13 THEN 'Sem continuidade'
+					 				 ELSE 'Fora do domínio liberado pela PRODAM'
+                                     END SituacaoMatricula
 								  from matricula_turma_escola (nolock)
 
 		  ) mte on mte.cd_matricula = matricula.cd_matricula

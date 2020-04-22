@@ -10,7 +10,7 @@ namespace SME.AE.Infra.Persistencia.Consultas
            SELECT 
                 responsavel.cd_identificador_responsavel AS Id,
                 RTRIM(LTRIM(responsavel.nm_responsavel)) AS Nome,
-                RTRIM(LTRIM(responsavel.cd_cpf_responsavel)) AS Cpf,
+                responsavel.cd_cpf_responsavel AS Cpf,
                 RTRIM(LTRIM(responsavel.email_responsavel)) AS Email,
                 aluno.dt_nascimento_aluno AS DataNascimento,
                 aluno.cd_tipo_sigilo as TipoSigilo,
