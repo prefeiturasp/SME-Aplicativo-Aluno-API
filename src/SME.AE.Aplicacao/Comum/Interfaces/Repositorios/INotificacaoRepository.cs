@@ -17,6 +17,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         
         public Task<bool> Remover(Notificacao notificacao);
 
-        public Task<IEnumerable> ObterGruposDoResponsavel(string cpf);
+        public Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos);
     }
 }
