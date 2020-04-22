@@ -80,6 +80,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
             private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
             {
+                usuario.Cpf = request.Cpf;
+
                 if (usuarioRetorno != null)
                 {
                     _repository.AtualizaUltimoLoginUsuario(request.Cpf);
