@@ -1,3 +1,4 @@
+﻿
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -15,11 +16,12 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Teste.Infra.Persistencia.Repositorios;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
 using SME.AE.Infra.Persistencia.Repositorios;
 
-namespace SME.AE.Infra
+namespace SME.AE.Aplicacao.Teste.Infra
 {
     public static class InjecaoDependencia
     {
@@ -35,10 +37,10 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
             services.AddTransient(typeof(INotificacaoRepository), typeof(NotificacaoRepository));
             services.AddTransient(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
-            services.AddTransient(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepository));
+            services.AddTransient(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepositoryMock));
             
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
-
+            
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.AddTransient<IAutenticacaoService, AutenticacaoService>();
 
