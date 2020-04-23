@@ -11,7 +11,7 @@ namespace SME.AE.Dominio.Entidades
         public string Titulo { get; set; }
         public string Grupo { get; set; }
         public DateTime DataEnvio { get; set; }
-        public DateTime DataExpiracao { get; set; }
+        public DateTime? DataExpiracao { get; set; }
         public DateTime? CriadoEm { get; set; }
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
