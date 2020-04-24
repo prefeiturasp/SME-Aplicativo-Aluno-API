@@ -72,7 +72,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 {
                     conn.Open();
                     await conn.ExecuteAsync(
-                        "update usuario set ultimologin = now()  where cpf = @cpf", new { cpf, });
+                        "update usuario set ultimologin = now(), excluido = false  where cpf = @cpf", new { cpf, });
                     conn.Close();
                 }
             }
