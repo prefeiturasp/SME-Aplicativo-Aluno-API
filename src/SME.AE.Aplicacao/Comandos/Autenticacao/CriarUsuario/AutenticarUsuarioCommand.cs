@@ -62,6 +62,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 if (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento))
                 {
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
+                    ExcluiUsuarioSeExistir(request, usuarioRetorno);
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
