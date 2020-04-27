@@ -9,21 +9,22 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AlunoRepositorio : IAlunoRepositorio
     {
-        private readonly string whereReponsavelAluno = @"WHERE responsavel.cd_cpf_responsavel = @cpf 
+        private readonly string whereReponsavelAluno = @" WHERE responsavel.cd_cpf_responsavel = @cpf 
                                                            AND responsavel.dt_fim IS NULL  
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
                                                            AND aluno.cd_tipo_sigilo is null";
-        public async Task<IEnumerable<Aluno>> ObterDadosAlunos(string cpf)
+        public async Task<IEnumerable<AlunoRespostaEol>> ObterDadosAlunos(string cpf)
         {
             try
             {
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-                IEnumerable<Aluno> listaAlunos = await conexao.QueryAsync<Aluno>($"{AlunoConsultas.ObterDadosAlunos}{whereReponsavelAluno}", new { cpf });
+                IEnumerable<AlunoRespostaEol> listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos}{whereReponsavelAluno}", new { cpf });
                 return listaAlunos;
             }
             catch (Exception ex)

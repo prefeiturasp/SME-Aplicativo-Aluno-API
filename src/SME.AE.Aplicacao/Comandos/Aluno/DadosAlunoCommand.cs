@@ -50,14 +50,13 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                 
                 var tipoEscola =
                     resultado
-                    .GroupBy(g => new { g.CodigoTipoEscola, g.DescricaoTipoEscola })
+                    .GroupBy(g => g.Grupo )
                     .Select(s => new ListaEscola
                     {
-                        CodigoTipoEscola = s.Key.CodigoTipoEscola,
-                        DescricaoTipoEscola = s.Key.DescricaoTipoEscola,
+                        Grupo = s.Key,
                         Alunos = resultado
-                                .Where(w => w.CodigoTipoEscola == s.Key.CodigoTipoEscola)
-                                .Select(a => new Dominio.Entidades.Aluno
+                                .Where(w => w.Grupo == s.Key)
+                                .Select(a => new SME.AE.Dominio.Entidades.Aluno
                                 {
                                     CodigoEol = a.CodigoEol,
                                     Nome = a.Nome,
