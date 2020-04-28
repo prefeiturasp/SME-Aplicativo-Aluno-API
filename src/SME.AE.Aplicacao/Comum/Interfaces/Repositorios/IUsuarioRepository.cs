@@ -9,8 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task Criar(Usuario usuario);
         Task AtualizaUltimoLoginUsuario(string cpf);
         Task ExcluirUsuario(string cpf);
-
-
-
+        Task CriaUsuarioDispositivo(int usuarioId, string dispositivoId);
+        Task RemoveUsuarioDispositivo(long idUsuario, string idDispositivo);
     }
 }
