@@ -8,7 +8,6 @@ using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
-using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia.Consultas;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -81,10 +80,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
-
-
 
         public async Task ExcluirUsuario(string cpf)
         {
@@ -106,7 +102,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
 
-        public async Task CriaUsuarioDispositivo(int usuarioId, string dispositivoId)
+        public async Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId)
         {
             try
             {
@@ -116,7 +112,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     await conn.ExecuteAsync(
                         @"INSERT INTO public.usuario_dispositivo
                           (usuario_id, codigo_dispositivo, criadoem)
-                           VALUES(@idUsuario, @idDispositivo , now()); ", new { usuarioId, dispositivoId });
+                           VALUES(@usuarioId, @dispositivoId , now()); ", new { usuarioId, dispositivoId });
                     conn.Close();
                 }
             }
@@ -126,7 +122,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task RemoveUsuarioDispositivo(long idUsuario, string idDispositivo)
+        public async Task<bool> RemoveUsuarioDispositivo(long usuarioId, string dispositivoId)
         {
             try
             {
@@ -135,13 +131,44 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     conn.Open();
                     await conn.ExecuteAsync(
                         @"DELETE FROM public.usuario_dispositivo
-                            WHERE usuario_id = @idUsuario  AND codigo_dispositivo = @idDispositivo ;", new { idUsuario, idDispositivo });
+                            WHERE usuario_id = @usuarioId  AND codigo_dispositivo = @dispositivoId ;", new { usuarioId, dispositivoId });
                     conn.Close();
+                   
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> ExisteUsuarioDispositivo(long usuarioId, string dispositivoId)
+        {
+        
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    string query =
+                         @"SELECT usuario_id 
+                            FROM public.usuario_dispositivo
+                           WHERE usuario_id = @usuarioId
+                             AND codigo_dispositivo =  @dispositivoId";
+                  var retorno  =  await conn.QueryAsync(query, new { usuarioId , dispositivoId });
+                    if (retorno.Count() == 0)
+                        return false;
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
             }
         }
     }
