@@ -35,7 +35,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
             private readonly IUsuarioRepository _repository;
 
             public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository)
-            {
+            { 
                 _context = context;
                 _autenticacaoService = autenticacaoService;
 

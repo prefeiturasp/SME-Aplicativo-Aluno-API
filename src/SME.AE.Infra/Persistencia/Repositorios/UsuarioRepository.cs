@@ -85,6 +85,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
 
+
         public async Task ExcluirUsuario(string cpf)
         {
             try
@@ -101,6 +102,46 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 SentrySdk.CaptureException(ex);
                 throw ex;
+            }
+        }
+
+
+        public async Task CriaUsuarioDispositivo(int usuarioId, string dispositivoId)
+        {
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO public.usuario_dispositivo
+                          (usuario_id, codigo_dispositivo, criadoem)
+                           VALUES(@idUsuario, @idDispositivo , now()); ", new { usuarioId, dispositivoId });
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
+        }
+
+        public async Task RemoveUsuarioDispositivo(long idUsuario, string idDispositivo)
+        {
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    await conn.ExecuteAsync(
+                        @"DELETE FROM public.usuario_dispositivo
+                            WHERE usuario_id = @idUsuario  AND codigo_dispositivo = @idDispositivo ;", new { idUsuario, idDispositivo });
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
             }
         }
     }
