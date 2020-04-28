@@ -9,6 +9,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
   public  interface IAlunoRepositorio
     {
-        Task<IEnumerable<AlunoRespostaEol>> ObterDadosAlunos(string cpf);
+        Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using FluentValidation.Results;
 using MediatR;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,20 +28,23 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
         public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoCommand, RespostaApi>
         {
             private readonly IAlunoRepositorio _repository;
+            private readonly IGrupoComunicadoRepository _repositorioGrupoComunicado;
 
-            public DadosAlunoComandoHandler(IAlunoRepositorio repository)
+            public DadosAlunoComandoHandler(IAlunoRepositorio repository, IGrupoComunicadoRepository repositorioGrupoComunicado)
             {
                 _repository = repository;
+                _repositorioGrupoComunicado = repositorioGrupoComunicado;
             }
             public async Task<RespostaApi> Handle
              (DadosAlunoCommand request, CancellationToken cancellationToken)
             {
                 var validator = new DadosAlunoUseCaseValidation();
                 ValidationResult validacao = validator.Validate(request);
-                
+
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
+                var grupos = await _repositorioGrupoComunicado.ObterTodos();
                 var resultado = await _repository.ObterDadosAlunos(request.Cpf);
 
                 if (resultado == null || !resultado.Any())
@@ -47,10 +52,12 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
                     return RespostaApi.Falha(validacao.Errors);
                 }
-                
+
+                resultado.ForEach(x => x.Grupo = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos));
+
                 var tipoEscola =
                     resultado
-                    .GroupBy(g => g.Grupo )
+                    .GroupBy(g => g.Grupo)
                     .Select(s => new ListaEscola
                     {
                         Grupo = s.Key,
@@ -75,6 +82,17 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                 return RespostaApi.Sucesso(tipoEscola);
             }
 
+            private string SelecionarGrupos(int? codigoTipoEscola, int codigoEtapaEnsino, int codigoCicloEnsino, IEnumerable<GrupoComunicado> grupos)
+            {
+                    return grupos
+                    .Where(x => (x.TipoEscolaId != null 
+                        && x.TipoEscolaId.Split(',').Contains(codigoTipoEscola.Value.ToString()))
+                    || (x.TipoEscolaId == null 
+                        && x.TipoCicloId.Split(',').Contains(codigoCicloEnsino.ToString())
+                        && x.EtapaEnsinoId.Split(',').Contains(codigoEtapaEnsino.ToString())))
+                    .Select(s => s.Nome)
+                    .FirstOrDefault();
+            }
         }
     }
 }

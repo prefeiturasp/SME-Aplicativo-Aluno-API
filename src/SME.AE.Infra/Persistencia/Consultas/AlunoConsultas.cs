@@ -18,17 +18,8 @@ namespace SME.AE.Infra.Persistencia.Consultas
                tesc.tp_escola                        CodigoTipoEscola, 
                mte.situacaomatricula                 SituacaoMatricula, 
                mte.dt_situacao_aluno                 DataSituacaoMatricula, 
-               CASE 
-                 WHEN tesc.tp_escola = 4 THEN 'EMEBS' 
-                 WHEN etapa_ensino.cd_etapa_ensino IN ( 1, 10 ) THEN 
-                   CASE 
-                     WHEN ciclo_ensino.cd_ciclo_ensino IN ( 1, 23 ) THEN 'CEI' 
-                     WHEN ciclo_ensino.cd_ciclo_ensino IN ( 2, 14 ) THEN 'EMEI' 
-                   END 
-                 WHEN etapa_ensino.cd_etapa_ensino = 5 THEN 'Fundamental' 
-                 WHEN etapa_ensino.cd_etapa_ensino IN ( 6, 8, 9 ) THEN 'Fundamental' 
-                 WHEN etapa_ensino.cd_etapa_ensino IN ( 3, 11 ) THEN 'EJA' 
-               END                                   AS Grupo 
+               etapa_ensino.cd_etapa_ensino AS CodigoEtapaEnsino,
+               ciclo_ensino.cd_ciclo_ensino AS CodigoCicloEnsino
         FROM   v_aluno_cotic aluno 
                INNER JOIN responsavel_aluno responsavel 
                        ON aluno.cd_aluno = responsavel.cd_aluno 
