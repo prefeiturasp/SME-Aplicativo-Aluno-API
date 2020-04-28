@@ -101,12 +101,14 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
             private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol)
             {
-                var usuario = new Dominio.Entidades.Usuario();
-                usuario.Cpf = usuarioEol.Cpf;
-                usuario.Nome = usuarioEol.Nome;
-                usuario.Email = usuarioEol.Email;
-                usuario.Excluido = false;
-                usuario.UltimoLogin = DateTime.Now;
+                var usuario = new Dominio.Entidades.Usuario
+                {
+                    Cpf = usuarioEol.Cpf,
+                    Nome = usuarioEol.Nome,
+                    Email = usuarioEol.Email,
+                    Excluido = false,
+                    UltimoLogin = DateTime.Now
+                };
 
                 return usuario;
 
