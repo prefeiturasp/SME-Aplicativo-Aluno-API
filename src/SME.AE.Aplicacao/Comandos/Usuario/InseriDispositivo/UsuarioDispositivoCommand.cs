@@ -8,30 +8,40 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo
 {
-   public class UsuarioDispositivoCommand : IRequest<bool>
+    public class UsuarioDispositivoCommand : IRequest<bool>
     {
-        public UsuarioDispositivoCommand(int usuarioId, string dispositivoId)
+        public UsuarioDispositivoCommand(string cpfUsuario, string dispositivoId)
         {
-            UsuarioId = usuarioId;
+            CpfUsuario = cpfUsuario;
             DispositivoId = dispositivoId;
         }
-        private int UsuarioId { get; set; }
+        private string CpfUsuario { get; set; }
         private string DispositivoId { get; set; }
 
         public class UsuarioDispositivoCommandHandler : IRequestHandler<UsuarioDispositivoCommand, bool>
         {
             private readonly IUsuarioRepository _repository;
 
+            public UsuarioDispositivoCommandHandler(IUsuarioRepository repository)
+            {
+                _repository = repository;
+            }
+
             public async Task<bool> Handle(UsuarioDispositivoCommand request, CancellationToken cancellationToken)
             {
-             
+
                 try
                 {
-                    // Validar Entradas
-                    //Verificar Se usuario Dispositivo ja existe se nao existir criar
-                    //Caso exista nao fazer nada.
                     //Veriicar essa arquitetura pois precido mesmo de um response aqui ? 
-                    _repository.CriaUsuarioDispositivo(request.UsuarioId, request.DispositivoId);
+                    var usuario = await _repository.ObterPorCpf(request.CpfUsuario);
+                    if (usuario == null)
+                        return false;
+                 bool existeUsuarioDisposivo =  await _repository.ExisteUsuarioDispositivo(usuario.Id, request.DispositivoId);
+                    if (!existeUsuarioDisposivo)
+                    {
+                        _ = _repository.CriaUsuarioDispositivo(usuario.Id, request.DispositivoId);
+
+                    }
 
                     return true;
                 }

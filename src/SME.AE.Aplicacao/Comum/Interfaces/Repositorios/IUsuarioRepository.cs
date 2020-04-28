@@ -9,7 +9,8 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task Criar(Usuario usuario);
         Task AtualizaUltimoLoginUsuario(string cpf);
         Task ExcluirUsuario(string cpf);
-        Task CriaUsuarioDispositivo(int usuarioId, string dispositivoId);
-        Task RemoveUsuarioDispositivo(long idUsuario, string idDispositivo);
+        Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId);
+        Task<bool> RemoveUsuarioDispositivo(long idUsuario, string idDispositivo);
+        Task <bool> ExisteUsuarioDispositivo(long idUsuario, string idDispositivo);
     }
 }

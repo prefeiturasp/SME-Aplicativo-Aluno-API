@@ -12,18 +12,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 {
     public class AutenticarUsuarioUseCase
     {
-        public static async Task<RespostaApi> Executar(IMediator mediator, string cpf, string senha)
+        public static async Task<RespostaApi> Executar(IMediator mediator, string cpf, string senha, string dispositivoId)
         {
             var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
-
-            string dispositivoId = "2222222";
             if (!resposta.Ok)
                 throw new Exception(resposta.Erros.Join());
             
             var token = await mediator.Send(new CriarTokenCommand(cpf));
             var data = ((RespostaAutenticar)resposta.Data);
-            // Cria usuarioDispositivoCommand
-            var bole = mediator.Send(new UsuarioDispositivoCommand(data.Id, dispositivoId));
+            _ = mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
             data.Token = token;
             resposta.Data = data;
 
