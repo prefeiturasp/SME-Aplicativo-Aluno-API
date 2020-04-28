@@ -22,12 +22,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-
                 var resultado = await conn.QueryAsync<Usuario>(UsuarioConsultas.ObterPorCpf, new
                 {
                     Cpf = cpf
                 });
                 usuario = resultado.FirstOrDefault();
+                conn.Close();
             }
             catch (Exception ex)
             {
