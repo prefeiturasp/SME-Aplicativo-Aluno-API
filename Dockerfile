@@ -9,7 +9,8 @@ ENV CoreSSOConnection=$SME_CORE_SSO_CONNECTION_STRING
 ENV SME_AE_JWT_TOKEN_SECRET=$SME_AE_JWT_TOKEN_SECRET
 ENV ChaveIntegracao=$ChaveIntegracao
 ENV SentryDsn=$SentryDsn
-ENV TZ=$TZ
+ENV TZ=America/Sao_Paulo
+
 ADD . /src
 WORKDIR /src
 RUN dotnet restore && \  
