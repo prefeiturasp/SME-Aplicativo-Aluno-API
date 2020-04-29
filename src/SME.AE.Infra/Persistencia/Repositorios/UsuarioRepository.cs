@@ -74,9 +74,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
-
 
         public async Task ExcluirUsuario(string cpf)
         {
@@ -93,6 +91,77 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 SentrySdk.CaptureException(ex);
                 throw ex;
+            }
+        }
+
+
+        public async Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId)
+        {
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO public.usuario_dispositivo
+                          (usuario_id, codigo_dispositivo, criadoem)
+                           VALUES(@usuarioId, @dispositivoId , now()); ", new { usuarioId, dispositivoId });
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
+        }
+
+        public async Task<bool> RemoveUsuarioDispositivo(long usuarioId, string dispositivoId)
+        {
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    await conn.ExecuteAsync(
+                        @"DELETE FROM public.usuario_dispositivo
+                            WHERE usuario_id = @usuarioId  AND codigo_dispositivo = @dispositivoId ;", new { usuarioId, dispositivoId });
+                    conn.Close();
+                   
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
+            }
+        }
+
+        public async Task<bool> ExisteUsuarioDispositivo(long usuarioId, string dispositivoId)
+        {
+        
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    string query =
+                         @"SELECT usuario_id 
+                            FROM public.usuario_dispositivo
+                           WHERE usuario_id = @usuarioId
+                             AND codigo_dispositivo =  @dispositivoId";
+                  var retorno  =  await conn.QueryAsync(query, new { usuarioId , dispositivoId });
+                    if (retorno.Count() == 0)
+                        return false;
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
             }
         }
     }
