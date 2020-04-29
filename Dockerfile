@@ -10,6 +10,7 @@ ENV SME_AE_JWT_TOKEN_SECRET=$SME_AE_JWT_TOKEN_SECRET
 ENV ChaveIntegracao=$ChaveIntegracao
 ENV SentryDsn=$SentryDsn
 ENV TZ=America/Sao_Paulo
+
 ADD . /src
 WORKDIR /src
 RUN dotnet restore && \  
