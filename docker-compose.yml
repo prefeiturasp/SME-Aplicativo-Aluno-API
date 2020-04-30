@@ -1,64 +1,18 @@
 ﻿version: '3'
 services:
-#  web:
-#    env_file:
-#      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
-#    container_name: smeae_container
-#    build: .
-#    ports:
-#      - "5001:5001"
-#      - "5000:5000"
-#    links:
-#      - postgres
-#    networks:
-#      - default
-#    depends_on:
-#      - flyway
-  
-  postgres:
-    env_file:
-      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
-    container_name: postgres_container
-    image: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      PGDATA: /data/postgres
-    volumes:
-      - postgres:/data/postgres
+  ae-api:
+    container_name: ae-api
+    image: ae-api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
-      - "5432:5432"
+      - '8080:80'
     networks:
-      - default
-        
-  pgadmin:
+      - ae-network    
     env_file:
-      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-    volumes:
-      - pgadmin:/root/.pgadmin
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
-    networks:
-      - default
-      
-  flyway:
-    container_name: flyway
-    image: boxfuse/flyway:5.2.4
-    command: -url=jdbc:postgresql://postgres_container:5432/smeae?user=${POSTGRES_USER:-postgres}&password=${POSTGRES_PASSWORD:-postgres} -locations='filesystem:/opt/scripts' -outOfOrder=false migrate
-    volumes:
-      - ./scripts:/opt/scripts
-    depends_on:
-      - postgres
-        
-volumes:
-  postgres:
-  pgadmin:
+      - smeae_api_dev.env
 
 networks:
-  default:
+  ae-network:
     driver: bridge
