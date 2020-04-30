@@ -53,17 +53,18 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
-                resultado.ForEach(x => x.Grupo = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos));
+                resultado.ForEach(x => { var g = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos); x.Grupo = g.gupo;x.CodigoGrupo = g.codigo;});
 
                 var tipoEscola =
                     resultado
-                    .GroupBy(g => g.Grupo)
+                    .GroupBy(g => new { g.Grupo, g.CodigoGrupo })
                     .Select(s => new ListaEscola
                     {
-                        Grupo = s.Key,
+                        Grupo = s.Key.Grupo,
+                        CodigoGrupo = s.Key.CodigoGrupo,
                         Alunos = resultado
-                                .Where(w => w.Grupo == s.Key)
-                                .Select(a => new SME.AE.Dominio.Entidades.Aluno
+                                .Where(w => w.CodigoGrupo == s.Key.CodigoGrupo)
+                                .Select(a => new Dominio.Entidades.Aluno
                                 {
                                     CodigoEol = a.CodigoEol,
                                     Nome = a.Nome,
@@ -82,15 +83,15 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                 return RespostaApi.Sucesso(tipoEscola);
             }
 
-            private string SelecionarGrupos(int? codigoTipoEscola, int codigoEtapaEnsino, int codigoCicloEnsino, IEnumerable<GrupoComunicado> grupos)
+            private (string gupo,long codigo) SelecionarGrupos(int? codigoTipoEscola, int codigoEtapaEnsino, int codigoCicloEnsino, IEnumerable<GrupoComunicado> grupos)
             {
-                    return grupos
-                    .Where(x => (x.TipoEscolaId != null 
-                        && x.TipoEscolaId.Split(',').Contains(codigoTipoEscola.Value.ToString()))
-                    || (x.TipoEscolaId == null 
-                        && x.TipoCicloId.Split(',').Contains(codigoCicloEnsino.ToString())
-                        && x.EtapaEnsinoId.Split(',').Contains(codigoEtapaEnsino.ToString())))
-                    .Select(s => s.Nome)
+                return grupos
+                .Where(x => (x.TipoEscolaId != null
+                    && x.TipoEscolaId.Split(',').Contains(codigoTipoEscola.Value.ToString()))
+                || (x.TipoEscolaId == null
+                    && x.TipoCicloId.Split(',').Contains(codigoCicloEnsino.ToString())
+                    && x.EtapaEnsinoId.Split(',').Contains(codigoEtapaEnsino.ToString())))
+                .Select(s => (s.Nome, s.Id))
                     .FirstOrDefault();
             }
         }
