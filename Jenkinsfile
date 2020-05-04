@@ -27,7 +27,7 @@ pipeline {
 
        stage('Analise Codigo') {
           when {
-                branch 'homolog'
+                branch 'release'
             }
          steps {
              sh 'echo Analise SonarQube API'
@@ -99,7 +99,7 @@ pipeline {
        
        stage('Deploy homologacao') {
          when {
-           branch 'homolog'
+           branch 'release'
          }
         steps {
           timeout(time: 24, unit: "HOURS") {
