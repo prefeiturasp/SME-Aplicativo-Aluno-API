@@ -6,6 +6,10 @@
             SELECT Id, Cpf, Nome, UltimoLogin
             FROM Usuario
             WHERE Usuario.Cpf = @Cpf";
+
+        internal static string ObterTodos = @"
+            SELECT Cpf from Usuario";
+
            //  AND Usuario.excluido = false";
     }
 }
