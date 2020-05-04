@@ -28,7 +28,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 list = await conn.QueryAsync<Notificacao>(
                     NotificacaoConsultas.Select
                     + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')" +
-                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) ", new
+                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
+                    " AND (DATE(DataEnvio) <= @dataAtual) ",  new
                     {
                         grupo,
                         dataAtual
