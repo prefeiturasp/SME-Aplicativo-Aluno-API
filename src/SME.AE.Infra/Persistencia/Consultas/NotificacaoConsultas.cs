@@ -17,5 +17,28 @@
             group by se.cd_ciclo_ensino, se.cd_etapa_ensino
             order by se.cd_ciclo_ensino, se.cd_etapa_ensino desc;
         ";
+
+        public static string ResponsaveisPorGrupo = @"
+                SELECT cd_cpf_responsavel
+                FROM responsavel_aluno ra
+          INNER JOIN(     SELECT cd_aluno, 
+                                 cd_matricula, 
+                                 cd_escola, 
+                                 cd_serie_ensino 
+                          FROM   v_matricula_cotic 
+                          WHERE  st_matricula = 1 
+                                 AND cd_serie_ensino IS NOT NULL -- turma regular 
+                                 AND an_letivo = Year(Getdate())) AS matricula
+                                  ON matricula.cd_aluno = ra.cd_aluno
+          INNER JOIN(  SELECT   cd_matricula,
+	                            cd_situacao_aluno                                                             
+                         FROM   matricula_turma_escola (nolock)) mte 
+                           ON   mte.cd_matricula = matricula.cd_matricula 
+                          AND   mte.cd_situacao_aluno IN ( 1, 6, 10, 13 ) 
+         INNER JOIN      dbo.serie_ensino se on matricula.cd_serie_ensino = se.cd_serie_ensino
+         INNER JOIN     escola esc on esc.cd_escola = matricula.cd_escola
+              WHERE  1 = 1 
+                AND cd_cpf_responsavel is not null"
+                 ;
     }
 }
