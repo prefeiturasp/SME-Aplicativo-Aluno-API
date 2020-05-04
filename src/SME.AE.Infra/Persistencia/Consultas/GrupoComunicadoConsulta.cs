@@ -20,9 +20,4 @@ namespace SME.AE.Infra.Persistencia.Consultas
             FROM grupo_comunicado 
         ";
     }
-
-
-
-
-
 }
