@@ -78,7 +78,8 @@ namespace SME.AE.Api.Controllers
         }
         
         [HttpGet]
-        [Authorize]
+      //  [Authorize]
+      [AllowAnonymous]
         public async Task<ObjectResult> ObterDoUsuarioLogado()
         {
             try

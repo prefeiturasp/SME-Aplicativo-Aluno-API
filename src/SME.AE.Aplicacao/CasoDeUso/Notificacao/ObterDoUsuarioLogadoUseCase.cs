@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Practices.ObjectBuilder2;
 using SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel;
+using SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterResponsaveisPorGrupo;
 using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Notificacao

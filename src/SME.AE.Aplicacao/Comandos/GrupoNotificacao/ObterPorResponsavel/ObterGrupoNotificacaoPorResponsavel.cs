@@ -21,6 +21,7 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
         {
             Cpf = cpf;
         }
+
     }
 
     public class ObterGrupoNotificacaoPorResponsavelCommandHandler : IRequestHandler<ObterGrupoNotificacaoPorResponsavelCommand, List<string>>
