@@ -1,4 +1,5 @@
-﻿using SME.AE.Dominio.Entidades;
+﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +9,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
   public  interface IAlunoRepositorio
     {
-        Task<IEnumerable<Aluno>> ObterDadosAlunos(string cpf);
+        Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf);
     }
 }

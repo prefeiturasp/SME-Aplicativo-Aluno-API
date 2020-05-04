@@ -20,20 +20,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<Notificacao>> ObterPorGrupo(string grupo)
         {
             IEnumerable<Notificacao> list = null;
-            
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    list = await conn.QueryAsync<Notificacao>(
-                        NotificacaoConsultas.Select 
-                        + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')", new
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var dataAtual = DateTime.Now.Date;
+                list = await conn.QueryAsync<Notificacao>(
+                    NotificacaoConsultas.Select
+                    + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')" +
+                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) ", new
                     {
-                        Grupo = grupo
+                        grupo,
+                        dataAtual
                     });
-                    conn.Close();
-                }
+                conn.Close();
             }
             catch (Exception ex)
             {
