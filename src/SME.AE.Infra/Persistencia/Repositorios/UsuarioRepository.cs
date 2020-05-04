@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -36,8 +37,25 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
             return usuario;
-        }
 
+        }
+        public async Task<IEnumerable<string>> ObterTodos()
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var resultado = await conn.QueryAsync<string>(UsuarioConsultas.ObterTodos);
+                conn.Close();
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+
+        }
         public async Task Criar(Usuario usuario)
         {
             try
@@ -126,7 +144,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         @"DELETE FROM public.usuario_dispositivo
                             WHERE usuario_id = @usuarioId  AND codigo_dispositivo = @dispositivoId ;", new { usuarioId, dispositivoId });
                     conn.Close();
-                   
+
                 }
                 return true;
             }
@@ -139,7 +157,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<bool> ExisteUsuarioDispositivo(long usuarioId, string dispositivoId)
         {
-        
+
             try
             {
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
@@ -150,7 +168,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             FROM public.usuario_dispositivo
                            WHERE usuario_id = @usuarioId
                              AND codigo_dispositivo =  @dispositivoId";
-                  var retorno  =  await conn.QueryAsync(query, new { usuarioId , dispositivoId });
+                    var retorno = await conn.QueryAsync(query, new { usuarioId, dispositivoId });
                     if (retorno.Count() == 0)
                         return false;
                 }
