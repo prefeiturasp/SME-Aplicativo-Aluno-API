@@ -9,6 +9,10 @@ ENV CoreSSOConnection=$SME_CORE_SSO_CONNECTION_STRING
 ENV SME_AE_JWT_TOKEN_SECRET=$SME_AE_JWT_TOKEN_SECRET
 ENV ChaveIntegracao=$ChaveIntegracao
 ENV SentryDsn=$SentryDsn
+ENV TZ=America/Sao_Paulo
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -yq tzdata && dpkg-reconfigure --frontend noninteractive tzdata
 
 ADD . /src
 WORKDIR /src
