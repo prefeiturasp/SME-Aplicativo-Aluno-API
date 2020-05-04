@@ -120,10 +120,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
                 {
                     conn.Open();
+                    var dataHoraAtual = DateTime.Now;
                     await conn.ExecuteAsync(
                         @"INSERT INTO public.usuario_dispositivo
                           (usuario_id, codigo_dispositivo, criadoem)
-                           VALUES(@usuarioId, @dispositivoId , now()); ", new { usuarioId, dispositivoId });
+                           VALUES(@usuarioId, @dispositivoId , @dataHoraAtual ); ", new { usuarioId, dispositivoId, dataHoraAtual });
                     conn.Close();
                 }
             }
