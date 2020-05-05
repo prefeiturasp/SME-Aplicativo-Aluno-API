@@ -9,7 +9,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
         "AEConnection": "***REMOVED***",
-        "EolConnection": "***REMOVED***",
+        "EolConnection": "Server=localhost;Database=localhost;User Id=localhost;Password=localhost;",
         "SgpConnection": "***REMOVED***",
         "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "***REMOVED***"
