@@ -8,10 +8,10 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
-        "AEConnection": "User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=db_appaluno;Pooling=true;",
-        "EolConnection": "***REMOVED***",
-        "SgpConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
-        "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
+        "AEConnection": "User ID=postgres;Password=postgres;Host=localhost;Port=5204;Database=localhost;Pooling=true;",
+        "EolConnection": "Server=localhost;Database=localhost;User Id=localhost;Password=localhost;",
+        "SgpConnection": "User ID=localhost;Password=localhost;Host=localhost;Port=30808;Database=localhost;Pooling=true;",
+        "CoreSSOConnection": "Host=localhost;Database=localhost;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "***REMOVED***"
       },
       "applicationUrl": "http://localhost:5000;https://localhost:5001;"
