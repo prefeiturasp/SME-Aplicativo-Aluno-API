@@ -15,7 +15,6 @@
                 inner join dbo.serie_ensino se on mc.cd_serie_ensino = se.cd_serie_ensino
             where ra.cd_cpf_responsavel = @cpf
             group by se.cd_ciclo_ensino, se.cd_etapa_ensino
-            order by se.cd_ciclo_ensino, se.cd_etapa_ensino desc;
         ";
 
         public static string ResponsaveisPorGrupo = @"
