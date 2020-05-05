@@ -46,7 +46,13 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
                 where g.TipoCicloId != null
                 select $"case when (se.cd_ciclo_ensino in ({g.TipoCicloId}) and se.cd_etapa_ensino IN ({g.EtapaEnsinoId})) then 1 else 0 end as \"{g.Nome}\",").Join("");
             query = query.Substring(0, query.Count() - 1);
-            var gruposDoResponsavel = await _repository.ObterGruposDoResponsavel(request.Cpf, query);
+
+            var nomeGrupos = (from n in grupos
+                              where n.TipoCicloId != null
+                              select $"max({n.Nome}){n.Nome},").Join("");
+            nomeGrupos = nomeGrupos.Substring(0, nomeGrupos.Count() - 1);
+
+            var gruposDoResponsavel = await _repository.ObterGruposDoResponsavel(request.Cpf, query, nomeGrupos);
             
             if(gruposDoResponsavel == null)
                 return new List<string>();
