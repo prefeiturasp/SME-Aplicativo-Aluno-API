@@ -72,7 +72,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
         // TODO Refatorar para montar a query aqui ao inves de receber por parametro
-        public async Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos)
+        public async Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos, string nomeGrupos)
         {
             IDictionary<string, object> list = null;
 
@@ -81,8 +81,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
                 {
                     conn.Open();
-                    var query = "select top 1 " + grupos + NotificacaoConsultas.GruposDoResponsavel;
-                    var resultado = await conn.QueryAsync(query, new { cpf = cpf });
+                    var query = $"select {nomeGrupos} from(select {grupos + NotificacaoConsultas.GruposDoResponsavel}) grupos";
+                    var resultado = await conn.QueryAsync(query, new { cpf });
 
                     if (resultado.Any())
                         list = resultado.First() as IDictionary<string, object>;
