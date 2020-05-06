@@ -36,7 +36,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     conn.Open();
 
                     var retorno = await conn.ExecuteAsync(
-                        @"DELETE FROM  where id = @ID", );
+                        @"DELETE FROM usuario_notificacao_leitura where id = @ID", new { notificacaoId });
                     conn.Close();
                 }
             }

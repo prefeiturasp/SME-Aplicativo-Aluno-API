@@ -13,11 +13,24 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
         {
             RespostaApi resposta = new RespostaApi();
             resposta.Ok = true;
-            resposta.Erros = await mediator.Send(new RemoverNotificacaoCommand(id));
-            if(resposta.Erros[0] != null)
+
+           var  removeuNotificaoUsuarios = await mediator.Send(new RemoverNotificacaoUsuarioCommand(id));
+            if (removeuNotificaoUsuarios)
+            {
+                resposta.Erros = await mediator.Send(new RemoverNotificacaoCommand(id));
+              
+            }
+
+            else
+            {
+                resposta.Erros.SetValue($"Errro ao excluir Registros de leitura", 0);
+            }
+
+            if (resposta.Erros[0] != null)
             {
                 resposta.Ok = false;
             }
+
             return resposta;
         }
     }

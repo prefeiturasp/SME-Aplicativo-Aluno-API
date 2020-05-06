@@ -47,7 +47,7 @@ namespace SME.AE.Api.Controllers
         
         [HttpDelete]
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
+      //  [ChaveIntegracaoFiltro]
         public async Task<ActionResult> Remover([FromBody] long[] ids)
         {
             try

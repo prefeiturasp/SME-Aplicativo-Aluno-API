@@ -12,8 +12,8 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         public Task<UsuarioNotificacao> Criar(Notificacao notificacao);
         
         public Task<UsuarioNotificacao> Atualizar(Notificacao notificacao);
-        
-        public Task<bool> Remover(Notificacao notificacao);
+
+        public  Task<bool> Remover(long notificacaoId);
 
     }
 }
