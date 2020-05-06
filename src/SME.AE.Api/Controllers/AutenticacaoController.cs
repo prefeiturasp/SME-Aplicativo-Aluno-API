@@ -17,11 +17,26 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha)
+        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId)
         {
             try
             {
-                return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha));
+                return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha, dispositivoId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
+        }
+
+        [HttpPost("Logout")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> Logout([FromQuery] string cpf, [FromQuery] string dispositivoId)
+        {
+            try
+            {
+                  return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf,  dispositivoId));
+              
             }
             catch (Exception ex)
             {

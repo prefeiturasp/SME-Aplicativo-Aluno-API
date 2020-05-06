@@ -7,8 +7,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
     public class ListaEscola
     {
-        public string DescricaoTipoEscola { get; set; }
-        public int CodigoTipoEscola { get; set; }
+        public string Grupo { get; set; }
+        public long CodigoGrupo { get; set; }
         public IEnumerable<Aluno> Alunos { get; set; }
     }
 }

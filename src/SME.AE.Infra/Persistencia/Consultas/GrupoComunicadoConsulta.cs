@@ -9,6 +9,7 @@ namespace SME.AE.Infra.Persistencia.Consultas
                 nome as Nome,
                 tipo_escola_id as TipoEscolaId,
                 tipo_ciclo_id as TipoCicloId,
+                etapa_ensino_id AS EtapaEnsinoId,
                 criado_em as CriadoEm,
                 criado_por as CriadoPor,
                 alterado_em as AlteradoEm,
