@@ -8,6 +8,20 @@
             FROM Notificacao 
         ";
 
+        public static string ObterPorUsuarioLogado = @"
+            SELECT Id, Mensagem, Titulo, Grupo, DataEnvio, DataExpiracao,
+                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor,
+                   case when exists (
+                            select unl.id 
+                            from usuario_notificacao_leitura unl 
+                                inner join usuario u on unl.usuario_id = u.id 
+                            where notificacao_id = notificacao.id and u.cpf = @cpf)
+                        then 'true'
+                        else 'false'
+                    end as MensagemVisualizada
+            FROM Notificacao 
+        ";
+
         public static string GruposDoResponsavel = @"
             from dbo.responsavel_aluno ra
                 inner join dbo.aluno a on a.cd_aluno = ra.cd_aluno

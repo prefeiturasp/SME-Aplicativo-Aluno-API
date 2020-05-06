@@ -3,21 +3,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
 {
-    public class ObterNotificacaoPorGrupoCommand : IRequest<IEnumerable<Dominio.Entidades.Notificacao>>
+    public class ObterNotificacaoPorGrupoCommand : IRequest<IEnumerable<NotificacaoPorUsuario>>
     {
         public string Grupo { get; set; }
+        public string Cpf { get; }
 
-        public ObterNotificacaoPorGrupoCommand(string grupo)
+        public ObterNotificacaoPorGrupoCommand(string grupo, string cpf)
         {
             Grupo = grupo;
+            Cpf = cpf;
         }
     }
 
     public class ObterNotificacaoPorGrupoCommandHandler : IRequestHandler<ObterNotificacaoPorGrupoCommand, 
-        IEnumerable<Dominio.Entidades.Notificacao>>
+        IEnumerable<NotificacaoPorUsuario>>
     {
         private readonly INotificacaoRepository _repository;
     
@@ -26,10 +29,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Dominio.Entidades.Notificacao>> Handle
-            (ObterNotificacaoPorGrupoCommand request, CancellationToken cancellationToken)
-        {
-            return await _repository.ObterPorGrupo(request.Grupo);
-        }
+        public async Task<IEnumerable<NotificacaoPorUsuario>> Handle
+            (ObterNotificacaoPorGrupoCommand request, CancellationToken cancellationToken) => await _repository.ObterPorGrupoUsuario(request.Grupo, request.Cpf);
     }
 }
