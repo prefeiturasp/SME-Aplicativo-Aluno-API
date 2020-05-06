@@ -32,8 +32,6 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 
                 try
                 {
-                    //validar se mensagem já foi lida
-
                     return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
                     
                 }
