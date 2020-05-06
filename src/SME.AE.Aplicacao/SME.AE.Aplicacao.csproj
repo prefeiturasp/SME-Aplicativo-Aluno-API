@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
   </ItemGroup>
 
