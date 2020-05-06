@@ -39,9 +39,28 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             throw new NotImplementedException();
         }
 
-        public Task<bool> Remover(Notificacao notificacao)
+        public async Task<bool> Remover(long notificacaoId)
         {
-            throw new NotImplementedException();
+           
+
+            try
+            {
+                await using (var conn = new Npgsql.NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+
+                     await conn.ExecuteAsync(
+                        @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
+            }
+
+            return true;
         }
     }
 }
