@@ -8,6 +8,7 @@ namespace SME.AE.Dominio.Entidades
         public String Nome { get; set; }
         public String TipoEscolaId { get; set; }
         public String TipoCicloId { get; set; }
+        public String EtapaEnsinoId { get; set; }
         public DateTime CriadoEm { get; set; }
         public String CriadoPor { get; set; }
         public DateTime AlteradoEm { get; set; }

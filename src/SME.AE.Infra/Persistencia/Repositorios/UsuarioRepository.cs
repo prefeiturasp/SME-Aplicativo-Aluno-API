@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -8,7 +9,6 @@ using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
-using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia.Consultas;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -21,17 +21,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var resultado = await conn.QueryAsync<Usuario>(UsuarioConsultas.ObterPorCpf, new
                 {
-                    conn.Open();
-
-                    var resultado = await conn.QueryAsync<Usuario>(UsuarioConsultas.ObterPorCpf, new
-                    {
-                        Cpf = cpf
-                    });
-                    usuario = resultado.FirstOrDefault();
-
-                }
+                    Cpf = cpf
+                });
+                usuario = resultado.FirstOrDefault();
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -40,21 +37,36 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
             return usuario;
-        }
 
+        }
+        public async Task<IEnumerable<string>> ObterTodos()
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var resultado = await conn.QueryAsync<string>(UsuarioConsultas.ObterTodos);
+                conn.Close();
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+
+        }
         public async Task Criar(Usuario usuario)
         {
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    await conn.ExecuteAsync(
-                        @"INSERT INTO usuario( cpf, nome, email, ultimoLogin, criadoEm, excluido) 
-                            VALUES(@Cpf, @Nome, @Email, now(), now(), @Excluido)",
-                        usuario);
-                    conn.Close();
-                }
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                await conn.ExecuteAsync(
+                    @"INSERT INTO usuario( cpf, nome, email, ultimoLogin, criadoEm, excluido) 
+                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido)",
+                  usuario);
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -68,24 +80,61 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    await conn.ExecuteAsync(
-                        "update usuario set ultimologin = now(), excluido = false  where cpf = @cpf", new { cpf, });
-                    conn.Close();
-                }
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var dataHoraAtual = DateTime.Now;
+                await conn.ExecuteAsync(
+                    "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
+                conn.Close();
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
+        }
 
+        public async Task ExcluirUsuario(string cpf)
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var dataHoraAtual = DateTime.Now;
+                await conn.ExecuteAsync(
+                    "update usuario set excluido = true , ultimoLogin = @dataHoraAtual  where cpf = @cpf", new { cpf, dataHoraAtual });
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
 
 
-        public async Task ExcluirUsuario(string cpf)
+        public async Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId)
+        {
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    var dataHoraAtual = DateTime.Now;
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO public.usuario_dispositivo
+                          (usuario_id, codigo_dispositivo, criadoem)
+                           VALUES(@usuarioId, @dispositivoId , @dataHoraAtual ); ", new { usuarioId, dispositivoId, dataHoraAtual });
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
+        }
+
+        public async Task<bool> RemoveUsuarioDispositivo(long usuarioId, string dispositivoId)
         {
             try
             {
@@ -93,14 +142,45 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 {
                     conn.Open();
                     await conn.ExecuteAsync(
-                        "update usuario set excluido = true , ultimoLogin = now()  where cpf = @cpf", new { cpf });
+                        @"DELETE FROM public.usuario_dispositivo
+                            WHERE usuario_id = @usuarioId  AND codigo_dispositivo = @dispositivoId ;", new { usuarioId, dispositivoId });
                     conn.Close();
+
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                return false;
+            }
+        }
+
+        public async Task<bool> ExisteUsuarioDispositivo(long usuarioId, string dispositivoId)
+        {
+
+            try
+            {
+                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+                {
+                    conn.Open();
+                    string query =
+                         @"SELECT usuario_id 
+                            FROM public.usuario_dispositivo
+                           WHERE usuario_id = @usuarioId
+                             AND codigo_dispositivo =  @dispositivoId";
+                    var retorno = await conn.QueryAsync(query, new { usuarioId, dispositivoId });
+                    if (retorno.Count() == 0)
+                        return false;
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
             }
         }
     }
