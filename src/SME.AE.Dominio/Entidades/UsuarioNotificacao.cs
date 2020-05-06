@@ -7,7 +7,7 @@ namespace SME.AE.Dominio.Entidades
     public class UsuarioNotificacao
     {
         public long Id { get; set; }
-        public int UsuarioId { get; set; }
+        public long UsuarioId { get; set; }
         public long CodigoAlunoEol { get; set; }
         public long NotificacaoId { get; set; }
         public DateTime? CriadoEm { get; set; }

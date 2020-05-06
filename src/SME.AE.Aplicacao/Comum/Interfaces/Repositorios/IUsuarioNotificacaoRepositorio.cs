@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
