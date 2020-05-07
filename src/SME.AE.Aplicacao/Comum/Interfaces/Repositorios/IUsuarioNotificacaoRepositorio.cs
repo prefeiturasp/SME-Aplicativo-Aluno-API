@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         
         public Task<bool> Criar(UsuarioNotificacao notificacao);
         
-        public Task<bool> Remover(Notificacao notificacao);
+        public  Task<bool> Remover(long id);
 
     }
 }
