@@ -18,6 +18,7 @@ using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
 using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
 using static SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario.AutenticarUsuarioCommand;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
+using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
 
 namespace SME.AE.Aplicacao
 {
@@ -81,6 +82,9 @@ namespace SME.AE.Aplicacao
             services.AddScoped(provider => provider.GetService<ObterNotificacaoPorGrupoUseCase>());
             services.AddScoped(provider => provider.GetService<RemoverNotificacaoEmLoteUseCase>());
             services.AddScoped(provider => provider.GetService<ObterDoUsuarioLogadoUseCase>());
+
+            // Mensagem
+            services.AddScoped(provider => provider.GetService<MarcarMensagemLidaUseCase>());
         }
 
         private static void AddComandos(IServiceCollection services)
@@ -110,6 +114,9 @@ namespace SME.AE.Aplicacao
             services.AddMediatR(typeof(ObterGrupoNotificacaoPorResponsavelCommandHandler).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(EnviarNotificacaoPorGrupoCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(EnviarNotificacaoPorGrupoCommandHandler).GetTypeInfo().Assembly);
+
+            //Mensagem
+            services.AddMediatR(typeof(AtualizarNotificacaoCommand).GetTypeInfo().Assembly);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("obter-data-hora")]
-        [AllowAnonymous]
+        [Authorize]
         public ActionResult ObterDataHoraAtual()
         {
             try
@@ -37,7 +37,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("obter-data-hora-servidor")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult> ObterDataHoraAtualBanco()
         {
             try

@@ -42,6 +42,7 @@ namespace SME.AE.Api
         
         public void ConfigureServices(IServiceCollection services)
         {
+
             AddAuthentication(services);
             services.AddResponseCompression(options =>
             {
