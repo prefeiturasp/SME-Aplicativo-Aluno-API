@@ -42,6 +42,17 @@ namespace SME.AE.Api
         
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
+            // If using IIS:
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
             AddAuthentication(services);
             services.AddResponseCompression(options =>
             {

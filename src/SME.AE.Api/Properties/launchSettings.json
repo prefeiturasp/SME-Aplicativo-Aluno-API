@@ -8,10 +8,10 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "5b56a410a465614194c3ed74ee33388a7d3a22a832ec483929bc6a091044af81",
-        "AEConnection": "User ID=postgres;Password=postgres;Host=localhost;Port=5204;Database=localhost;Pooling=true;",
-        "EolConnection": "Server=localhost;Database=localhost;User Id=localhost;Password=localhost;",
-        "SgpConnection": "User ID=localhost;Password=localhost;Host=localhost;Port=30808;Database=localhost;Pooling=true;",
-        "CoreSSOConnection": "Host=localhost;Database=localhost;Username=postgres;Password=postgres;Pooling=true;",
+        "AEConnection": "User ID=postgres;Password=postgres;Host=10.50.1.33;Port=30808;Database=db_appaluno;Pooling=true;",
+        "EolConnection": "Server=10.49.16.60;Database=se1426;User Id=user_se1426_cotic;Password=3ol_c0tic@;",
+        "SgpConnection": "User ID=postgres;Password=postgres;Host=10.50.1.33;Port=30808;Database=sgp_db-dev;Pooling=true;",
+        "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "78e9f4e7b848afb642ce50270174dddf18bcaabb66db112b9198fee6529f0e9d"
       },
       "applicationUrl": "http://localhost:5000;https://localhost:5001;"
@@ -25,3 +25,4 @@
     }
   }
 }
+
