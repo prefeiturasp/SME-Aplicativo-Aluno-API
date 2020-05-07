@@ -8,11 +8,13 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
-        "AEConnection": "User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=db_appaluno;Pooling=true;",
+        "AEConnection": "Username=postgres;Password=postgres;Host=10.50.1.33;Port=30808;Database=db_appaluno;Pooling=true;",
         "EolConnection": "***REMOVED***",
         "SgpConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
         "CoreSSOConnection": "Host=localhost;Database=smeae;Username=postgres;Password=postgres;Pooling=true;",
-        "ChaveIntegracao": "***REMOVED***"
+        "ChaveIntegracao": "***REMOVED***",
+        "FirebaseToken": "AAAAwTNHxqM:APA91bE99jZT088bnw7kliMJLsfogZLsL9fGJRYxl9F6KEtx98fmzi8BWuDAGdExAM7BVh-Gm00p-5Wyw-Ue2zeVt8HY2iALwoXvb9YSfmQoRakWTCSwr2eitD6xxUOz0XuKwqw40Z_1",
+        "FirebaseProjectId": "app-aluno-2aef1"
       },
       "applicationUrl": "http://localhost:5000;https://localhost:5001;"
     },

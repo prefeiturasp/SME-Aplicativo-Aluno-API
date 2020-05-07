@@ -22,7 +22,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                  GrupoComunicadoConsulta.Select + 
                  @"WHERE id in(" + ids + ")");
             conexao.Close();
-            return resultado;D
+            return resultado;
         }
         
         public async Task<IEnumerable<GrupoComunicado>> ObterTodos()
