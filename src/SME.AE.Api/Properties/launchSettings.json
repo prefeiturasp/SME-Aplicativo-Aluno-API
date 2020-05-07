@@ -13,8 +13,8 @@
         "SgpConnection": "User ID=localhost;Password=localhost;Host=localhost;Port=30808;Database=localhost;Pooling=true;",
         "CoreSSOConnection": "Host=localhost;Database=localhost;Username=postgres;Password=postgres;Pooling=true;",
         "ChaveIntegracao": "***REMOVED***",
-        "FirebaseToken": "AAAAwTNHxqM:APA91bE99jZT088bnw7kliMJLsfogZLsL9fGJRYxl9F6KEtx98fmzi8BWuDAGdExAM7BVh-Gm00p-5Wyw-Ue2zeVt8HY2iALwoXvb9YSfmQoRakWTCSwr2eitD6xxUOz0XuKwqw40Z_1",
-        "FirebaseProjectId": "app-aluno-2aef1"
+        "FirebaseToken": "",
+        "FirebaseProjectId": ""
       },
       "applicationUrl": "http://localhost:5000;https://localhost:5001;"
     },
