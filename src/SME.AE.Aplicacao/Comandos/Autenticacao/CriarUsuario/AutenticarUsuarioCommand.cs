@@ -13,32 +13,36 @@ using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
     public class AutenticarUsuarioCommand : IRequest<RespostaApi>
     {
-        public AutenticarUsuarioCommand(string cpf, string dataNascimento)
+        public AutenticarUsuarioCommand(string cpf, string senha)
         {
             Cpf = cpf;
-            dataNascimento = Regex.Replace(dataNascimento, @"\-\/", "");
-            DataNascimento = DateTime.ParseExact(dataNascimento, "ddMMyyyy", CultureInfo.InvariantCulture);
+            Senha = senha;
+            senha = Regex.Replace(senha, @"\-\/", "");
+            DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
         }
 
         public string Cpf { get; set; }
         public DateTime DataNascimento { get; set; }
+        public String Senha { get; set; }
 
         public class AutenticarUsuarioCommandHandler : IRequestHandler<AutenticarUsuarioCommand, RespostaApi>
         {
             private readonly IAplicacaoContext _context;
             private readonly IAutenticacaoService _autenticacaoService;
             private readonly IUsuarioRepository _repository;
+            private readonly IUsuarioCoreSSORepositorio _repositoryCoreSSO;
 
-            public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository)
-            { 
+            public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO)
+            {
                 _context = context;
                 _autenticacaoService = autenticacaoService;
-
+                _repositoryCoreSSO = repositoryCoreSSO;
                 _repository = repository;
             }
 
@@ -49,6 +53,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 var usuarioRetorno = _repository.ObterPorCpf(request.Cpf).Result;
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
+
+             
 
                 //selecionar alunos do responsável buscando apenas pelo cpf
                 var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
@@ -73,9 +79,32 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
+
+                //necessário implementar unit of work para transacionar essas operações
+
+                //verificar se usuário está cadastrado no coreSSO
+                var retornoUsuarioCoreSSO = await _repositoryCoreSSO.Selecionar(request.Cpf);
+                if (!retornoUsuarioCoreSSO.Any())
+                {
+                    try
+                    {
+                        await _repositoryCoreSSO.Criar(new Comum.Modelos.Entrada.UsuarioCoreSSO { Cpf = request.Cpf, Nome = usuario.Nome, Senha = request.Senha });
+                    }
+                    catch
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Erro ao tentar cadastrar o usuário no CoreSSO"));
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
+                }
+
                 CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
 
                 return MapearResposta(usuario);
+            }
+
+            private object MapearUsuarioCoreSSO(IEnumerable<RetornoUsuarioCoreSSO> retornoUsuarioCoreSSO)
+            {
+                throw new NotImplementedException();
             }
 
             private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
@@ -89,7 +118,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 else
                 {
-                   _repository.Criar(MapearDominioUsuario(usuario));
+                    _repository.Criar(MapearDominioUsuario(usuario));
                 }
             }
 
