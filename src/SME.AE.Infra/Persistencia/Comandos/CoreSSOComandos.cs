@@ -61,5 +61,15 @@ namespace SME.AE.Infra.Persistencia.Comandos
                 ,1
                 ,GETDATE()
                 ,GETDATE())";
+
+        public static string InserirUsuarioGrupo = @"
+            INSERT INTO SYS_UsuarioGrupo
+                (usu_id
+                ,gru_id
+                ,usg_situacao)
+            VALUES
+                (@usuId
+                ,@gruId
+                ,1)";
     }
 }
