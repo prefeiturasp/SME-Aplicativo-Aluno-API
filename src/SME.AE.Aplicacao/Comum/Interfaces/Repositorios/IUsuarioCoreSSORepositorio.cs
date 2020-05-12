@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -10,5 +11,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task Criar(UsuarioCoreSSO usuario);
         Task<IEnumerable<RetornoUsuarioCoreSSO>> Selecionar(string cpf);
+        Task<List<Guid>> SelecionarGrupos();
+        void IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos);
     }
 }

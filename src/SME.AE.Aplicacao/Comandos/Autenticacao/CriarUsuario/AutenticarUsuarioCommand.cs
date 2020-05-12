@@ -14,6 +14,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System.Collections.Generic;
+using SME.AE.Aplicacao.Comum.Extensoes;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
@@ -54,7 +55,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
-             
+
 
                 //selecionar alunos do responsável buscando apenas pelo cpf
                 var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
@@ -84,17 +85,27 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 //verificar se usuário está cadastrado no coreSSO
                 var retornoUsuarioCoreSSO = await _repositoryCoreSSO.Selecionar(request.Cpf);
+                string senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
+                var grupos = await _repositoryCoreSSO.SelecionarGrupos();
+                //se não estiver cadastra um novo
                 if (!retornoUsuarioCoreSSO.Any())
                 {
                     try
                     {
-                        await _repositoryCoreSSO.Criar(new Comum.Modelos.Entrada.UsuarioCoreSSO { Cpf = request.Cpf, Nome = usuario.Nome, Senha = request.Senha });
+                        
+                        await _repositoryCoreSSO.Criar(new Comum.Modelos.Entrada.UsuarioCoreSSO { Cpf = request.Cpf, Nome = usuario.Nome, Senha = senhaCriptografada, Grupos = grupos });
                     }
                     catch
                     {
                         validacao.Errors.Add(new ValidationFailure("Usuário", "Erro ao tentar cadastrar o usuário no CoreSSO"));
                         return RespostaApi.Falha(validacao.Errors);
                     }
+                }//caso contrário verificar se o usuário está incluído em todos os grupos
+                else
+                {
+                    var gruposNaoIncluidos = grupos.Where(w =>  !retornoUsuarioCoreSSO.Select(x => x.GrupoId).Contains(w));
+                    if (gruposNaoIncluidos.Any())
+                        _repositoryCoreSSO.IncluirUsuarioNosGrupos(retornoUsuarioCoreSSO.FirstOrDefault().UsuId, gruposNaoIncluidos);
                 }
 
                 CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
@@ -102,10 +113,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 return MapearResposta(usuario);
             }
 
-            private object MapearUsuarioCoreSSO(IEnumerable<RetornoUsuarioCoreSSO> retornoUsuarioCoreSSO)
-            {
-                throw new NotImplementedException();
-            }
 
             private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
             {

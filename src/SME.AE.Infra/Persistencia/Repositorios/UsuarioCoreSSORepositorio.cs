@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Practices.ObjectBuilder2;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
@@ -8,6 +9,7 @@ using SME.AE.Infra.Persistencia.Comandos;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -26,11 +28,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var usuId = Guid.NewGuid();
                 var parametrosPessoa = new { pessoaId, pesNome = usuario.Nome.Trim() };
                 var parametrosUsuario = new {  usuId, login = usuario.Cpf.Trim(), senha = usuario.Senha,  pessoaId };
-                var parametrosPessoaDoc = new { pesId = pessoaId, cpf = usuario.Cpf.Trim() };
+                var parametrosPessoaDoc = new { pessoaId, cpf = usuario.Cpf.Trim() };
 
                 await conn.ExecuteAsync(CoreSSOComandos.InserirPessoa, parametrosPessoa, transaction);
                 await conn.ExecuteAsync(CoreSSOComandos.InserirUsuario, parametrosUsuario, transaction);
                 await conn.ExecuteAsync(CoreSSOComandos.InserirPessoaDocumento, parametrosPessoaDoc, transaction);
+
+                usuario.Grupos.ForEach(async x => await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo,new { gruId = x, usuId }, transaction));
+
 
                 transaction.Commit();
                 conn.Close();
@@ -43,13 +48,39 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         }
 
+        public void IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos)
+        {
+            try
+            {
+                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                conn.Open();
+                using var transaction = conn.BeginTransaction();
+                gruposNaoIncluidos.ForEach(async x => await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = x, usuId }, transaction));
+                transaction.Commit();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
         public async Task<IEnumerable<RetornoUsuarioCoreSSO>> Selecionar(string cpf)
         {
             try
             {
                 using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
                 conn.Open();
-                var resultado = await conn.QueryAsync<RetornoUsuarioCoreSSO>("SELECT u.usu_id usuId FROM sys_usuario u WHERE u.usu_login = @cpf", new { cpf });
+                var resultado = await conn.QueryAsync<RetornoUsuarioCoreSSO>(@"
+                    SELECT u.usu_id usuId,u.usu_senha as senha, g.gru_id as grupoId
+                    FROM sys_usuario u
+                        LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
+                        LEFT JOIN sys_grupo g on gu.gru_id = g.gru_id
+                        WHERE u.usu_login = @cpf 
+                            AND(g.sis_id is null 
+                                OR g.sis_id = 1001)"
+                    , new { cpf });
                 conn.Close();
                 return resultado;
             }
@@ -58,6 +89,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 return null;
             }
+        }
+
+        public async Task<List<Guid>> SelecionarGrupos()
+        {
+            using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+            conn.Open();
+            var resultado = await conn.QueryAsync<Guid>(@"
+                    SELECT gru_id
+                    FROM sys_grupo 
+                        WHERE sis_id = 1001");
+            conn.Close();
+            return resultado.ToList();
         }
     }
 }
