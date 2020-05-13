@@ -39,20 +39,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             throw new NotImplementedException();
         }
 
-        public async Task<bool> Remover(long notificacaoId)
+        public async Task<bool> RemoverPorId(long id)
         {
-           
+
 
             try
             {
-                await using (var conn = new Npgsql.NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
 
-                     await conn.ExecuteAsync(
-                        @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
-                    conn.Close();
-                }
+                await conn.ExecuteAsync(
+                   @"DELETE FROM usuario_notificacao_leitura where id = @id", new { id });
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -61,6 +59,40 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
             return true;
+        }
+
+        public async Task<bool> Remover(long notificacaoId)
+        {
+           
+
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+
+                await conn.ExecuteAsync(
+                   @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<UsuarioNotificacao> Selecionar(UsuarioNotificacao usuarioNotificacao)
+        {
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataAtual = DateTime.Now;
+            var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
+                @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
+                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
+            conn.Close();
+            return retorno;
         }
     }
 }
