@@ -30,7 +30,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return false;
+                throw new Exception("Erro ao marcar a mensagem como  lida, tente novamente");
             }
         }
 
@@ -55,7 +55,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return false;
+                throw new Exception("Erro ao marcar a mensagem como não lida, tente novamente");
             }
 
             return true;
