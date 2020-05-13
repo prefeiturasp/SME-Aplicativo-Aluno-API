@@ -35,11 +35,12 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
                     var mensagem = await _repository.Selecionar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
                     if (mensagem == null)
                         return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    return await _repository.RemoverPorId(mensagem.Id);
+                    //retorna false 
+                    return !await _repository.RemoverPorId(mensagem.Id);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    return false;
+                    throw new Exception(ex.Message);
                 }
             }
         }
