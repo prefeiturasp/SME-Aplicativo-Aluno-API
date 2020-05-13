@@ -63,6 +63,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 {
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
                     ExcluiUsuarioSeExistir(request, usuarioRetorno);
+                    var usuarioCoreSSO = await _repositoryCoreSSO.Selecionar(request.Cpf);
+                    if (usuarioCoreSSO.Any())
+                        await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, StatusUsuarioCoreSSO.Inativo);
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
@@ -92,7 +95,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 {
                     try
                     {
-                        
+
                         await _repositoryCoreSSO.Criar(new Comum.Modelos.Entrada.UsuarioCoreSSO { Cpf = request.Cpf, Nome = usuario.Nome, Senha = senhaCriptografada, Grupos = grupos });
                     }
                     catch
@@ -103,7 +106,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 }//caso contrário verificar se o usuário está incluído em todos os grupos
                 else
                 {
-                    var gruposNaoIncluidos = grupos.Where(w =>  !retornoUsuarioCoreSSO.Select(x => x.GrupoId).Contains(w));
+                    if (retornoUsuarioCoreSSO.FirstOrDefault().Status == (int)StatusUsuarioCoreSSO.Inativo)
+                        await _repositoryCoreSSO.AlterarStatusUsuario(retornoUsuarioCoreSSO.FirstOrDefault().UsuId, StatusUsuarioCoreSSO.Ativo);
+                    var gruposNaoIncluidos = grupos.Where(w => !retornoUsuarioCoreSSO.Select(x => x.GrupoId).Contains(w));
                     if (gruposNaoIncluidos.Any())
                         _repositoryCoreSSO.IncluirUsuarioNosGrupos(retornoUsuarioCoreSSO.FirstOrDefault().UsuId, gruposNaoIncluidos);
                 }
@@ -113,6 +118,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 return MapearResposta(usuario);
             }
 
+         
 
             private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
             {

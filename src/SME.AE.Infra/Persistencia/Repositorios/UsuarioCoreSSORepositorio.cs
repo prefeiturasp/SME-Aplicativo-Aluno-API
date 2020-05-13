@@ -2,6 +2,7 @@
 using Microsoft.Practices.ObjectBuilder2;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -16,6 +17,29 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioCoreSSORepositorio : IUsuarioCoreSSORepositorio
     {
+        public async Task AlterarStatusUsuario(Guid usuId, StatusUsuarioCoreSSO novoStatus)
+        {
+            try
+            {
+                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                conn.Open();
+                using var transaction = conn.BeginTransaction();
+
+                int status = (int)novoStatus;
+
+                await conn.ExecuteAsync(CoreSSOComandos.AtualizarStatusUsuario, new { usuId, status }, transaction);
+                await conn.ExecuteAsync(CoreSSOComandos.AtualizarStatusUsuarioGrupo, new { usuId, status }, transaction);
+
+                transaction.Commit();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
         public async Task Criar(UsuarioCoreSSO usuario)
         {
             try
@@ -73,7 +97,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
                 conn.Open();
                 var resultado = await conn.QueryAsync<RetornoUsuarioCoreSSO>(@"
-                    SELECT u.usu_id usuId,u.usu_senha as senha, g.gru_id as grupoId
+                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, g.gru_id as grupoId
                     FROM sys_usuario u
                         LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
                         LEFT JOIN sys_grupo g on gu.gru_id = g.gru_id

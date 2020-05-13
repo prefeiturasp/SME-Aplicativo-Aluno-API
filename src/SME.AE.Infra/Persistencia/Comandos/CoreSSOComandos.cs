@@ -71,5 +71,15 @@ namespace SME.AE.Infra.Persistencia.Comandos
                 (@usuId
                 ,@gruId
                 ,1)";
+        public static string AtualizarStatusUsuario = @"
+            UPDATE SYS_Usuario SET usu_situacao = @status WHERE usu_id = @usuId";
+        public static string AtualizarStatusUsuarioGrupo = @"
+            UPDATE UG 
+            SET ug.usg_situacao = @status 
+                FROM SYS_UsuarioGrupo UG
+                    INNER JOIN SYS_Grupo G
+                        ON UG.gru_id = g.gru_id
+            WHERE usu_id = @usuId
+                AND g.sis_id = 1001";
     }
 }

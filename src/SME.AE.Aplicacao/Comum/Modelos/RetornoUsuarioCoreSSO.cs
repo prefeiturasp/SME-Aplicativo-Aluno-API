@@ -8,5 +8,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string Cpf { get; set; }
         public string Senha { get; set; }
         public Guid GrupoId { get; set; }
+        public int Status { get; internal set; }
     }
 }
