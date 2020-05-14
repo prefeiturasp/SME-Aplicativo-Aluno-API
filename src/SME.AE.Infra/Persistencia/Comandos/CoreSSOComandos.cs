@@ -81,5 +81,10 @@ namespace SME.AE.Infra.Persistencia.Comandos
                         ON UG.gru_id = g.gru_id
             WHERE usu_id = @usuId
                 AND g.sis_id = 1001";
+
+        public static string AtualizarCriptografia = @"
+            UPDATE SYS_Usuario SET usu_criptogarfia = 1, usu_senha = @senha
+            WHERE usu_id = @usuId
+        ";
     }
 }

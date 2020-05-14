@@ -12,5 +12,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string Nome { get; set; }
         public DateTime DataNascimento { get; set; }
         public int TipoSigilo { get; set; }
+        public string DDD { get; set; }
+        public string Celular { get; set; }
     }
 }

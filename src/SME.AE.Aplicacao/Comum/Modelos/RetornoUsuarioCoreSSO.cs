@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+using System;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
@@ -9,5 +10,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string Senha { get; set; }
         public Guid GrupoId { get; set; }
         public int Status { get; internal set; }
+        public TipoCriptografia TipoCriptografia {get;set;}
     }
 }
