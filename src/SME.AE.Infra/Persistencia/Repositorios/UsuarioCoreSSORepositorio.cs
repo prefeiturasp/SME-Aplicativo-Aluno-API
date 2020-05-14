@@ -40,6 +40,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task AtualizarCriptografiaUsuario(Guid usuId, string senha)
+        {
+            try
+            {
+                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                conn.Open();
+                await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
         public async Task Criar(UsuarioCoreSSO usuario)
         {
             try
@@ -58,7 +74,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conn.ExecuteAsync(CoreSSOComandos.InserirUsuario, parametrosUsuario, transaction);
                 await conn.ExecuteAsync(CoreSSOComandos.InserirPessoaDocumento, parametrosPessoaDoc, transaction);
 
-                usuario.Grupos.ForEach(async x => await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo,new { gruId = x, usuId }, transaction));
+                foreach(var grupo in usuario.Grupos)
+                    await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
 
 
                 transaction.Commit();
@@ -97,7 +114,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
                 conn.Open();
                 var resultado = await conn.QueryAsync<RetornoUsuarioCoreSSO>(@"
-                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, g.gru_id as grupoId
+                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, g.gru_id as grupoId
                     FROM sys_usuario u
                         LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
                         LEFT JOIN sys_grupo g on gu.gru_id = g.gru_id
