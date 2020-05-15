@@ -8,7 +8,8 @@ using System.Text;
 
 namespace SME.AE.Api.Services
 {
-    public class TokenService
+    public class 
+        TokenService
     {
         public static string GerarToken(Usuario usuario)
         {
