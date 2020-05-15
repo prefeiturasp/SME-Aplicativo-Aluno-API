@@ -1,19 +1,19 @@
 ﻿version: '3'
 services:
-#  web:
-#    env_file:
-#      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
-#    container_name: smeae_container
-#    build: .
-#    ports:
-#      - "5001:5001"
-#      - "5000:5000"
-#    links:
-#      - postgres
-#    networks:
-#      - default
-#    depends_on:
-#      - flyway
+  web:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: smeae_container
+    build: .
+    ports:
+      - "5001:5001"
+      - "5000:5000"
+    links:
+      - postgres
+    networks:
+      - default
+    depends_on:
+      - flyway
   
   postgres:
     env_file:
