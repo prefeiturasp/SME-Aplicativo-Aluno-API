@@ -28,6 +28,7 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Infra;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Swashbuckle.Swagger;
 
 namespace SME.AE.Api
 {
@@ -61,18 +62,42 @@ namespace SME.AE.Api
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))
                 .AddNewtonsoftJson();
-            
+
             // Register the Swagger generator, defining 1 or more Swagger documents
+            //    services.AddSwaggerGen(c =>
+            //    {
+            //        c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
+            //        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
+            //            In = ParameterLocation.Header,
+            //            Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.", 
+            //            Name = "Authorization", Type = SecuritySchemeType.ApiKey
+            //        });
+            //    });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
-                    In = ParameterLocation.Header,
-                    Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.", 
-                    Name = "Authorization", Type = SecuritySchemeType.ApiKey
-                });
+                c.AddSecurityDefinition("Bearer",
+                    new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Description = "Para autenticação, incluir 'Bearer' seguido do token JWT",
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey
+                    });
+
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> {
+                    { "Bearer", Enumerable.Empty<string>() },
+                            });
             });
+
+
         }
+
+
+
+
+
 
         private void AddAuthentication(IServiceCollection services)
         {
