@@ -40,7 +40,7 @@ namespace SME.AE.Api
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
 
@@ -53,9 +53,10 @@ namespace SME.AE.Api
 
             services.AddInfrastructure();
             services.AddApplication();
-            
+
             services.AddCors(options => options.AddDefaultPolicy(
-                builder => {
+                builder =>
+                {
                     builder.WithOrigins("*");
                 })
             );
@@ -64,60 +65,56 @@ namespace SME.AE.Api
                 .AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
-            //    services.AddSwaggerGen(c =>
-            //    {
-            //        c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
-            //        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
-            //            In = ParameterLocation.Header,
-            //            Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.", 
-            //            Name = "Authorization", Type = SecuritySchemeType.ApiKey
-            //        });
-            //    });
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
-                c.AddSecurityDefinition("Bearer",
-                    new OpenApiSecurityScheme
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
                     {
-                        In = ParameterLocation.Header,
-                        Description = "Para autenticação, incluir 'Bearer' seguido do token JWT",
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.ApiKey
-                    });
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
 
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> {
-                    { "Bearer", Enumerable.Empty<string>() },
-                            });
+                    }
+                });
             });
-
-
         }
-
-
-
-
-
-
         private void AddAuthentication(IServiceCollection services)
         {
             byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
             services
-                .AddAuthentication(x => {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(x =>{
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                    };
-                });
+                    .AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+                    .AddJwtBearer(x =>
+    {
+        x.RequireHttpsMetadata = false;
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+        };
+    });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -130,23 +127,23 @@ namespace SME.AE.Api
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhemento Escolar V1");
-            });
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhemento Escolar V1");
+                });
 
             app
-                .UseCors(x => x
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod())
-                // .UseHttpsRedirection()
-                .UseAuthentication()
-                .UseRouting()
-                .UseAuthorization()
-                .UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
+                    .UseCors(x => x
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod())
+                    // .UseHttpsRedirection()
+                    .UseAuthentication()
+                    .UseRouting()
+                    .UseAuthorization()
+                    .UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                    });
         }
     }
 }
