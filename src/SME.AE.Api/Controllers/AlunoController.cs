@@ -16,7 +16,7 @@ namespace SME.AE.Api.Controllers
     public class AlunoController : ApiController
     {
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult> ObterDadosAlunos([FromQuery] string cpf)
         {
             try
