@@ -39,30 +39,38 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
             var firebaseCredential = GoogleCredential.FromJson(VariaveisAmbiente.FirebaseToken);
 
             FirebaseApp app;
-
+            String resultado = "";
             if (FirebaseApp.DefaultInstance == null)
-                app = FirebaseApp.Create(new AppOptions()
-                {
-                    Credential = firebaseCredential,
-                    ProjectId = VariaveisAmbiente.FirebaseProjectId
-                });
-
-            String resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
             {
-                Data = new Dictionary<String, String>
+
+            
+            app = FirebaseApp.Create(new AppOptions()
+            {
+                Credential = firebaseCredential,
+                ProjectId = VariaveisAmbiente.FirebaseProjectId
+            });
+
+             foreach(var grupo in request.Grupos)
+            {
+                 resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
-                    ["Titulo"] = request.Notificacao.Titulo,
-                    ["Mensagem"] = request.Notificacao.Mensagem,
-                    ["Grupo"] = request.Notificacao.Grupo,
-                    ["Id"] = request.Notificacao.Id.ToString()
-                },
-                Notification = new Notification
-                {
-                    Title = request.Notificacao.Titulo,
-                    Body = "Você possui novos comunicados. Toque aqui para abrir no aplicativo.",
-                },
-                Topic = "AppAluno"
-            }).ConfigureAwait(true);
+                    Data = new Dictionary<String, String>
+                    {
+                        ["Titulo"] = request.Notificacao.Titulo,
+                        ["Mensagem"] = request.Notificacao.Mensagem,
+                        ["Grupo"] = request.Notificacao.Grupo,
+                        ["Id"] = request.Notificacao.Id.ToString()
+                    },
+                    Notification = new Notification
+                    {
+                        Title = request.Notificacao.Titulo,
+                        Body = "Você possui novos comunicados. Toque aqui para abrir no aplicativo.",
+                    },
+                    Topic = grupo.ToString()
+                 }).ConfigureAwait(true);
+            }
+            }
+
 
             return resultado != null;
         }
