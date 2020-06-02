@@ -28,6 +28,7 @@
     <Compile Include="Comum\Modelos\Resposta\Grupo.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
   </ItemGroup>
 
@@ -38,6 +39,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="FirebaseAdmin" Version="1.11.0" />
     <PackageReference Include="FluentValidation" Version="8.6.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="8.6.2" />
