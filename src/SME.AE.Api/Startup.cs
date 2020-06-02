@@ -28,6 +28,7 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Infra;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using SME.AE.Infra.Persistencia.Mapeamentos;
 
 namespace SME.AE.Api
 {
@@ -52,6 +53,8 @@ namespace SME.AE.Api
 
             services.AddInfrastructure();
             services.AddApplication();
+
+            RegistrarMapeamentos.Registrar();
             
             services.AddCors(options => options.AddDefaultPolicy(
                 builder => {
