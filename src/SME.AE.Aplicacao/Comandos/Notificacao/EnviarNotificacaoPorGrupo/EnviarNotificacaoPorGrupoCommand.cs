@@ -38,21 +38,21 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
         {
             var firebaseCredential = GoogleCredential.FromJson(VariaveisAmbiente.FirebaseToken);
 
-            FirebaseApp app;
+            FirebaseApp app = FirebaseApp.DefaultInstance;
             String resultado = "";
-            if (FirebaseApp.DefaultInstance == null)
-            {
 
-            
-            app = FirebaseApp.Create(new AppOptions()
+            if (app == null)
             {
-                Credential = firebaseCredential,
-                ProjectId = VariaveisAmbiente.FirebaseProjectId
-            });
+                app = FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = firebaseCredential,
+                    ProjectId = VariaveisAmbiente.FirebaseProjectId
+                });
+            }
 
-             foreach(var grupo in request.Grupos)
+            foreach(var grupo in request.Grupos)
             {
-                 resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
+                resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
                     Data = new Dictionary<String, String>
                     {
@@ -67,10 +67,8 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                         Body = "Você possui novos comunicados. Toque aqui para abrir no aplicativo.",
                     },
                     Topic = grupo.ToString()
-                 }).ConfigureAwait(true);
+                }).ConfigureAwait(true);
             }
-            }
-
 
             return resultado != null;
         }
