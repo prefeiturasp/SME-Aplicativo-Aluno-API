@@ -13,10 +13,12 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
     public class ObterNotificacaoPorGrupoCommand : IRequest<IEnumerable<NotificacaoResposta>>
     {
         public string Grupo { get; set; }
+        public string Cpf { get; }
 
-        public ObterNotificacaoPorGrupoCommand(string grupo)
+        public ObterNotificacaoPorGrupoCommand(string grupo, string cpf)
         {
             Grupo = grupo;
+            Cpf = cpf;
         }
     }
 
@@ -35,7 +37,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
             (ObterNotificacaoPorGrupoCommand request, CancellationToken cancellationToken)
         {
             var grupos = await _grupoComunicadoRepository.ObterTodos();
-            var grupo = await _repository.ObterPorGrupo(request.Grupo);
+            var grupo = await _repository.ObterPorGrupoUsuario(request.Grupo, request.Cpf);
             return grupo.Select(x => new NotificacaoResposta
             {
                 AlteradoEm = x.AlteradoEm,
@@ -47,6 +49,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
                 DataExpiracao = x.DataExpiracao,
                 Mensagem = x.Mensagem,
                 Titulo = x.Titulo,
+                MensagemVisualizada =  x.MensagemVisualizada,
                 Grupos = SelecionarGrupos(x.Grupo, grupos)
             });
         }
