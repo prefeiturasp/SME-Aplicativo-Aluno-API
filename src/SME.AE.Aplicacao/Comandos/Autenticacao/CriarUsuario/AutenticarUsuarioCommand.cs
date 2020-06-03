@@ -59,8 +59,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 //verificar se o usuário está cadastrado no CoreSSO
                 var usuarioCoreSSO = await _repositoryCoreSSO.Selecionar(request.Cpf);
-
-
+                
                 string senhaCriptografada = string.Empty;
                
                 //verificar se as senhas são iguais
