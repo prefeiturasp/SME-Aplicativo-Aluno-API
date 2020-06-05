@@ -31,6 +31,8 @@ namespace SME.AE.Aplicacao.Teste.Infra
             services.AddTransient(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.AddTransient(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
             services.AddTransient(typeof(IAplicacaoDapperContext<>), typeof(AplicacaoDapperContext<>));
+            services.AddTransient(typeof(IBaseRepositorio<>), typeof(BaseRepositorio<>));
+            services.AddTransient(typeof(IExternoRepositorio<,>), typeof(ExternoRepositorio<,>));
             services.AddTransient(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepositoryMock));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
