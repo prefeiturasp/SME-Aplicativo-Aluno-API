@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public interface IExternoRepositorio<T> where T : class
+    public interface IExternoRepositorio<T,Z> where T : class where Z : IDbConnection
     {
         IEnumerable<T> Listar();
 

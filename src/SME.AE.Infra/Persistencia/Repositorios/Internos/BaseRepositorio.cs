@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
+using Npgsql;
 using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
@@ -13,11 +14,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class BaseRepositorio<T> : IBaseRepositorio<T> where T : EntidadeBase
     {
-        protected readonly IAplicacaoDapperContext database;
+        protected readonly IAplicacaoDapperContext<NpgsqlConnection> database;
 
         protected BaseRepositorio(string connectionString)
         {
-            this.database = new AplicacaoDapperContext(connectionString);
+            var connection = new NpgsqlConnection(connectionString);
+
+            this.database = new AplicacaoDapperContext<NpgsqlConnection>(connection);
         }
 
         public virtual IEnumerable<T> Listar()

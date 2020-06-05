@@ -3,17 +3,19 @@ using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Text;
 
 namespace SME.AE.Infra.Persistencia
 {
-    public class AplicacaoDapperContext : IAplicacaoDapperContext
+    public class AplicacaoDapperContext<T> : IAplicacaoDapperContext<T> where T : IDbConnection
     {
-        private readonly NpgsqlConnection conexao;
+        private readonly IDbConnection conexao;
 
-        public AplicacaoDapperContext(string connectionString)
+        public AplicacaoDapperContext(T connection)
         {
-            conexao = new NpgsqlConnection(connectionString);
+            conexao = connection;
         }
 
         public IDbConnection Conexao

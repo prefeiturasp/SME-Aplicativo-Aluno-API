@@ -4,18 +4,19 @@ using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class ExternoRepositorio<T> : IExternoRepositorio<T> where T : class
+    public class ExternoRepositorio<T,Z> : IExternoRepositorio<T,Z> where T : class where Z : IDbConnection
     {
-        protected IAplicacaoDapperContext database;
+        protected IAplicacaoDapperContext<Z> database;
 
-        protected ExternoRepositorio(string connectionString)
-        {
-            database = new AplicacaoDapperContext(connectionString);
+        protected ExternoRepositorio(Z connection)
+        {            
+            database = new AplicacaoDapperContext<Z>(connection);
         }
 
         public virtual IEnumerable<T> Listar()

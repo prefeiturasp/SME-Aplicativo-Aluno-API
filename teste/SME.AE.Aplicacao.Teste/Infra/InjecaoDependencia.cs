@@ -30,11 +30,11 @@ namespace SME.AE.Aplicacao.Teste.Infra
             services.AddTransient(typeof(INotificacaoRepository), typeof(NotificacaoRepository));
             services.AddTransient(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.AddTransient(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
-            services.AddTransient(typeof(IAplicacaoDapperContext), typeof(AplicacaoDapperContext));
+            services.AddTransient(typeof(IAplicacaoDapperContext<>), typeof(AplicacaoDapperContext<>));
             services.AddTransient(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepositoryMock));
-            
+
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
-            
+
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.AddTransient<IAutenticacaoService, AutenticacaoService>();
 
