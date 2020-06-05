@@ -1,4 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+﻿using SME.AE.Dominio.Comum.Enumeradores;
 
 namespace SME.AE.Infra.Persistencia.Comandos
 {

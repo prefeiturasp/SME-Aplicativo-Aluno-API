@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Contextos
 {
-    public interface IAplicacaoDapperContext : IDbConnection
+    public interface IAplicacaoDapperContext<T> where T : IDbConnection
     {
         IDbConnection Conexao { get; }
     }
