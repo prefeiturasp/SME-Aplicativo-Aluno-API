@@ -22,8 +22,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var dataAtual = DateTime.Now;
                 var retorno = await conn.ExecuteAsync(
                     @"INSERT INTO public.usuario_notificacao_leitura
-                     (usuario_id, codigo_eol_aluno, notificacao_id, criadoem)
-                    VALUES(@usuarioId, 0, @notificacaoId, @dataAtual);", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
+                     (usuario_id,  notificacao_id, criadoem, mensagemLida, ueId, dreId)
+                    VALUES(@usuarioId, @notificacaoId, @dataAtual, @mensagemLida, @ueId, @dreId);",
+                     new
+                     {
+                         usuarioNotificacao.UsuarioId,
+                         usuarioNotificacao.NotificacaoId,
+                         dataAtual,
+                         usuarioNotificacao.MensagemLida,
+                         usuarioNotificacao.UeId,
+                         usuarioNotificacao.DreId
+                     });
                 conn.Close();
                 return true;
             }
@@ -63,7 +72,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<bool> Remover(long notificacaoId)
         {
-           
+
 
             try
             {
@@ -89,8 +98,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Open();
             var dataAtual = DateTime.Now;
             var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
-                @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
-                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
+                @"SELECT * from public.usuario_notificacao_leitura
+                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId });
             conn.Close();
             return retorno;
         }

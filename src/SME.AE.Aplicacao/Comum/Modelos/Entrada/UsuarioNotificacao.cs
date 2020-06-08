@@ -8,5 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
     {
         public long Id { get; set; }
         public long UsuarioId { get; set; }
+        public string  UeId { get; set; }
+        public string  DreId { get; set; }
     }
 }

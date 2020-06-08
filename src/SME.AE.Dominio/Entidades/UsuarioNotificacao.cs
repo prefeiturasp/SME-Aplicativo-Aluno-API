@@ -10,9 +10,13 @@ namespace SME.AE.Dominio.Entidades
         public long UsuarioId { get; set; }
         public long CodigoAlunoEol { get; set; }
         public long NotificacaoId { get; set; }
+        public string UeId { get; set; }
+        public string DreId { get; set; }
         public DateTime? CriadoEm { get; set; }
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
         public string AlteradoPor { get; set; }
+        public bool MensagemLida { get; set; }
+
     }
 }

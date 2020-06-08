@@ -10,9 +10,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 {
     public class MarcarMensagemLidaUseCase
     {
-        public static async Task<bool> Executar(IMediator mediator, UsuarioNotificacao usuarioMensagem)
+        public static async Task<object> Executar(IMediator mediator, UsuarioNotificacao usuarioMensagem)
         {
-            return await mediator.Send(new UsuarioNotificacaoCommand(usuarioMensagem.Id,usuarioMensagem.UsuarioId));
+            return await mediator.Send(new UsuarioNotificacaoCommand( usuarioMensagem.Id, usuarioMensagem.UsuarioId, usuarioMensagem.UeId, usuarioMensagem.DreId));
         }
     }
 }

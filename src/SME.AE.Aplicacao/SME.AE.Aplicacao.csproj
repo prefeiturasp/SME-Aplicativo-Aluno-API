@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Compile Include="Comum\Modelos\Resposta\Grupo.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotificacaoLeitura.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
