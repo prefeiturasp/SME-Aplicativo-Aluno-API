@@ -59,7 +59,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     {
                         ["Titulo"] = request.Notificacao.Titulo,
                         ["Mensagem"] = request.Notificacao.Mensagem,
-                        ["Grupo"] = request.Notificacao.Grupo,
+                        ["Grupo"] = grupo.ToString(),
                         ["Id"] = request.Notificacao.Id.ToString(),
                         ["CriadoEm"] = request.Notificacao.CriadoEm.Value.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
                         ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
