@@ -49,8 +49,9 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     ProjectId = VariaveisAmbiente.FirebaseProjectId
                 });
             }
-
-            foreach(var grupo in request.Grupos)
+            var data = request.Notificacao.CriadoEm.ToString();
+          
+            foreach (var grupo in request.Grupos)
             {
                 resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
@@ -58,8 +59,10 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     {
                         ["Titulo"] = request.Notificacao.Titulo,
                         ["Mensagem"] = request.Notificacao.Mensagem,
-                        ["Grupo"] = request.Notificacao.Grupo,
-                        ["Id"] = request.Notificacao.Id.ToString()
+                        ["Grupo"] = grupo.ToString(),
+                        ["Id"] = request.Notificacao.Id.ToString(),
+                        ["CriadoEm"] = request.Notificacao.CriadoEm.Value.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
+                        ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
                     },
                     Notification = new Notification
                     {
