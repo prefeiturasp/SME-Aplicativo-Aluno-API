@@ -10,7 +10,7 @@ namespace SME.AE.Api.Controllers
     public class UsuarioNotificacaoController : ApiController
     {
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<ActionResult> MarcarMensagemLida([FromBody] Aplicacao.Comum.Modelos.Entrada.UsuarioNotificacao usuarioMensagem)
         {
             try

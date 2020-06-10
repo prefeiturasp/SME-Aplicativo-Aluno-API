@@ -171,6 +171,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
 
                 return MapearResposta(usuario, primeiroAcesso, email, celular);
+                return MapearResposta(usuario, usuarioRetorno);
             }
 
 
@@ -212,12 +213,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
             }
 
             private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, bool primeiroAcesso, string email, string celular)
+            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp)
             {
                 RespostaAutenticar usuario = new RespostaAutenticar
                 {
                     Cpf = usuarioEol.Cpf,
                     Email = email,
-                    Id = usuarioEol.Id,
+                    Id = usuarioApp.Id,
                     Nome = usuarioEol.Nome,
                     PrimeiroAcesso = primeiroAcesso,
                     Celular = celular,
