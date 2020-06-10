@@ -90,7 +90,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var dataAtual = DateTime.Now;
             var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
                 @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
-                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
+                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId });
             conn.Close();
             return retorno;
         }
