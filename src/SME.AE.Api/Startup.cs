@@ -14,6 +14,7 @@ using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra;
 using System.Linq;
 using System.Text;
+using Swashbuckle.Swagger;
 
 namespace SME.AE.Api
 {
@@ -62,32 +63,48 @@ namespace SME.AE.Api
                     In = ParameterLocation.Header,
                     Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.",
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
+
+                    }
                 });
             });
         }
-
         private void AddAuthentication(IServiceCollection services)
         {
             byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
             services
-                .AddAuthentication(x =>
-                {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                    };
-                });
+                    .AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+                    .AddJwtBearer(x =>
+    {
+        x.RequireHttpsMetadata = false;
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+        };
+    });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -100,23 +117,23 @@ namespace SME.AE.Api
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhemento Escolar V1");
-            });
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhemento Escolar V1");
+                });
 
             app
-                .UseCors(x => x
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod())
-                // .UseHttpsRedirection()
-                .UseAuthentication()
-                .UseRouting()
-                .UseAuthorization()
-                .UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
+                    .UseCors(x => x
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod())
+                    // .UseHttpsRedirection()
+                    .UseAuthentication()
+                    .UseRouting()
+                    .UseAuthorization()
+                    .UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                    });
         }
     }
 }

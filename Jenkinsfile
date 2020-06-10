@@ -102,10 +102,10 @@ pipeline {
            branch 'release'
          }
         steps {
-          timeout(time: 24, unit: "HOURS") {
+         // timeout(time: 24, unit: "HOURS") {
           // telegramSend("${JOB_NAME}...O Build ${BUILD_DISPLAY_NAME} - Requer uma aprovação para deploy !!!\n Consulte o log para detalhes -> [Job logs](${env.BUILD_URL}console)\n")
-            input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato'
-          }
+          //  input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato'
+         // }
          sh 'echo Deploying ambiente homologacao'
                 
           // Start JOB para build das imagens Docker e push SME Registry
@@ -154,10 +154,10 @@ pipeline {
            branch 'master'
          }
         steps {
-          timeout(time: 24, unit: "HOURS") {
+         // timeout(time: 24, unit: "HOURS") {
           // telegramSend("${JOB_NAME}...O Build ${BUILD_DISPLAY_NAME} - Requer uma aprovação para deploy !!!\n Consulte o log para detalhes -> [Job logs](${env.BUILD_URL}console)\n")
-            input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato'
-          }
+         //   input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato'
+         // }
             sh 'echo Build image docker Produção'
           // Start JOB para build das imagens Docker e push SME Registry
       

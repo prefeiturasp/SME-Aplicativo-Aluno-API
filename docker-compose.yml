@@ -4,12 +4,32 @@ volumes:
   postgres-data: {}
 
 services:
-  sme-api-ae:
-    container_name: sme-api-ae
-    image: sme-api-ae
-    build:
-      context: .
-      dockerfile: Dockerfile
+  web:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: smeae_container
+    build: .
+    ports:
+      - "5001:5001"
+      - "5000:5000"
+    links:
+      - postgres
+    networks:
+      - default
+    depends_on:
+      - flyway
+  
+  postgres:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
     ports:
       - "5000:5000"                  
     networks:
