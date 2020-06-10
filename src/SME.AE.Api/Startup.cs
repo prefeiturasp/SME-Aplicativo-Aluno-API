@@ -1,33 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Logging;
+using SME.AE.Api.Configuracoes;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Config;
-using SME.AE.Aplicacao.CasoDeUso;
-using SME.AE.Aplicacao.Comum.Interfaces;
-using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Infra;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Linq;
+using System.Text;
 
 namespace SME.AE.Api
 {
@@ -39,37 +25,44 @@ namespace SME.AE.Api
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
 
             AddAuthentication(services);
+
             services.AddResponseCompression(options =>
             {
                 options.Providers.Add<GzipCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
 
+            RegistrarMvc.Registrar(services, Configuration);
             services.AddInfrastructure();
             services.AddApplication();
-            
+
+            services.AdicionarValidadoresFluentValidation();
+
             services.AddCors(options => options.AddDefaultPolicy(
-                builder => {
+                builder =>
+                {
                     builder.WithOrigins("*");
                 })
             );
             services
                 .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))
                 .AddNewtonsoftJson();
-            
+
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { 
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
                     In = ParameterLocation.Header,
-                    Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.", 
-                    Name = "Authorization", Type = SecuritySchemeType.ApiKey
+                    Description = "Por favor, entre com a palavra 'Bearer' seguido de espaço e o token JWT.",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
                 });
             });
         }
@@ -78,11 +71,13 @@ namespace SME.AE.Api
         {
             byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
             services
-                .AddAuthentication(x => {
+                .AddAuthentication(x =>
+                {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
-                .AddJwtBearer(x =>{
+                .AddJwtBearer(x =>
+                {
                     x.RequireHttpsMetadata = false;
                     x.SaveToken = true;
                     x.TokenValidationParameters = new TokenValidationParameters
