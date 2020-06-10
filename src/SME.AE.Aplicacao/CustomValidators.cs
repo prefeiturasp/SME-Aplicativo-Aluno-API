@@ -11,7 +11,7 @@ namespace SME.AE.Aplicacao
         {
             return ruleBuilder.Must(m => CpfEhValido(m) == true);
         }
-
+        
         public static IRuleBuilderOptions<T, DateTime> DataNascimentoEhValida<T>(this IRuleBuilder<T, DateTime> ruleBuilder)
         {
             return ruleBuilder.Must(m => NascimentoEhValida(m) == true);
