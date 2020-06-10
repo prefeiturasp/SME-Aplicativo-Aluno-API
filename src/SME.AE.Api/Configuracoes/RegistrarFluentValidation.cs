@@ -8,12 +8,6 @@ namespace SME.AE.Api
     {
         public static void AdicionarValidadoresFluentValidation(this IServiceCollection services)
         {
-            var assemblyInfra = AppDomain.CurrentDomain.Load("SME.AE.Infra");
-
-            AssemblyScanner
-                .FindValidatorsInAssembly(assemblyInfra)
-                .ForEach(result => services.AddScoped(result.InterfaceType, result.ValidatorType));
-
             var assembly = AppDomain.CurrentDomain.Load("SME.AE.Aplicacao");
 
             AssemblyScanner

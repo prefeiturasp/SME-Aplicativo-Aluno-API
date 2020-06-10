@@ -19,6 +19,7 @@ using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
 using static SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario.AutenticarUsuarioCommand;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
+using System;
 
 namespace SME.AE.Aplicacao
 {
@@ -50,12 +51,19 @@ namespace SME.AE.Aplicacao
             return services;
         }
 
+        public static void AdicionarMediatr(this IServiceCollection services)
+        {
+            var assembly = AppDomain.CurrentDomain.Load("SME.AE.Aplicacao");
+            services.AddMediatR(assembly);
+            //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidacoesPipeline<,>));
+        }
+
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddFluentValidation(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly());
-            
+
+            AdicionarMediatr(services);
             AddFiltros(services);
             AddServices(services);
             AddCasosDeUso(services);
