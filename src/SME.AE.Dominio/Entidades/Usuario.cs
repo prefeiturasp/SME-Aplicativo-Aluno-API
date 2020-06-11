@@ -11,6 +11,7 @@ namespace SME.AE.Dominio.Entidades
         public string Nome { get; set; }
         public string Email { get; set; }
         public DateTime UltimoLogin { get; set; }
+        public bool PrimeiroAcesso { get; set; }
         public bool Excluido { get; set; }
     }
 }
