@@ -13,8 +13,13 @@ using SME.AE.Infra.Persistencia.Consultas;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class UsuarioRepository : IUsuarioRepository
+    public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
+        public UsuarioRepository() : base(ConnectionStrings.Conexao)
+        {
+
+        }
+
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
             Usuario usuario;
@@ -39,6 +44,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return usuario;
 
         }
+
         public async Task<IEnumerable<string>> ObterTodos()
         {
             try

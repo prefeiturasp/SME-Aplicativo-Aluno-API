@@ -3,7 +3,7 @@ using System;
 
 namespace SME.AE.Dominio.Entidades.Externas
 {
-    public class UsuarioSenhaHistoricoCoreSSO
+    public class UsuarioSenhaHistoricoCoreSSO : EntidadeExterna
     {
         public Guid UsuarioId { get; set; }
         public Guid SenhaId { get; set; }

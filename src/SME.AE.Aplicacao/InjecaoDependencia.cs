@@ -18,6 +18,8 @@ using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
 using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
 using static SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario.AutenticarUsuarioCommand;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 
 namespace SME.AE.Aplicacao
 {
@@ -54,27 +56,27 @@ namespace SME.AE.Aplicacao
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddFluentValidation(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
-            
+
             AddFiltros(services);
             AddServices(services);
             AddCasosDeUso(services);
             AddComandos(services);
-            
+
             return services;
         }
 
-        private static void AddServices(IServiceCollection services) {}
+        private static void AddServices(IServiceCollection services) { }
 
         private static void AddFiltros(IServiceCollection services)
         {
-            services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidacaoRequisicaoMiddleware<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidacaoRequisicaoMiddleware<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExcecaoMiddleware<,>));
         }
 
         private static void AddCasosDeUso(IServiceCollection services)
         {
             services.AddScoped(provider => provider.GetService<AutenticarUsuarioUseCase>());
-            
+
             // Notificacao
             services.AddScoped(provider => provider.GetService<CriarNotificacaoUseCase>());
             services.AddScoped(provider => provider.GetService<AtualizarNotificacaoUseCase>());
@@ -84,6 +86,9 @@ namespace SME.AE.Aplicacao
 
             // Mensagem
             services.AddScoped(provider => provider.GetService<MarcarMensagemLidaUseCase>());
+
+            //Usuario
+            services.TryAddScoped(typeof(ICriarUsuarioPrimeiroAcessoUseCase), typeof(CriarUsuarioPrimeiroAcessoUseCase));
         }
 
         private static void AddComandos(IServiceCollection services)
@@ -95,11 +100,11 @@ namespace SME.AE.Aplicacao
             // Token
             services.AddMediatR(typeof(CriarTokenCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(CriarTokenCommandHandler).GetTypeInfo().Assembly);
-            
+
             // Autenticacao
             services.AddMediatR(typeof(AutenticarUsuarioCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(AutenticarUsuarioCommandHandler).GetTypeInfo().Assembly);
-            
+
             // Notificacao
             services.AddMediatR(typeof(CriarNotificacaoCommand).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(CriarNotificacaoCommandHandler).GetTypeInfo().Assembly);

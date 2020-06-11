@@ -24,7 +24,8 @@ namespace SME.AE.Infra.Persistencia
             {
                 if (conexao.State != ConnectionState.Open)
                     Open();
-                return Conexao;
+
+                return conexao;
             }
         }
 

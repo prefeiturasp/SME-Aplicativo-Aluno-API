@@ -21,13 +21,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos
 
         public async Task<bool> VerificarUltimas5Senhas(string usuId, string senha)
         {
-            database.Conexao.Open();
+            using (var conexao = database.Conexao)
+            {
+                var senhas = await conexao.QueryAsync<UsuarioSenhaHistoricoCoreSSO>(UsuarioSenhaHitoricoConsultas.ObterUltimas5Senhas, new { usuId });
 
-            var senhas = await database.Conexao.QueryAsync<UsuarioSenhaHistoricoCoreSSO>(UsuarioSenhaHitoricoConsultas.ObterUltimas5Senhas, new { usuId });            
+                conexao.Close();
 
-            database.Conexao.Close();
-
-            return senhas.Any(x => x.Senha.Equals(senha));
+                return senhas.Any(x => x.Senha.Equals(senha));
+            }
         }
     }
 }

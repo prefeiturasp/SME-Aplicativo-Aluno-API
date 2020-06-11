@@ -1,4 +1,5 @@
 ﻿using Dapper.FluentMap;
+using SME.AE.Infra.Persistencia.Mapeamentos.Externos;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
                 config.AddMap(new NotificacaoMap());
                 config.AddMap(new UsuarioNotificacaoMap());
                 config.AddMap(new UsuarioMap());
+                config.AddMap(new PessoaCoreSSOMap());
             });
         }
     }
