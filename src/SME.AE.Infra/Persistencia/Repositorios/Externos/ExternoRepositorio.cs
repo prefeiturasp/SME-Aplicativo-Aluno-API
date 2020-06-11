@@ -2,15 +2,15 @@
 using Dapper.Contrib.Extensions;
 using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Dominio.Entidades.Externas;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class ExternoRepositorio<T,Z> : IExternoRepositorio<T,Z> where T : class where Z : IDbConnection
+    public class ExternoRepositorio<T,Z> : IExternoRepositorio<T,Z> where T : EntidadeExterna where Z : IDbConnection , IDisposable
     {
         protected IAplicacaoDapperContext<Z> database;
 
@@ -58,5 +58,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             return await database.Conexao.GetAsync<T>(id);
         }
+
+        public virtual void Dispose() => database.Conexao.Close();
     }
 }

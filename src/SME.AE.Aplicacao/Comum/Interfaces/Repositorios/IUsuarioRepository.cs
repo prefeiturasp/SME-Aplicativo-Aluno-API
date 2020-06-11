@@ -4,7 +4,7 @@ using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public interface IUsuarioRepository
+    public interface IUsuarioRepository : IBaseRepositorio<Usuario>
     {
         Task<Usuario> ObterPorCpf(string cpf);
         Task Criar(Usuario usuario);

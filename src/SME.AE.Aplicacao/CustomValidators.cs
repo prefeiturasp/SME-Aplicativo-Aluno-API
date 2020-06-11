@@ -11,10 +11,19 @@ namespace SME.AE.Aplicacao
         {
             return ruleBuilder.Must(m => CpfEhValido(m) == true);
         }
-        
+
         public static IRuleBuilderOptions<T, DateTime> DataNascimentoEhValida<T>(this IRuleBuilder<T, DateTime> ruleBuilder)
         {
             return ruleBuilder.Must(m => NascimentoEhValida(m) == true);
+        }
+
+        public static IRuleBuilderOptions<T, string> ValidarSenha<T>(this IRuleBuilder<T, string> ruleBuilder)
+        {
+            return ruleBuilder
+                .MinimumLength(8)
+                .MaximumLength(12)
+                .Must(x => !x.Contains(" "))
+                .Matches(@"(?=.*?[A-Z])(?=.*?[a-z])(?=((?=.*[!@#$\-%&/\\\[\]|*()_=+])|(?=.*?[0-9]+)))");
         }
 
         private static bool NascimentoEhValida(DateTime data) => data > new DateTime(1900, 1, 1) && data < DateTime.Now;
@@ -38,7 +47,7 @@ namespace SME.AE.Aplicacao
             for (int i = 0; i < 9; i++)
                 soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
             resto = soma % 11;
-            
+
             if (resto < 2)
                 resto = 0;
             else

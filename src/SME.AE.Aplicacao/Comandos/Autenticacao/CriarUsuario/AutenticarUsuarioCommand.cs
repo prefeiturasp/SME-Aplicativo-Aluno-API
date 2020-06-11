@@ -54,14 +54,15 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 var validator = new AutenticarUsuarioUseCaseValidatior();
                 ValidationResult validacao = validator.Validate(request);
+
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
                 //verificar se o usuário está cadastrado no CoreSSO
                 var usuarioCoreSSO = await _repositoryCoreSSO.Selecionar(request.Cpf);
-                
+
                 string senhaCriptografada = string.Empty;
-               
+
                 //verificar se as senhas são iguais
                 if (usuarioCoreSSO.Any())
                 {
@@ -77,6 +78,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 {
                     primeiroAcesso = true;
                     var senha = Regex.Replace(request.Senha, @"\-\/", "");
+
                     try
                     {
                         request.DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
@@ -102,6 +104,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                     if (usuarioCoreSSO.Any())
                         await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, StatusUsuarioCoreSSO.Inativo);
+
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
@@ -114,6 +117,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                         ExcluiUsuarioSeExistir(request, usuarioRetorno);
                         return RespostaApi.Falha(validacao.Errors);
                     }
+
                     if (usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento && w.TipoSigilo == (int)AlunoTipoSigilo.Restricao))
                     {
                         validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
@@ -124,45 +128,29 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 //verificar se o usuário tem e-mail e celular cadastrado
                 if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Email)))
                     email = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Email)).Email;
+
                 if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Celular)))
                 {
                     celular = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Celular)).Celular;
                     if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.DDD)))
-                        celular=  $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
+                        celular = $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
                 }
-
-              
 
                 //necessário implementar unit of work para transacionar essas operações
                 senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
                 var grupos = await _repositoryCoreSSO.SelecionarGrupos();
                 var usuario = usuarioAlunos.FirstOrDefault();
-                //se usuário  não estiver cadastrado no CoreSSO
-                if (!usuarioCoreSSO.Any())
-                {
-                    try
-                    {
-                        await _repositoryCoreSSO.Criar(new Comum.Modelos.Entrada.UsuarioCoreSSO
-                        {
-                            Cpf = request.Cpf,
-                            Nome = usuario.Nome,
-                            Senha = senhaCriptografada,
-                            Grupos = grupos
-                        });
-                    }
-                    catch
-                    {
-                        validacao.Errors.Add(new ValidationFailure("Usuário", "Erro ao tentar cadastrar o usuário no CoreSSO"));
-                        return RespostaApi.Falha(validacao.Errors);
-                    }
-                }//caso contrário verificar se o usuário está incluído em todos os grupos
-                else
+
+                //verificar se o usuário está incluído em todos os grupos
+                if (usuarioCoreSSO.Any())
                 {
                     if (usuarioCoreSSO.FirstOrDefault().Status == (int)StatusUsuarioCoreSSO.Inativo)
                         await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, StatusUsuarioCoreSSO.Ativo);
+
                     var gruposNaoIncluidos = grupos.Where(w => !usuarioCoreSSO.Select(x => x.GrupoId).Contains(w));
                     if (gruposNaoIncluidos.Any())
                         _repositoryCoreSSO.IncluirUsuarioNosGrupos(usuarioCoreSSO.FirstOrDefault().UsuId, gruposNaoIncluidos);
+
                     if (usuarioCoreSSO.FirstOrDefault().TipoCriptografia != TipoCriptografia.TripleDES)
                         await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, request.Senha);
                 }

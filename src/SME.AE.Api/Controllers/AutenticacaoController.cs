@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 
 namespace SME.AE.Api.Controllers
 {
@@ -35,13 +37,19 @@ namespace SME.AE.Api.Controllers
         {
             try
             {
-                  return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf,  dispositivoId));
-              
+                return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf, dispositivoId));
+
             }
             catch (Exception ex)
             {
                 return StatusCode(400, ex.Message);
             }
+        }
+
+        [HttpPost("PrimeiroAcesso")]
+        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]ICriarUsuarioPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
+        {
+            return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(Mediator, novaSenhaDto));
         }
     }
 }
