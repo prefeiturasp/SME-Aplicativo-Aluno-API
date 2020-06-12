@@ -22,9 +22,11 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
         {
             private readonly IUsuarioNotificacaoRepositorio _repository;
 
+
             public UsuarioMensagemCommandHandler(IUsuarioNotificacaoRepositorio repository)
             {
                 _repository = repository;
+
             }
 
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)

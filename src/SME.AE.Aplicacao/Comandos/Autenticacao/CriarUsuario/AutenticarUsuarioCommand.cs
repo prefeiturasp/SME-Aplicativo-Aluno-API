@@ -1,7 +1,9 @@
 ﻿using FluentValidation.Results;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Interfaces.Geral;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
@@ -10,9 +12,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using SME.AE.Aplicacao.Comum.Interfaces.Geral;
-using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
@@ -35,7 +34,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
             private readonly IUsuarioRepository _repository;
 
             public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository)
-            { 
+            {
                 _context = context;
                 _autenticacaoService = autenticacaoService;
 
@@ -46,7 +45,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
             {
                 var validator = new AutenticarUsuarioUseCaseValidatior();
                 ValidationResult validacao = validator.Validate(request);
-                var usuarioRetorno = _repository.ObterPorCpf(request.Cpf).Result;
+                var usuarioRetorno =  await _repository.ObterPorCpf(request.Cpf);
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
@@ -73,24 +72,26 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
-                CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
+                usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
 
                 return MapearResposta(usuario, usuarioRetorno);
             }
 
-            private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
+            private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
             {
                 usuario.Cpf = request.Cpf;
 
                 if (usuarioRetorno != null)
                 {
-                    _repository.AtualizaUltimoLoginUsuario(request.Cpf);
+                   await _repository.AtualizaUltimoLoginUsuario(request.Cpf);
                 }
 
                 else
                 {
-                   _repository.Criar(MapearDominioUsuario(usuario));
+                    await _repository.Criar(MapearDominioUsuario(usuario));
                 }
+
+                return await _repository.ObterPorCpf(request.Cpf);
             }
 
             private void ExcluiUsuarioSeExistir(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno)
