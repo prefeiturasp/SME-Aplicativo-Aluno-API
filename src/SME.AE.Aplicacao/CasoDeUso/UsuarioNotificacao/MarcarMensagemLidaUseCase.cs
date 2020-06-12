@@ -16,6 +16,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
         public static async Task<NotificacaoResposta> Executar(IMediator mediator, Comum.Modelos.Entrada.UsuarioNotificacao usuarioMensagem)
         {
             RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.cpfUsuario));
+
             var listaEscolas = (List<ListaEscola>)resposta.Data;
 
             foreach (var lista in listaEscolas)
