@@ -1,7 +1,5 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,11 +10,12 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 {
     public class UsuarioNotificacaoCommand : IRequest<bool>
     {
-        public UsuarioNotificacaoCommand(UsuarioNotificacao usuarioNotificacao)
+        public UsuarioNotificacaoCommand(long idMensagem, long idUsuario)
         {
-            UsuarioNotificacao = usuarioNotificacao;
+            IdMensagem = idMensagem;
+            IdUsuario = idUsuario;
         }
-        private UsuarioNotificacao UsuarioNotificacao { get; set; }
+        private long IdMensagem { get; set; }
         private long IdUsuario { get; set; }
 
         public class UsuarioMensagemCommandHandler : IRequestHandler<UsuarioNotificacaoCommand, bool>
@@ -32,18 +31,14 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)
             {
+
                 try
                 {
-                    var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(
-                         request.UsuarioNotificacao.NotificacaoId, request.UsuarioNotificacao.UsuarioCpf);
-                    if (usuarioNotificacao != null)
-                    {
-                         return await _repository.Atualizar(usuarioNotificacao);
-                    }
-                    else
-                    {
-                        return await _repository.Criar(usuarioNotificacao);
-                    }
+                    var mensagem = await _repository.Selecionar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
+                    if (mensagem == null)
+                        return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
+                    //retorna false 
+                    return !await _repository.RemoverPorId(mensagem.Id);
                 }
                 catch (Exception ex)
                 {
