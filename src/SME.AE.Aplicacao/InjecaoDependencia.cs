@@ -89,6 +89,7 @@ namespace SME.AE.Aplicacao
 
             //Usuario
             services.TryAddScoped(typeof(ICriarUsuarioPrimeiroAcessoUseCase), typeof(CriarUsuarioPrimeiroAcessoUseCase));
+            services.TryAddScoped(typeof(IAlterarEmailCelularUseCase), typeof(AlterarEmailCelularUseCase));
         }
 
         private static void AddComandos(IServiceCollection services)

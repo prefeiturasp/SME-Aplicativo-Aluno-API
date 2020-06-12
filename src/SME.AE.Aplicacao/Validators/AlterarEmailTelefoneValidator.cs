@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SME.AE.Aplicacao.Validators
 {
-    public class AlterarEmailTelefoneValidator : AbstractValidator<AlterarEmailTelefoneDto>
+    public class AlterarEmailTelefoneValidator : AbstractValidator<AlterarEmailCelularDto>
     {
         public AlterarEmailTelefoneValidator()
         {
