@@ -61,7 +61,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                 {
                     Data = new Dictionary<String, String>
                     {
-                        ["Titulo"] = request.Notificacao.Titulo.Substring(0,19) + "...",
+                        ["Titulo"] = request.Notificacao.Titulo,
                         ["Mensagem"] = request.Notificacao.Mensagem,
                         ["CodigoGrupo"] = idGrupo.ToString(),
                         ["DescricaoGrupo"] = grupos.Where(x => x.Id == idGrupo).FirstOrDefault().Nome,
@@ -71,7 +71,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     },
                     Notification = new Notification
                     {
-                        Title = request.Notificacao.Titulo,
+                        Title = request.Notificacao.Titulo.Substring(0, 19) + "..."  ,
                         Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
                     },
                     Topic = idGrupo.ToString()
