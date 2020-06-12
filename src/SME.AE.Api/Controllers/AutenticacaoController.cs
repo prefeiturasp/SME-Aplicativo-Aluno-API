@@ -64,8 +64,8 @@ namespace SME.AE.Api.Controllers
             return StatusCode(400, respostaAPI);
         }
 
-        [HttpPost("AlterarEmailTelefone")]
-        public async Task<ActionResult<RespostaApi>> AlterarEmailTelefone([FromBody]AlterarEmailTelefoneDto alterarEmailTelefoneDto)
+        [HttpPost("AlterarEmailCelular")]
+        public async Task<ActionResult<RespostaApi>> AlterarEmailTelefone([FromBody]AlterarEmailCelularDto alterarEmailTelefoneDto)
         {
             var validador = new AlterarEmailTelefoneDtoValidator();
 
@@ -83,11 +83,11 @@ namespace SME.AE.Api.Controllers
             return StatusCode(400, respostaApi);
         }
 
-        public class AlterarEmailTelefoneDto
+        public class AlterarEmailCelularDto
         {
             public long Id { get; set; }
             public string Email { get; set; }
-            public string Telefone { get; set; }
+            public string Celular { get; set; }
         }
 
         public class NovaSenhaDto
@@ -96,13 +96,13 @@ namespace SME.AE.Api.Controllers
             public string NovaSenha { get; set; }
         }
 
-        public class AlterarEmailTelefoneDtoValidator : AbstractValidator<AlterarEmailTelefoneDto>
+        public class AlterarEmailTelefoneDtoValidator : AbstractValidator<AlterarEmailCelularDto>
         {
             public AlterarEmailTelefoneDtoValidator()
             {
                 RuleFor(x => x.Id).NotNull().GreaterThan(0);
-                RuleFor(x => x.Telefone).NotNull().NotEmpty().Matches(@"(\(\d{2}\)\s)(\d{4,5}\-\d{4})").When(x => string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Telefone));
-                RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress().When(x => string.IsNullOrWhiteSpace(x.Telefone) || !string.IsNullOrWhiteSpace(x.Email));
+                RuleFor(x => x.Celular).NotNull().NotEmpty().Matches(@"(\(\d{2}\)\s)(\d{4,5}\-\d{4})").When(x => string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Celular));
+                RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress().When(x => string.IsNullOrWhiteSpace(x.Celular) || !string.IsNullOrWhiteSpace(x.Email));
             }
         }
 
