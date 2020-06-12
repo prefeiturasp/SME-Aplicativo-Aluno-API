@@ -1,6 +1,7 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,20 +30,18 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)
             {
-
                 try
                 {
-                    // atualizar tabela com dados 
-                    // ver se existe 
-                    // se existir Atualizar
-                    // Se nao criar
-                    // Retornar Notificacao com visualizacao true or false
-
-                    var mensagem = await _repository.Selecionar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    if (mensagem == null)
-                        return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    //retorna false 
-                    return !await _repository.RemoverPorId(mensagem.Id);
+                    var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(
+                         request.UsuarioNotificacao.NotificacaoId, request.UsuarioNotificacao.UsuarioCpf);
+                    if (usuarioNotificacao != null)
+                    {
+                         return await _repository.Atualizar(usuarioNotificacao);
+                    }
+                    else
+                    {
+                        return await _repository.Criar(usuarioNotificacao);
+                    }
                 }
                 catch (Exception ex)
                 {
