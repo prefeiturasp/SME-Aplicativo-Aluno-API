@@ -67,7 +67,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     Notification = new Notification
                     {
                         Title = request.Notificacao.Titulo,
-                        Body = "Você possui novos comunicados. Toque aqui para abrir no aplicativo.",
+                        Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
                     },
                     Topic = grupo.ToString()
                 }).ConfigureAwait(true);
