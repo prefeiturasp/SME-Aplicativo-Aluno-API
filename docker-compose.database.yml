@@ -1,0 +1,39 @@
+version: "3.1"
+
+volumes:
+  postgres-data: {}
+
+services:
+  sme-db-ae:
+    container_name: sme-db-ae
+    restart: always
+    image: postgres:11-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_appaluno
+    volumes:
+      - postgres-data:/var/lib/postgresql/data 
+  sme-flyway-ae:
+    container_name: sme-flyway-ae
+    image: boxfuse/flyway:5.2.4
+    command: -url=jdbc:postgresql://sme-db-ae:5432/db_appaluno?user=postgres&password=postgres -locations='filesystem:/opt/scripts' -outOfOrder=true migrate
+    volumes:
+      - ./scripts:/opt/scripts
+    depends_on:
+      - sme-db-ae
+  pgadmin:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@pgadmin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    #volumes:
+    #  - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - default
