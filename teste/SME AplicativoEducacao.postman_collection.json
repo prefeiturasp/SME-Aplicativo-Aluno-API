@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "e25e5261-a5bc-4aa2-9a8b-4d9c960b6a60",
+		"name": "SME AplicativoEducacao",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "v1",
+			"item": [
+				{
+					"name": "autenticacao",
+					"item": [
+						{
+							"name": "AutenticarUsuario",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:5001/api/v1/autenticacao?cpf=37915340840&senha=2020/02/20",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "5001",
+									"path": [
+										"api",
+										"v1",
+										"autenticacao"
+									],
+									"query": [
+										{
+											"key": "cpf",
+											"value": "37915340840"
+										},
+										{
+											"key": "senha",
+											"value": "2020/02/20"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "usuario",
+					"item": [
+						{
+							"name": "ObterUsuario",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:5001/api/v1/usuario?cpf=37915340840",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "5001",
+									"path": [
+										"api",
+										"v1",
+										"usuario"
+									],
+									"query": [
+										{
+											"key": "cpf",
+											"value": "37915340840"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "notificacao",
+					"item": [
+						{
+							"name": "CriarNotificacao",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "x-integration-key",
+										"value": "{{x-integration-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"mensagem\": \"Mensagem de teste\",\r\n  \"titulo\": \"Titulo\",\r\n  \"grupo\": \"Geral\",\r\n  \"dataEnvio\": \"2020-04-06T20:41:18.636Z\",\r\n  \"dataExpiracao\": \"2020-04-10T20:41:18.636Z\",\r\n  \"criadoEm\": \"2020-04-06T20:41:18.636Z\",\r\n  \"criadoPor\": \"corongavairus\"\r\n}"
+								},
+								"url": {
+									"raw": "https://localhost:5001/api/v1/notificacao",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "5001",
+									"path": [
+										"api",
+										"v1",
+										"notificacao"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8217e9e2-2a8a-4c5c-b72a-d811ef5c8d61",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "09ec7137-19d7-4a84-a1ab-f0d32d732afd",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "6f7630b0-3534-4428-b24f-3bcd0adc0997",
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "bc93499a-be53-463b-ab7d-f7edfe2e7195",
+			"key": "x-integration-key",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

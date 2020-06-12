@@ -1,45 +1,54 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.30" />
+    <PackageReference Include="Dapper" Version="2.0.35" />
+    <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
+    <PackageReference Include="Dapper.Contrib.Ext" Version="1.0.5" />
+    <PackageReference Include="Dapper.Extensions" Version="1.2.1" />
+    <PackageReference Include="Dapper.FluentMap" Version="1.8.0" />
+    <PackageReference Include="DapperExtensions" Version="1.6.3" />
+    <PackageReference Include="DapperExtensions.NetCore" Version="2.0.7" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
-    <PackageReference Include="IdentityServer4.EntityFramework" Version="4.0.0-preview.3" />
-    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.3" />
+    <PackageReference Include="IdentityModel" Version="4.2.0" />
+    <PackageReference Include="IdentityServer4" Version="3.0.0" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
+    <PackageReference Include="IdentityServer4.EntityFramework" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.3" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocol.Extensions" Version="1.0.4.403061554" />
     <PackageReference Include="Npgsql" Version="4.1.3.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SME.AE.Api\SME.AE.Api.csproj" />
     <ProjectReference Include="..\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj" />
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Persistencia\Repositorios\**" />
-    <Compile Remove="Migrations\20200326124709_InitialCreate.cs" />
-    <Compile Remove="Migrations\20200326124709_InitialCreate.Designer.cs" />
-    <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
+    <Compile Remove="Persistencia\Mappers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="Persistencia\Repositorios\**" />
+    <EmbeddedResource Remove="Persistencia\Mappers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Persistencia\Repositorios\**" />
+    <None Remove="Persistencia\Mappers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations" />
+    <Folder Include="Mapeamento\" />
   </ItemGroup>
 
 </Project>
