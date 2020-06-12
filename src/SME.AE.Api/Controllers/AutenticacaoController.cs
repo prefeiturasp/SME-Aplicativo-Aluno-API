@@ -46,30 +46,64 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpPost("PrimeiroAcesso")]
-        [AllowAnonymous]
         public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto)
         {
             var validador = new NovaSenhaDtoValidator();
 
             var result = await validador.ValidateAsync(novaSenhaDto);
 
-            var respostaAPI = new RespostaApi();
-
-            if (!result.IsValid)
+            var respostaAPI = new RespostaApi
             {
-                respostaAPI.Erros = result.Errors.Select(x => x.ErrorMessage).ToArray();
-                return StatusCode(400, respostaAPI);
-            }
+                Ok = result.IsValid
+            };
 
-            respostaAPI.Ok = true;
+            if (respostaAPI.Ok)
+                return Ok(respostaAPI);
 
-            return Ok(respostaAPI);
+            respostaAPI.Erros = result.Errors.Select(x => x.ErrorMessage).ToArray();
+            return StatusCode(400, respostaAPI);
+        }
+
+        [HttpPost("AlterarEmailTelefone")]
+        public async Task<ActionResult<RespostaApi>> AlterarEmailTelefone([FromBody]AlterarEmailTelefoneDto alterarEmailTelefoneDto)
+        {
+            var validador = new AlterarEmailTelefoneDtoValidator();
+
+            var result = await validador.ValidateAsync(alterarEmailTelefoneDto);
+
+            var respostaApi = new RespostaApi
+            {
+                Ok = result.IsValid
+            };
+
+            if (respostaApi.Ok)
+                return Ok(respostaApi);
+
+            respostaApi.Erros = result.Errors.Select(x => x.ErrorMessage).ToArray();
+            return StatusCode(400, respostaApi);
+        }
+
+        public class AlterarEmailTelefoneDto
+        {
+            public long Id { get; set; }
+            public string Email { get; set; }
+            public string Telefone { get; set; }
         }
 
         public class NovaSenhaDto
         {
             public long Id { get; set; }
             public string NovaSenha { get; set; }
+        }
+
+        public class AlterarEmailTelefoneDtoValidator : AbstractValidator<AlterarEmailTelefoneDto>
+        {
+            public AlterarEmailTelefoneDtoValidator()
+            {
+                RuleFor(x => x.Id).NotNull().GreaterThan(0);
+                RuleFor(x => x.Telefone).NotNull().NotEmpty().Matches(@"(\(\d{2}\)\s)(\d{4,5}\-\d{4})").When(x => string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Telefone));
+                RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress().When(x => string.IsNullOrWhiteSpace(x.Telefone) || !string.IsNullOrWhiteSpace(x.Email));
+            }
         }
 
         public class NovaSenhaDtoValidator : AbstractValidator<NovaSenhaDto>
