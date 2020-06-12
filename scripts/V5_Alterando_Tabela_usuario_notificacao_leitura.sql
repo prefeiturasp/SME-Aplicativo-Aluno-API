@@ -6,4 +6,4 @@ add column if not exists usuario_cpf varchar (11),
 add column if not exists alteradoEm  timestamp,
 add column if not exists criadoPor    varchar(500),
 add column if not exists alteradoPor  varchar(500),
-add column if not exists mensagemVisualisada bool
+add column if not exists mensagemVisualizada bool
