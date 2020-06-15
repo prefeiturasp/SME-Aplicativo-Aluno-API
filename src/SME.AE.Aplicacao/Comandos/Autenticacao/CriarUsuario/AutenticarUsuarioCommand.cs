@@ -90,7 +90,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 }
 
                 //buscar o usuario 
-                var usuarioRetorno = _repository.ObterPorCpf(request.Cpf).Result;
+                var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
 
                 //selecionar alunos do responsável buscando apenas pelo cpf
                 var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
@@ -155,7 +155,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                         await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, request.Senha);
                 }
 
-                CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
+                usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
 
                 usuarioRetorno.Email = usuarioRetorno.Email ?? email;
                 usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
@@ -165,7 +165,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
 
 
-            private void CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
+            private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
             {
                 usuario.Cpf = request.Cpf;
 
@@ -176,7 +176,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 else
                 {
-                    _repository.Criar(MapearDominioUsuario(usuario));
+                    await _repository.Criar(MapearDominioUsuario(usuario));
                 }
 
                 return await _repository.ObterPorCpf(request.Cpf);
