@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.CasoDeUso.Usuario;
 
 namespace SME.AE.Aplicacao
 {

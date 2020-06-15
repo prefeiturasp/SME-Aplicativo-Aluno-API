@@ -63,8 +63,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 string senhaCriptografada = string.Empty;
 
-                string senhaCriptografada = string.Empty;
-
                 //verificar se as senhas são iguais
                 if (usuarioCoreSSO.Any())
                 {

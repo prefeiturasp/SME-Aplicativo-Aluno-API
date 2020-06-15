@@ -8,4 +8,4 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Usuario
         public string Celular { get; set; }
     }
 }
-}
+
