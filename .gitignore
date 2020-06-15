@@ -6,6 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+.vscode/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -263,6 +264,7 @@ __pycache__/
 # Variáveis de ambiente para docker-compose
 sme-api.env
 variaveis.json
+firebase.json
 src/SME.SGP.WebClient/package-lock.json
 src/SME.SGP.Api/healthchecksdb
 /src/Benchmarks/SME.SGP.Benchmarks/BenchmarkDotNet.Artifacts/results
