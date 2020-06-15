@@ -47,4 +47,8 @@
     <None Remove="Persistencia\Mappers\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mapeamento\" />
+  </ItemGroup>
+
 </Project>

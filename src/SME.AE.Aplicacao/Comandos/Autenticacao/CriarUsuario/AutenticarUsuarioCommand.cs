@@ -63,6 +63,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 string senhaCriptografada = string.Empty;
 
+                string senhaCriptografada = string.Empty;
+
                 //verificar se as senhas são iguais
                 if (usuarioCoreSSO.Any())
                 {
@@ -136,6 +138,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                         celular = $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
                 }
 
+
                 //necessário implementar unit of work para transacionar essas operações
                 senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
                 var grupos = await _repositoryCoreSSO.SelecionarGrupos();
@@ -157,7 +160,10 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
 
-                return MapearResposta(usuario, primeiroAcesso, email, celular);
+                usuarioRetorno.Email = usuarioRetorno.Email ?? email;
+                usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
+
+                return MapearResposta(usuario, usuarioRetorno, primeiroAcesso);
             }
 
 
@@ -198,16 +204,16 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
             }
 
-            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, bool primeiroAcesso, string email, string celular)
+            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso)
             {
                 RespostaAutenticar usuario = new RespostaAutenticar
                 {
                     Cpf = usuarioEol.Cpf,
-                    Email = email,
-                    Id = usuarioEol.Id,
+                    Email = usuarioApp.Email,
+                    Id = usuarioApp.Id,
                     Nome = usuarioEol.Nome,
                     PrimeiroAcesso = primeiroAcesso,
-                    Celular = celular,
+                    Celular = usuarioApp.Celular,
                     Token = ""
                 };
                 return RespostaApi.Sucesso(usuario);

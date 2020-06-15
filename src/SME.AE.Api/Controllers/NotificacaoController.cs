@@ -15,7 +15,7 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
+        //[ChaveIntegracaoFiltro]
         public async Task<ObjectResult> Criar([FromBody] SME.AE.Dominio.Entidades.Notificacao notificacao)
         {
             try

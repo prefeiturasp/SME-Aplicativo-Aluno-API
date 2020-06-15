@@ -30,7 +30,7 @@ namespace SME.AE.Api
                     .UseKestrel(c =>
                     {
                         c.ConfigureHttpsDefaults(opt =>
-                        {
+                         {
                             opt.SslProtocols = SslProtocols.Tls;
                         });
                     })
