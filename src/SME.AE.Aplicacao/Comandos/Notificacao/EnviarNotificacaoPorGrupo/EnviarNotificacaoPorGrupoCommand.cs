@@ -8,6 +8,7 @@ using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,9 +30,10 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
 
     public class EnviarNotificacaoPorGrupoCommandHandler : IRequestHandler<EnviarNotificacaoPorGrupoCommand, bool>
     {
-
-        public EnviarNotificacaoPorGrupoCommandHandler()
+        private readonly IGrupoComunicadoRepository _repositorioGrupoComunicado;
+        public EnviarNotificacaoPorGrupoCommandHandler(IGrupoComunicadoRepository repositorioGrupoComunicado)
         {
+            _repositorioGrupoComunicado = repositorioGrupoComunicado;
         }
 
         public async Task<bool> Handle(EnviarNotificacaoPorGrupoCommand request, CancellationToken cancellationToken)
@@ -49,17 +51,20 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     ProjectId = VariaveisAmbiente.FirebaseProjectId
                 });
             }
-            var data = request.Notificacao.CriadoEm.ToString();
+
+             var grupos = await _repositorioGrupoComunicado.ObterTodos();
           
-            foreach (var grupo in request.Grupos)
+            foreach (var idGrupo in request.Grupos)
             {
+
                 resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
                     Data = new Dictionary<String, String>
                     {
-                        ["Titulo"] = request.Notificacao.Titulo,
+                        ["Titulo"] = request.Notificacao.Titulo.Substring(0,19) + "...",
                         ["Mensagem"] = request.Notificacao.Mensagem,
-                        ["Grupo"] = grupo.ToString(),
+                        ["CodigoGrupo"] = idGrupo.ToString(),
+                        ["DescricaoGrupo"] = grupos.Where(x => x.Id == idGrupo).FirstOrDefault().Nome,
                         ["Id"] = request.Notificacao.Id.ToString(),
                         ["CriadoEm"] = request.Notificacao.CriadoEm.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
                         ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
@@ -67,9 +72,9 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                     Notification = new Notification
                     {
                         Title = request.Notificacao.Titulo,
-                        Body = "Você possui novos comunicados. Toque aqui para abrir no aplicativo.",
+                        Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
                     },
-                    Topic = grupo.ToString()
+                    Topic = idGrupo.ToString()
                 }).ConfigureAwait(true);
             }
 

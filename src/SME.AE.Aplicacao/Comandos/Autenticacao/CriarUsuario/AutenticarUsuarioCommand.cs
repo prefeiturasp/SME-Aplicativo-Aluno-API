@@ -1,7 +1,9 @@
 ﻿using FluentValidation.Results;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Interfaces.Geral;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
@@ -10,9 +12,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using SME.AE.Aplicacao.Comum.Interfaces.Geral;
-using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System.Collections.Generic;
 using SME.AE.Aplicacao.Comum.Extensoes;
 
@@ -172,13 +171,15 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 if (usuarioRetorno != null)
                 {
-                    _repository.AtualizaUltimoLoginUsuario(request.Cpf);
+                   await _repository.AtualizaUltimoLoginUsuario(request.Cpf);
                 }
 
                 else
                 {
                     _repository.Criar(MapearDominioUsuario(usuario));
                 }
+
+                return await _repository.ObterPorCpf(request.Cpf);
             }
 
             private void ExcluiUsuarioSeExistir(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno)
