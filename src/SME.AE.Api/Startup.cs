@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,7 +15,6 @@ using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra;
 using System.Linq;
 using System.Text;
-using Swashbuckle.Swagger;
 
 namespace SME.AE.Api
 {
@@ -29,6 +29,10 @@ namespace SME.AE.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
 
             AddAuthentication(services);
 
@@ -51,7 +55,7 @@ namespace SME.AE.Api
                 })
             );
             services
-                .AddControllers(options => options.Filters.Add(new ExcecoesApiFilter()))
+                .AddControllers()
                 .AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
