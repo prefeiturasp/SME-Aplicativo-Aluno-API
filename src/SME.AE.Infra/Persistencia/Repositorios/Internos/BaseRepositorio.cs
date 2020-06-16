@@ -128,7 +128,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         private async Task<long> AtualizarAsync(T entidade)
         {
             entidade.AtualizarAuditoria();
-            await database.Conexao.UpdateAsync<T>(entidade);
+            await database.Conexao.UpdateAsync(entidade);
 
             return entidade.Id;
         }

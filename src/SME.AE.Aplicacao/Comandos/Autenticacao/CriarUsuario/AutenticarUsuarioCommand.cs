@@ -154,18 +154,19 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     if (usuarioCoreSSO.FirstOrDefault().TipoCriptografia != TipoCriptografia.TripleDES)
                         await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, request.Senha);
                 }
-
-                usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
+                
+                usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
 
                 usuarioRetorno.Email = usuarioRetorno.Email ?? email;
                 usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
+                usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
                 return MapearResposta(usuario, usuarioRetorno, primeiroAcesso);
             }
 
 
 
-            private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
+            private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
             {
                 usuario.Cpf = request.Cpf;
 
@@ -176,7 +177,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 else
                 {
-                    await _repository.Criar(MapearDominioUsuario(usuario));
+                    await _repository.SalvarAsync(MapearDominioUsuario(usuario, primeiroAcesso));
                 }
 
                 return await _repository.ObterPorCpf(request.Cpf);
@@ -188,7 +189,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     _repository.ExcluirUsuario(request.Cpf);
             }
 
-            private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol)
+            private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol, bool primeiroAcesso)
             {
                 var usuario = new Dominio.Entidades.Usuario
                 {
@@ -196,7 +197,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     Nome = usuarioEol.Nome,
                     Email = usuarioEol.Email,
                     Excluido = false,
-                    UltimoLogin = DateTime.Now
+                    UltimoLogin = DateTime.Now,
+                    PrimeiroAcesso = primeiroAcesso
                 };
 
                 return usuario;

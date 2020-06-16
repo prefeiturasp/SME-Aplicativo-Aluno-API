@@ -35,7 +35,7 @@ namespace SME.AE.Api
                 options.AllowSynchronousIO = true;
             });
 
-            AddAuthentication(services);
+            AddAuthentication(services);            
 
             services.AddResponseCompression(options =>
             {
@@ -45,12 +45,10 @@ namespace SME.AE.Api
 
             RegistrarMvc.Registrar(services, Configuration);
             services.AddInfrastructure();
-            services.AddApplication();
-
-            RegistrarMapeamentos.Registrar();
-            
+            services.AddApplication();            
 
             services.AdicionarValidadoresFluentValidation();
+            RegistrarMapeamentos.Registrar();
 
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>

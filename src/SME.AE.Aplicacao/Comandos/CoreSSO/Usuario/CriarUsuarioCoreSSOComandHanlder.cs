@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -25,7 +26,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
             var usuarios = await repositoryCoreSSO.Selecionar(request.Usuario.Cpf);
 
             if (usuarios.Any())
-                throw new Exception($"Já existe usuário com o CPF {request.Usuario.Cpf} na base do CoreSSO");
+                throw new NegocioException($"Já existe usuário com o CPF {request.Usuario.Cpf} na base do CoreSSO");
 
             var usuarioId = await repositoryCoreSSO.Criar(request.Usuario);
 

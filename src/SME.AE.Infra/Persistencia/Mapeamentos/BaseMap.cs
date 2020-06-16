@@ -1,19 +1,17 @@
 ﻿using SME.AE.Dominio.Entidades;
-using Dapper.FluentMap.Mapping;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Dapper.FluentMap.Dommel.Mapping;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos
 {
-    public class BaseMap<T> : EntityMap<T> where T : EntidadeBase
+    public class BaseMap<T> : DommelEntityMap<T> where T : EntidadeBase
     {
         public BaseMap()
         {
-            Map(c => c.CriadoEm).ToColumn("criado_em");
-            Map(c => c.CriadoPor).ToColumn("criado_por");
-            Map(c => c.AlteradoEm).ToColumn("alterado_em");
-            Map(c => c.AlteradoPor).ToColumn("alterado_por");
+            Map(c => c.Id).ToColumn("id").IsKey();
+            Map(c => c.CriadoEm).ToColumn("criadoem");
+            Map(c => c.CriadoPor).ToColumn("criadopor");
+            Map(c => c.AlteradoEm).ToColumn("alteradoem");
+            Map(c => c.AlteradoPor).ToColumn("alteradopor");
         }
     }
 }

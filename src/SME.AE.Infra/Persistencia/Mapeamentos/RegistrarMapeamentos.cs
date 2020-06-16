@@ -1,8 +1,6 @@
 ﻿using Dapper.FluentMap;
+using Dapper.FluentMap.Dommel;
 using SME.AE.Infra.Persistencia.Mapeamentos.Externos;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos
 {
@@ -12,10 +10,11 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         {
             FluentMapper.Initialize(config =>
             {
+                config.AddMap(new UsuarioMap());
                 config.AddMap(new NotificacaoMap());
                 config.AddMap(new UsuarioNotificacaoMap());
-                config.AddMap(new UsuarioMap());
                 config.AddMap(new PessoaCoreSSOMap());
+                config.ForDommel();
             });
         }
     }
