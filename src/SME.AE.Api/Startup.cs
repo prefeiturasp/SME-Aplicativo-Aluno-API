@@ -44,11 +44,11 @@ namespace SME.AE.Api
             });
 
             RegistrarMvc.Registrar(services, Configuration);
+            RegistrarMapeamentos.Registrar();
             services.AddInfrastructure();
             services.AddApplication();            
 
             services.AdicionarValidadoresFluentValidation();
-            RegistrarMapeamentos.Registrar();
 
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>

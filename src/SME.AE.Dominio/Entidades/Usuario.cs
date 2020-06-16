@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SME.AE.Dominio.Entidades
 {
+    [Table("usuario")]
     public class Usuario : EntidadeBase
     {
         public string? Cpf { get; set; }
