@@ -32,14 +32,12 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
         public class AutenticarUsuarioCommandHandler : IRequestHandler<AutenticarUsuarioCommand, RespostaApi>
         {
-            private readonly IAplicacaoContext _context;
             private readonly IAutenticacaoService _autenticacaoService;
             private readonly IUsuarioRepository _repository;
             private readonly IUsuarioCoreSSORepositorio _repositoryCoreSSO;
 
-            public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO)
+            public AutenticarUsuarioCommandHandler( IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO)
             {
-                _context = context;
                 _autenticacaoService = autenticacaoService;
                 _repositoryCoreSSO = repositoryCoreSSO;
                 _repository = repository;

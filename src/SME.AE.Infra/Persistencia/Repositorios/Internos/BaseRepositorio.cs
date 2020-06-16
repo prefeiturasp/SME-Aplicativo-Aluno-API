@@ -1,14 +1,10 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using Npgsql;
-using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
-using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -217,7 +213,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             using(var conexao = Conexao)
             {
                 entidade.InserirAuditoria();
-                entidade.Id = await conexao.InsertAsync<T>(entidade);
+                entidade.Id = await conexao.InsertAsync(entidade);
 
                 conexao.Close();
 
