@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace SME.AE.Dominio.Entidades
@@ -11,19 +12,17 @@ namespace SME.AE.Dominio.Entidades
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
         public string? AlteradoPor { get; set; }
-        public string? CriadoRf { get; set; }
-        public string? AlteradoRf { get; set; }
 
         public void AtualizarAuditoria()
         {
             AlteradoEm = DateTime.Now;
-            //AlteradoPor = "Falta Implementação";
+            AlteradoPor = "Sistema";
         }
 
         public void InserirAuditoria()
         {
             CriadoEm = DateTime.Now;
-            //CriadoPor = "Falta Implementação";
+            CriadoPor = "Sistema";
         }
     }
 }

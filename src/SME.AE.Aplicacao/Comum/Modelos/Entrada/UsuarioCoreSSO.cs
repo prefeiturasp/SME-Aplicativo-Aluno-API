@@ -6,6 +6,11 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
 {
     public class UsuarioCoreSSO
     {
+        public UsuarioCoreSSO()
+        {
+            Grupos = new List<Guid>();
+        }
+
         public string Cpf { get; set; }
         public string Nome { get; set; }
         public string Senha { get; set; }
