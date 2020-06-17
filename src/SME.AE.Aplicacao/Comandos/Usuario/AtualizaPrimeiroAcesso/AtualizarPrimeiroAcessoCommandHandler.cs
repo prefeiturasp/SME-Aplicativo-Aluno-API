@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso
 
             usuario.PrimeiroAcesso = request.PrimeiroAcesso;
 
-            await usuarioRepository.SalvarAsync(usuario);
+            await usuarioRepository.AtualizarPrimeiroAcesso(request.Id, request.PrimeiroAcesso);
 
             return default;
         }

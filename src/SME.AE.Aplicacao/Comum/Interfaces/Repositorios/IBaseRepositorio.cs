@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public interface IBaseRepositorio<T> : IDisposable where T : EntidadeBase
+    public interface IBaseRepositorio<T> where T : EntidadeBase
     {
         IEnumerable<T> Listar();
 

@@ -8,6 +8,8 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task<Usuario> ObterPorCpf(string cpf);
         Task Criar(Usuario usuario);
+        Task AtualizarPrimeiroAcesso(long id, bool primeiroAcesso);
+        Task AtualizarEmailTelefone(long id, string email, string celular);
         Task AtualizaUltimoLoginUsuario(string cpf);
         Task ExcluirUsuario(string cpf);
         Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId);

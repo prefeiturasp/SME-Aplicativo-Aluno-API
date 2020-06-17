@@ -147,7 +147,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                     var gruposNaoIncluidos = grupos.Where(w => !usuarioCoreSSO.Select(x => x.GrupoId).Contains(w));
                     if (gruposNaoIncluidos.Any())
-                        _repositoryCoreSSO.IncluirUsuarioNosGrupos(usuarioCoreSSO.FirstOrDefault().UsuId, gruposNaoIncluidos);
+                       await _repositoryCoreSSO.IncluirUsuarioNosGrupos(usuarioCoreSSO.FirstOrDefault().UsuId, gruposNaoIncluidos);
 
                     if (usuarioCoreSSO.FirstOrDefault().TipoCriptografia != TipoCriptografia.TripleDES)
                         await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, request.Senha);
@@ -155,11 +155,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                 
                 usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
 
+                var informarCelularEmail = string.IsNullOrWhiteSpace(usuarioRetorno.Email) && string.IsNullOrWhiteSpace(usuarioRetorno.Celular);
+
                 usuarioRetorno.Email = usuarioRetorno.Email ?? email;
                 usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
                 usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-                return MapearResposta(usuario, usuarioRetorno, primeiroAcesso);
+                return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, informarCelularEmail);
             }
 
 
@@ -203,7 +205,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
             }
 
-            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso)
+            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool informarCelularEmail)
             {
                 RespostaAutenticar usuario = new RespostaAutenticar
                 {
@@ -212,9 +214,11 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     Id = usuarioApp.Id,
                     Nome = usuarioEol.Nome,
                     PrimeiroAcesso = primeiroAcesso,
+                    InformarCelularEmail = informarCelularEmail,
                     Celular = usuarioApp.Celular,
                     Token = ""
                 };
+
                 return RespostaApi.Sucesso(usuario);
             }
         }

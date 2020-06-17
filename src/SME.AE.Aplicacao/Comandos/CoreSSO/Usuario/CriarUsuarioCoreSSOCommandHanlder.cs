@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
 {
-    public class CriarUsuarioCoreSSOComandHanlder : IRequestHandler<CriarUsuarioCoreSSOCommand, RetornoUsuarioCoreSSO>
+    public class CriarUsuarioCoreSSOCommandHanlder : IRequestHandler<CriarUsuarioCoreSSOCommand, RetornoUsuarioCoreSSO>
     {
         private readonly IUsuarioCoreSSORepositorio repositoryCoreSSO;
 
-        public CriarUsuarioCoreSSOComandHanlder(IUsuarioCoreSSORepositorio repositoryCoreSSO)
+        public CriarUsuarioCoreSSOCommandHanlder(IUsuarioCoreSSORepositorio repositoryCoreSSO)
         {
             this.repositoryCoreSSO = repositoryCoreSSO ?? throw new ArgumentNullException(nameof(repositoryCoreSSO));
         }

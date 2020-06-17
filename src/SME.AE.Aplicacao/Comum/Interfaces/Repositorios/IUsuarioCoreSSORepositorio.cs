@@ -14,7 +14,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task<RetornoUsuarioCoreSSO> ObterPorId(Guid id);
         Task<IEnumerable<RetornoUsuarioCoreSSO>> Selecionar(string cpf);
         Task<List<Guid>> SelecionarGrupos();
-        void IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos);
+        Task IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos);
         Task AlterarStatusUsuario(Guid id, StatusUsuarioCoreSSO status);
         Task AtualizarCriptografiaUsuario(Guid usuId, string senha);
     }

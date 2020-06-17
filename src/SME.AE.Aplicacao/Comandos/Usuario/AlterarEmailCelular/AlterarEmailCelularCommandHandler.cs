@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.AlterarEmailCelular
             if (!string.IsNullOrWhiteSpace(request.AlterarEmailCelularDto.Email))
                 usuario.Email = request.AlterarEmailCelularDto.Email;
 
-            await usuarioRepository.SalvarAsync(usuario);
+            await usuarioRepository.AtualizarEmailTelefone(usuario.Id, usuario.Email, usuario.Celular);
 
             return default;
         }
