@@ -67,7 +67,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var pessoaId = Guid.NewGuid();
                 var usuId = Guid.NewGuid();
                 var parametrosPessoa = new { pessoaId, pesNome = usuario.Nome.Trim() };
-                var parametrosUsuario = new { usuId, login = usuario.Cpf.Trim(), senha = usuario.Senha, pessoaId };
+                var parametrosUsuario = new { usuId, login = usuario.Cpf.Trim(), senha = usuario.SenhaCriptografada, pessoaId };
                 var parametrosPessoaDoc = new { pessoaId, cpf = usuario.Cpf.Trim() };
 
                 await conn.ExecuteAsync(CoreSSOComandos.InserirPessoa, parametrosPessoa, transaction);
@@ -91,15 +91,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         }
 
-        public void IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos)
+        public async Task IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos)
         {
             try
             {
                 using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+
                 conn.Open();
+
                 using var transaction = conn.BeginTransaction();
-                gruposNaoIncluidos.ForEach(async x => await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = x, usuId }, transaction));
+
+                foreach (var grupo in gruposNaoIncluidos)
+                    await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
+
                 transaction.Commit();
+
                 conn.Close();
             }
             catch (Exception ex)

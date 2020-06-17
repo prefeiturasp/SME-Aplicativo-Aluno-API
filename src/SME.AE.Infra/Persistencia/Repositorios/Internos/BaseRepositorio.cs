@@ -11,7 +11,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class BaseRepositorio<T> : IBaseRepositorio<T> where T : EntidadeBase
     {
-        private readonly NpgsqlConnection _conexao;
+        private NpgsqlConnection _conexao;
+        private readonly string _connectionString;
 
         protected NpgsqlConnection Conexao
         {
@@ -27,11 +28,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         protected BaseRepositorio(string connectionString)
         {
             this._conexao = new NpgsqlConnection(connectionString);
+            this._connectionString = connectionString;
+        }
+
+        protected virtual NpgsqlConnection InstanciarConexao()
+        {
+            _conexao = new NpgsqlConnection(_connectionString);
+
+            return Conexao;
         }
 
         public virtual IEnumerable<T> Listar()
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = conexao.GetAll<T>();
 
@@ -43,7 +52,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task<IEnumerable<T>> ListarAsync()
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = await conexao.GetAllAsync<T>();
 
@@ -55,7 +64,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task<IEnumerable<T>> QueryAsync(string query, object parametros)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = await conexao.QueryAsync<T>(query, parametros);
 
@@ -67,7 +76,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task<T> QueryFirstOrDefaultAsync(string query, object parametros)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = await conexao.QueryFirstOrDefaultAsync<T>(query, parametros);
 
@@ -79,7 +88,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual IEnumerable<T> Query(string query, object parametros)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = conexao.Query<T>(query, parametros);
 
@@ -91,7 +100,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual T QueryFirstOrDefault(string query, object parametros)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = conexao.QueryFirstOrDefault<T>(query, parametros);
 
@@ -103,7 +112,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual T ObterPorId(long id)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = conexao.Get<T>(id);
 
@@ -115,7 +124,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var retorno = await conexao.GetAsync<T>(id);
 
@@ -127,7 +136,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual void Remover(long id)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var entidade = conexao.Get<T>(id);
 
@@ -139,7 +148,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual void Remover(T entidade)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 conexao.Delete<T>(entidade);
 
@@ -149,7 +158,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task RemoverAsync(long id)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 var entidade = await conexao.GetAsync<T>(id);
 
@@ -161,7 +170,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task RemoverAsync(T entidade)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 await conexao.DeleteAsync<T>(entidade);
 
@@ -184,20 +193,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             return await AtualizarAsync(entidade);
         }
-
-        public virtual void Dispose()
-        {
-            _conexao.Close();
-        }
-
+        
         protected virtual void Close()
         {
-            _conexao.Close();
+            if (Conexao != null)
+                _conexao.Close();
         }
 
         private long Inserir(T entidade)
         {
-            using (var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 entidade.InserirAuditoria();
                 entidade.Id = conexao.Insert<T>(entidade);
@@ -210,7 +215,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private async Task<long> InserirAsync(T entidade)
         {
-            using(var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 entidade.InserirAuditoria();
                 entidade.Id = await conexao.InsertAsync(entidade);
@@ -223,7 +228,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private long Atualizar(T entidade)
         {
-            using(var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 entidade.AtualizarAuditoria();
                 conexao.Update<T>(entidade);
@@ -236,7 +241,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private async Task<long> AtualizarAsync(T entidade)
         {
-            using(var conexao = Conexao)
+            using (var conexao = InstanciarConexao())
             {
                 entidade.AtualizarAuditoria();
                 await conexao.UpdateAsync(entidade);
