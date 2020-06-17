@@ -52,16 +52,15 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                 });
             }
 
-             var grupos = await _repositorioGrupoComunicado.ObterTodos();
-          
+            var grupos = await _repositorioGrupoComunicado.ObterTodos();
+
             foreach (var idGrupo in request.Grupos)
             {
-
                 resultado = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
                     Data = new Dictionary<String, String>
                     {
-                        ["Titulo"] = request.Notificacao.Titulo.Substring(0,19) + "...",
+                        ["Titulo"] = request.Notificacao.Titulo.Substring(0, Math.Min(19, request.Notificacao.Titulo.Length)) + "...",
                         ["Mensagem"] = request.Notificacao.Mensagem,
                         ["CodigoGrupo"] = idGrupo.ToString(),
                         ["DescricaoGrupo"] = grupos.Where(x => x.Id == idGrupo).FirstOrDefault().Nome,
