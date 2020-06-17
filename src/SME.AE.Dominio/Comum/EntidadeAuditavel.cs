@@ -4,6 +4,7 @@ namespace SME.AE.Dominio.Comum
 {
     public class EntidadeAuditavel
     {
+        public long Id { get; set; }
         public string CreatedBy { get; set; }
 
         public DateTime Created { get; set; }
