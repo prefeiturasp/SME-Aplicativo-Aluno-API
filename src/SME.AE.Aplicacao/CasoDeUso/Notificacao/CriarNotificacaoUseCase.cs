@@ -37,7 +37,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
         {
             try
             {
-                if (notificacao.DataEnvio <= DateTime.Now)
+                var dataEnvio = TimeZoneInfo.ConvertTimeToUtc(notificacao.DataEnvio);
+                var agora = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now);
+
+                if (dataEnvio <= agora)
                 {
                     List<int> grupos = notificacao.Grupo.Split(',').Select(i => Int32.Parse(i)).ToList();
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(notificacao, grupos));
