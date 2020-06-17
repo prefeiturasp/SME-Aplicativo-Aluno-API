@@ -56,7 +56,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task Criar(UsuarioCoreSSO usuario)
+        public async Task<Guid> Criar(UsuarioCoreSSO usuario)
         {
             try
             {
@@ -67,19 +67,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var pessoaId = Guid.NewGuid();
                 var usuId = Guid.NewGuid();
                 var parametrosPessoa = new { pessoaId, pesNome = usuario.Nome.Trim() };
-                var parametrosUsuario = new {  usuId, login = usuario.Cpf.Trim(), senha = usuario.Senha,  pessoaId };
+                var parametrosUsuario = new { usuId, login = usuario.Cpf.Trim(), senha = usuario.SenhaCriptografada, pessoaId };
                 var parametrosPessoaDoc = new { pessoaId, cpf = usuario.Cpf.Trim() };
 
                 await conn.ExecuteAsync(CoreSSOComandos.InserirPessoa, parametrosPessoa, transaction);
                 await conn.ExecuteAsync(CoreSSOComandos.InserirUsuario, parametrosUsuario, transaction);
                 await conn.ExecuteAsync(CoreSSOComandos.InserirPessoaDocumento, parametrosPessoaDoc, transaction);
 
-                foreach(var grupo in usuario.Grupos)
+                foreach (var grupo in usuario.Grupos)
                     await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
 
 
                 transaction.Commit();
                 conn.Close();
+
+                return usuId;
             }
             catch (Exception ex)
             {
@@ -89,21 +91,44 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         }
 
-        public void IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos)
+        public async Task IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos)
         {
             try
             {
                 using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+
                 conn.Open();
+
                 using var transaction = conn.BeginTransaction();
-                gruposNaoIncluidos.ForEach(async x => await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = x, usuId }, transaction));
+
+                foreach (var grupo in gruposNaoIncluidos)
+                    await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
+
                 transaction.Commit();
+
                 conn.Close();
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
                 throw ex;
+            }
+        }
+
+        public async Task<RetornoUsuarioCoreSSO> ObterPorId(Guid id)
+        {
+            using (var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+            {
+                conn.Open();
+
+                var consulta = @"
+                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, g.gru_id as grupoId
+                    FROM sys_usuario u
+                        LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
+                        LEFT JOIN sys_grupo g on gu.gru_id = g.gru_id
+                        WHERE u.usu_id = @id";
+
+                return await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(consulta, new { id });
             }
         }
 

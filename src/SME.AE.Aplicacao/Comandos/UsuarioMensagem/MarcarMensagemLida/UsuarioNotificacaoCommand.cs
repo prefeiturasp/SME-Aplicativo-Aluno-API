@@ -22,9 +22,11 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
         {
             private readonly IUsuarioNotificacaoRepositorio _repository;
 
+
             public UsuarioMensagemCommandHandler(IUsuarioNotificacaoRepositorio repository)
             {
                 _repository = repository;
+
             }
 
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)
@@ -32,12 +34,15 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 
                 try
                 {
-                    return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    
+                    var mensagem = await _repository.Selecionar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
+                    if (mensagem == null)
+                        return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
+                    //retorna false 
+                    return !await _repository.RemoverPorId(mensagem.Id);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    return false;
+                    throw new Exception(ex.Message);
                 }
             }
         }
