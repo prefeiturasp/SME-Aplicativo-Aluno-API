@@ -69,8 +69,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 await conn.ExecuteAsync(
-                    @"INSERT INTO usuario( cpf, nome, email, ultimoLogin, criadoEm, excluido) 
-                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido)",
+                    @"INSERT INTO usuario(cpf, nome, email, ultimoLogin, criadoEm, excluido, celular,primeiroacesso,criadoem,criadopor,alteradoEm,alteradoPor) 
+                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido, @Celular,@PrimeiroAcesso,@CriadoEm,@CriadoPor,@AlteradoEm,@AlteradoPor)",
                   usuario);
                 conn.Close();
             }
