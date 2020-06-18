@@ -7,8 +7,6 @@ using Sentry;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.Comum.Config;
-using SME.AE.Aplicacao.Comum.Excecoes;
-using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 
 namespace SME.AE.Api.Controllers
 {
