@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using SME.AE.Api.Filtros;
+using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Api.Controllers
@@ -29,11 +30,18 @@ namespace SME.AE.Api.Controllers
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-            
-            return new 
+
+            return new
             {
                 IsEolConnOk = isEolConnOk
             };
-        } 
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> TesteArquitetura([FromServices] ITesteArquiteturaUseCase testeArquiteturaUseCase)
+        {
+            return Ok(await testeArquiteturaUseCase.Executar(Mediator));
+        }
     }
 }

@@ -12,72 +12,161 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using SME.AE.Aplicacao.Comum.Extensoes;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 {
     public class AutenticarUsuarioCommand : IRequest<RespostaApi>
     {
-        public AutenticarUsuarioCommand(string cpf, string dataNascimento)
+        public AutenticarUsuarioCommand(string cpf, string senha)
         {
             Cpf = cpf;
-            dataNascimento = Regex.Replace(dataNascimento, @"\-\/", "");
-            DataNascimento = DateTime.ParseExact(dataNascimento, "ddMMyyyy", CultureInfo.InvariantCulture);
+            Senha = senha;
+
         }
 
         public string Cpf { get; set; }
         public DateTime DataNascimento { get; set; }
+        public string Senha { get; set; }
 
         public class AutenticarUsuarioCommandHandler : IRequestHandler<AutenticarUsuarioCommand, RespostaApi>
         {
-            private readonly IAplicacaoContext _context;
             private readonly IAutenticacaoService _autenticacaoService;
             private readonly IUsuarioRepository _repository;
+            private readonly IUsuarioCoreSSORepositorio _repositoryCoreSSO;
 
-            public AutenticarUsuarioCommandHandler(IAplicacaoContext context, IAutenticacaoService autenticacaoService, IUsuarioRepository repository)
+            public AutenticarUsuarioCommandHandler( IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO)
             {
-                _context = context;
                 _autenticacaoService = autenticacaoService;
-
+                _repositoryCoreSSO = repositoryCoreSSO;
                 _repository = repository;
             }
 
             public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
             {
+                bool primeiroAcesso = false;
+                string email = "";
+                string celular = "";
+
                 var validator = new AutenticarUsuarioUseCaseValidatior();
                 ValidationResult validacao = validator.Validate(request);
-                var usuarioRetorno =  await _repository.ObterPorCpf(request.Cpf);
+
                 if (!validacao.IsValid)
                     return RespostaApi.Falha(validacao.Errors);
 
+                //verificar se o usuário está cadastrado no CoreSSO
+                var usuarioCoreSSO = await _repositoryCoreSSO.Selecionar(request.Cpf);
+
+                string senhaCriptografada = string.Empty;
+
+                //verificar se as senhas são iguais
+                if (usuarioCoreSSO.Any())
+                {
+                    if (!Criptografia.EqualsSenha(request.Senha, usuarioCoreSSO.FirstOrDefault().Senha, usuarioCoreSSO.FirstOrDefault().TipoCriptografia))
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário ou senha incorretos."));
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
+                }
+
+                //se for primeiro acesso
+                if (!usuarioCoreSSO.Any())
+                {
+                    primeiroAcesso = true;
+                    var senha = Regex.Replace(request.Senha, @"\-\/", "");
+
+                    try
+                    {
+                        request.DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
+                    }
+                    catch
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
+                }
+
+                //buscar o usuario 
+                var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
+
                 //selecionar alunos do responsável buscando apenas pelo cpf
                 var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
+
+                //caso nao tenha nenhum filho matriculado, retornar falha e inativá-lo no coresso
                 if (usuarioAlunos == null || !usuarioAlunos.Any())
                 {
                     validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
                     ExcluiUsuarioSeExistir(request, usuarioRetorno);
+
+                    if (usuarioCoreSSO.Any())
+                        await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, StatusUsuarioCoreSSO.Inativo);
+
                     return RespostaApi.Falha(validacao.Errors);
                 }
 
-                if (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento))
+                //se for primeiro acesso, a senha validar se a senha inputada é alguma data de nascimento de algum aluno do responsável
+                if (primeiroAcesso)
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
-                    ExcluiUsuarioSeExistir(request, usuarioRetorno);
-                    return RespostaApi.Falha(validacao.Errors);
+                    if (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento))
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
+                        ExcluiUsuarioSeExistir(request, usuarioRetorno);
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
+
+                    if (usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento && w.TipoSigilo == (int)AlunoTipoSigilo.Restricao))
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
                 }
 
-                var usuario = usuarioAlunos.FirstOrDefault(w => w.DataNascimento == request.DataNascimento);
-                if (usuario.TipoSigilo == (int)AlunoTipoSigilo.Restricao)
+                //verificar se o usuário tem e-mail e celular cadastrado
+                if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Email)))
+                    email = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Email)).Email;
+
+                if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Celular)))
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
-                    return RespostaApi.Falha(validacao.Errors);
+                    celular = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Celular)).Celular;
+                    if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.DDD)))
+                        celular = $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
                 }
 
-                usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario);
 
-                return MapearResposta(usuario, usuarioRetorno);
+                //necessário implementar unit of work para transacionar essas operações
+                senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
+                var grupos = await _repositoryCoreSSO.SelecionarGrupos();
+                var usuario = usuarioAlunos.FirstOrDefault();
+
+                //verificar se o usuário está incluído em todos os grupos
+                if (usuarioCoreSSO.Any())
+                {
+                    if (usuarioCoreSSO.FirstOrDefault().Status == (int)StatusUsuarioCoreSSO.Inativo)
+                        await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, StatusUsuarioCoreSSO.Ativo);
+
+                    var gruposNaoIncluidos = grupos.Where(w => !usuarioCoreSSO.Select(x => x.GrupoId).Contains(w));
+                    if (gruposNaoIncluidos.Any())
+                       await _repositoryCoreSSO.IncluirUsuarioNosGrupos(usuarioCoreSSO.FirstOrDefault().UsuId, gruposNaoIncluidos);
+
+                    if (usuarioCoreSSO.FirstOrDefault().TipoCriptografia != TipoCriptografia.TripleDES)
+                        await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.FirstOrDefault().UsuId, request.Senha);
+                }
+                
+                usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
+
+                var informarCelularEmail = string.IsNullOrWhiteSpace(usuarioRetorno.Email) && string.IsNullOrWhiteSpace(usuarioRetorno.Celular);
+
+                usuarioRetorno.Email = usuarioRetorno.Email ?? email;
+                usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
+                usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
+
+                return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, informarCelularEmail);
             }
 
-            private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario)
+
+
+            private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
             {
                 usuario.Cpf = request.Cpf;
 
@@ -88,7 +177,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
                 else
                 {
-                    await _repository.Criar(MapearDominioUsuario(usuario));
+                    await _repository.Criar(MapearDominioUsuario(usuario, primeiroAcesso));
                 }
 
                 return await _repository.ObterPorCpf(request.Cpf);
@@ -100,7 +189,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     _repository.ExcluirUsuario(request.Cpf);
             }
 
-            private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol)
+            private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol, bool primeiroAcesso)
             {
                 var usuario = new Dominio.Entidades.Usuario
                 {
@@ -108,23 +197,28 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
                     Nome = usuarioEol.Nome,
                     Email = usuarioEol.Email,
                     Excluido = false,
-                    UltimoLogin = DateTime.Now
+                    UltimoLogin = DateTime.Now,
+                    PrimeiroAcesso = primeiroAcesso
                 };
 
                 return usuario;
 
             }
 
-            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp)
+            private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool informarCelularEmail)
             {
                 RespostaAutenticar usuario = new RespostaAutenticar
                 {
                     Cpf = usuarioEol.Cpf,
-                    Email = usuarioEol.Email,
+                    Email = usuarioApp.Email,
                     Id = usuarioApp.Id,
                     Nome = usuarioEol.Nome,
+                    PrimeiroAcesso = primeiroAcesso,
+                    InformarCelularEmail = informarCelularEmail,
+                    Celular = usuarioApp.Celular,
                     Token = ""
                 };
+
                 return RespostaApi.Sucesso(usuario);
             }
         }
