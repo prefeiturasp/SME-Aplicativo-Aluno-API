@@ -19,9 +19,9 @@
     <PackageReference Include="Sentry" Version="2.1.1" />
     <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Sentry.Extensions.Logging" Version="2.1.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.4.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.4.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.4.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.4.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.4.1" />
     <PackageReference Include="Swashbuckle.Core" Version="5.6.0" />
   </ItemGroup>
 
@@ -29,6 +29,8 @@
     <ProjectReference Include="..\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj" />
     <ProjectReference Include="..\SME.AE.Infra\SME.AE.Infra.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 
 </Project>

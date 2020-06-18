@@ -19,13 +19,11 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf
     }
     
     public class ObterUsuarioPorCpfCommandHandler : IRequestHandler<ObterUsuarioPorCpfCommand, Dominio.Entidades.Usuario>
-    {
-        private readonly IAplicacaoContext _context;
+    {        
         private readonly IUsuarioRepository _repository;
         
-        public ObterUsuarioPorCpfCommandHandler(IAplicacaoContext context, IUsuarioRepository repository)
+        public ObterUsuarioPorCpfCommandHandler(IUsuarioRepository repository)
         {
-            _context = context;
             _repository = repository;
         }
 

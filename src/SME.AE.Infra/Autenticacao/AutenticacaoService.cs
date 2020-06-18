@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
-using System;
-using SME.AE.Aplicacao.Comum.Modelos;
 using System.Collections.Generic;
 
 namespace SME.AE.Infra.Autenticacao

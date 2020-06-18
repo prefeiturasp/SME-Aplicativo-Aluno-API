@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Npgsql;
@@ -13,8 +14,13 @@ using SME.AE.Infra.Persistencia.Consultas;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class UsuarioRepository : IUsuarioRepository
+    public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
+        public UsuarioRepository() : base(ConnectionStrings.Conexao)
+        {
+
+        }
+
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
             Usuario usuario;
@@ -39,6 +45,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return usuario;
 
         }
+
         public async Task<IEnumerable<string>> ObterTodos()
         {
             try
@@ -62,9 +69,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
+                usuario.InserirAuditoria();
                 await conn.ExecuteAsync(
-                    @"INSERT INTO usuario( cpf, nome, email, ultimoLogin, criadoEm, excluido) 
-                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido)",
+                    @"INSERT INTO usuario(cpf, nome, email, ultimoLogin, criadoEm, excluido, celular,primeiroacesso,criadopor,alteradoEm,alteradoPor) 
+                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido, @Celular,@PrimeiroAcesso,@CriadoPor,@AlteradoEm,@AlteradoPor)",
                   usuario);
                 conn.Close();
             }
@@ -93,6 +101,42 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
+
+        public async Task AtualizarEmailTelefone(long id, string email, string celular)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine(@"UPDATE usuario SET alteradopor='Sistema', alteradoem=@alteradoem");
+
+
+            if (!string.IsNullOrWhiteSpace(email))
+                builder.AppendLine(",email=@email");
+
+            if (!string.IsNullOrWhiteSpace(celular))
+                builder.AppendLine(",celular=@celular");
+
+            builder.AppendLine("where id = @id;");
+
+            using (var conexao = InstanciarConexao())
+            {
+                await conexao.ExecuteAsync(builder.ToString(), new { id, email, celular, alteradoem = DateTime.Now });
+
+                conexao.Close();
+            }
+        }
+
+        public async Task AtualizarPrimeiroAcesso(long id, bool primeiroAcesso)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                await conexao.ExecuteAsync(@"UPDATE usuario
+                            SET primeiroacesso=@primeiroAcesso,alteradopor='Sistema', alteradoem=@alteradoem
+                            where id = @id;", new { id, primeiroAcesso, alteradoem = DateTime.Now });
+
+                conexao.Close();
+            }
+        }
+
 
         public async Task ExcluirUsuario(string cpf)
         {
