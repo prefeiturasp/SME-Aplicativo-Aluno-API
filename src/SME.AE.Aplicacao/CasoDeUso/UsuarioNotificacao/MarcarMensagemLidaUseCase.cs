@@ -21,13 +21,13 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
         {
             var usuario = await mediator.Send(new ObterUsuarioQuery()
             {
-                Cpf = usuarioMensagem.cpfUsuario
+                Cpf = usuarioMensagem.CpfUsuario
             });
 
             if (usuario == null)
-                throw new NegocioException($"Não encontrado usuário com o CPF '{usuarioMensagem.cpfUsuario}'");
+                throw new NegocioException($"Não encontrado usuário com o CPF '{usuarioMensagem.CpfUsuario}'");
 
-            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.cpfUsuario));
+            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.CpfUsuario));
 
             if (resposta.Data == null)
                 throw new NegocioException("Não foi possivel obter os alunos por escola");
