@@ -3,6 +3,7 @@ using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida;
 using SME.AE.Aplicacao.Comum.Excecoes;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
@@ -14,19 +15,19 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 {
-    public class MarcarMensagemLidaUseCase
+    public class MarcarMensagemLidaUseCase : IMarcarMensagemLidaUseCase
     {
         public async Task<NotificacaoResposta> Executar(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem)
         {
             var usuario = await mediator.Send(new ObterUsuarioQuery()
             {
-                Cpf = usuarioMensagem.CPF
+                Cpf = usuarioMensagem.cpfUsuario
             });
 
             if (usuario == null)
-                throw new NegocioException($"Não encontrado usuário com o CPF '{usuarioMensagem.CPF}'");
+                throw new NegocioException($"Não encontrado usuário com o CPF '{usuarioMensagem.cpfUsuario}'");
 
-            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.CPF));
+            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.cpfUsuario));
 
             if (resposta.Data == null)
                 throw new NegocioException("Não foi possivel obter os alunos por escola");
@@ -41,6 +42,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                     {
                         UsuarioCpf = usuario.Cpf,
                         NotificacaoId = usuarioMensagem.NotificacaoId,
+                        DreCodigoEol = aluno.CodigoDre,
                         UeCodigoEol = aluno.CodigoEscola,
                         CodigoAlunoEol = aluno.CodigoEol,
                         UsuarioId = usuario.Id,
