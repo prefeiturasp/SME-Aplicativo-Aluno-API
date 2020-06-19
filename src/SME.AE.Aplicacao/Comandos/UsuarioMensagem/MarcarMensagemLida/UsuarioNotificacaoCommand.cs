@@ -36,7 +36,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
                 if (usuarioNotificacao != null)
                     return await _repository.Atualizar(usuarioNotificacao);
 
-                return await _repository.Criar(request.usuarioNotificacao);
+                return await _repository.Criar(request.UsuarioNotificacao);
             }
         }
     }
