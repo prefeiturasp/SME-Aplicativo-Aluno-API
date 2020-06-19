@@ -33,10 +33,14 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
                 var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(
                          request.UsuarioNotificacao.NotificacaoId, request.UsuarioNotificacao.UsuarioCpf);
 
-                if (usuarioNotificacao != null)
-                    return await _repository.Atualizar(usuarioNotificacao);
+                if (usuarioNotificacao == null)
+                    return await _repository.Criar(request.UsuarioNotificacao);
 
-                return await _repository.Criar(request.UsuarioNotificacao);
+                usuarioNotificacao.MensagemVisualizada = request.UsuarioNotificacao.MensagemVisualizada;
+
+                usuarioNotificacao.AtualizarAuditoria();
+
+                return await _repository.Atualizar(usuarioNotificacao);
             }
         }
     }
