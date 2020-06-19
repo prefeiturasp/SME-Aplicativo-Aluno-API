@@ -14,8 +14,6 @@ namespace SME.AE.Aplicacao.Validators
             RuleFor(x => x.CpfUsuario).ValidarCpf().WithMessage("CPF com Formato Invalido").When(x => !string.IsNullOrWhiteSpace(x.CpfUsuario));
 
             RuleFor(x => x.NotificacaoId).NotEmpty().NotNull().WithMessage("Deve ser informado o Id da Notificação");
-
-            RuleFor(x => x.MensagemVisualizada).NotNull().NotEmpty().WithMessage("Deve ser informada a propriedade Mensagem Visualizada");
         }
     }
 }
