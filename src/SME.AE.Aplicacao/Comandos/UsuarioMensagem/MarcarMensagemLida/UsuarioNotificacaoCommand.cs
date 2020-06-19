@@ -33,7 +33,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)
             {
                 try
-                {
+                {                    
                     var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(
                          request.UsuarioNotificacao.NotificacaoId, request.UsuarioNotificacao.UsuarioCpf);
                     if (usuarioNotificacao != null)
@@ -42,7 +42,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
                     }
                     else
                     {
-                        return await _repository.Criar(usuarioNotificacao);
+                        return await _repository.Criar(request.UsuarioNotificacao);
                     }
                 }
                 catch (Exception ex)

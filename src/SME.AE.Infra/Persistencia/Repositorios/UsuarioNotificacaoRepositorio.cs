@@ -25,11 +25,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     (usuario_id,
                      notificacao_id,
                            criadoem,
-                    aluno_codigoeol, 
+                    codigo_eol_aluno, 
                       dre_codigoeol, 
                        ue_codigoeol, 
                         usuario_cpf,
-                         alteradoem,
                           criadopor,
                      mensagemvisualizada)
                     VALUES(@UsuarioId,
@@ -47,7 +46,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuarioNotificacao.NotificacaoId,
                         dataAtual,
                         usuarioNotificacao.CodigoAlunoEol,
-                        usuarioNotificacao.DreCodigoEol,
+                        DreCodigoEol = long.Parse(usuarioNotificacao.DreCodigoEol),
                         usuarioNotificacao.UeCodigoEol,
                         usuarioNotificacao.UsuarioCpf,
                         usuarioNotificacao.CriadoPor,
@@ -131,7 +130,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var dataAtual = DateTime.Now;
             var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
                 @"SELECT * from public.usuario_notificacao_leitura
-                     WHERE usuario_cpf = @usuario_cpf AND notificacao_id = @notificacaoId", new { usuarioCpf, notificacaoId });
+                     WHERE usuario_cpf = @usuarioCpf AND notificacao_id = @notificacaoId", new { usuarioCpf, notificacaoId });
             conn.Close();
             return retorno;
         }

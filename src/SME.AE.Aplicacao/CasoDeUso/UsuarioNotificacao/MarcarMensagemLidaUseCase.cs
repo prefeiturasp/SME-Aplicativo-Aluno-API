@@ -17,7 +17,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
         {
             RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.cpfUsuario));
 
-            var listaEscolas = (List<ListaEscola>)resposta.Data;
+            var listaEscolas = (IEnumerable<ListaEscola>)resposta.Data;
 
             foreach (var lista in listaEscolas)
             {
