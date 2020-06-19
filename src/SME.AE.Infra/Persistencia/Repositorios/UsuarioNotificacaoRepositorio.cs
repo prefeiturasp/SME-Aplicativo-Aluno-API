@@ -11,27 +11,45 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioNotificacaoRepositorio : IUsuarioNotificacaoRepositorio
     {
-
         public async Task<bool> Criar(UsuarioNotificacao usuarioNotificacao)
         {
-
-            try
-            {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                var dataAtual = DateTime.Now;
-                var retorno = await conn.ExecuteAsync(
-                    @"INSERT INTO public.usuario_notificacao_leitura
-                     (usuario_id, codigo_eol_aluno, notificacao_id, criadoem)
-                    VALUES(@usuarioId, 0, @notificacaoId, @dataAtual);", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
-                conn.Close();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw new Exception("Erro ao marcar a mensagem como  lida, tente novamente");
-            }
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataAtual = DateTime.Now;
+            var retorno = await conn.ExecuteAsync(
+                @"INSERT INTO public.usuario_notificacao_leitura
+                    (usuario_id,
+                     notificacao_id,
+                           criadoem,
+                    codigo_eol_aluno, 
+                      dre_codigoeol, 
+                       ue_codigoeol, 
+                        usuario_cpf,
+                          criadopor,
+                     mensagemvisualizada)
+                    VALUES(@UsuarioId,
+                           @NotificacaoId,
+                           @dataAtual,
+                           @CodigoAlunoEol,
+                           @DreCodigoEol,
+                           @UeCodigoEol,
+                           @UsuarioCpf,
+                           @CriadoPor,
+                           @MensagemVisualizada);",
+                new
+                {
+                    usuarioNotificacao.UsuarioId,
+                    usuarioNotificacao.NotificacaoId,
+                    dataAtual,
+                    usuarioNotificacao.CodigoAlunoEol,
+                    DreCodigoEol = long.Parse(usuarioNotificacao.DreCodigoEol),
+                    usuarioNotificacao.UeCodigoEol,
+                    usuarioNotificacao.UsuarioCpf,
+                    usuarioNotificacao.CriadoPor,
+                    usuarioNotificacao.MensagemVisualizada
+                });
+            conn.Close();
+            return true;
         }
 
         public Task<UsuarioNotificacao> ObterPorId(long id)
@@ -42,43 +60,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<bool> RemoverPorId(long id)
         {
 
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
 
-            try
-            {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-
-                await conn.ExecuteAsync(
-                   @"DELETE FROM usuario_notificacao_leitura where id = @id", new { id });
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw new Exception("Erro ao marcar a mensagem como não lida, tente novamente");
-            }
+            await conn.ExecuteAsync(
+               @"DELETE FROM usuario_notificacao_leitura where id = @id", new { id });
+            conn.Close();
 
             return true;
         }
 
         public async Task<bool> Remover(long notificacaoId)
         {
-           
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
 
-            try
-            {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-
-                await conn.ExecuteAsync(
-                   @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return false;
-            }
+            await conn.ExecuteAsync(
+               @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
+            conn.Close();
 
             return true;
         }
@@ -90,9 +89,45 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var dataAtual = DateTime.Now;
             var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
                 @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
-                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
+                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId });
             conn.Close();
             return retorno;
+        }
+
+        public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf)
+        {
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataAtual = DateTime.Now;
+            var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
+                @"SELECT * from public.usuario_notificacao_leitura
+                     WHERE usuario_cpf = @usuarioCpf AND notificacao_id = @notificacaoId", new { usuarioCpf, notificacaoId });
+            conn.Close();
+            return retorno;
+        }
+
+        public async Task<bool> Atualizar(UsuarioNotificacao usuarioNotificacao)
+        {
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataAtual = DateTime.Now;
+            var retorno = await conn.ExecuteAsync(
+                @"UPDATE public.usuario_notificacao_leitura
+                         SET 
+                             alteradoem= @dataAtual, 
+                             alteradopor= @UsuarioId, 
+                             mensagemVisualizada= @MensagemVisualizada 
+                         WHERE id = @Id ;",
+                new
+                {
+                    dataAtual,
+                    usuarioNotificacao.UsuarioId,
+                    usuarioNotificacao.MensagemVisualizada,
+                    usuarioNotificacao.Id
+
+                });
+            conn.Close();
+            return true;
         }
     }
 }
