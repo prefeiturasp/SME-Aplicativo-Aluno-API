@@ -60,7 +60,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
                 {
                     Data = new Dictionary<String, String>
                     {
-                        ["Titulo"] = request.Notificacao.Titulo.Substring(0, Math.Min(19, request.Notificacao.Titulo.Length)) + "...",
+                        ["Titulo"] = request.Notificacao.Titulo,
                         ["Mensagem"] = request.Notificacao.Mensagem,
                         ["CodigoGrupo"] = idGrupo.ToString(),
                         ["DescricaoGrupo"] = grupos.Where(x => x.Id == idGrupo).FirstOrDefault().Nome,

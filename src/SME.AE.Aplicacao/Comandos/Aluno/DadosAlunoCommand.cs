@@ -1,6 +1,7 @@
 ﻿using FluentValidation.Results;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
@@ -38,22 +39,13 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             public async Task<RespostaApi> Handle
              (DadosAlunoCommand request, CancellationToken cancellationToken)
             {
-                var validator = new DadosAlunoUseCaseValidation();
-                ValidationResult validacao = validator.Validate(request);
-
-                if (!validacao.IsValid)
-                    return RespostaApi.Falha(validacao.Errors);
-
                 var grupos = await _repositorioGrupoComunicado.ObterTodos();
                 var resultado = await _repository.ObterDadosAlunos(request.Cpf);
 
                 if (resultado == null || !resultado.Any())
-                {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
-                    return RespostaApi.Falha(validacao.Errors);
-                }
-
-                resultado.ForEach(x => { var g = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos); x.Grupo = g.gupo;x.CodigoGrupo = g.codigo;});
+                    throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
+                
+                resultado.ForEach(x => { var g = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos); x.Grupo = g.gupo; x.CodigoGrupo = g.codigo; });
 
                 var tipoEscola =
                     resultado
@@ -87,7 +79,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                 return RespostaApi.Sucesso(tipoEscola);
             }
 
-            private (string gupo,long codigo) SelecionarGrupos(int? codigoTipoEscola, int codigoEtapaEnsino, int codigoCicloEnsino, IEnumerable<GrupoComunicado> grupos)
+            private (string gupo, long codigo) SelecionarGrupos(int? codigoTipoEscola, int codigoEtapaEnsino, int codigoCicloEnsino, IEnumerable<GrupoComunicado> grupos)
             {
                 return grupos
                 .Where(x => (x.TipoEscolaId != null

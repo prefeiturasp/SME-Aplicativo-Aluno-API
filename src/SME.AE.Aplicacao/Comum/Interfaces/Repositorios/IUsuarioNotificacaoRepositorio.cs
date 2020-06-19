@@ -12,5 +12,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         public  Task<bool> Remover(long id);
         public Task<bool> RemoverPorId(long id);
         Task<UsuarioNotificacao> Selecionar(UsuarioNotificacao usuarioNotificacao);
+        public Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf);
+        public Task<bool> Atualizar(UsuarioNotificacao notificacao);
     }
 }
