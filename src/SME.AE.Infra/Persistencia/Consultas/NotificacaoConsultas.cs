@@ -9,17 +9,9 @@
         ";
 
         public static string ObterPorUsuarioLogado = @"
-            SELECT Id, Mensagem, Titulo, Grupo, DataEnvio, DataExpiracao,
-                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor,
-                   case when exists (
-                            select unl.id 
-                            from usuario_notificacao_leitura unl 
-                                inner join usuario u on unl.usuario_id = u.id 
-                            where notificacao_id = notificacao.id and u.cpf = @cpf)
-                        then 'true'
-                        else 'false'
-                    end as MensagemVisualizada
-            FROM Notificacao 
+             SELECT N.Id, N.Mensagem, N.Titulo, N.Grupo, N.DataEnvio, N.DataExpiracao,
+                   N.CriadoEm, N.CriadoPor, N.AlteradoEm, N.AlteradoPor, UNL.mensagemvisualizada FROM Notificacao N
+            left join usuario_notificacao_leitura UNL  on UNL.notificacao_id = N.id and UNL.usuario_cpf = @cpf
         ";
 
         public static string GruposDoResponsavel = @"
