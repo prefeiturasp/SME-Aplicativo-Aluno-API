@@ -33,12 +33,17 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
             {
 
                 try
-                {
-                    var mensagem = await _repository.Selecionar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    if (mensagem == null)
-                        return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    //retorna false 
-                    return !await _repository.RemoverPorId(mensagem.Id);
+                {                    
+                    var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(
+                         request.UsuarioNotificacao.NotificacaoId, request.UsuarioNotificacao.UsuarioCpf);
+                    if (usuarioNotificacao != null)
+                    {
+                         return await _repository.Atualizar(usuarioNotificacao);
+                    }
+                    else
+                    {
+                        return await _repository.Criar(request.UsuarioNotificacao);
+                    }
                 }
                 catch (Exception ex)
                 {

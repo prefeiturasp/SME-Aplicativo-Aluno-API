@@ -22,8 +22,36 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var dataAtual = DateTime.Now;
                 var retorno = await conn.ExecuteAsync(
                     @"INSERT INTO public.usuario_notificacao_leitura
-                     (usuario_id, codigo_eol_aluno, notificacao_id, criadoem)
-                    VALUES(@usuarioId, 0, @notificacaoId, @dataAtual);", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
+                    (usuario_id,
+                     notificacao_id,
+                           criadoem,
+                    codigo_eol_aluno, 
+                      dre_codigoeol, 
+                       ue_codigoeol, 
+                        usuario_cpf,
+                          criadopor,
+                     mensagemvisualizada)
+                    VALUES(@UsuarioId,
+                           @NotificacaoId,
+                           @dataAtual,
+                           @CodigoAlunoEol,
+                           @DreCodigoEol,
+                           @UeCodigoEol,
+                           @UsuarioCpf,
+                           @CriadoPor,
+                           @MensagemVisualizada);",
+                    new
+                    {
+                        usuarioNotificacao.UsuarioId,
+                        usuarioNotificacao.NotificacaoId,
+                        dataAtual,
+                        usuarioNotificacao.CodigoAlunoEol,
+                        DreCodigoEol = long.Parse(usuarioNotificacao.DreCodigoEol),
+                        usuarioNotificacao.UeCodigoEol,
+                        usuarioNotificacao.UsuarioCpf,
+                        usuarioNotificacao.CriadoPor,
+                        usuarioNotificacao.MensagemVisualizada
+                    });
                 conn.Close();
                 return true;
             }
@@ -93,6 +121,50 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                      WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId, dataAtual });
             conn.Close();
             return retorno;
+        }
+
+        public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf)
+        {
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataAtual = DateTime.Now;
+            var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
+                @"SELECT * from public.usuario_notificacao_leitura
+                     WHERE usuario_cpf = @usuarioCpf AND notificacao_id = @notificacaoId", new { usuarioCpf, notificacaoId });
+            conn.Close();
+            return retorno;
+        }
+
+        public async Task<bool> Atualizar(UsuarioNotificacao usuarioNotificacao)
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var dataAtual = DateTime.Now;
+                var retorno = await conn.ExecuteAsync(
+                    @"UPDATE public.usuario_notificacao_leitura
+                         SET 
+                             alteradoem= @dataAtual, 
+                             alteradopor= @UsuarioId, 
+                             mensagemVisualizada= @MensagemVisualizada 
+                         WHERE id = @Id ;",
+                    new
+                    {
+                        dataAtual,
+                        usuarioNotificacao.UsuarioId,
+                        usuarioNotificacao.MensagemVisualizada,
+                        usuarioNotificacao.Id
+                     
+                    });
+                conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw new Exception("Erro ao atualizar status da Mensagem , tente novamente");
+            }
         }
     }
 }
