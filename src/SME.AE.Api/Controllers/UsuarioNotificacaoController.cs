@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 
 namespace SME.AE.Api.Controllers
 {
@@ -11,16 +13,9 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> MarcarMensagemLida([FromBody] Aplicacao.Comum.Modelos.Entrada.UsuarioNotificacao usuarioMensagem)
+        public async Task<ActionResult> MarcarMensagemLida([FromBody] UsuarioNotificacaoDto usuarioMensagem, [FromServices]IMarcarMensagemLidaUseCase marcarMensagemLidaUseCase)
         {
-            try
-            {
-                return Ok(await MarcarMensagemLidaUseCase.Executar(Mediator, usuarioMensagem));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await marcarMensagemLidaUseCase.Executar(Mediator, usuarioMensagem));
         }
     }
 }
