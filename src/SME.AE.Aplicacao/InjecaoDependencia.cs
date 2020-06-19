@@ -11,6 +11,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
+using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
 
 namespace SME.AE.Aplicacao
 {
@@ -46,6 +47,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<ITesteArquiteturaUseCase, TesteArquiteturaUseCase>();
 
             //Usuario
+            services.TryAddScoped(typeof(IMarcarMensagemLidaUseCase), typeof(MarcarMensagemLidaUseCase));
             services.TryAddScoped(typeof(ICriarUsuarioPrimeiroAcessoUseCase), typeof(CriarUsuarioPrimeiroAcessoUseCase));
             services.TryAddScoped(typeof(IAlterarEmailCelularUseCase), typeof(AlterarEmailCelularUseCase));
         }
