@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
-using Dapper.Contrib.Extensions;
+﻿using Dapper;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
@@ -13,6 +6,11 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
@@ -21,17 +19,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf)
         {
             IEnumerable<NotificacaoPorUsuario> list = null;
-            
+
+            var query = NotificacaoConsultas.ObterPorUsuarioLogado
+                    + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')" +
+                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
+                    " AND (DATE(DataEnvio) <= @dataAtual) ";
+
             try
             {
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 var dataAtual = DateTime.Now.Date;
                 list = await conn.QueryAsync<NotificacaoPorUsuario>(
-                    NotificacaoConsultas.ObterPorUsuarioLogado
-                    + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')" +
-                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
-                    " AND (DATE(DataEnvio) <= @dataAtual) ",  new
+                    query, new
                     {
                         grupo,
                         cpf,

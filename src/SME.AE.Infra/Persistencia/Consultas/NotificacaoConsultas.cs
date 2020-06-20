@@ -8,11 +8,24 @@
             FROM Notificacao 
         ";
 
-        public static string ObterPorUsuarioLogado = @"
-             SELECT N.Id, N.Mensagem, N.Titulo, N.Grupo, N.DataEnvio, N.DataExpiracao,
-                   N.CriadoEm, N.CriadoPor, N.AlteradoEm, N.AlteradoPor, UNL.mensagemvisualizada FROM Notificacao N
-            left join usuario_notificacao_leitura UNL  on UNL.notificacao_id = N.id and UNL.usuario_cpf = @cpf
-        ";
+        public static string ObterPorUsuarioLogado = @"select 
+                                                            distinct 
+                                                            N.Id,
+	                                                        N.Mensagem,
+	                                                        N.Titulo,
+	                                                        N.Grupo,
+	                                                        N.DataEnvio,
+	                                                        N.DataExpiracao,
+	                                                        N.CriadoEm,
+	                                                        N.CriadoPor,
+	                                                        N.AlteradoEm,
+	                                                        N.AlteradoPor,
+	                                                        UNL.mensagemvisualizada
+                                                        from
+	                                                        Notificacao N
+                                                        left join usuario_notificacao_leitura UNL on
+	                                                        UNL.notificacao_id = N.id
+	                                                        and UNL.usuario_cpf = @cpf ";
 
         public static string GruposDoResponsavel = @"
             from dbo.responsavel_aluno ra

@@ -42,7 +42,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                     {
                         UsuarioCpf = usuario.Cpf,
                         NotificacaoId = usuarioMensagem.NotificacaoId,
-                        DreCodigoEol = aluno.CodigoDre,
+                        DreCodigoEol = long.Parse(aluno.CodigoDre),
                         UeCodigoEol = aluno.CodigoEscola,
                         CodigoAlunoEol = aluno.CodigoEol,
                         UsuarioId = usuario.Id,
