@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Aluno;
-using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida;
 using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
@@ -11,6 +10,7 @@ using SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Dominio.Entidades;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
@@ -33,8 +33,13 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                 throw new NegocioException("Não foi possivel obter os alunos por escola");
 
             var listaEscolas = (IEnumerable<ListaEscola>)resposta.Data;
+            var notificacao = await mediator.Send(new ObterNotificacaoPorIdQuery(usuarioMensagem.NotificacaoId));
 
-            foreach (var lista in listaEscolas)
+            if (notificacao == null)
+                throw new NegocioException("Não foi possivel localizar a notificação.");
+
+
+            foreach (var lista in listaEscolas.Where(c => notificacao.Grupos.Any(n => n.Codigo == c.CodigoGrupo)))
             {
                 foreach (var aluno in lista.Alunos)
                 {
@@ -54,7 +59,6 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                     var Notificacao = await mediator.Send(new UsuarioNotificacaoCommand(usuarioNotificacao));
                 }
             }
-            var notificacao = await mediator.Send(new ObterNotificacaoPorIdQuery(usuarioMensagem.NotificacaoId));
 
             notificacao.MensagemVisualizada = usuarioMensagem.MensagemVisualizada;
             return notificacao;
