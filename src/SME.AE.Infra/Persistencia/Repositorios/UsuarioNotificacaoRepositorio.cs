@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Npgsql;
-using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
@@ -42,7 +41,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     usuarioNotificacao.NotificacaoId,
                     dataAtual,
                     usuarioNotificacao.CodigoAlunoEol,
-                    DreCodigoEol = long.Parse(usuarioNotificacao.DreCodigoEol),
+                    usuarioNotificacao.DreCodigoEol,
                     usuarioNotificacao.UeCodigoEol,
                     usuarioNotificacao.UsuarioCpf,
                     usuarioNotificacao.CriadoPor,
@@ -94,15 +93,28 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return retorno;
         }
 
-        public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf)
+
+        public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf, long dreCodigoEol, string ueCodigoEol)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-            conn.Open();
-            var dataAtual = DateTime.Now;
-            var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
-                @"SELECT * from public.usuario_notificacao_leitura
-                     WHERE usuario_cpf = @usuarioCpf AND notificacao_id = @notificacaoId", new { usuarioCpf, notificacaoId });
-            conn.Close();
+            var query = @"select
+	                        *
+                        from
+	                        public.usuario_notificacao_leitura
+                        where
+	                        usuario_cpf = @usuarioCpf
+	                        and notificacao_id = @notificacaoId
+	                        and dre_codigoeol = @dreCodigoEol
+	                        and ue_codigoeol = @ueCodigoEol";
+
+            UsuarioNotificacao retorno = null;
+            await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+            {
+
+                conn.Open();
+                retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
+                    query, new { usuarioCpf, notificacaoId, dreCodigoEol, ueCodigoEol });
+                conn.Close();
+            }
             return retorno;
         }
 
