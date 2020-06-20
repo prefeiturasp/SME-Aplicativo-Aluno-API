@@ -1,9 +1,6 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,8 +27,12 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)
             {
-                var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(
-                         request.UsuarioNotificacao.NotificacaoId, request.UsuarioNotificacao.UsuarioCpf);
+                var usuarioNotificacaoRequest = request.UsuarioNotificacao;
+
+                var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(usuarioNotificacaoRequest.NotificacaoId,
+                                                                                             usuarioNotificacaoRequest.UsuarioCpf,
+                                                                                             usuarioNotificacaoRequest.DreCodigoEol,
+                                                                                             usuarioNotificacaoRequest.UeCodigoEol);
 
                 if (usuarioNotificacao == null)
                     return await _repository.Criar(request.UsuarioNotificacao);
