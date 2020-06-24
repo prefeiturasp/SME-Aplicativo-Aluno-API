@@ -3,6 +3,7 @@ using SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.Usuario;
 using SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Extensoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -19,6 +20,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
         public async Task<RespostaApi> Executar(IMediator mediator, NovaSenhaDto novaSenhaDto)
         {
             var usuario = await mediator.Send(new ObterUsuarioQuery() { Id = novaSenhaDto.Id });
+
+            if (!usuario.PrimeiroAcesso)
+                throw new NegocioException("Somente é possivel utilizar essa função quando for o primeiro acesso do usuário");
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
 
