@@ -138,7 +138,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var consulta = @"
                     SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia
                     FROM sys_usuario u
-                        LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
                         WHERE u.usu_id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(consulta, new { id });
@@ -152,10 +151,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var resultado = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
                     SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia
                     FROM sys_usuario u
-                        LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
-                        WHERE u.usu_login = @cpf 
-                            AND(g.sis_id is null 
-                                OR g.sis_id = 1001)"
+                        WHERE u.usu_login = @cpf "
                 , new { cpf });
             conn.Close();
             return resultado;

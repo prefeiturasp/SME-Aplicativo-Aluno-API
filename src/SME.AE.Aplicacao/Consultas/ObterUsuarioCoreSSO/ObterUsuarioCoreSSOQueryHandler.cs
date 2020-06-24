@@ -31,7 +31,11 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO
             else
                 retorno = await usuarioCoreSSORepositorio.ObterPorId(request.UsuarioId);
 
-            retorno.Grupos = (await usuarioGrupoRepositorio.ObterPorUsuarioId(retorno.UsuId))?.Select(x => x.GrupoId) ?? default;
+            if (retorno == null)
+                return retorno;
+
+            var grupos = await usuarioGrupoRepositorio.ObterPorUsuarioId(retorno.UsuId);
+            retorno.Grupos = grupos?.Select(x => x.GrupoId) ?? default;
 
             return retorno;
         }
