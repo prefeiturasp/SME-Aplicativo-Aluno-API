@@ -22,7 +22,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
         {
             var grupos = await usuarioCoreSSORepositorio.SelecionarGrupos();
 
-            var gruposNaoIncluidos = grupos.Where(x => request.UsuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
+            var gruposNaoIncluidos = grupos.Where(x => !request.UsuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
             if (gruposNaoIncluidos.Any())
                 await usuarioCoreSSORepositorio.IncluirUsuarioNosGrupos(request.UsuarioCoreSSO.UsuId, gruposNaoIncluidos);
