@@ -40,6 +40,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task AlterarSenha(Guid usuarioId, string senhaCriptografada)
+        {
+            using var conexao = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+            conexao.Open();
+
+            var sql = @"update SYS_Usuario 
+                       set usu_senha = @senhaCriptografada, usu_dataAlteracaoSenha = @dataAtual, usu_dataAlteracao = @dataAtual
+                        where usu_id = @usuarioId;";
+
+            await conexao.ExecuteAsync(sql, new { usuarioId, senhaCriptografada, dataAtual = DateTime.Now });
+
+            conexao.Close();
+        }
+
         public async Task AtualizarCriptografiaUsuario(Guid usuId, string senha)
         {
             try
