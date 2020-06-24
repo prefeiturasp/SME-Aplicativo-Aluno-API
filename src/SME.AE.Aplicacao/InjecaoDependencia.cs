@@ -48,7 +48,7 @@ namespace SME.AE.Aplicacao
 
             //Usuario
             services.TryAddScoped(typeof(IMarcarMensagemLidaUseCase), typeof(MarcarMensagemLidaUseCase));
-            services.TryAddScoped(typeof(ICriarUsuarioPrimeiroAcessoUseCase), typeof(CriarUsuarioPrimeiroAcessoUseCase));
+            services.TryAddScoped(typeof(ICriarUsuarioPrimeiroAcessoUseCase), typeof(PrimeiroAcessoUseCase));
             services.TryAddScoped(typeof(IAlterarEmailCelularUseCase), typeof(AlterarEmailCelularUseCase));
         }
     }
