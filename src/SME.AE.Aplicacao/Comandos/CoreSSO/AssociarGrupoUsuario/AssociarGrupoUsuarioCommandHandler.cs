@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,9 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
         public async Task<Unit> Handle(AssociarGrupoUsuarioCommand request, CancellationToken cancellationToken)
         {
             var grupos = await usuarioCoreSSORepositorio.SelecionarGrupos();
+
+            if (grupos == null)
+                throw new NegocioException("Grupos de usuáio não encontrados");
 
             var gruposNaoIncluidos = grupos.Where(x => !request.UsuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 

@@ -21,6 +21,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
         {
             var usuario = await mediator.Send(new ObterUsuarioQuery() { Id = novaSenhaDto.Id });
 
+            if (usuario == null)
+                throw new NegocioException("Usuário não encontrado");
+
             if (!usuario.PrimeiroAcesso)
                 throw new NegocioException("Somente é possivel utilizar essa função quando for o primeiro acesso do usuário");
 
