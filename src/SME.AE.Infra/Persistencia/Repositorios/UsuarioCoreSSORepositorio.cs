@@ -40,6 +40,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task AlterarSenha(Guid usuarioId, string senhaCriptografada)
+        {
+            using var conexao = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+            conexao.Open();
+
+            var sql = @"update SYS_Usuario 
+                       set usu_senha = @senhaCriptografada, usu_dataAlteracaoSenha = @dataAtual, usu_dataAlteracao = @dataAtual
+                        where usu_id = @usuarioId;";
+
+            await conexao.ExecuteAsync(sql, new { usuarioId, senhaCriptografada, dataAtual = DateTime.Now });
+
+            conexao.Close();
+        }
+
         public async Task AtualizarCriptografiaUsuario(Guid usuId, string senha)
         {
             try
@@ -122,39 +136,25 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conn.Open();
 
                 var consulta = @"
-                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, g.gru_id as grupoId
+                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia
                     FROM sys_usuario u
-                        LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
-                        LEFT JOIN sys_grupo g on gu.gru_id = g.gru_id
                         WHERE u.usu_id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(consulta, new { id });
             }
         }
 
-        public async Task<IEnumerable<RetornoUsuarioCoreSSO>> Selecionar(string cpf)
+        public async Task<RetornoUsuarioCoreSSO> ObterPorCPF(string cpf)
         {
-            try
-            {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
-                conn.Open();
-                var resultado = await conn.QueryAsync<RetornoUsuarioCoreSSO>(@"
-                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, g.gru_id as grupoId
+            using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+            conn.Open();
+            var resultado = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
+                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia
                     FROM sys_usuario u
-                        LEFT JOIN SYS_UsuarioGrupo gu on u.usu_id = gu.usu_id
-                        LEFT JOIN sys_grupo g on gu.gru_id = g.gru_id
-                        WHERE u.usu_login = @cpf 
-                            AND(g.sis_id is null 
-                                OR g.sis_id = 1001)"
-                    , new { cpf });
-                conn.Close();
-                return resultado;
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return null;
-            }
+                        WHERE u.usu_login = @cpf "
+                , new { cpf });
+            conn.Close();
+            return resultado;
         }
 
         public async Task<List<Guid>> SelecionarGrupos()

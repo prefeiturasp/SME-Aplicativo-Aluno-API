@@ -12,23 +12,27 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
 {
-    public class CriarUsuarioCoreSSOCommandHanlder : IRequestHandler<CriarUsuarioCoreSSOCommand, RetornoUsuarioCoreSSO>
+    public class CriarUsuarioCoreSSOCommandHandler : IRequestHandler<CriarUsuarioCoreSSOCommand, RetornoUsuarioCoreSSO>
     {
         private readonly IUsuarioCoreSSORepositorio repositoryCoreSSO;
 
-        public CriarUsuarioCoreSSOCommandHanlder(IUsuarioCoreSSORepositorio repositoryCoreSSO)
+        public CriarUsuarioCoreSSOCommandHandler(IUsuarioCoreSSORepositorio repositoryCoreSSO)
         {
             this.repositoryCoreSSO = repositoryCoreSSO ?? throw new ArgumentNullException(nameof(repositoryCoreSSO));
         }
 
         public async Task<RetornoUsuarioCoreSSO> Handle(CriarUsuarioCoreSSOCommand request, CancellationToken cancellationToken)
         {
-            var usuarios = await repositoryCoreSSO.Selecionar(request.Usuario.Cpf);
+            var usuarios = await repositoryCoreSSO.ObterPorCPF(request.Usuario.Cpf);
 
-            if (usuarios.Any())
+            if (usuarios != null)
                 throw new NegocioException($"Já existe usuário com o CPF {request.Usuario.Cpf} na base do CoreSSO");
-
+           
             var usuarioId = await repositoryCoreSSO.Criar(request.Usuario);
+
+            var grupos = await repositoryCoreSSO.SelecionarGrupos();
+
+            await repositoryCoreSSO.IncluirUsuarioNosGrupos(usuarioId, grupos);
 
             return await repositoryCoreSSO.ObterPorId(usuarioId);
         }
