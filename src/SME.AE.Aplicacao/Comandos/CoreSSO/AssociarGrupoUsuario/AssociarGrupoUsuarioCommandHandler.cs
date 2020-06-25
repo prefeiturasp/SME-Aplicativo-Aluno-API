@@ -24,7 +24,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
             var grupos = await usuarioCoreSSORepositorio.SelecionarGrupos();
 
             if (grupos == null)
-                throw new NegocioException("Grupos de usuáio não encontrados");
+                throw new NegocioException("Grupos de usuário não encontrados");
 
             var gruposNaoIncluidos = grupos.Where(x => !request.UsuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
