@@ -59,6 +59,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return await database.Conexao.GetAsync<T>(id);
         }
 
-        public virtual void Dispose() => database.Conexao.Close();
+        public void Dispose() => database.Conexao.Close();
     }
 }

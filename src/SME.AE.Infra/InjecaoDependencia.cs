@@ -18,6 +18,8 @@ using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
 using SME.AE.Infra.Persistencia.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
+using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
 
 namespace SME.AE.Infra
 {
@@ -39,6 +41,7 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
             services.AddTransient(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
             services.AddTransient(typeof(ITesteRepositorio), typeof(TesteRepositorio));
+            services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
