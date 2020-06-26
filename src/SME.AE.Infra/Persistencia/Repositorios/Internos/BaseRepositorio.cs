@@ -244,7 +244,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             using (var conexao = InstanciarConexao())
             {
                 entidade.AtualizarAuditoria();
-                await conexao.UpdateAsync(entidade);
+                await conexao.UpdateAsync<T>(entidade);
 
                 conexao.Close();
 
