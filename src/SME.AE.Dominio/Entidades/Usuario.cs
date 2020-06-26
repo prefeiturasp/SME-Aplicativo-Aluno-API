@@ -13,5 +13,14 @@ namespace SME.AE.Dominio.Entidades
         public DateTime UltimoLogin { get; set; }
         public bool PrimeiroAcesso { get; set; }
         public bool Excluido { get; set; }
+
+        public void AtualizarLogin(bool primeiroAcesso = false)
+        {
+            UltimoLogin = DateTime.Now;
+            Excluido = false;
+            PrimeiroAcesso = primeiroAcesso;
+
+            AtualizarAuditoria();
+        }
     }
 }
