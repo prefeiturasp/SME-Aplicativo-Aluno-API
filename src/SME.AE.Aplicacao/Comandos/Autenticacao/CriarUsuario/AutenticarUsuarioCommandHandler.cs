@@ -147,7 +147,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             if (usuarioRetorno != null)
             {
-                await _repository.AtualizaUltimoLoginUsuario(request.Cpf);
+                usuarioRetorno.AtualizarLogin(primeiroAcesso);              
+
+                await _repository.AltualizarUltimoAcessoPrimeiroUsuario(usuarioRetorno);                
             }
             else
             {
