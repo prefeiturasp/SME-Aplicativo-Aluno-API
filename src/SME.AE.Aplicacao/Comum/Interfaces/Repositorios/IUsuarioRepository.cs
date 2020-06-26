@@ -12,9 +12,10 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task AtualizarEmailTelefone(long id, string email, string celular);
         Task AtualizaUltimoLoginUsuario(string cpf);
         Task ExcluirUsuario(string cpf);
+        Task AltualizarUltimoAcessoPrimeiroUsuario(Usuario usuario);
         Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId);
         Task<bool> RemoveUsuarioDispositivo(long idUsuario, string idDispositivo);
-        Task <bool> ExisteUsuarioDispositivo(long idUsuario, string idDispositivo);
+        Task<bool> ExisteUsuarioDispositivo(long idUsuario, string idDispositivo);
         Task<IEnumerable<string>> ObterTodos();
     }
 }
