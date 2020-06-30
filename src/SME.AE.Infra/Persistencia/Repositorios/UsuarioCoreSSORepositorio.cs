@@ -56,7 +56,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<Guid> Criar(UsuarioCoreSSO usuario)
+        public async Task<Guid> Criar(UsuarioCoreSSODto usuario)
         {
             try
             {

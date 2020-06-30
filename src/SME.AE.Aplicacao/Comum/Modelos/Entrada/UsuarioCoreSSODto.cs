@@ -5,9 +5,9 @@ using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
 {
-    public class UsuarioCoreSSO
+    public class UsuarioCoreSSODto
     {
-        public UsuarioCoreSSO()
+        public UsuarioCoreSSODto()
         {
             Grupos = new List<Guid>();
         }
@@ -22,6 +22,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
                 return Criptografia.CriptografarSenha(Senha, Enumeradores.TipoCriptografia.TripleDES);
             }
         }
+
         public List<Guid> Grupos { get; set; }
     }
 }

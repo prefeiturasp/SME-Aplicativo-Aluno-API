@@ -6,6 +6,6 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
 {
     public class CriarUsuarioCoreSSOCommand : IRequest<RetornoUsuarioCoreSSO>
     {
-        public UsuarioCoreSSO Usuario { get; set; }
+        public UsuarioCoreSSODto Usuario { get; set; }
     }
 }
