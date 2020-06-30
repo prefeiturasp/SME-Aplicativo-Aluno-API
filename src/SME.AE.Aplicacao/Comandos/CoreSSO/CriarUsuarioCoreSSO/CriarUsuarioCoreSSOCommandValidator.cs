@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
     {
         public CriarUsuarioCoreSSOCommandValidator()
         {
-            RuleFor(x => x.Usuario).NotNull();            
+            RuleFor(x => x.Usuario).NotNull().WithMessage("O Usuário é Obrigátorio");            
         }
     }
 }
