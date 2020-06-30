@@ -10,9 +10,9 @@ namespace SME.AE.Aplicacao.Validators
     {
         public AlterarEmailTelefoneValidator()
         {
-            RuleFor(x => x.Id).NotNull().GreaterThan(0);
-            RuleFor(x => x.Celular).NotNull().NotEmpty().Matches(@"(\(\d{2}\)\s)(\d{4,5}\-\d{4})").When(x => string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Celular));
-            RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress().When(x => string.IsNullOrWhiteSpace(x.Celular) || !string.IsNullOrWhiteSpace(x.Email));
+            RuleFor(x => x.Id).NotNull().GreaterThan(0).WithMessage("O Id deve ser informado");
+            RuleFor(x => x.Celular).NotNull().NotEmpty().Matches(@"(\(\d{2}\)\s)(\d{4,5}\-\d{4})").When(x => string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Celular)).WithMessage("O Celular deve ser informado");
+            RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress().When(x => string.IsNullOrWhiteSpace(x.Celular) || !string.IsNullOrWhiteSpace(x.Email)).WithMessage("O Email deve ser informado");
         }
     }
 }
