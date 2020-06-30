@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
         {
             return new CriarUsuarioCoreSSOCommand()
             {
-                Usuario = new UsuarioCoreSSO
+                Usuario = new UsuarioCoreSSODto
                 {
                     Cpf = usuario.Cpf,
                     Nome = usuario.Nome,

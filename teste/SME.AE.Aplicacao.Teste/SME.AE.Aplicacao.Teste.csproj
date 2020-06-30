@@ -24,15 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Comandos\" />
-    <Folder Include="CasosDeUso\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\SME.AE.Api\SME.AE.Api.csproj" />
     <ProjectReference Include="..\..\src\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj" />
     <ProjectReference Include="..\..\src\SME.AE.Dominio\SME.AE.Dominio.csproj" />
     <ProjectReference Include="..\..\src\SME.AE.Infra\SME.AE.Infra.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Comandos\" />
+    <Folder Include="Consultas\" />
   </ItemGroup>
 
 </Project>

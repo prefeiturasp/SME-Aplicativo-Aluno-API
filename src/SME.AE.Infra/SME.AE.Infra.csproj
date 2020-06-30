@@ -37,19 +37,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Mapeamento\**" />
     <Compile Remove="Persistencia\Mappers\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Mapeamento\**" />
     <EmbeddedResource Remove="Persistencia\Mappers\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Mapeamento\**" />
     <None Remove="Persistencia\Mappers\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Mapeamento\" />
   </ItemGroup>
 
 </Project>

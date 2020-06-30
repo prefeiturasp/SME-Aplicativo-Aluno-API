@@ -1,55 +1,49 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
-using SME.AE.Aplicacao.Comandos.Token.Criar;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using SME.AE.Dominio.Entidades;
+using SME.AE.Aplicacao.Comum.Modelos;
+using AutoMapper;
 
-namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
+namespace SME.AE.Aplicacao
 {
-    public class CriarNotificacaoUseCase
+    public class CriarNotificacaoUseCase : ICriarNotificacaoUseCase
     {
-        public static async Task<Dominio.Entidades.Notificacao> Executar(
-            IMediator mediator, Dominio.Entidades.Notificacao notificacao)
+        private readonly IMediator mediator;
+        private readonly IMapper mapper;
+
+        public CriarNotificacaoUseCase(IMediator mediator, IMapper mapper)
         {
-            Dominio.Entidades.Notificacao resultado;
-
-            try
-            {
-                resultado = await mediator.Send(new CriarNotificacaoCommand(notificacao));
-                await EnviarNotificacaoImediataAsync(mediator, notificacao);
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
-            }
-
-            return resultado;
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        private static async Task EnviarNotificacaoImediataAsync(
-            IMediator mediator, Dominio.Entidades.Notificacao notificacao)
+        public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
-            try
-            {
-                var dataEnvio = TimeZoneInfo.ConvertTimeToUtc(notificacao.DataEnvio);
-                var agora = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now);
+            Notificacao resultado = await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
 
-                if (dataEnvio <= agora)
-                {
-                    List<int> grupos = notificacao.Grupo.Split(',').Select(i => Int32.Parse(i)).ToList();
-                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(notificacao, grupos));
-                }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-            }
+            await EnviarNotificacaoImediataAsync(notificacao);
+
+            return mapper.Map<NotificacaoSgpDto>(resultado);
+        }
+
+        private async Task EnviarNotificacaoImediataAsync(NotificacaoSgpDto notificacao)
+        {
+            var dataEnvio = TimeZoneInfo.ConvertTimeToUtc(notificacao.DataEnvio);
+            var agora = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now);
+
+            if (dataEnvio > agora)
+                return;
+
+            List<int> grupos = notificacao.Grupo.Split(',').Select(i => Int32.Parse(i)).ToList();
+
+            await mediator.Send(new EnviarNotificacaoPorGrupoCommand(mapper.Map<Notificacao>(notificacao), grupos));
         }
     }
 }

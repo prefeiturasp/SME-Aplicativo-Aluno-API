@@ -30,7 +30,6 @@
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
-    <Compile Include="Comum\Modelos\Resposta\UsuarioCoreSSO.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,6 +78,8 @@
 
   <ItemGroup>
     <Folder Include="Comandos\Usuario\AdicionarCoreSSO\" />
+    <Folder Include="Comum\Interfaces\UseCase\TesteArquitetura\" />
+    <Folder Include="Comum\Modelos\Validadores\" />
     <Folder Include="Consultas\UsuarioNotificacao\" />
   </ItemGroup>
 
