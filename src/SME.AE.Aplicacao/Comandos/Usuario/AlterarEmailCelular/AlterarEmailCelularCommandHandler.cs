@@ -25,7 +25,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.AlterarEmailCelular
                 throw new Exception($"Não encontrado usuário com id {request.AlterarEmailCelularDto.Id}");
 
             if (!string.IsNullOrWhiteSpace(request.AlterarEmailCelularDto.Celular))
-                usuario.Celular = request.AlterarEmailCelularDto.Celular;
+                usuario.Celular = request.AlterarEmailCelularDto.CelularBanco;
 
             if (!string.IsNullOrWhiteSpace(request.AlterarEmailCelularDto.Email))
                 usuario.Email = request.AlterarEmailCelularDto.Email;

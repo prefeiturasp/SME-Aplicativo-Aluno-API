@@ -9,8 +9,8 @@ namespace SME.AE.Aplicacao.Consultas.VerificarSenha
     {
         public VerificarUltimasSenhasQueryValidator()
         {
-            RuleFor(x => x.UsuarioIdCore).NotNull();
-            RuleFor(x => x.SenhaCriptografada).NotNull();
+            RuleFor(x => x.UsuarioIdCore).NotNull().WithMessage("O Id do Usuário no CoreSSO é Obrigátorio"); ;
+            RuleFor(x => x.SenhaCriptografada).NotNull().WithMessage("O Id é Obrigátorio"); ;
         }
     }
 }
