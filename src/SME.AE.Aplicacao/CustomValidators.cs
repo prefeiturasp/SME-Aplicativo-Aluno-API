@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao
     {
         public static IRuleBuilderOptions<T, string> ValidarCpf<T>(this IRuleBuilder<T, string> ruleBuilder)
         {
-            return ruleBuilder.Must(m => CpfEhValido(m) == true);
+            return ruleBuilder.Must(m => CpfEhValido(m) == true).WithMessage("O CPF informado não é valido");
         }
 
         public static IRuleBuilderOptions<T, DateTime> DataNascimentoEhValida<T>(this IRuleBuilder<T, DateTime> ruleBuilder)
@@ -20,10 +20,10 @@ namespace SME.AE.Aplicacao
         public static IRuleBuilderOptions<T, string> ValidarSenha<T>(this IRuleBuilder<T, string> ruleBuilder)
         {
             return ruleBuilder
-                .MinimumLength(8)
-                .MaximumLength(12)
-                .Must(x => !x.Contains(" "))
-                .Matches(@"(?=.*?[A-Z])(?=.*?[a-z])(?=((?=.*[!@#$\-%&/\\\[\]|*()_=+])|(?=.*?[0-9]+)))");
+                .MinimumLength(8).WithMessage("A senha deve conter no Minimo 8 digitos")
+                .MaximumLength(12).WithMessage("A senha deve conter no Maximo 12 digitos")
+                .Must(x => !x.Contains(" ")).WithMessage("A senha não pode conter espaços em branco")
+                .Matches(@"(?=.*?[A-Z])(?=.*?[a-z])(?=((?=.*[!@#$\-%&/\\\[\]|*()_=+])|(?=.*?[0-9]+)))").WithMessage("A senha não cumpre os padrões necessários");
         }
 
         private static bool NascimentoEhValida(DateTime data) => data > new DateTime(1900, 1, 1) && data < DateTime.Now;
