@@ -27,7 +27,7 @@ namespace SME.AE.Api.Controllers
         [HttpPost("PrimeiroAcesso")]
         public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]ICriarUsuarioPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
         {
-            return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(Mediator, novaSenhaDto));
+            return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDto));
         }
 
         [HttpPost("AlterarEmailCelular")]

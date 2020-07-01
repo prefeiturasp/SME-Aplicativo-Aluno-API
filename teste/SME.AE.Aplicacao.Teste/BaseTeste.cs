@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Aplicacao.Teste.CasosDeUso
+namespace SME.AE.Aplicacao.Teste
 {
     public class BaseTeste
     {
