@@ -30,7 +30,14 @@ namespace SME.AE.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            AddAuthentication(services);            
+            AddAuthentication(services);
+
+#if DEBUG
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+#endif
 
             services.AddResponseCompression(options =>
             {

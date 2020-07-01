@@ -6,8 +6,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf
     {
         public ObterPorCpfCommandValidator()
         {
-            RuleFor(v => v).NotNull();
-            RuleFor(v => v.Cpf).NotNull();
+            RuleFor(v => v.Cpf).NotNull().WithMessage("O CPF é Obrigátorio");
         }
     }
 }

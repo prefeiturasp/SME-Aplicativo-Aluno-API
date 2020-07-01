@@ -12,8 +12,9 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task<Guid> Criar(UsuarioCoreSSODto usuario);
         Task<RetornoUsuarioCoreSSO> ObterPorId(Guid id);
-        Task<IEnumerable<RetornoUsuarioCoreSSO>> Selecionar(string cpf);
+        Task<RetornoUsuarioCoreSSO> ObterPorCPF(string cpf);
         Task<List<Guid>> SelecionarGrupos();
+        Task AlterarSenha(Guid usuarioId, string senhaCriptografada);
         Task IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos);
         Task AlterarStatusUsuario(Guid id, StatusUsuarioCoreSSO status);
         Task AtualizarCriptografiaUsuario(Guid usuId, string senha);
