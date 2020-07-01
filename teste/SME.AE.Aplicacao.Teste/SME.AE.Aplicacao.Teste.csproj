@@ -31,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Comandos\" />
     <Folder Include="Consultas\" />
   </ItemGroup>
 

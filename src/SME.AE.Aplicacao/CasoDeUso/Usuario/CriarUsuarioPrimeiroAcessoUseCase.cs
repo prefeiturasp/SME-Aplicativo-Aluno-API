@@ -6,13 +6,21 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
+using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 {
     public class CriarUsuarioPrimeiroAcessoUseCase : ICriarUsuarioPrimeiroAcessoUseCase
     {
-        public async Task<RespostaApi> Executar(IMediator mediator, NovaSenhaDto novaSenhaDto)
+        private readonly IMediator mediator;
+
+        public CriarUsuarioPrimeiroAcessoUseCase(IMediator mediator)
+        {
+            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+        }
+
+        public async Task<RespostaApi> Executar(NovaSenhaDto novaSenhaDto)
         {
             var usuario = await mediator.Send(new ObterUsuarioQuery() { Id = novaSenhaDto.Id });
 
@@ -37,6 +45,11 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
                 Id = usuario.Id,
                 PrimeiroAcesso = false
             };
+        }
+
+        public void Executar<TValue>(Func<TValue> isAny)
+        {
+            throw new NotImplementedException();
         }
 
         private CriarUsuarioCoreSSOCommand MapearCriarUsuarioCoreSSOCommand(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)

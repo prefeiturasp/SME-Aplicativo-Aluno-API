@@ -10,6 +10,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
 {
     public interface ICriarUsuarioPrimeiroAcessoUseCase
     {
-        Task<RespostaApi> Executar(IMediator mediator, NovaSenhaDto novaSenhaDto);
+        Task<RespostaApi> Executar(NovaSenhaDto novaSenhaDto);
     }
 }
