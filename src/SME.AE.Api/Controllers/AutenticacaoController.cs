@@ -25,7 +25,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpPost("PrimeiroAcesso")]
-        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]ICriarUsuarioPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
+        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]IPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
         {
             return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDto));
         }
