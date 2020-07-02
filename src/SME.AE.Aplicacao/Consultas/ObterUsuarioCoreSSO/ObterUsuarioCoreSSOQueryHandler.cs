@@ -24,7 +24,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO
 
         public async Task<RetornoUsuarioCoreSSO> Handle(ObterUsuarioCoreSSOQuery request, CancellationToken cancellationToken)
         {
-            RetornoUsuarioCoreSSO retorno;
+            RetornoUsuarioCoreSSO retorno = null;
 
             if (!string.IsNullOrWhiteSpace(request.Cpf))
                 retorno = await usuarioCoreSSORepositorio.ObterPorCPF(request.Cpf);
@@ -35,6 +35,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO
                 return retorno;
 
             var grupos = await usuarioGrupoRepositorio.ObterPorUsuarioId(retorno.UsuId);
+
             retorno.Grupos = grupos?.Select(x => x.GrupoId) ?? default;
 
             return retorno;
