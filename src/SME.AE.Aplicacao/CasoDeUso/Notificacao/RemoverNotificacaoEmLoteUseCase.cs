@@ -1,35 +1,35 @@
-﻿using System.Threading.Tasks;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
 {
-    public class RemoverNotificacaoEmLoteUseCase
+    public class RemoverNotificacaoEmLoteUseCase : IRemoverNotificacaoEmLoteUseCase
     {
-        public static async Task<RespostaApi> Executar(IMediator mediator, long[] id)
+        private readonly IMediator mediator;
+
+        public RemoverNotificacaoEmLoteUseCase(IMediator mediator)
+        {
+            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+        }
+
+        public async Task<RespostaApi> Executar(long[] id)
         {
             RespostaApi resposta = new RespostaApi();
-            resposta.Ok = true;
 
             var removeuNotificaoUsuarios = await mediator.Send(new RemoverNotificacaoUsuarioCommand(id));
-            if (removeuNotificaoUsuarios)
-            {
-                resposta.Erros = await mediator.Send(new RemoverNotificacaoCommand(id));
 
+            if (!removeuNotificaoUsuarios)
+            {
+                resposta.Erros.SetValue($"Erro ao excluir Registros de leitura", 0);
+                return resposta;
             }
 
-            else
-            {
-                resposta.Erros.SetValue($"Errro ao excluir Registros de leitura", 0);
-            }
+            resposta.Erros = await mediator.Send(new RemoverNotificacaoCommand(id));
 
-            if (resposta.Erros[0] != null)
-            {
-                resposta.Ok = false;
-            }
+            resposta.Ok = resposta.Erros?[0] == null;
 
             return resposta;
         }

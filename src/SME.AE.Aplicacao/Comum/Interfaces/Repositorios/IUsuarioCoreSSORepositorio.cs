@@ -10,7 +10,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IUsuarioCoreSSORepositorio
     {
-        Task<Guid> Criar(UsuarioCoreSSO usuario);
+        Task<Guid> Criar(UsuarioCoreSSODto usuario);
         Task<RetornoUsuarioCoreSSO> ObterPorId(Guid id);
         Task<RetornoUsuarioCoreSSO> ObterPorCPF(string cpf);
         Task<List<Guid>> SelecionarGrupos();

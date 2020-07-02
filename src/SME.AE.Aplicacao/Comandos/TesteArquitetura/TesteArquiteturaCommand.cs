@@ -5,7 +5,7 @@ namespace SME.AE.Aplicacao.Comandos.TesteArquitetura
 {
     public class TesteArquiteturaCommand : IRequest
     {
-        public Aplicacao.Comum.Modelos.Entrada.Usuario Usuario { get; set; } = new Comum.Modelos.Entrada.Usuario();
+        public Aplicacao.Comum.Modelos.Entrada.UsuarioDto Usuario { get; set; } = new Comum.Modelos.Entrada.UsuarioDto();
         public string Cpf { get; set; }
         public string Id { get; set; }
     }

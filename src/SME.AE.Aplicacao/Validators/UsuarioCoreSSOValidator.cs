@@ -3,7 +3,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 
 namespace SME.AE.Aplicacao.Validators
 {
-    public class UsuarioCoreSSOValidator : AbstractValidator<UsuarioCoreSSO>
+    public class UsuarioCoreSSOValidator : AbstractValidator<UsuarioCoreSSODto>
     {
         public UsuarioCoreSSOValidator()
         {
