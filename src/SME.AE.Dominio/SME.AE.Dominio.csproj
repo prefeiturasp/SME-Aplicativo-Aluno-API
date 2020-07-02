@@ -13,7 +13,4 @@
     <Folder Include="Excecoes" />
   </ItemGroup>
 
-  <ItemGroup>
-  </ItemGroup>
-
 </Project>

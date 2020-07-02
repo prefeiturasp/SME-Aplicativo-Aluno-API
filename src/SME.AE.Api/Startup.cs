@@ -44,9 +44,9 @@ namespace SME.AE.Api
                 options.Providers.Add<GzipCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
-
-            RegistrarMvc.Registrar(services, Configuration);
             RegistrarMapeamentos.Registrar();
+            RegistrarMvc.Registrar(services, Configuration);
+        
             services.AddInfrastructure();
             services.AddApplication();            
 
