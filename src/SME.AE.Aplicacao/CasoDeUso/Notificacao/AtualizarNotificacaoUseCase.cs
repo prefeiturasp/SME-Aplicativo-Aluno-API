@@ -2,6 +2,7 @@
 using AutoMapper;
 using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Dominio.Entidades;
 
