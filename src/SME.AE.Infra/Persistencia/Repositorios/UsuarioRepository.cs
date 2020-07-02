@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Dommel;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
@@ -63,18 +64,39 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
         }
+        //public async Task Criar(Usuario usuario)
+        //{
+        //    await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+        //    conn.Open();
+        //    usuario.InserirAuditoria();
+        //    await conn.ExecuteAsync(
+        //        @"INSERT INTO usuario(cpf, nome, email, ultimoLogin, criadoEm, excluido, celular,primeiroacesso,criadopor,alteradoEm,alteradoPor) 
+        //                    VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido, @Celular,@PrimeiroAcesso,@CriadoPor,@AlteradoEm,@AlteradoPor)",
+        //      usuario);
+        //    conn.Close();
+
+        //}
+
         public async Task Criar(Usuario usuario)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-            conn.Open();
-            usuario.InserirAuditoria();
-            await conn.ExecuteAsync(
-                @"INSERT INTO usuario(cpf, nome, email, ultimoLogin, criadoEm, excluido, celular,primeiroacesso,criadopor,alteradoEm,alteradoPor) 
-                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido, @Celular,@PrimeiroAcesso,@CriadoPor,@AlteradoEm,@AlteradoPor)",
-              usuario);
-            conn.Close();
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                usuario.InserirAuditoria();
+                await conn.InsertAsync(usuario);
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+     
 
         }
+
+
 
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {

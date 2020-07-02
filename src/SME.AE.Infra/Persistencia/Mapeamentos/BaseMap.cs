@@ -7,7 +7,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
     {
         public BaseMap()
         {
-            Map(c => c.Id).ToColumn("id").IsKey();
+            //Map(c => c.Id).ToColumn("id").IsKey();
             Map(c => c.CriadoEm).ToColumn("criadoem");
             Map(c => c.CriadoPor).ToColumn("criadopor");
             Map(c => c.AlteradoEm).ToColumn("alteradoem");
