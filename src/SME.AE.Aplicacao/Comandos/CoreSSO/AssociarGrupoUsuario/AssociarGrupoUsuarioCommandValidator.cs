@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
     {
         public AssociarGrupoUsuarioCommandValidator()
         {
-            RuleFor(x => x.UsuarioCoreSSO).NotNull();
+            RuleFor(x => x.UsuarioCoreSSO).NotNull().WithMessage("È obrigatório informar um usuário para incluir os grupos");
         }
     }
 }

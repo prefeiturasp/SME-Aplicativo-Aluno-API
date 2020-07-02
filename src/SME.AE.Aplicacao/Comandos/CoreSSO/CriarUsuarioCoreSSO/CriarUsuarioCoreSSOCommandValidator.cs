@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SME.AE.Aplicacao.Validators;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
 {
@@ -9,7 +7,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
     {
         public CriarUsuarioCoreSSOCommandValidator()
         {
-            RuleFor(x => x.Usuario).NotNull().WithMessage("O Usuário é Obrigátorio");            
+            RuleFor(x => x.Usuario).NotNull().SetValidator(new UsuarioCoreSSOValidator()).WithMessage("O Usuário é Obrigátorio");            
         }
     }
 }

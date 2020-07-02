@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
 using System.Threading;
@@ -24,7 +25,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             else
                 usuario = await usuarioRepository.ObterPorIdAsync(request.Id);
 
-            return usuario ?? throw new System.Exception($"Usuário não encontrado");
+            return usuario ?? throw new NegocioException($"Usuário não encontrado");
         }
     }
 }
