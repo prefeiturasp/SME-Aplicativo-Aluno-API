@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,9 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso
         public async Task<Unit> Handle(AtualizarPrimeiroAcessoCommand request, CancellationToken cancellationToken)
         {
             var usuario = await usuarioRepository.ObterPorIdAsync(request.Id);
+
+            if (usuario == null)
+                throw new NegocioException($"Não foi encontrado usuário com o id {request.Id}");
 
             usuario.PrimeiroAcesso = request.PrimeiroAcesso;
 

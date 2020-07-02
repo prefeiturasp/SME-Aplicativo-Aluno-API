@@ -9,8 +9,8 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO
     {
         public AlterarSenhaUsuarioCoreSSOCommandValidator()
         {
-            RuleFor(x => x.UsuarioId).NotNull().NotEmpty();
-            RuleFor(x => x.SenhaCriptograda).NotNull().NotEmpty();
+            RuleFor(x => x.UsuarioId).NotEmpty().WithMessage("O Id do Usuário é Obrigátorio");
+            RuleFor(x => x.SenhaCriptograda).NotEmpty().WithMessage("A Senha é Obrigátoria");
         }
     }
 }

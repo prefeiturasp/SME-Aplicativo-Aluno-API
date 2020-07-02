@@ -11,11 +11,11 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.Usuario
 
         }
 
-        public CriarUsuarioCoreSSOCommand(UsuarioCoreSSO usuario)
+        public CriarUsuarioCoreSSOCommand(UsuarioCoreSSODto usuario)
         {
             Usuario = usuario;
         }
 
-        public UsuarioCoreSSO Usuario { get; set; }
+        public UsuarioCoreSSODto Usuario { get; set; }
     }
 }

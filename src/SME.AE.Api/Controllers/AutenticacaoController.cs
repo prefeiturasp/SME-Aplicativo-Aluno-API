@@ -1,18 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Castle.DynamicProxy.Generators;
-using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
+using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
 {
@@ -20,30 +12,22 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId)
+        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
         {
-            return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha, dispositivoId));
+            return Ok(await autenticarUsuarioUseCase.Executar(cpf, senha, dispositivoId));
         }
 
         [HttpPost("Logout")]
         [AllowAnonymous]
         public async Task<ActionResult<RespostaApi>> Logout([FromQuery] string cpf, [FromQuery] string dispositivoId)
         {
-            try
-            {
-                return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf, dispositivoId));
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf, dispositivoId));
         }
 
         [HttpPost("PrimeiroAcesso")]
-        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]ICriarUsuarioPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
+        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]IPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
         {
-            return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(Mediator, novaSenhaDto));
+            return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDto));
         }
 
         [HttpPost("AlterarEmailCelular")]

@@ -30,13 +30,16 @@
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
-    <Compile Include="Comum\Modelos\Resposta\UsuarioCoreSSO.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="coverlet.collector" Version="1.2.1">
+    <PackageReference Include="coverlet.collector" Version="1.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="2.9.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -79,6 +82,8 @@
 
   <ItemGroup>
     <Folder Include="Comandos\Usuario\AdicionarCoreSSO\" />
+    <Folder Include="Comum\Interfaces\UseCase\TesteArquitetura\" />
+    <Folder Include="Comum\Modelos\Validadores\" />
     <Folder Include="Consultas\UsuarioNotificacao\" />
   </ItemGroup>
 
