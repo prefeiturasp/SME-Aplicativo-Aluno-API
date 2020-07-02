@@ -14,7 +14,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
     {
         private readonly IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio;
 
-        public AssociarGrupoUsuarioCommandHandler(IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio, IMediator mediator)
+        public AssociarGrupoUsuarioCommandHandler(IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio)
         {
             this.usuarioCoreSSORepositorio = usuarioCoreSSORepositorio ?? throw new ArgumentNullException(nameof(usuarioCoreSSORepositorio));
         }

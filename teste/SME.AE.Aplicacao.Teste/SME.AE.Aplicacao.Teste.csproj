@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="2.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Dapper.FluentMap" Version="1.8.1" />
     <PackageReference Include="IdentityModel" Version="4.2.0" />
     <PackageReference Include="IdentityServer4" Version="3.0.0" />
@@ -17,7 +21,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="1.2.1">
+    <PackageReference Include="coverlet.collector" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -28,10 +32,6 @@
     <ProjectReference Include="..\..\src\SME.AE.Aplicacao\SME.AE.Aplicacao.csproj" />
     <ProjectReference Include="..\..\src\SME.AE.Dominio\SME.AE.Dominio.csproj" />
     <ProjectReference Include="..\..\src\SME.AE.Infra\SME.AE.Infra.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Consultas\" />
   </ItemGroup>
 
 </Project>
