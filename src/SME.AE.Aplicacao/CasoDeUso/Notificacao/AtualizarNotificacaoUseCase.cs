@@ -7,7 +7,7 @@ using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao
 {
-    public class AtualizarNotificacaoUseCase
+    public class AtualizarNotificacaoUseCase : IAtualizarNotificacaoUseCase
     {
         private readonly IMediator mediator;
         private readonly IMapper mapper;
