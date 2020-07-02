@@ -10,9 +10,9 @@ namespace SME.AE.Aplicacao.Comandos.TesteArquitetura
     {
         public TesteArquiteturaValidator()
         {
-            RuleFor(x => x.Cpf).NotNull().NotEmpty().ValidarCpf();
-            RuleFor(x => x.Id).NotNull().NotEmpty();
-            RuleFor(x => x.Usuario).NotNull().SetValidator(new UsuarioValidator());
+            RuleFor(x => x.Cpf).NotNull().NotEmpty().ValidarCpf().WithMessage("O CPF é obrigátorio");
+            RuleFor(x => x.Id).NotNull().NotEmpty().WithMessage("O Id é obrigátorio");
+            RuleFor(x => x.Usuario).NotNull().SetValidator(new UsuarioValidator()).WithMessage("O Usuário é obrigátorio");
         }
     }
 }

@@ -48,7 +48,7 @@ namespace SME.AE.Api
             RegistrarMvc.Registrar(services, Configuration);
         
             services.AddInfrastructure();
-            services.AddApplication();            
+            services.AddApplication();
 
             services.AdicionarValidadoresFluentValidation();
 

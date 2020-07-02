@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class AutenticarUsuarioUseCase
     {
-        public static async Task<RespostaApi> Executar(IMediator mediator, Comum.Modelos.Entrada.Usuario usuario)
+        public static async Task<RespostaApi> Executar(IMediator mediator, Comum.Modelos.Entrada.UsuarioDto usuario)
         {
             return await mediator.Send(new AutenticarUsuarioCommand(usuario.Cpf, usuario.DataNascimento.ToString()));
         }

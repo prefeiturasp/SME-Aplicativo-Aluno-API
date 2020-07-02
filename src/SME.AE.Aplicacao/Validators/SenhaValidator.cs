@@ -10,7 +10,7 @@ namespace SME.AE.Aplicacao.Validators
     {
         public SenhaValidator()
         {
-            RuleFor(x => x.NovaSenha).ValidarSenha();
+            RuleFor(x => x.NovaSenha).NotEmpty().WithMessage("A Senha deve ser informada").ValidarSenha();
         }
     }
 }

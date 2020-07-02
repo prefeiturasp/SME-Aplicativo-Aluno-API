@@ -15,9 +15,16 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 {
-    public class PrimeiroAcessoUseCase : ICriarUsuarioPrimeiroAcessoUseCase
+    public class PrimeiroAcessoUseCase : IPrimeiroAcessoUseCase
     {
-        public async Task<RespostaApi> Executar(IMediator mediator, NovaSenhaDto novaSenhaDto)
+        private readonly IMediator mediator;
+
+        public PrimeiroAcessoUseCase(IMediator mediator)
+        {
+            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+        }
+
+        public async Task<RespostaApi> Executar(NovaSenhaDto novaSenhaDto)
         {
             var usuario = await mediator.Send(new ObterUsuarioQuery() { Id = novaSenhaDto.Id });
 
@@ -71,12 +78,12 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
                 PrimeiroAcesso = false
             };
         }
-
+        
         private CriarUsuarioCoreSSOCommand MapearCriarUsuarioCoreSSOCommand(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)
         {
             return new CriarUsuarioCoreSSOCommand()
             {
-                Usuario = new UsuarioCoreSSO
+                Usuario = new UsuarioCoreSSODto
                 {
                     Cpf = usuario.Cpf,
                     Nome = usuario.Nome,
