@@ -9,8 +9,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
     {
         public UsuarioValidator()
         {
-            RuleFor(x => x.Cpf).NotNull().NotEmpty().ValidarCpf().WithMessage("O CPF é obrigátorio");
-            RuleFor(x => x.DataNascimento).NotNull().NotEmpty().DataNascimentoEhValida().WithMessage("A Data de Nascimento é obrigátoria");
+            RuleFor(x => x.Cpf).NotEmpty().WithMessage("O CPF é obrigátorio").ValidarCpf();
+            RuleFor(x => x.DataNascimento).NotEmpty().WithMessage("A Data de Nascimento é obrigátoria").DataNascimentoEhValida();
         }
     }
 }

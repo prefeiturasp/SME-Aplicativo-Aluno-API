@@ -11,7 +11,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.AlterarEmailCelular
     {
         public AlterarEmailCelularCommandValidator()
         {
-            RuleFor(x => x.AlterarEmailCelularDto).NotNull().SetValidator(new AlterarEmailTelefoneValidator()).WithMessage($"O Objeto AlterarEmailCelularDto é Obrigátorio");            
+            RuleFor(x => x.AlterarEmailCelularDto).NotNull().WithMessage($"O Objeto AlterarEmailCelularDto é Obrigátorio").SetValidator(new AlterarEmailTelefoneValidator());            
         }
     }
 }

@@ -9,8 +9,8 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO
     {
         public ObterUsuarioCoreSSOQueryValidator()
         {
-            RuleFor(x => x.Cpf).NotNull().NotEmpty().When(x => x.UsuarioId == default || !string.IsNullOrEmpty(x.Cpf)).WithMessage("O CPF é Obrigátorio"); ;
-            RuleFor(x => x.UsuarioId).NotNull().NotEmpty().When(x => string.IsNullOrEmpty(x.Cpf) || x.UsuarioId != default).WithMessage("O Id do Usuário é Obrigátorio"); ;
+            RuleFor(x => x.Cpf).NotEmpty().When(x => x.UsuarioId == default || !string.IsNullOrEmpty(x.Cpf)).WithMessage("O CPF é Obrigátorio"); ;
+            RuleFor(x => x.UsuarioId).NotEmpty().When(x => string.IsNullOrEmpty(x.Cpf) || x.UsuarioId != default).WithMessage("O Id do Usuário é Obrigátorio"); ;
         }
     }
 }
