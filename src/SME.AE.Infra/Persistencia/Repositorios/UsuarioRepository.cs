@@ -79,21 +79,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task Criar(Usuario usuario)
         {
-            try
-            {
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 usuario.InserirAuditoria();
                 await conn.InsertAsync(usuario);
                 conn.Close();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-     
-
         }
 
 
