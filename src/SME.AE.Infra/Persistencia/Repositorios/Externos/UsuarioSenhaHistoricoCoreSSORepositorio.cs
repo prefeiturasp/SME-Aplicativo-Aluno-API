@@ -15,7 +15,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos
 {
     public class UsuarioSenhaHistoricoCoreSSORepositorio : ExternoRepositorio<UsuarioSenhaHistoricoCoreSSO, SqlConnection>, IUsuarioSenhaHistoricoCoreSSORepositorio
     {
-        protected UsuarioSenhaHistoricoCoreSSORepositorio() : base(new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+        public UsuarioSenhaHistoricoCoreSSORepositorio() : base(new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
         {
         }
 
@@ -28,6 +28,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos
                 conexao.Close();
 
                 return senhas.Any(x => x.Senha.Equals(senha));
+            }
+        }      
+        
+        public async Task AdicionarSenhaHistorico(UsuarioSenhaHistoricoCoreSSO usuarioSenhaHistoricoCoreSSO)
+        {
+            using(var conexao = database.Conexao)
+            {
+                var senhas = await conexao.InsertAsync<UsuarioSenhaHistoricoCoreSSO>(usuarioSenhaHistoricoCoreSSO);
+
+                conexao.Close();
             }
         }
     }

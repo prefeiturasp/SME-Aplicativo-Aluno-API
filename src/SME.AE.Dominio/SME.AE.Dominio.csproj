@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Entidades\Externas\CoreSSO\" />
     <Folder Include="Enumeradores" />
     <Folder Include="Excecoes" />
   </ItemGroup>
