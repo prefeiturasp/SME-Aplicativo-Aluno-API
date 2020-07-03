@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SME.AE.Dominio.Entidades
 {
-    public class EntidadeBase
+    public abstract class  EntidadeBase
     {
         public long Id { get; set; }
         public DateTime CriadoEm { get; set; }
