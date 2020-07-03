@@ -9,23 +9,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class BaseRepositorio<T> : IBaseRepositorio<T> where T : EntidadeBase
     {
-        // private NpgsqlConnection _conexao;
+       
         private readonly string _connectionString;
-
-        //protected NpgsqlConnection Conexao
-        //{
-        //    get
-        //    {
-        //        if (_conexao.State == ConnectionState.Closed)
-        //            _conexao.Open();
-
-        //        return _conexao;
-        //    }
-        //}
-
         protected BaseRepositorio(string connectionString)
         {
-            //this._conexao = new NpgsqlConnection(connectionString);
             this._connectionString = connectionString;
         }
 
@@ -58,53 +45,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        //public virtual async Task<IEnumerable<T>> QueryAsync(string query, object parametros)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        var retorno = await conexao.GetA<T>(query, parametros);
-
-        //        conexao.Close();
-
-        //        return retorno;
-        //    }
-        //}
-
-        //public virtual async Task<T> QueryFirstOrDefaultAsync(string query, object parametros)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        var retorno = await conexao.QueryFirstOrDefaultAsync<T>(query, parametros);
-
-        //        conexao.Close();
-
-        //        return retorno;
-        //    }
-        //}
-
-        //public virtual IEnumerable<T> Query(string query, object parametros)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        var retorno = conexao.Query<T>(query, parametros);
-
-        //        conexao.Close();
-
-        //        return retorno;
-        //    }
-        //}
-
-        //public virtual T QueryFirstOrDefault(string query, object parametros)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        var retorno = conexao.QueryFirstOrDefault<T>(query, parametros);
-
-        //        conexao.Close();
-
-        //        return retorno;
-        //    }
-        //}
+       
+    
 
         public virtual T ObterPorId(long id)
         {
@@ -174,64 +116,49 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        //public virtual long Salvar(T entidade)
-        //{
+        public virtual object Salvar(T entidade)
+        {
+            if (entidade.Id == 0)
+                return Inserir(entidade);
+
+            return Atualizar(entidade);
+        }
+
+        public virtual async Task<object> SalvarAsync(T entidade)
+        {
+            if (entidade.Id == 0)
+                return await InserirAsync(entidade);
+           
+            return await AtualizarAsync(entidade);
+        }
 
 
-        //    if (entidade.Id == 0)
-        //        return Inserir(entidade);
 
-        //    return Atualizar(entidade);
-        //}
+        private object Inserir(T entidade)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                entidade.InserirAuditoria();
+                var entidadeRetorno = conexao.Insert(entidade);
 
-        //public virtual async Task<long> SalvarAsync(T entidade)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        var id = await conexao.InsertAsync<T>(entidade);
+                conexao.Close();
 
-        //        await conexao.DeleteAsync<T>(entidade);
+                return entidadeRetorno;
+            }
+        }
 
-        //        conexao.Close();
-        //    }
+        private async Task<object> InserirAsync(T entidade)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                entidade.InserirAuditoria();
+                var retornoEntidade = await conexao.InsertAsync(entidade);
 
-        //    if (entidade.Id == 0)
-        //        return await conexao.InserirAsync(entidade);
+                conexao.Close();
 
-        //    return await AtualizarAsync(entidade);
-        //}
-
-        //protected virtual void Close()
-        //{
-        //    if (Conexao != null)
-        //        _conexao.Close();
-        //}
-
-        //private long Inserir(T entidade)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        entidade.InserirAuditoria();
-        //        entidade.Id = conexao.Insert<T>(entidade, null);
-
-        //        conexao.Close();
-
-        //        return entidade.Id;
-        //    }
-        //}
-
-        //private async Task<long> InserirAsync(T entidade)
-        //{
-        //    using (var conexao = InstanciarConexao())
-        //    {
-        //        entidade.InserirAuditoria();
-        //        entidade.Id = await conexao.InsertAsync<T>(entidade);
-
-        //        conexao.Close();
-
-        //        return entidade.Id;
-        //    }
-        //}
+                return retornoEntidade;
+            }
+        }
 
         private long Atualizar(T entidade)
         {
