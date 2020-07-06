@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos
 {
     public interface IUsuarioSenhaHistoricoCoreSSORepositorio : IExternoRepositorio<UsuarioSenhaHistoricoCoreSSO, SqlConnection>
     {
-        Task<bool> VerificarUltimas5Senhas(string usuId, string senha);
+        Task<bool> VerificarUltimas5Senhas(Guid usuId, string senha);
 
         Task AdicionarSenhaHistorico(UsuarioSenhaHistoricoCoreSSO usuarioSenhaHistoricoCoreSSO);
     }

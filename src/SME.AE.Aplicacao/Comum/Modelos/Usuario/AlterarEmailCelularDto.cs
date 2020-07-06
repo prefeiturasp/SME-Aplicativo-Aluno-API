@@ -8,6 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Usuario
         public long Id { get; set; }
         public string Email { get; set; }
         public string Celular { get; set; }
+        public bool AlterarSenha { get; set; }
 
         public string CelularBanco
         {
