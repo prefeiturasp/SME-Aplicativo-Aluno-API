@@ -1,8 +1,8 @@
 ﻿using Moq;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
+using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.Usuario;
-using SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
 using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;

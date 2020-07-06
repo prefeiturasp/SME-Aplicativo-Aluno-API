@@ -1,10 +1,10 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico;
+using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.Usuario;
-using SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
 using SME.AE.Aplicacao.Comum.Excecoes;
-using SME.AE.Aplicacao.Comum.Extensoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -42,10 +42,18 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             await mediator.Send(atualizarPrimeiroAcesso);
 
-            return new RespostaApi
-            {
-                Ok = true
-            };
+            await IncluirSenhaHistorico(usuario.Cpf);
+
+            return RespostaApi.Sucesso();
+        }
+
+        private async Task IncluirSenhaHistorico(string cpf)
+        {
+            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(cpf));
+
+            var incluirSenhaHistorico = new AdicionarSenhaHistoricoCommand(usuarioCoreSSO.UsuId, usuarioCoreSSO.Senha);
+
+            await mediator.Send(incluirSenhaHistorico);
         }
 
         private async Task CriarUsuarioOuAssociarGrupo(IMediator mediator, NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario, RetornoUsuarioCoreSSO usuarioCoreSSO)
@@ -58,9 +66,11 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
         private async Task AssociarGrupoEAlterarSenha(IMediator mediator, NovaSenhaDto novaSenhaDto, RetornoUsuarioCoreSSO usuarioCoreSSO)
         {
+            usuarioCoreSSO.Alterarsenha(novaSenhaDto.NovaSenha);
+
             await mediator.Send(new AssociarGrupoUsuarioCommand(usuarioCoreSSO));
 
-            await mediator.Send(new AlterarSenhaUsuarioCoreSSOCommand(usuarioCoreSSO.UsuId, Criptografia.CriptografarSenha(novaSenhaDto.NovaSenha, usuarioCoreSSO.TipoCriptografia)));
+            await mediator.Send(new AlterarSenhaUsuarioCoreSSOCommand(usuarioCoreSSO.UsuId, usuarioCoreSSO.Senha));
         }
 
         private async Task CriarUsuario(IMediator mediator, NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)

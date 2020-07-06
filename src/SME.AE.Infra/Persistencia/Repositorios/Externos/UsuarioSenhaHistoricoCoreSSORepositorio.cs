@@ -19,7 +19,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos
         {
         }
 
-        public async Task<bool> VerificarUltimas5Senhas(string usuId, string senha)
+        public async Task<bool> VerificarUltimas5Senhas(Guid usuId, string senha)
         {
             using (var conexao = database.Conexao)
             {

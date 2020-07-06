@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation.Results;
+using Microsoft.Practices.ObjectBuilder2;
 
 namespace SME.AE.Aplicacao.Comum.Excecoes
 {
@@ -26,6 +27,11 @@ namespace SME.AE.Aplicacao.Comum.Excecoes
 
                 Errors.Add(propertyName, propertyFailures);
             }
+        }
+
+        public ValidacaoException(IDictionary<string, string[]> errors)
+        {
+            errors.ForEach(x => Errors.Add(x.Key, x.Value));
         }
 
         public IDictionary<string, string[]> Errors { get; }
