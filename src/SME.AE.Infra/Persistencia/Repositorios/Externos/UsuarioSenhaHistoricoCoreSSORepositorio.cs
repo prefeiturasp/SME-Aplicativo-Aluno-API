@@ -19,24 +19,28 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos
 
         public async Task<bool> VerificarUltimas5Senhas(Guid usuId, string senha)
         {
-            using (var conexao = database.Conexao)
-            {
-                var senhas = await conexao.QueryAsync<UsuarioSenhaHistoricoCoreSSO>(UsuarioSenhaHitoricoConsultas.ObterUltimas5Senhas, new { usuId });
+            var senhas = await database.Conexao.QueryAsync<UsuarioSenhaHistoricoCoreSSO>(UsuarioSenhaHitoricoConsultas.ObterUltimas5Senhas, new { usuId });
 
-                conexao.Close();
+            database.Conexao.Close();
 
-                return senhas.Any(x => x.Senha.Equals(senha));
-            }
-        }      
-        
+            return senhas.Any(x => x.Senha.Equals(senha));
+        }
+
         public async Task AdicionarSenhaHistorico(UsuarioSenhaHistoricoCoreSSO usuarioSenhaHistoricoCoreSSO)
         {
-            using(var conexao = database.Conexao)
-            {
-                var senhas = await conexao.InsertAsync<UsuarioSenhaHistoricoCoreSSO>(usuarioSenhaHistoricoCoreSSO);
+            var sql = @"INSERT INTO SYS_UsuarioSenhaHistorico
+                            (usu_id,ush_senha,ush_criptografia,ush_data)
+                            VALUES (@usuid,@ushsenha,@ushcriptografia,@ushdata);";
 
-                conexao.Close();
-            }
+            await database.Conexao.ExecuteAsync(sql, new
+            {
+                usuid = usuarioSenhaHistoricoCoreSSO.UsuarioId,
+                ushsenha = usuarioSenhaHistoricoCoreSSO.Senha,
+                ushcriptografia = usuarioSenhaHistoricoCoreSSO.Criptografia,
+                ushdata = usuarioSenhaHistoricoCoreSSO.Data
+            });
+
+            database.Conexao.Close();
         }
     }
 }

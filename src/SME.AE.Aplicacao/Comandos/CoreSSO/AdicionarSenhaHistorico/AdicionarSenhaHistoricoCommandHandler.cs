@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico
             this.usuarioSenhaHistoricoCoreSSORepositorio = usuarioSenhaHistoricoCoreSSORepositorio ?? throw new ArgumentNullException(nameof(usuarioSenhaHistoricoCoreSSORepositorio));
         }
 
-        public Task<Unit> Handle(AdicionarSenhaHistoricoCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(AdicionarSenhaHistoricoCommand request, CancellationToken cancellationToken)
         {
             var historico = new UsuarioSenhaHistoricoCoreSSO
             {
@@ -28,7 +28,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico
                 UsuarioId = request.UsuarioId
             };
 
-            usuarioSenhaHistoricoCoreSSORepositorio.AdicionarSenhaHistorico(historico);
+            await usuarioSenhaHistoricoCoreSSORepositorio.AdicionarSenhaHistorico(historico);
 
             return default;
         }
