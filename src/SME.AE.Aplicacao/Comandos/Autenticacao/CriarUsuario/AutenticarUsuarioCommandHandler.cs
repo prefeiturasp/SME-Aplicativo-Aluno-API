@@ -147,9 +147,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             if (usuarioRetorno != null)
             {
-                usuarioRetorno.AtualizarLogin(primeiroAcesso);              
+                usuarioRetorno.AtualizarLogin(primeiroAcesso);
 
-                await _repository.AltualizarUltimoAcessoPrimeiroUsuario(usuarioRetorno);                
+                await _repository.AltualizarUltimoAcessoPrimeiroUsuario(usuarioRetorno);
             }
             else
             {
@@ -171,14 +171,12 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             {
                 Cpf = usuarioEol.Cpf,
                 Nome = usuarioEol.Nome,
-                Email = usuarioEol.Email,
                 Excluido = false,
                 UltimoLogin = DateTime.Now,
                 PrimeiroAcesso = primeiroAcesso
             };
 
             return usuario;
-
         }
 
         private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool informarCelularEmail)

@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
+using Dommel;
 using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades.Externas;
