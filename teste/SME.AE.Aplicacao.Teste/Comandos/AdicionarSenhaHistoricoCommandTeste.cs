@@ -25,6 +25,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
 
         [Theory(DisplayName = "Deve inserir senha historico")]
         [InlineData("5b19cabf-bac5-4cd0-a249-add9794a4c9a", "Teste12345#")]
+        [InlineData("5b19cabf-bac5-4cd0-a249-add9794a4c9a", "Teste#12345")]
         public async Task Deve_Inserir_Senha_Historico(Guid usuarioId, string senha)
         {
             MocarRepositorios();

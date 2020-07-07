@@ -75,7 +75,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             mediator.Setup(a => a.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()));
         }
 
-        private Usuario usuario { get; set; } = new Usuario
+        private Dominio.Entidades.Usuario usuario { get; set; } = new Dominio.Entidades.Usuario
         {
             Celular = "00000000000",
             Cpf = "00000000000",
