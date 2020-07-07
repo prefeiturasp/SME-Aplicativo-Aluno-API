@@ -47,7 +47,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             var resultado = await mediator.Send(validarUltimasSenhas);
 
-            if (!resultado)
+            if (resultado)
                 throw new NegocioException("A sua nova senha deve ser diferente das últimas 5 senhas utilizadas.");
         }
 
