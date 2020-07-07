@@ -31,7 +31,9 @@ namespace SME.AE.Aplicacao.Comum.Excecoes
 
         public ValidacaoException(IDictionary<string, string[]> errors)
         {
-            errors.ForEach(x => Errors.Add(x.Key, x.Value));
+            Errors = errors;
+
+            //errors.ForEach(x => Errors.Add(x.Key, x.Value));
         }
 
         public IDictionary<string, string[]> Errors { get; }

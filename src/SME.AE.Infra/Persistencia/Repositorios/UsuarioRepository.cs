@@ -116,8 +116,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             StringBuilder builder = new StringBuilder();
 
             builder.AppendLine(@"UPDATE usuario SET alteradopor='Sistema', alteradoem=@alteradoem");
-
-
+            
             if (!string.IsNullOrWhiteSpace(email))
                 builder.AppendLine(",email=@email");
 
