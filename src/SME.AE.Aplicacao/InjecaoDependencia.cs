@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using System;
 
@@ -62,7 +63,10 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped(typeof(IObterNotificacaoDoUsuarioLogadoUseCase), typeof(ObterNotificacaoDoUsuarioLogadoUseCase));
             services.TryAddScoped(typeof(IAutenticarUsuarioUseCase), typeof(AutenticarUsuarioUseCase));
             services.TryAddScoped(typeof(IDadosDoAlunoUseCase), typeof(DadosDoAlunoUseCase));
+            services.TryAddScoped(typeof(IAlterarSenhaUseCase), typeof(AlterarSenhaUseCase));
             
+
+
         }
     }
 }
