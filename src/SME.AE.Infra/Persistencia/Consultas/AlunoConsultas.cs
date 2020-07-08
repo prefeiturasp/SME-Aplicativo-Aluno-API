@@ -14,6 +14,7 @@ namespace SME.AE.Infra.Persistencia.Consultas
 			   responsavel.cd_cpf_responsavel        CpfResponsavel,
                aluno.dt_nascimento_aluno             DataNascimento, 
                Rtrim(Ltrim(tesc.sg_tp_escola))       DescricaoTipoEscola, 
+               responsavel.tp_pessoa_responsavel	 TipoResponsavel,
                vue.cd_unidade_educacao               CodigoEscola,
                Ltrim(Rtrim(vue.nm_unidade_educacao)) Escola, 
                dre.cd_unidade_educacao               CodigoDre,
