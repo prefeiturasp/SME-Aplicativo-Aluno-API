@@ -1,8 +1,8 @@
 ﻿using Moq;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
+using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.Usuario;
-using SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
 using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
@@ -75,7 +75,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             mediator.Setup(a => a.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()));
         }
 
-        private Usuario usuario { get; set; } = new Usuario
+        private Dominio.Entidades.Usuario usuario { get; set; } = new Dominio.Entidades.Usuario
         {
             Celular = "00000000000",
             Cpf = "00000000000",

@@ -56,18 +56,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task AtualizarCriptografiaUsuario(Guid usuId, string senha)
         {
-            try
-            {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
-                conn.Open();
-                await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
-            }
+            using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+            conn.Open();
+            await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
+            conn.Close();
         }
 
         public async Task<Guid> Criar(UsuarioCoreSSODto usuario)

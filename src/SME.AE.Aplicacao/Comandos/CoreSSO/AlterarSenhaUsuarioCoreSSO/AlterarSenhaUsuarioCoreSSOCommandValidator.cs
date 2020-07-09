@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO
+namespace SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO
 {
     public class AlterarSenhaUsuarioCoreSSOCommandValidator : AbstractValidator<AlterarSenhaUsuarioCoreSSOCommand>
     {

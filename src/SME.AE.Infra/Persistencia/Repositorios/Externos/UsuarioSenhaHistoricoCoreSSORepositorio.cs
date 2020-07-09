@@ -1,34 +1,46 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
+using Dommel;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Dominio.Entidades.Externas;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios.Externos
 {
     public class UsuarioSenhaHistoricoCoreSSORepositorio : ExternoRepositorio<UsuarioSenhaHistoricoCoreSSO, SqlConnection>, IUsuarioSenhaHistoricoCoreSSORepositorio
     {
-        protected UsuarioSenhaHistoricoCoreSSORepositorio() : base(new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+        public UsuarioSenhaHistoricoCoreSSORepositorio() : base(new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
         {
         }
 
-        public async Task<bool> VerificarUltimas5Senhas(string usuId, string senha)
+        public async Task<bool> VerificarUltimas5Senhas(Guid usuId, string senha)
         {
-            using (var conexao = database.Conexao)
+            var senhas = await database.Conexao.QueryAsync<UsuarioSenhaHistoricoCoreSSO>(UsuarioSenhaHitoricoConsultas.ObterUltimas5Senhas, new { usuId });
+
+            database.Conexao.Close();
+
+            return senhas.Any(x => x.Senha.Equals(senha));
+        }
+
+        public async Task AdicionarSenhaHistorico(UsuarioSenhaHistoricoCoreSSO usuarioSenhaHistoricoCoreSSO)
+        {
+            var sql = @"INSERT INTO SYS_UsuarioSenhaHistorico
+                            (usu_id,ush_senha,ush_criptografia,ush_data)
+                            VALUES (@usuid,@ushsenha,@ushcriptografia,@ushdata);";
+
+            await database.Conexao.ExecuteAsync(sql, new
             {
-                var senhas = await conexao.QueryAsync<UsuarioSenhaHistoricoCoreSSO>(UsuarioSenhaHitoricoConsultas.ObterUltimas5Senhas, new { usuId });
+                usuid = usuarioSenhaHistoricoCoreSSO.UsuarioId,
+                ushsenha = usuarioSenhaHistoricoCoreSSO.Senha,
+                ushcriptografia = usuarioSenhaHistoricoCoreSSO.Criptografia,
+                ushdata = usuarioSenhaHistoricoCoreSSO.Data
+            });
 
-                conexao.Close();
-
-                return senhas.Any(x => x.Senha.Equals(senha));
-            }
+            database.Conexao.Close();
         }
     }
 }
