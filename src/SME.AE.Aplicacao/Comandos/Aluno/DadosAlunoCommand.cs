@@ -44,7 +44,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
 
                 if (resultado == null || !resultado.Any())
                     throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
-                
+
                 resultado.ForEach(x => { var g = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos); x.Grupo = g.gupo; x.CodigoGrupo = g.codigo; });
 
                 var tipoEscola =
@@ -60,7 +60,10 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                                 {
                                     CodigoEol = a.CodigoEol,
                                     Nome = a.Nome,
-                                    NomeResponsavel = a.NomeResponsavel,
+                                    NomeResponsavel = a.TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno &&
+                                                        !string.IsNullOrWhiteSpace(a.NomeSocial) ?
+                                                        a.NomeSocial :
+                                                        a.NomeResponsavel,
                                     CpfResponsavel = a.CpfResponsavel,
                                     NomeSocial = a.NomeSocial,
                                     DataNascimento = a.DataNascimento.Date,
