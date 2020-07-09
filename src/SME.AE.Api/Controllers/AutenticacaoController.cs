@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using System.Threading.Tasks;
@@ -34,6 +35,12 @@ namespace SME.AE.Api.Controllers
         public async Task<ActionResult<RespostaApi>> AlterarEmailCelular([FromBody] AlterarEmailCelularDto alterarEmailCelularDto, [FromServices]IAlterarEmailCelularUseCase alterarEmailCelularUseCase)
         {
             return Ok(await alterarEmailCelularUseCase.Executar(Mediator, alterarEmailCelularDto));
+        }
+        
+        [HttpPut("Senha/Alterar")]
+        public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody]string senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)
+        {
+            return await alterarSenhaUseCase.Executar(new AlterarSenhaDto(User.Identity.Name, senha));
         }
     }
 }

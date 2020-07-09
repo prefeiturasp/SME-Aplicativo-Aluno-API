@@ -1,12 +1,10 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.Comandos.Usuario.AlterarSenhaUsuarioCoreSSO
+namespace SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO
 {
     public class AlterarSenhaUsuarioCoreSSOCommandhandler : IRequestHandler<AlterarSenhaUsuarioCoreSSOCommand>
     {
