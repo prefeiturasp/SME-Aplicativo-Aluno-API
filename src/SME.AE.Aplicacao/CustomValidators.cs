@@ -19,11 +19,15 @@ namespace SME.AE.Aplicacao
 
         public static IRuleBuilderOptions<T, string> ValidarSenha<T>(this IRuleBuilder<T, string> ruleBuilder)
         {
-            return ruleBuilder
-                .MinimumLength(8).WithMessage("A senha deve conter no Minimo 8 digitos")
-                .MaximumLength(12).WithMessage("A senha deve conter no Maximo 12 digitos")
-                .Must(x => !x.Contains(" ")).WithMessage("A senha não pode conter espaços em branco")
-                .Matches(@"(?=.*?[A-Z])(?=.*?[a-z])(?=((?=.*[!@#$\-%&/\\\[\]|*()_=+])|(?=.*?[0-9]+)))").WithMessage("Sua nova senha deve conter letras maiúsculas, minúsculas, números e símbolos. Por favor digite outra senha");
+            var rule = ruleBuilder.MinimumLength(8).WithMessage("A senha deve conter no Minimo 8 digitos");
+
+            rule = rule.MaximumLength(12).WithMessage("A senha deve conter no Maximo 12 digitos");
+
+            rule = rule.Must(x => !x.Contains(" ")).WithMessage("A senha não pode conter espaços em branco");
+
+            rule = rule.Matches(@"(?=.*?[A-Z])(?=.*?[a-z])(?=((?=.*[!@#$\-%&/\\\[\]|*()_=+])|(?=.*?[0-9]+)))").WithMessage("Sua nova senha deve conter letras maiúsculas, minúsculas, números e símbolos. Por favor digite outra senha");
+
+            return rule;
         }
 
         private static bool NascimentoEhValida(DateTime data) => data > new DateTime(1900, 1, 1) && data < DateTime.Now;

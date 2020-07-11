@@ -38,9 +38,9 @@ namespace SME.AE.Api.Controllers
         }
         
         [HttpPut("Senha/Alterar")]
-        public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody]string senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)
+        public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody]SenhaDto senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)
         {
-            return await alterarSenhaUseCase.Executar(new AlterarSenhaDto(User.Identity.Name, senha));
+            return await alterarSenhaUseCase.Executar(new AlterarSenhaDto(User.Identity.Name, senha.Senha));
         }
     }
 }
