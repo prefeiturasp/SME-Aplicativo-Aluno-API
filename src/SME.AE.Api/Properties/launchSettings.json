@@ -12,7 +12,7 @@
         "EolConnection": "Server=localhost;Database=localhost;User Id=localhost;Password=localhost;",
         "SgpConnection": "User ID=localhost;Password=localhost;Host=localhost;Database=localhost;Pooling=true;",
         "CoreSSOConnection": "Host=localhost;Database=localhost;Username=postgres;Password=postgres;Pooling=true;",
-        "ChaveIntegracao":"",
+        "ChaveIntegracao": "",
         "FirebaseToken": "",
         "FirebaseProjectId": ""
       },

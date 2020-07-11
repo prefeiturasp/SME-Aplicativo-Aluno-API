@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
-    public class AlterarSenhaDto
+    public class AlterarSenhaDto : SenhaDto
     {
         public AlterarSenhaDto()
         {
@@ -18,6 +18,5 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         }
 
         public string CPF { get; set; }
-        public string Senha { get; set; }
     }
 }
