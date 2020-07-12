@@ -1,4 +1,5 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Extensoes;
 using System;
 using System.Collections;
@@ -15,9 +16,20 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int Status { get; internal set; }
         public TipoCriptografia TipoCriptografia {get;set;}
 
-        public void Alterarsenha(string senha)
+        public void AlterarSenha(string senha)
         {
-            Senha = Criptografia.CriptografarSenha(senha, TipoCriptografia);
+            Senha = ObterSenhaCriptografada(senha);
+        }
+
+        public void ValidarSenhaAlterarSenha(string senha)
+        {
+            if (!senha.Equals(Senha))
+                throw new NegocioException("A senha anterior não é igual a senha informada");
+        }
+
+        public string ObterSenhaCriptografada(string senha)
+        {
+            return Criptografia.CriptografarSenha(senha, TipoCriptografia);
         }
     }
 }
