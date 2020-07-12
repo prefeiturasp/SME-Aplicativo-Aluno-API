@@ -24,13 +24,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<RespostaApi> Executar(AlterarSenhaDto alterarSenhaDto)
+        public async Task<RespostaApi> Executar(AlterarSenhaDto alterarSenhaDto, string senhaAntiga)
         {
             await ValidarDto(alterarSenhaDto);
 
             var usuario = await ObterUsuarioCoreSSO(alterarSenhaDto);
 
-            usuario.Alterarsenha(alterarSenhaDto.Senha);
+            usuario.ValidarSenhaAlterarSenha(usuario.ObterSenhaCriptografada(senhaAntiga));
+
+            usuario.AlterarSenha(alterarSenhaDto.Senha);
 
             await Validar5UltimasSenhas(usuario);
 
