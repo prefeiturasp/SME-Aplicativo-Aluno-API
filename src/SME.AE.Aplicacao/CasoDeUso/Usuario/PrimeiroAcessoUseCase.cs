@@ -66,7 +66,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
         private async Task AssociarGrupoEAlterarSenha(IMediator mediator, NovaSenhaDto novaSenhaDto, RetornoUsuarioCoreSSO usuarioCoreSSO)
         {
-            usuarioCoreSSO.Alterarsenha(novaSenhaDto.NovaSenha);
+            usuarioCoreSSO.AlterarSenha(novaSenhaDto.NovaSenha);
 
             await mediator.Send(new AssociarGrupoUsuarioCommand(usuarioCoreSSO));
 
