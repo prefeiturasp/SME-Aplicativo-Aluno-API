@@ -10,8 +10,10 @@ namespace SME.AE.Aplicacao.Validators
     {
         public SenhaDtoValidator()
         {
-            RuleFor(x => x.Senha).NotEmpty().WithMessage("È necessario informar a senha");
-            RuleFor(x => x.Senha).ValidarSenha().When(x => !string.IsNullOrWhiteSpace(x.Senha));
+            RuleFor(x => x.NovaSenha).NotEmpty().WithMessage("È necessario informar a nova senha");
+            RuleFor(x => x.NovaSenha).ValidarSenha().When(x => !string.IsNullOrWhiteSpace(x.NovaSenha));
+
+            RuleFor(x => x.SenhaAntiga).NotEmpty().WithMessage("È necessario informar a senha antiga");
         }
     }
 }

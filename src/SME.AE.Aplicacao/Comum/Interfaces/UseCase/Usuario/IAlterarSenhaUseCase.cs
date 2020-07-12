@@ -8,6 +8,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario
 {
     public interface IAlterarSenhaUseCase
     {
-        Task<RespostaApi> Executar(AlterarSenhaDto alterarSenhaDto);
+        Task<RespostaApi> Executar(AlterarSenhaDto alterarSenhaDto, string senhaAntiga);
     }
 }

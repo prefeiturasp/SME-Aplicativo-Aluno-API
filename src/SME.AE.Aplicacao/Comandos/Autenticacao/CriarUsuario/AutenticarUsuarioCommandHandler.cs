@@ -51,7 +51,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             //verificar se as senhas são iguais
             if (usuarioCoreSSO != null && (!Criptografia.EqualsSenha(request.Senha, usuarioCoreSSO.Senha, usuarioCoreSSO.TipoCriptografia)))
-            {
+            {                
                 validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário ou senha incorretos."));
                 return RespostaApi.Falha(validacao.Errors);
             }

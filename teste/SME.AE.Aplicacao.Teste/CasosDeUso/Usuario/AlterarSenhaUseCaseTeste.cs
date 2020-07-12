@@ -27,38 +27,50 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
         }
 
         [Theory(DisplayName = "Deve Alterar a Senha")]
-        [InlineData("23891476159", "Ab#12345")]
-        [InlineData("09900791126", "Sgp@1234")]
-        [InlineData("61056974141", "Aa!11111")]
-        [InlineData("77083696144", "#Aa12345")]
-        [InlineData("49072009193", "Ab#12345")]
-        [InlineData("95461504108", "Sgp@1234")]
-        [InlineData("91063385180", "Aa!11111")]
-        [InlineData("94377608100", "#Aa12345")]
-        public async Task Deve_Alterar_Senha(string cpf, string senha)
+        [InlineData("23891476159", "Ab#12345", "Ab#12345")]
+        [InlineData("09900791126", "Sgp@1234", "Ab#12345")]
+        [InlineData("61056974141", "Aa!11111", "Ab#12345")]
+        [InlineData("77083696144", "#Aa12345", "Ab#12345")]
+        [InlineData("49072009193", "Ab#12345", "Ab#12345")]
+        [InlineData("95461504108", "Sgp@1234", "Ab#12345")]
+        [InlineData("91063385180", "Aa!11111", "Ab#12345")]
+        [InlineData("94377608100", "#Aa12345", "Ab#12345")]
+        public async Task Deve_Alterar_Senha(string cpf, string senha, string senhaAnterior)
         {
             InstanciarSetup();
 
             var dto = new AlterarSenhaDto(cpf, senha);
 
-            await alterarSenhaUseCase.Executar(dto);
+            await alterarSenhaUseCase.Executar(dto, senhaAnterior);
+        }
+
+        [Theory(DisplayName = "Deve Validar a Senha Anterior")]
+        [InlineData("23891476159", "Ab#12345", "Ab12345")]
+        [InlineData("09900791126", "Sgp@1234", "Ab#12346")]
+        public async Task Deve_Validar_Senha_Anterior(string cpf, string senha, string senhaAnterior)
+        {
+            InstanciarSetup();
+
+            var dto = new AlterarSenhaDto(cpf, senha);
+
+            await Assert.ThrowsAsync<NegocioException>(async () => await alterarSenhaUseCase.Executar(dto, senhaAnterior));
         }
 
         [Theory(DisplayName = "Deve Acusar erro de validação")]
-        [InlineData("", "")]
-        [InlineData("238914767159", "Ab#12345")]
-        [InlineData("09900791126", "Sgp1234")]
-        [InlineData("61056974141", "")]
-        [InlineData("", "#Aa12345")]
-        [InlineData("23814767159", "Ab#12345")]
-        [InlineData("00000100000", "Ab#12345")]
-        public async Task Deve_Acusar_Erro_Validacao(string cpf, string senha)
+        [InlineData("", "", "Ab#12345")]
+        [InlineData("238914767159", "Ab#12345", "Ab#12345")]
+        [InlineData("09900791126", "Sgp1234", "Ab#12345")]
+        [InlineData("61056974141", "", "Ab#12345")]
+        [InlineData("", "#Aa12345", "Ab#12345")]
+        [InlineData("23814767159", "Ab#12345", "Ab#12345")]
+        [InlineData("00000100000", "Ab#12345", "Ab#12345")]        
+        public async Task Deve_Acusar_Erro_Validacao(string cpf, string senha, string senhaAnterior)
         {
             InstanciarSetup();
 
             var dto = new AlterarSenhaDto(cpf, senha);
 
-            await Assert.ThrowsAsync<ValidacaoException>(async () => await alterarSenhaUseCase.Executar(dto));
+            await Assert.ThrowsAsync<ValidacaoException>(async () => await alterarSenhaUseCase.Executar(dto, senhaAnterior));
         }
 
         private void InstanciarSetup()
@@ -70,7 +82,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
             {
                 Cpf = "76565938105",
                 UsuId = Guid.NewGuid(),
-                TipoCriptografia = TipoCriptografia.TripleDES
+                TipoCriptografia = TipoCriptografia.TripleDES,
+                Senha = "y05Om5MZcpi+QTomos5O2g==",
             });
         }
     }
