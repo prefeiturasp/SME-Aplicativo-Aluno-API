@@ -19,6 +19,7 @@ namespace SME.AE.Infra.Persistencia.Consultas
                Ltrim(Rtrim(vue.nm_unidade_educacao)) Escola, 
                dre.cd_unidade_educacao               CodigoDre,
                dre.nm_exibicao_unidade               SiglaDre, 
+               te.cd_turma_escola                    CodigoTurma,
                te.dc_turma_escola                    Turma, 
                tesc.tp_escola                        CodigoTipoEscola, 
                mte.situacaomatricula                 SituacaoMatricula, 
