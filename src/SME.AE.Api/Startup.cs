@@ -16,6 +16,8 @@ using SME.AE.Infra;
 using System.Linq;
 using System.Text;
 using SME.AE.Infra.Persistencia.Mapeamentos;
+using System;
+using System.Text.Unicode;
 
 namespace SME.AE.Api
 {
@@ -30,7 +32,7 @@ namespace SME.AE.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            AddAuthentication(services);
+            AddAuthentication(services, Configuration);
 
 #if DEBUG
             services.Configure<KestrelServerOptions>(options =>
@@ -91,8 +93,10 @@ namespace SME.AE.Api
                     }
                 });
             });
+
+            services.AddMemoryCache();
         }
-        private void AddAuthentication(IServiceCollection services)
+        private void AddAuthentication(IServiceCollection services,  IConfiguration configuration)
         {
             byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
             services
