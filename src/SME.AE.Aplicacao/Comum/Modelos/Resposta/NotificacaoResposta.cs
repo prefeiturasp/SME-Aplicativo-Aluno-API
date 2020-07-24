@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public DateTime? AlteradoEm { get; set; }
         public string? AlteradoPor { get; set; }
         public bool MensagemVisualizada { get; internal set; }
-
-        public string categoriaNotificacao { get; set; }
+        public TipoComunicado TipoComunicado { get; set; }
+        public string CategoriaNotificacao { get; set; }
     }
 }

@@ -20,6 +20,7 @@
 	                                                        N.CriadoPor,
 	                                                        N.AlteradoEm,
 	                                                        N.AlteradoPor,
+                                                            N.TipoComunicado
 	                                                        UNL.mensagemvisualizada
                                                         from
 	                                                        Notificacao N
