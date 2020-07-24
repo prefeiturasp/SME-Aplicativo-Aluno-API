@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Aplicacao.Comum.Modelos;
 using AutoMapper;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 
 namespace SME.AE.Aplicacao
 {
@@ -26,11 +27,9 @@ namespace SME.AE.Aplicacao
 
         public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
-            Notificacao resultado = await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+             await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
 
-            await EnviarNotificacaoImediataAsync(notificacao);
-
-            return mapper.Map<NotificacaoSgpDto>(resultado);
+            return mapper.Map<NotificacaoSgpDto>(notificacao);
         }
 
         private async Task EnviarNotificacaoImediataAsync(NotificacaoSgpDto notificacao)
