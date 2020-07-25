@@ -25,10 +25,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
 
             IEnumerable<NotificacaoResposta> lista = await mediator.Send(new ObterNotificacaoPorGrupoCommand(grupos.JoinStrings(","), usuario));
 
-            return AdicionaCategoria(lista);
+            return AdicionaCategoriasERetornaLista(lista);
         }
 
-        private static IEnumerable<NotificacaoResposta> AdicionaCategoria(IEnumerable<NotificacaoResposta> lista)
+        private static IEnumerable<NotificacaoResposta> AdicionaCategoriasERetornaLista(IEnumerable<NotificacaoResposta> lista)
         {
             var listaRetorno = new List<NotificacaoResposta>();
 
