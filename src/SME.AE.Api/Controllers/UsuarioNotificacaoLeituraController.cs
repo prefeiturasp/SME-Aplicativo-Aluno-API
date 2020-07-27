@@ -12,10 +12,10 @@ namespace SME.AE.Api.Controllers
     public class UsuarioNotificacaoLeituraController : ApiController
     {
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult> MarcarMensagemLida([FromBody] UsuarioNotificacaoDto usuarioMensagem, [FromServices]IMarcarMensagemLidaUseCase marcarMensagemLidaUseCase)
         {
-            return Ok(await marcarMensagemLidaUseCase.Executar(Mediator, usuarioMensagem, "40861153871"));
+            return Ok(await marcarMensagemLidaUseCase.Executar(Mediator, usuarioMensagem, User.Identity.Name));
         }
     }
 }

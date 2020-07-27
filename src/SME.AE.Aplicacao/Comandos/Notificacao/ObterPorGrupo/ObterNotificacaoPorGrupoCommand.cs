@@ -51,7 +51,9 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
                 Titulo = x.Titulo,
                 MensagemVisualizada =  x.MensagemVisualizada,
                 Grupos = SelecionarGrupos(x.Grupo, grupos),
-                TipoComunicado = x.TipoComunicado
+                TipoComunicado = x.TipoComunicado,
+                CategoriaNotificacao = x.CategoriaNotificacao
+                
             });
         }
 

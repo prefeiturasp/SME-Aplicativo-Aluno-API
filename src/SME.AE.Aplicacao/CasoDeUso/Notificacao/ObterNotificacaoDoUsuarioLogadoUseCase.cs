@@ -23,32 +23,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
         {
             List<string> grupos = await mediator.Send(new ObterGrupoNotificacaoPorResponsavelCommand(usuario));
 
-            IEnumerable<NotificacaoResposta> lista = await mediator.Send(new ObterNotificacaoPorGrupoCommand(grupos.JoinStrings(","), usuario));
-
-            return AdicionaCategoriasERetornaLista(lista);
-        }
-
-        private static IEnumerable<NotificacaoResposta> AdicionaCategoriasERetornaLista(IEnumerable<NotificacaoResposta> lista)
-        {
-            var listaRetorno = new List<NotificacaoResposta>();
-
-            foreach (var item in lista)
-            {
-
-                if (item.TipoComunicado == TipoComunicado.SME)
-                    item.CategoriaNotificacao = "SME";
-                else if (item.TipoComunicado == TipoComunicado.DRE ||
-                         item.TipoComunicado == TipoComunicado.UE ||
-                         item.TipoComunicado == TipoComunicado.UEMOD)
-                    item.CategoriaNotificacao = "UE";
-                else if (item.TipoComunicado == TipoComunicado.TURMA ||
-                         item.TipoComunicado == TipoComunicado.ALUNO)
-                    item.CategoriaNotificacao = "TURMA";
-
-                listaRetorno.Add(item);
-
-            }
-            return listaRetorno;
+            return await mediator.Send(new ObterNotificacaoPorGrupoCommand(grupos.JoinStrings(","), usuario));
         }
     }
 }
