@@ -2,7 +2,7 @@
 using Microsoft.Practices.ObjectBuilder2;
 using SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel;
 using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
-using SME.AE.Aplicacao.Comum.Enumeradores;
+using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;

@@ -131,6 +131,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 notificacao.InserirAuditoria();
+                notificacao.InserirCategoria();
                 await conn.InsertAsync(notificacao);
                 conn.Close();
             }

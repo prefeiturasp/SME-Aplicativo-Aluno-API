@@ -35,10 +35,15 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
                 CriadoEm = Notificacao.CriadoEm,
                 CriadoPor = Notificacao.CriadoPor,
                 Id = Notificacao.Id,
+                CodigoDre = Notificacao.CodigoDre,
+                CodigoUe = Notificacao.CodigoUe,
+
                 DataEnvio = Notificacao.DataEnvio,
                 DataExpiracao = Notificacao.DataExpiracao,
                 Mensagem = Notificacao.Mensagem,
-                Titulo = Notificacao.Titulo,                
+                Titulo = Notificacao.Titulo, 
+                TipoComunicado = Notificacao.TipoComunicado,
+                CategoriaNotificacao = Notificacao.CategoriaNotificacao,
                 Grupos = SelecionarGrupos(Notificacao.Grupo, grupos)
             };
 

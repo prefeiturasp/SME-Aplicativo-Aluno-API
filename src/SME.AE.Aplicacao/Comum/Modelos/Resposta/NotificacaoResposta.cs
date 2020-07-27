@@ -1,8 +1,7 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+﻿
+using SME.AE.Dominio.Comum.Enumeradores;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
@@ -21,5 +20,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public bool MensagemVisualizada { get; internal set; }
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
+        public string CodigoDre { get; set; }
+        public string CodigoUe { get; set; }
     }
 }

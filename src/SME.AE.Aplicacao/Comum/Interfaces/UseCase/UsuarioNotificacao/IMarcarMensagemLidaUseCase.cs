@@ -10,6 +10,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
 {
     public interface IMarcarMensagemLidaUseCase
     {
-        Task<NotificacaoResposta> Executar(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem);
+        Task<NotificacaoResposta> Executar(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpf);
     }
 }

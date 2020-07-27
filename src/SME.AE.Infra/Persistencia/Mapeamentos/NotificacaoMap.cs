@@ -21,6 +21,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
             Map(x => x.CodigoUe).ToColumn("ue_codigoeol");
             Map(x => x.AnoLetivo).ToColumn("ano_letivo");
             Map(x => x.TipoComunicado).ToColumn("tipocomunicado");
+            Map(x => x.CategoriaNotificacao).ToColumn("categorianotificacao");
 
         }
     }
