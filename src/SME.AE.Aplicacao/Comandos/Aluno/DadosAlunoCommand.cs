@@ -73,6 +73,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                                     Escola = a.Escola,
                                     CodigoDre = a.CodigoDre,
                                     SiglaDre = a.SiglaDre,
+                                    CodigoTurma = a.CodigoTurma,
                                     Turma = a.Turma,
                                     SituacaoMatricula = a.SituacaoMatricula,
                                     DataSituacaoMatricula = a.DataSituacaoMatricula

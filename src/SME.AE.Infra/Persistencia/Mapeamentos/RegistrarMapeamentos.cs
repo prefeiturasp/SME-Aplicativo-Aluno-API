@@ -15,6 +15,8 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
                 config.AddMap(new UsuarioNotificacaoMap());
                 config.AddMap(new PessoaCoreSSOMap());
                 config.AddMap(new UsuarioSenhaHistoricoCoreSSOMap());
+                config.AddMap(new NotificacaoAlunoMap());
+                config.AddMap(new NotificacaoTurmaMap());
                 config.ForDommel();
             });
         }

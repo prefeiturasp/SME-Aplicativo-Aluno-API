@@ -12,11 +12,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     {
         public async Task<bool> Criar(UsuarioNotificacao usuarioNotificacao)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-            conn.Open();
-            var dataAtual = DateTime.Now;
-            var retorno = await conn.ExecuteAsync(
-                @"INSERT INTO public.usuario_notificacao_leitura
+            try
+            {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var dataAtual = DateTime.Now;
+                var retorno = await conn.ExecuteAsync(
+                    @"INSERT INTO public.usuario_notificacao_leitura
                     (usuario_id,
                      notificacao_id,
                            criadoem,
@@ -29,26 +31,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     VALUES(@UsuarioId,
                            @NotificacaoId,
                            @dataAtual,
-                           @CodigoAlunoEol,
+                           @CodigoEolAluno,
                            @DreCodigoEol,
                            @UeCodigoEol,
                            @UsuarioCpf,
                            @CriadoPor,
                            @MensagemVisualizada);",
-                new
-                {
-                    usuarioNotificacao.UsuarioId,
-                    usuarioNotificacao.NotificacaoId,
-                    dataAtual,
-                    usuarioNotificacao.CodigoAlunoEol,
-                    usuarioNotificacao.DreCodigoEol,
-                    usuarioNotificacao.UeCodigoEol,
-                    usuarioNotificacao.UsuarioCpf,
-                    usuarioNotificacao.CriadoPor,
-                    usuarioNotificacao.MensagemVisualizada
-                });
-            conn.Close();
-            return true;
+                    new
+                    {
+                        usuarioNotificacao.UsuarioId,
+                        usuarioNotificacao.NotificacaoId,
+                        dataAtual,
+                        usuarioNotificacao.CodigoEolAluno,
+                        usuarioNotificacao.DreCodigoEol,
+                        usuarioNotificacao.UeCodigoEol,
+                        usuarioNotificacao.UsuarioCpf,
+                        usuarioNotificacao.CriadoPor,
+                        usuarioNotificacao.MensagemVisualizada
+                    });
+                conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+          
         }
 
         public Task<UsuarioNotificacao> ObterPorId(long id)
