@@ -44,7 +44,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
                 {
                     await IncluirNotificacaoTurma(request);
                 }
-                // await EnviarNotificacaoImediataAsync(notificacao);
+                
 
                 return Unit.Value;
 

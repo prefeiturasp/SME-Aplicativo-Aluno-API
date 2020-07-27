@@ -4,7 +4,7 @@
     {
         public static string Select = @"
             SELECT Id, Mensagem, Titulo, Grupo, DataEnvio, DataExpiracao,
-                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor
+                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor, Dre_CodigoEol, Ue_CodigoEol, TipoComunicado, CategoriaNotificacao
             FROM Notificacao 
         ";
 

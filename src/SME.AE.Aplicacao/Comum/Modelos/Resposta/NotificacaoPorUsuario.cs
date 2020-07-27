@@ -1,4 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+﻿using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;

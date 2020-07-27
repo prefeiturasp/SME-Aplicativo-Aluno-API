@@ -78,8 +78,7 @@ namespace SME.AE.Aplicacao
 
             else if (notificacao.TipoComunicado == TipoComunicado.DRE)
             {
-                var data = new Dictionary<String, String>();
-                data = dicionarioNotificacao;
+                var data = new Dictionary<String, String>(dicionarioNotificacao);
                 topico = "DRE-" + notificacao.CodigoDre;
                 data.Add("CodigoDre", "DRE-" + topico);
 
@@ -88,8 +87,7 @@ namespace SME.AE.Aplicacao
 
             else if (notificacao.TipoComunicado == TipoComunicado.UE)
             {
-                var data = new Dictionary<String, String>();
-                data = dicionarioNotificacao;
+                var data = new Dictionary<String, String>(dicionarioNotificacao);
                 topico = "DRE-" + notificacao.CodigoUe;
                 data.Add("CodigoDre", "DRE-" + topico);
 
@@ -100,9 +98,7 @@ namespace SME.AE.Aplicacao
             {
                 foreach (var grupo in grupos)
                 {
-                    var data = new Dictionary<String, String>();
-                    data = dicionarioNotificacao;
-
+                    var data = new Dictionary<String, String>(dicionarioNotificacao);
                     topico = "UE-" + notificacao.CodigoUe + "-MOD-" + grupo;
                     data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
@@ -113,9 +109,7 @@ namespace SME.AE.Aplicacao
             {
                 foreach (var turma in notificacao.Turma)
                 {
-                    var data = new Dictionary<String, String>();
-                    data = dicionarioNotificacao;
-
+                    var data = new Dictionary<String, String>(dicionarioNotificacao);
                     topico = "UE-" + notificacao.CodigoUe;
                     data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
@@ -126,9 +120,8 @@ namespace SME.AE.Aplicacao
             {
                 foreach (var aluno in notificacao.Alunos)
                 {
-                    var data = new Dictionary<String, String>();
-                    data = dicionarioNotificacao;
 
+                    var data = new Dictionary<String, String>(dicionarioNotificacao);
                     topico = "ALU-" + aluno;
                     data.Add("CodigoAluno", topico);
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
