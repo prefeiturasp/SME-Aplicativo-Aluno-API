@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Aplicacao.Comum.Enumeradores
+namespace SME.AE.Dominio.Comum.Enumeradores
 {
-
     public enum TipoComunicado
     {
         SME = 1,
@@ -14,5 +13,5 @@ namespace SME.AE.Aplicacao.Comum.Enumeradores
         TURMA = 5,
         ALUNO = 6
     }
-
 }
+

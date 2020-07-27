@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Dommel;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
@@ -25,8 +26,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual) ";
 
-            try
-            {
+          
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 var dataAtual = DateTime.Now.Date;
@@ -38,13 +38,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         dataAtual
                     });
                 conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return list;
-            }
-
             return list;
         }
 
@@ -123,30 +116,34 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return null;
         }
 
-        public async Task<Notificacao> Criar(Notificacao notificacao)
+        public async Task Criar(Notificacao notificacao)
         {
-            try
-            {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    notificacao.CriadoEm = DateTime.Now;
-                    await conn.ExecuteAsync(
-                        @"INSERT INTO notificacao(id, mensagem, titulo, grupo, dataEnvio, dataExpiracao, criadoEm, criadoPor, alteradoEm, alteradoPor) 
-                            VALUES(@Id, @Mensagem, @Titulo, @Grupo, @DataEnvio, @DataExpiracao, @CriadoEm, @CriadoPor, @AlteradoEm,  @AlteradoPor)",
-                        notificacao);
-                    conn.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
-            }
-
-            return notificacao;
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                notificacao.InserirAuditoria();
+                notificacao.InserirCategoria();
+                await conn.InsertAsync(notificacao);
+                conn.Close();
         }
 
+
+        public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
+        {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                notificacaoAluno.InserirAuditoria();
+                await conn.InsertAsync(notificacaoAluno);
+                conn.Close();
+        }
+
+        public async Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma)
+        {
+             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+             conn.Open();
+             notificacaoTurma.InserirAuditoria();
+             await conn.InsertAsync(notificacaoTurma);
+             conn.Close();
+        }
         public async Task<Notificacao> Atualizar(Notificacao notificacao)
         {
             try

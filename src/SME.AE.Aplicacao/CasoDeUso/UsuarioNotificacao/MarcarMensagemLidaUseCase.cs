@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida;
+using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -17,17 +18,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 {
     public class MarcarMensagemLidaUseCase : IMarcarMensagemLidaUseCase
     {
-        public async Task<NotificacaoResposta> Executar(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem)
+        public async Task<NotificacaoResposta> Executar(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario)
         {
-            var usuario = await mediator.Send(new ObterUsuarioQuery()
-            {
-                Cpf = usuarioMensagem.CpfUsuario
-            });
 
-            if (usuario == null)
-                throw new NegocioException($"Não encontrado usuário com o CPF '{usuarioMensagem.CpfUsuario}'");
-
-            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(usuarioMensagem.CpfUsuario));
+            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpfUsuario));
 
             if (resposta.Data == null)
                 throw new NegocioException("Não foi possivel obter os alunos por escola");
@@ -37,31 +31,53 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
             if (notificacao == null)
                 throw new NegocioException("Não foi possivel localizar a notificação.");
-
-
-            foreach (var lista in listaEscolas.Where(c => notificacao.Grupos.Any(n => n.Codigo == c.CodigoGrupo)))
+            if (notificacao.TipoComunicado == TipoComunicado.ALUNO)
             {
-                foreach (var aluno in lista.Alunos)
+
+                var usuarioNotificacao = new UsuarioNotificacao
                 {
-                    var usuarioNotificacao = new UsuarioNotificacao
+                    UsuarioCpf = cpfUsuario,
+                    NotificacaoId = usuarioMensagem.NotificacaoId,
+                    DreCodigoEol = long.Parse(notificacao.CodigoDre),
+                    UeCodigoEol = notificacao.CodigoUe,
+                    CodigoEolAluno = usuarioMensagem.CodigoAlunoEol,
+                    UsuarioId = usuarioMensagem.UsuarioId,
+                    MensagemVisualizada = usuarioMensagem.MensagemVisualizada,
+                };
+
+                await IncluiConfirmacaoDeLeitura(mediator, usuarioNotificacao);
+            }
+
+            else
+            {
+                foreach (var lista in listaEscolas.Where(c => notificacao.Grupos.Any(n => n.Codigo == c.CodigoGrupo)))
+                {
+                    foreach (var aluno in lista.Alunos)
                     {
-                        UsuarioCpf = usuario.Cpf,
-                        NotificacaoId = usuarioMensagem.NotificacaoId,
-                        DreCodigoEol = long.Parse(aluno.CodigoDre),
-                        UeCodigoEol = aluno.CodigoEscola,
-                        CodigoAlunoEol = aluno.CodigoEol,
-                        UsuarioId = usuario.Id,
-                        MensagemVisualizada = usuarioMensagem.MensagemVisualizada,
-                    };
+                        var usuarioNotificacao = new UsuarioNotificacao
+                        {
+                            UsuarioCpf = cpfUsuario,
+                            NotificacaoId = usuarioMensagem.NotificacaoId,
+                            DreCodigoEol = long.Parse(aluno.CodigoDre),
+                            UeCodigoEol = aluno.CodigoEscola,
+                            CodigoEolAluno = aluno.CodigoEol,
+                            UsuarioId = usuarioMensagem.UsuarioId,
+                            MensagemVisualizada = usuarioMensagem.MensagemVisualizada,
+                        };
 
-                    usuarioNotificacao.InserirAuditoria();
-
-                    var Notificacao = await mediator.Send(new UsuarioNotificacaoCommand(usuarioNotificacao));
+                        await IncluiConfirmacaoDeLeitura(mediator, usuarioNotificacao);
+                    }
                 }
             }
 
             notificacao.MensagemVisualizada = usuarioMensagem.MensagemVisualizada;
             return notificacao;
+        }
+
+        private static async Task IncluiConfirmacaoDeLeitura(IMediator mediator, UsuarioNotificacao usuarioNotificacao)
+        {
+            usuarioNotificacao.InserirAuditoria();
+            var Notificacao = await mediator.Send(new UsuarioNotificacaoCommand(usuarioNotificacao));
         }
     }
 }
