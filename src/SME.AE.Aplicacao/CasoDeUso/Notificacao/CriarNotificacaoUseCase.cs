@@ -108,7 +108,7 @@ namespace SME.AE.Aplicacao
 
             else if (notificacao.TipoComunicado == TipoComunicado.TURMA)
             {
-                foreach (var turma in notificacao.Turma)
+                foreach (var turma in notificacao.Turmas)
                 {
                     var data = new Dictionary<String, String>(dicionarioNotificacao);
                     topico = "UE-" + notificacao.CodigoUe;
