@@ -20,5 +20,19 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string CodigoUe { get; set; }
         public IEnumerable<string> Turma { get; set; }
         public TipoComunicado TipoComunicado { get; set; }
+        public string CategoriaNotificacao { get; set; }
+
+        public void InserirCategoria()
+        {
+            if (TipoComunicado == TipoComunicado.SME)
+                CategoriaNotificacao = "SME";
+            else if (TipoComunicado == TipoComunicado.DRE ||
+                     TipoComunicado == TipoComunicado.UE ||
+                     TipoComunicado == TipoComunicado.UEMOD)
+                CategoriaNotificacao = "UE";
+            else if (TipoComunicado == TipoComunicado.TURMA ||
+                     TipoComunicado == TipoComunicado.ALUNO)
+                CategoriaNotificacao = "TURMA";
+        }
     }
 }
