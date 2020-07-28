@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int AnoLetivo { get; set; }
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
-        public IEnumerable<string> Turma { get; set; }
+        public IEnumerable<string> Turmas { get; set; }
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
 
