@@ -22,7 +22,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             IEnumerable<NotificacaoPorUsuario> list = null;
 
             var query = NotificacaoConsultas.ObterPorUsuarioLogado
-                    + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')" +
+                    + "WHERE UNL.usuario_cpf = @cpf" +
                     " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual) ";
 
@@ -118,6 +118,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task Criar(Notificacao notificacao)
         {
+          
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 notificacao.InserirAuditoria();
@@ -144,6 +145,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
              await conn.InsertAsync(notificacaoTurma);
              conn.Close();
         }
+
+
+
+
         public async Task<Notificacao> Atualizar(Notificacao notificacao)
         {
             try
