@@ -123,7 +123,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conn.Open();
                 notificacao.InserirAuditoria();
                 notificacao.InserirCategoria();
-                await conn.InsertAsync(notificacao);
+                 await conn.InsertAsync(notificacao);
                 conn.Close();
         }
 

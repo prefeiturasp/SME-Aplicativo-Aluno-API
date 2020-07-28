@@ -30,8 +30,8 @@ namespace SME.AE.Aplicacao
 
         public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
-            await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
-
+           var retorno =  await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+            notificacao.InserirCategoria();
             await EnviarNotificacaoImediataAsync(notificacao);
             return mapper.Map<NotificacaoSgpDto>(notificacao);
         }
@@ -50,6 +50,7 @@ namespace SME.AE.Aplicacao
             {
                 ["Titulo"] = notificacao.Titulo,
                 ["Mensagem"] = notificacao.Mensagem,
+                ["categoriaNotificacao"] = notificacao.CategoriaNotificacao,
                 ["Id"] = notificacao.Id.ToString(),
                 ["CriadoEm"] = notificacao.CriadoEm.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
                 ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
