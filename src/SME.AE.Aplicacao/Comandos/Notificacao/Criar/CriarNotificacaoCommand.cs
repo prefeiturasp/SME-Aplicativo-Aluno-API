@@ -58,7 +58,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 
         private async Task IncluirNotificacaoTurma(CriarNotificacaoCommand request)
         {
-            foreach (var codigoTurma in request.Notificacao.Turma)
+            foreach (var codigoTurma in request.Notificacao.Turmas)
             {
                 var notificacaoTurma = new NotificacaoTurma();
                 notificacaoTurma.CodigoTurma =  Convert.ToInt64(codigoTurma);
