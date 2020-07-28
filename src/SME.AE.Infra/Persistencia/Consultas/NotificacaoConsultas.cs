@@ -26,8 +26,7 @@
                                                         from
 	                                                        Notificacao N
                                                         left join usuario_notificacao_leitura UNL on
-	                                                        UNL.notificacao_id = N.id
-	                                                        and UNL.usuario_cpf = @cpf ";
+	                                                        UNL.notificacao_id = N.id ";
 
         public static string GruposDoResponsavel = @"
             from dbo.responsavel_aluno ra
