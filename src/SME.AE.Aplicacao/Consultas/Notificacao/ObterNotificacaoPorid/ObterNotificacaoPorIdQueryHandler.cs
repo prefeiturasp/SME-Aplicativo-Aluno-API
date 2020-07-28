@@ -35,8 +35,8 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
                 CriadoEm = Notificacao.CriadoEm,
                 CriadoPor = Notificacao.CriadoPor,
                 Id = Notificacao.Id,
-                CodigoDre = Notificacao.CodigoDre,
-                CodigoUe = Notificacao.CodigoUe,
+                //CodigoDre = Notificacao.CodigoDre,
+               // CodigoUe = Notificacao.CodigoUe,
 
                 DataEnvio = Notificacao.DataEnvio,
                 DataExpiracao = Notificacao.DataExpiracao,
@@ -44,7 +44,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
                 Titulo = Notificacao.Titulo, 
                 TipoComunicado = Notificacao.TipoComunicado,
                 CategoriaNotificacao = Notificacao.CategoriaNotificacao,
-                Grupos = SelecionarGrupos(Notificacao.Grupo, grupos)
+              //  Grupos = SelecionarGrupos(Notificacao.Grupo, grupos)
             };
 
             return notificacaoResposta;
