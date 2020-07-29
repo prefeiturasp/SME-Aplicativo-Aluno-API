@@ -32,19 +32,32 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
             if (notificacao == null)
                 throw new NegocioException("Não foi possivel localizar a notificação.");
             if (notificacao.TipoComunicado == TipoComunicado.ALUNO)
+
             {
 
+                var alunoEol = new Dominio.Entidades.Aluno();
+                foreach (var lista in listaEscolas)
+                {
+                    foreach (var aluno in lista.Alunos)
+                    {
+                        if (aluno.CodigoEol == usuarioMensagem.CodigoAlunoEol)
+                        {
+                            alunoEol = aluno;
+                            break;
+                        }
+
+                    }
+                }
                 var usuarioNotificacao = new UsuarioNotificacao();
 
                 usuarioNotificacao.UsuarioCpf = cpfUsuario;
                 usuarioNotificacao.NotificacaoId = usuarioMensagem.NotificacaoId;
-                if (notificacao.CodigoDre != null && !string.IsNullOrEmpty(notificacao.CodigoDre))
-                    usuarioNotificacao.DreCodigoEol = long.Parse(notificacao.CodigoDre);
-                usuarioNotificacao.UeCodigoEol = notificacao.CodigoUe;
+                usuarioNotificacao.DreCodigoEol = long.Parse(alunoEol.CodigoDre);
+                usuarioNotificacao.UeCodigoEol = alunoEol.CodigoEscola;
                 usuarioNotificacao.CodigoEolAluno = usuarioMensagem.CodigoAlunoEol;
                 usuarioNotificacao.UsuarioId = usuarioMensagem.UsuarioId;
                 usuarioNotificacao.MensagemVisualizada = usuarioMensagem.MensagemVisualizada;
-              
+
 
                 await IncluiConfirmacaoDeLeitura(mediator, usuarioNotificacao);
             }
