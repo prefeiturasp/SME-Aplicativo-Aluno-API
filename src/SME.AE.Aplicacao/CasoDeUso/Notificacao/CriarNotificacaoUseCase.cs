@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao
 
         public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
-           var retorno =  await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+            var retorno = await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
             notificacao.InserirCategoria();
             await EnviarNotificacaoImediataAsync(notificacao);
             return mapper.Map<NotificacaoSgpDto>(notificacao);
@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao
                     var data = new Dictionary<String, String>();
                     data = dicionarioNotificacao;
                     topico = "Grupo-" + grupo.ToString();
-                    
+
 
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
 
@@ -89,8 +89,8 @@ namespace SME.AE.Aplicacao
             else if (notificacao.TipoComunicado == TipoComunicado.UE)
             {
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
-                topico = "DRE-" + notificacao.CodigoUe;
-                data.Add("CodigoDre", "DRE-" + topico);
+                topico = "UE-" + notificacao.CodigoUe;
+                data.Add("CodigoUe", "UE-" + topico);
 
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
             }
@@ -111,8 +111,8 @@ namespace SME.AE.Aplicacao
                 foreach (var turma in notificacao.Turmas)
                 {
                     var data = new Dictionary<String, String>(dicionarioNotificacao);
-                    topico = "UE-" + notificacao.CodigoUe;
-                    data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
+                    topico = "TUR-" + turma;
+                    data.Add("CodigoTurma", "TUR-" + turma);
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
                 }
             }
