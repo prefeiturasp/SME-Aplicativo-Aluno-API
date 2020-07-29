@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao
                     var data = new Dictionary<String, String>();
                     data = dicionarioNotificacao;
                     topico = "Grupo-" + grupo.ToString();
-                    data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
+                    
 
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
 
