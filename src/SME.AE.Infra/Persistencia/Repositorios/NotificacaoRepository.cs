@@ -22,8 +22,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             IEnumerable<NotificacaoPorUsuario> list = null;
 
             var query = NotificacaoConsultas.ObterPorUsuarioLogado
-                    + "WHERE UNL.usuario_cpf = @cpf" +
-                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
+                    //"WHERE UNL.usuario_cpf = @cpf" +
+                  +   " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual) ";
 
           
