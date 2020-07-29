@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao
 
             if (dataEnvio > agora)
                 return;
-
+            notificacao.InserirCategoria();
             List<int> grupos = notificacao.Grupo.Split(',').Select(i => Int32.Parse(i)).ToList();//
             string topico = string.Empty;
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
