@@ -34,23 +34,24 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
             if (notificacao.TipoComunicado == TipoComunicado.ALUNO)
             {
 
-                var usuarioNotificacao = new UsuarioNotificacao
-                {
-                    UsuarioCpf = cpfUsuario,
-                    NotificacaoId = usuarioMensagem.NotificacaoId,
-                    DreCodigoEol = long.Parse(notificacao.CodigoDre),
-                    UeCodigoEol = notificacao.CodigoUe,
-                    CodigoEolAluno = usuarioMensagem.CodigoAlunoEol,
-                    UsuarioId = usuarioMensagem.UsuarioId,
-                    MensagemVisualizada = usuarioMensagem.MensagemVisualizada,
-                };
+                var usuarioNotificacao = new UsuarioNotificacao();
+
+                usuarioNotificacao.UsuarioCpf = cpfUsuario;
+                usuarioNotificacao.NotificacaoId = usuarioMensagem.NotificacaoId;
+                if (notificacao.CodigoDre != null && !string.IsNullOrEmpty(notificacao.CodigoDre))
+                    usuarioNotificacao.DreCodigoEol = long.Parse(notificacao.CodigoDre);
+                usuarioNotificacao.UeCodigoEol = notificacao.CodigoUe;
+                usuarioNotificacao.CodigoEolAluno = usuarioMensagem.CodigoAlunoEol;
+                usuarioNotificacao.UsuarioId = usuarioMensagem.UsuarioId;
+                usuarioNotificacao.MensagemVisualizada = usuarioMensagem.MensagemVisualizada;
+              
 
                 await IncluiConfirmacaoDeLeitura(mediator, usuarioNotificacao);
             }
 
             else
             {
-                foreach (var lista in listaEscolas.Where(c => notificacao.Grupos.Any(n => n.Codigo == c.CodigoGrupo)))
+                foreach (var lista in listaEscolas)
                 {
                     foreach (var aluno in lista.Alunos)
                     {
