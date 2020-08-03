@@ -31,7 +31,7 @@ pipeline {
             }
          steps {
              sh 'echo Analise SonarQube API'
-             sh 'dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno" /d:sonar.host.url="http://automation.educacao.intranet:9000" /d:sonar.login="82daa76df5080b75b89b6e1db6cbdde71794405f"'
+             sh 'dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno" /d:sonar.host.url="http://sonar.sme.prefeitura.sp.gov.br/" /d:sonar.login="82daa76df5080b75b89b6e1db6cbdde71794405f"'
              sh 'dotnet build'
              sh 'dotnet-sonarscanner end /d:sonar.login="82daa76df5080b75b89b6e1db6cbdde71794405f"'
            
