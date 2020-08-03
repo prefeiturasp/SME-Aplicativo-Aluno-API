@@ -11,14 +11,17 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         public Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf);
 
         public Task<Notificacao> ObterPorId(long id);
-        
-        public Task<Notificacao> Criar(Notificacao notificacao);
-        
+
+        public Task Criar(Notificacao notificacao);
+
         public Task<Notificacao> Atualizar(Notificacao notificacao);
-        
+
         public Task<bool> Remover(Notificacao notificacao);
 
-        public Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos,string nomeGrupos);
+        public Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos, string nomeGrupos);
         public Task<IEnumerable<string>> ObterResponsaveisPorGrupo(string where);
+
+        public Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno);
+        public Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma);
     }
 }

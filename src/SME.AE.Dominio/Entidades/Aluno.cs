@@ -17,6 +17,7 @@ namespace SME.AE.Dominio.Entidades
         public string DescricaoTipoEscola { get; set; }
         public string CodigoDre { get; set; }
         public string SiglaDre { get; set; }
+        public int CodigoTurma { get; set; }
         public string Turma { get; set; }
         public string SituacaoMatricula { get; set; }
         public DateTime DataNascimento { get; set; }
