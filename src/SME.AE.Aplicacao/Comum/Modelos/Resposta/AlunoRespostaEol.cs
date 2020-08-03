@@ -16,9 +16,11 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string CodigoEscola { get; set; }
         public string CodigoDre { get; set; }
         public string Escola { get; set; }
+        public TipoResponsavelEnum TipoResponsavel { get; set; }
         public int CodigoTipoEscola { get; set; }
         public string DescricaoTipoEscola { get; set; }
         public string SiglaDre { get; set; }
+        public int CodigoTurma { get; set; }
         public string Turma { get; set; }
         public string SituacaoMatricula { get; set; }
         public DateTime DataNascimento { get; set; }

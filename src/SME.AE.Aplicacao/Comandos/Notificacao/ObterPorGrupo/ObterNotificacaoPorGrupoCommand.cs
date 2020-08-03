@@ -37,6 +37,8 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
             (ObterNotificacaoPorGrupoCommand request, CancellationToken cancellationToken)
         {
             var grupos = await _grupoComunicadoRepository.ObterTodos();
+
+
             var grupo = await _repository.ObterPorGrupoUsuario(request.Grupo, request.Cpf);
             return grupo.Select(x => new NotificacaoResposta
             {
@@ -50,7 +52,10 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
                 Mensagem = x.Mensagem,
                 Titulo = x.Titulo,
                 MensagemVisualizada =  x.MensagemVisualizada,
-                Grupos = SelecionarGrupos(x.Grupo, grupos)
+              //  Grupos = SelecionarGrupos(x.Grupo, grupos),
+                TipoComunicado = x.TipoComunicado,
+                CategoriaNotificacao = x.CategoriaNotificacao
+                
             });
         }
 

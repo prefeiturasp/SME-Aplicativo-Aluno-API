@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Dominio.Entidades;
+using System;
+using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
 {
@@ -16,80 +15,40 @@ namespace SME.AE.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]
-        public async Task<ObjectResult> Criar([FromBody] SME.AE.Dominio.Entidades.Notificacao notificacao)
+        public async Task<ObjectResult> Criar([FromBody] NotificacaoSgpDto notificacao,[FromServices] ICriarNotificacaoUseCase criarNotificacaoUseCase)
         {
-            try
-            {
-                return Ok(await CriarNotificacaoUseCase.Executar(Mediator, notificacao));
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await criarNotificacaoUseCase.Executar(notificacao));
         }
         
         [HttpPut("{id}")]
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
-        public async Task<ObjectResult> Atualizar([FromBody] SME.AE.Dominio.Entidades.Notificacao notificacao)
+        //[ChaveIntegracaoFiltro]
+        public async Task<ObjectResult> Atualizar([FromBody] NotificacaoSgpDto notificacao, [FromServices] IAtualizarNotificacaoUseCase atualizarNotificacaoUseCase)
         {
-            try
-            {
-                return Ok(await AtualizarNotificacaoUseCase.Executar(Mediator, notificacao));
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await atualizarNotificacaoUseCase.Executar(notificacao));
         }
         
         [HttpDelete]
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
-        public async Task<ActionResult> Remover([FromBody] long[] ids)
+        public async Task<ActionResult> Remover([FromBody] long[] ids,[FromServices] IRemoverNotificacaoEmLoteUseCase removerNotificacaoEmLoteUseCase)
         {
-            try
-            {
-                return Ok(await RemoverNotificacaoEmLoteUseCase.Executar(Mediator, ids));
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await removerNotificacaoEmLoteUseCase.Executar(ids));
         }
 
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
         [HttpDelete("{id}")]
-        public async Task<ActionResult> RemoverPorID([FromBody] int id)
+        public async Task<ActionResult> RemoverPorID([FromBody] int id, [FromServices] IRemoveNotificacaoPorIdUseCase removeNotificacaoPorIdUseCase)
         {
-            try
-            {
-                return Ok(await RemoveNotificacaoPorIdUseCase.Executar(Mediator, id));
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await removeNotificacaoPorIdUseCase.Executar(id));
         }
         
         [HttpGet]
         [Authorize]
-        public async Task<ObjectResult> ObterDoUsuarioLogado()
+        public async Task<ObjectResult> ObterDoUsuarioLogado([FromServices]IObterNotificacaoDoUsuarioLogadoUseCase obterDoUsuarioLogadoUseCase)
         {
-            try
-            {
-                return Ok(await ObterDoUsuarioLogadoUseCase.Executar(Mediator, User.Identity.Name));
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await obterDoUsuarioLogadoUseCase.Executar(User.Identity.Name));
         }
     }
 }

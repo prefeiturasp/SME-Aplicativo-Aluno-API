@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
-using Dapper.Contrib.Extensions;
+﻿using Dapper;
+using Dommel;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
@@ -13,6 +7,11 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
@@ -21,30 +20,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf)
         {
             IEnumerable<NotificacaoPorUsuario> list = null;
-            
-            try
-            {
+
+            var query = NotificacaoConsultas.ObterPorUsuarioLogado
+                    //"WHERE UNL.usuario_cpf = @cpf" +
+                  +   " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
+                    " AND (DATE(DataEnvio) <= @dataAtual) ";
+
+          
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 var dataAtual = DateTime.Now.Date;
                 list = await conn.QueryAsync<NotificacaoPorUsuario>(
-                    NotificacaoConsultas.ObterPorUsuarioLogado
-                    + "WHERE string_to_array(Grupo,',') && string_to_array(@Grupo,',')" +
-                    " AND (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
-                    " AND (DATE(DataEnvio) <= @dataAtual) ",  new
+                    query, new
                     {
                         grupo,
                         cpf,
                         dataAtual
                     });
                 conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return list;
-            }
-
             return list;
         }
 
@@ -123,29 +116,38 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return null;
         }
 
-        public async Task<Notificacao> Criar(Notificacao notificacao)
+        public async Task Criar(Notificacao notificacao)
         {
-            try
-            {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    notificacao.CriadoEm = DateTime.Now;
-                    await conn.ExecuteAsync(
-                        @"INSERT INTO notificacao(id, mensagem, titulo, grupo, dataEnvio, dataExpiracao, criadoEm, criadoPor, alteradoEm, alteradoPor) 
-                            VALUES(@Id, @Mensagem, @Titulo, @Grupo, @DataEnvio, @DataExpiracao, @CriadoEm, @CriadoPor, @AlteradoEm,  @AlteradoPor)",
-                        notificacao);
-                    conn.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
-            }
-
-            return notificacao;
+          
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                notificacao.InserirAuditoria();
+                notificacao.InserirCategoria();
+                 await conn.InsertAsync(notificacao);
+                conn.Close();
         }
+
+
+        public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
+        {
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                notificacaoAluno.InserirAuditoria();
+                await conn.InsertAsync(notificacaoAluno);
+                conn.Close();
+        }
+
+        public async Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma)
+        {
+             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+             conn.Open();
+             notificacaoTurma.InserirAuditoria();
+             await conn.InsertAsync(notificacaoTurma);
+             conn.Close();
+        }
+
+
+
 
         public async Task<Notificacao> Atualizar(Notificacao notificacao)
         {
