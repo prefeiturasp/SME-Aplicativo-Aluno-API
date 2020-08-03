@@ -21,7 +21,6 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
         public DadosAlunoCommand(string cpf)
         {
             Cpf = cpf;
-
         }
 
         public string Cpf { get; set; }
