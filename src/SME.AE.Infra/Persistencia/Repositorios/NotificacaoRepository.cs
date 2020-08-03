@@ -150,7 +150,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 var consulta = MontarQueryListagemCompleta();
 
-                var retorno = await conexao.QueryAsync<NotificacaoResposta>(MontarQueryListagemCompleta(), new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId });
+                var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId });
 
                 conexao.Close();
 
