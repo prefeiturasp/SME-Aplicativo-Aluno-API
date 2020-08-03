@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
@@ -19,18 +17,29 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             using var conexao = new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
             conexao.Open();
             var resultado = await conexao.QueryAsync<GrupoComunicado>(
-                 GrupoComunicadoConsulta.Select + 
+                 GrupoComunicadoConsulta.Select +
                  @"WHERE id in(" + ids + ")");
             conexao.Close();
             return resultado;
         }
-        
+
         public async Task<IEnumerable<GrupoComunicado>> ObterTodos()
         {
-            using var conexao = new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
-            conexao.Open();
-            var resultado = await conexao.QueryAsync<GrupoComunicado>(GrupoComunicadoConsulta.Select);
-            conexao.Close();
+            IEnumerable<GrupoComunicado> resultado = null;
+            using (var conexao = new NpgsqlConnection(ConnectionStrings.ConexaoSgp))
+            {
+                try
+                {
+
+                    conexao.Open();
+                    resultado = await conexao.QueryAsync<GrupoComunicado>(GrupoComunicadoConsulta.Select);
+                    conexao.Close();
+                }
+                catch (Exception ex)
+                {
+                    conexao.Close();
+                }
+            }
             return resultado;
         }
     }

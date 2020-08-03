@@ -7,5 +7,8 @@
         public string Cpf { get; set; }
         public string Email { get; set; }
         public string Token { get; set; }
+        public bool PrimeiroAcesso { get; internal set; }
+        public bool InformarCelularEmail { get; set; }
+        public object Celular { get; internal set; }
     }
 }
