@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SME.AE.Dominio.Entidades;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,13 +8,11 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 {
     public class UsuarioNotificacaoCommand : IRequest<bool>
     {
-        public UsuarioNotificacaoCommand(long idMensagem, long idUsuario)
+        public UsuarioNotificacaoCommand(UsuarioNotificacao usuarioNotificacao)
         {
-            IdMensagem = idMensagem;
-            IdUsuario = idUsuario;
+            UsuarioNotificacao = usuarioNotificacao;
         }
-        private long IdMensagem { get; set; }
-        private long IdUsuario { get; set; }
+        private UsuarioNotificacao UsuarioNotificacao { get; set; }
 
         public class UsuarioMensagemCommandHandler : IRequestHandler<UsuarioNotificacaoCommand, bool>
         {
@@ -31,19 +27,21 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
 
             public async Task<bool> Handle(UsuarioNotificacaoCommand request, CancellationToken cancellationToken)
             {
+                var usuarioNotificacaoRequest = request.UsuarioNotificacao;
 
-                try
-                {
-                    var mensagem = await _repository.Selecionar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    if (mensagem == null)
-                        return await _repository.Criar(new Dominio.Entidades.UsuarioNotificacao { UsuarioId = request.IdUsuario, NotificacaoId = request.IdMensagem });
-                    //retorna false 
-                    return !await _repository.RemoverPorId(mensagem.Id);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
+                var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(usuarioNotificacaoRequest.NotificacaoId,
+                                                                                             usuarioNotificacaoRequest.UsuarioCpf,
+                                                                                             usuarioNotificacaoRequest.DreCodigoEol,
+                                                                                             usuarioNotificacaoRequest.UeCodigoEol);
+
+                if (usuarioNotificacao == null)
+                    return await _repository.Criar(request.UsuarioNotificacao);
+
+                usuarioNotificacao.MensagemVisualizada = request.UsuarioNotificacao.MensagemVisualizada;
+
+                usuarioNotificacao.AtualizarAuditoria();
+
+                return await _repository.Atualizar(usuarioNotificacao);
             }
         }
     }

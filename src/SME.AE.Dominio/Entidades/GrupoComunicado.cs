@@ -2,19 +2,14 @@
 
 namespace SME.AE.Dominio.Entidades
 {
-    public class GrupoComunicado
+    public class GrupoComunicado : EntidadeBase
     {
-        public long Id { get; set; }
-        public String Nome { get; set; }
-        public String TipoEscolaId { get; set; }
-        public String TipoCicloId { get; set; }
-        public String EtapaEnsinoId { get; set; }
-        public DateTime CriadoEm { get; set; }
-        public String CriadoPor { get; set; }
-        public DateTime AlteradoEm { get; set; }
-        public String AlteradoPor { get; set; }
-        public String CriadoRf { get; set; }
-        public String AlteradoRf { get; set; }
+        public string Nome { get; set; }
+        public string TipoEscolaId { get; set; }
+        public string TipoCicloId { get; set; }
+        public string EtapaEnsinoId { get; set; }
         public bool Excluido { get; set; }
+        public string CriadoRf { get; set; }
+        public string? AlteradoRf { get; set; }
     }
 }

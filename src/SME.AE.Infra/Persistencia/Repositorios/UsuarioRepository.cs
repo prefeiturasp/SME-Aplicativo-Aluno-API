@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Dommel;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
@@ -13,8 +15,13 @@ using SME.AE.Infra.Persistencia.Consultas;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class UsuarioRepository : IUsuarioRepository
+    public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
+        public UsuarioRepository() : base(ConnectionStrings.Conexao)
+        {
+
+        }
+
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
             Usuario usuario;
@@ -39,6 +46,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return usuario;
 
         }
+
         public async Task<IEnumerable<string>> ObterTodos()
         {
             try
@@ -56,81 +64,99 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
         }
+        
+
         public async Task Criar(Usuario usuario)
         {
-            try
-            {
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                await conn.ExecuteAsync(
-                    @"INSERT INTO usuario( cpf, nome, email, ultimoLogin, criadoEm, excluido) 
-                            VALUES(@Cpf, @Nome, @Email, @UltimoLogin,@UltimoLogin, @Excluido)",
-                  usuario);
+                usuario.InserirAuditoria();
+                await conn.InsertAsync(usuario);
                 conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
-            }
-
         }
+
+
 
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
-            try
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataHoraAtual = DateTime.Now;
+            await conn.ExecuteAsync(
+                "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
+            conn.Close();
+        }
+
+        public async Task AltualizarUltimoAcessoPrimeiroUsuario(Usuario usuario)
+        {
+            var sql = @"UPDATE usuario
+                SET ultimologin=@ultimologin, excluido=@Excluido, primeiroacesso=@PrimeiroAcesso, 
+                alteradoem=@AlteradoEm, alteradopor=@AlteradoPor
+                where id=@Id;";
+
+            using(var conexao = InstanciarConexao())
             {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                var dataHoraAtual = DateTime.Now;
-                await conn.ExecuteAsync(
-                    "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
+                await conexao.ExecuteAsync(sql, usuario);
             }
         }
 
+        public async Task AtualizarEmailTelefone(long id, string email, string celular)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine(@"UPDATE usuario SET alteradopor='Sistema', alteradoem=@alteradoem");
+            
+            if (!string.IsNullOrWhiteSpace(email))
+                builder.AppendLine(",email=@email");
+
+            if (!string.IsNullOrWhiteSpace(celular))
+                builder.AppendLine(",celular=@celular");
+
+            builder.AppendLine("where id = @id;");
+
+            using (var conexao = InstanciarConexao())
+            {
+                await conexao.ExecuteAsync(builder.ToString(), new { id, email, celular, alteradoem = DateTime.Now });
+
+                conexao.Close();
+            }
+        }
+
+        public async Task AtualizarPrimeiroAcesso(long id, bool primeiroAcesso)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                await conexao.ExecuteAsync(@"UPDATE usuario
+                            SET primeiroacesso=@primeiroAcesso,alteradopor='Sistema', alteradoem=@alteradoem
+                            where id = @id;", new { id, primeiroAcesso, alteradoem = DateTime.Now });
+
+                conexao.Close();
+            }
+        }
+
+
         public async Task ExcluirUsuario(string cpf)
         {
-            try
-            {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                var dataHoraAtual = DateTime.Now;
-                await conn.ExecuteAsync(
-                    "update usuario set excluido = true , ultimoLogin = @dataHoraAtual  where cpf = @cpf", new { cpf, dataHoraAtual });
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
-            }
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataHoraAtual = DateTime.Now;
+            await conn.ExecuteAsync(
+                "update usuario set excluido = true , ultimoLogin = @dataHoraAtual  where cpf = @cpf", new { cpf, dataHoraAtual });
+            conn.Close();
         }
 
 
         public async Task CriaUsuarioDispositivo(long usuarioId, string dispositivoId)
         {
-            try
+            await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    var dataHoraAtual = DateTime.Now;
-                    await conn.ExecuteAsync(
-                        @"INSERT INTO public.usuario_dispositivo
+                conn.Open();
+                var dataHoraAtual = DateTime.Now;
+                await conn.ExecuteAsync(
+                    @"INSERT INTO public.usuario_dispositivo
                           (usuario_id, codigo_dispositivo, criadoem)
                            VALUES(@usuarioId, @dispositivoId , @dataHoraAtual ); ", new { usuarioId, dispositivoId, dataHoraAtual });
-                    conn.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
+                conn.Close();
             }
         }
 

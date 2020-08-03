@@ -4,23 +4,29 @@
     {
         public static string Select = @"
             SELECT Id, Mensagem, Titulo, Grupo, DataEnvio, DataExpiracao,
-                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor
+                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor, Dre_CodigoEol, Ue_CodigoEol, TipoComunicado, CategoriaNotificacao
             FROM Notificacao 
         ";
 
-        public static string ObterPorUsuarioLogado = @"
-            SELECT Id, Mensagem, Titulo, Grupo, DataEnvio, DataExpiracao,
-                   CriadoEm, CriadoPor, AlteradoEm, AlteradoPor,
-                   case when exists (
-                            select unl.id 
-                            from usuario_notificacao_leitura unl 
-                                inner join usuario u on unl.usuario_id = u.id 
-                            where notificacao_id = notificacao.id and u.cpf = @cpf)
-                        then 'true'
-                        else 'false'
-                    end as MensagemVisualizada
-            FROM Notificacao 
-        ";
+        public static string ObterPorUsuarioLogado = @"select 
+                                                            distinct 
+                                                            N.Id,
+	                                                        N.Mensagem,
+	                                                        N.Titulo,
+	                                                        N.Grupo,
+	                                                        N.DataEnvio,
+	                                                        N.DataExpiracao,
+	                                                        N.CriadoEm,
+	                                                        N.CriadoPor,
+	                                                        N.AlteradoEm,
+	                                                        N.AlteradoPor,
+                                                            N.TipoComunicado,
+                                                            N.CategoriaNotificacao,
+	                                                        UNL.mensagemvisualizada
+                                                        from
+	                                                        Notificacao N
+                                                        left join usuario_notificacao_leitura UNL on
+	                                                        UNL.notificacao_id = N.id ";
 
         public static string GruposDoResponsavel = @"
             from dbo.responsavel_aluno ra

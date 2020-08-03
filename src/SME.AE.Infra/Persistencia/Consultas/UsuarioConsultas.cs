@@ -3,7 +3,8 @@
     public static class UsuarioConsultas
     {
         internal static string ObterPorCpf = @"
-            SELECT Id, Cpf, Nome, UltimoLogin
+            SELECT Cpf,Celular,Nome,Email,UltimoLogin,PrimeiroAcesso,
+                Excluido,Id,CriadoEm,CriadoPor,AlteradoEm,AlteradoPor
             FROM Usuario
             WHERE Usuario.Cpf = @Cpf";
 
