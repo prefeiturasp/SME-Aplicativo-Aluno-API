@@ -70,7 +70,9 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
                     ids += $"{id},";
                 }
             }
-            ids = ids.Substring(0, ids.Count() - 1);
+            if (ids.Length > 0) 
+                ids = ids.Substring(0, ids.Count() - 1);
+
             return ids.Split(",").ToList();
         }
     }

@@ -30,10 +30,13 @@ namespace SME.AE.Aplicacao
 
         public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
-            var retorno = await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+            await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+
             notificacao.InserirCategoria();
+
             await EnviarNotificacaoImediataAsync(notificacao);
-            return mapper.Map<NotificacaoSgpDto>(notificacao);
+
+            return notificacao;
         }
 
         private async Task EnviarNotificacaoImediataAsync(NotificacaoSgpDto notificacao)
@@ -43,9 +46,11 @@ namespace SME.AE.Aplicacao
 
             if (dataEnvio > agora)
                 return;
+
             notificacao.InserirCategoria();
-            List<int> grupos = notificacao.Grupo.Split(',').Select(i => Int32.Parse(i)).ToList();//
-            string topico = string.Empty;
+
+            List<int> grupos = notificacao.ObterGrupoLista();//
+
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
             {
                 ["Titulo"] = notificacao.Titulo,
@@ -63,70 +68,102 @@ namespace SME.AE.Aplicacao
                 Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
             };
 
-            if (notificacao.TipoComunicado == TipoComunicado.SME)
+            await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, Notificacao);
+        }
+
+        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            switch (notificacao.TipoComunicado)
             {
-                foreach (var grupo in grupos)
-                {
-                    var data = new Dictionary<String, String>();
-                    data = dicionarioNotificacao;
-                    topico = "Grupo-" + grupo.ToString();
-
-
-                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
-
-                }
+                case TipoComunicado.SME:
+                    await EnviarNotificacaoSME(grupos, dicionarioNotificacao, Notificacao);
+                    break;
+                case TipoComunicado.DRE:
+                    await EnviarComunicadoDRE(notificacao, dicionarioNotificacao, Notificacao);
+                    break;
+                case TipoComunicado.UE:
+                    await EnviarComunicadoUE(notificacao, dicionarioNotificacao, Notificacao);
+                    break;
+                case TipoComunicado.UEMOD:
+                    await EnviarComunicadoUEModalidade(notificacao, grupos, dicionarioNotificacao, Notificacao);
+                    break;
+                case TipoComunicado.TURMA:
+                    await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, Notificacao);
+                    break;
+                case TipoComunicado.ALUNO:
+                    await EnviarComunicadoAlunos(notificacao, dicionarioNotificacao, Notificacao);
+                    break;
+                default:
+                    break;
             }
+        }
 
-            else if (notificacao.TipoComunicado == TipoComunicado.DRE)
+        private async Task EnviarComunicadoAlunos(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            foreach (var aluno in notificacao.Alunos)
             {
+
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
-                topico = "DRE-" + notificacao.CodigoDre;
-                data.Add("CodigoDre", "DRE-" + topico);
+
+                var topico = "ALU-" + aluno;
+
+                data.Add("CodigoAluno", topico);
+                data.Add("CodigoEOL", aluno);
 
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
             }
+        }
 
-            else if (notificacao.TipoComunicado == TipoComunicado.UE)
+        private async Task EnviarComunicadoTurmas(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            foreach (var turma in notificacao.Turmas)
             {
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
-                topico = "UE-" + notificacao.CodigoUe;
-                data.Add("CodigoUe", "UE-" + topico);
-
+                var topico = "TUR-" + turma;
+                data.Add("CodigoTurma", "TUR-" + turma);
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
             }
+        }
 
-            else if (notificacao.TipoComunicado == TipoComunicado.UEMOD)
+        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            foreach (var grupo in grupos)
             {
-                foreach (var grupo in grupos)
-                {
-                    var data = new Dictionary<String, String>(dicionarioNotificacao);
-                    topico = "UE-" + notificacao.CodigoUe + "-MOD-" + grupo;
-                    data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
-                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
-                }
+                var data = new Dictionary<String, String>(dicionarioNotificacao);
+                var topico = "UE-" + notificacao.CodigoUe + "-MOD-" + grupo;
+                data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
             }
+        }
 
-            else if (notificacao.TipoComunicado == TipoComunicado.TURMA)
+        private async Task EnviarComunicadoUE(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+            var topico = "UE-" + notificacao.CodigoUe;
+            data.Add("CodigoUe", "UE-" + topico);
+
+            await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+        }
+
+        private async Task EnviarComunicadoDRE(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+            var topico = "DRE-" + notificacao.CodigoDre;
+            data.Add("CodigoDre", "DRE-" + topico);
+
+            await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+        }
+
+        private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        {
+            foreach (var grupo in grupos)
             {
-                foreach (var turma in notificacao.Turmas)
-                {
-                    var data = new Dictionary<String, String>(dicionarioNotificacao);
-                    topico = "TUR-" + turma;
-                    data.Add("CodigoTurma", "TUR-" + turma);
-                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
-                }
-            }
+                var data = dicionarioNotificacao;
 
-            else if (notificacao.TipoComunicado == TipoComunicado.ALUNO)
-            {
-                foreach (var aluno in notificacao.Alunos)
-                {
+                var topico = "Grupo-" + grupo.ToString();
 
-                    var data = new Dictionary<String, String>(dicionarioNotificacao);
-                    topico = "ALU-" + aluno;
-                    data.Add("CodigoAluno", topico);
-                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
-                }
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+
             }
         }
 

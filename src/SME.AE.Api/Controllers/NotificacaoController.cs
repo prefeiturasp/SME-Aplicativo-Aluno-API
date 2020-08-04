@@ -15,11 +15,11 @@ namespace SME.AE.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]
-        public async Task<ObjectResult> Criar([FromBody] NotificacaoSgpDto notificacao,[FromServices] ICriarNotificacaoUseCase criarNotificacaoUseCase)
+        public async Task<ObjectResult> Criar([FromBody] NotificacaoSgpDto notificacao, [FromServices] ICriarNotificacaoUseCase criarNotificacaoUseCase)
         {
             return Ok(await criarNotificacaoUseCase.Executar(notificacao));
         }
-        
+
         [HttpPut("{id}")]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]
@@ -27,11 +27,11 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await atualizarNotificacaoUseCase.Executar(notificacao));
         }
-        
+
         [HttpDelete]
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
-        public async Task<ActionResult> Remover([FromBody] long[] ids,[FromServices] IRemoverNotificacaoEmLoteUseCase removerNotificacaoEmLoteUseCase)
+        public async Task<ActionResult> Remover([FromBody] long[] ids, [FromServices] IRemoverNotificacaoEmLoteUseCase removerNotificacaoEmLoteUseCase)
         {
             return Ok(await removerNotificacaoEmLoteUseCase.Executar(ids));
         }
@@ -39,16 +39,16 @@ namespace SME.AE.Api.Controllers
         [AllowAnonymous]
         [ChaveIntegracaoFiltro]
         [HttpDelete("{id}")]
-        public async Task<ActionResult> RemoverPorID([FromBody] int id, [FromServices] IRemoveNotificacaoPorIdUseCase removeNotificacaoPorIdUseCase)
+        public async Task<ActionResult> RemoverPorID(int id, [FromServices] IRemoveNotificacaoPorIdUseCase removeNotificacaoPorIdUseCase)
         {
             return Ok(await removeNotificacaoPorIdUseCase.Executar(id));
         }
-        
-        [HttpGet]
+
+        [HttpGet("{codigoAluno}")]
         [Authorize]
-        public async Task<ObjectResult> ObterDoUsuarioLogado([FromServices]IObterNotificacaoDoUsuarioLogadoUseCase obterDoUsuarioLogadoUseCase)
+        public async Task<ObjectResult> ObterDoUsuarioLogado(long codigoAluno, [FromServices]IObterNotificacaoDoUsuarioLogadoUseCase obterDoUsuarioLogadoUseCase)
         {
-            return Ok(await obterDoUsuarioLogadoUseCase.Executar(User.Identity.Name));
+            return Ok(await obterDoUsuarioLogadoUseCase.Executar(User.Identity.Name, codigoAluno));
         }
     }
 }

@@ -22,29 +22,23 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
     public class CriarNotificacaoCommandHandler : IRequestHandler<CriarNotificacaoCommand, Unit>
     {
         private readonly INotificacaoRepository _repository;
-        
+
         public CriarNotificacaoCommandHandler(INotificacaoRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<Unit> Handle
-            (CriarNotificacaoCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CriarNotificacaoCommand request, CancellationToken cancellationToken)
         {
             try
             {
-              await _repository.Criar(request.Notificacao);
+                await _repository.Criar(request.Notificacao);
 
                 if (request.Notificacao.TipoComunicado == TipoComunicado.ALUNO)
-                {
                     await IncluirNotificacaoAlunos(request);
-                }
 
                 else if (request.Notificacao.TipoComunicado == TipoComunicado.TURMA)
-                {
                     await IncluirNotificacaoTurma(request);
-                }
-                
 
                 return Unit.Value;
 
@@ -61,7 +55,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
             foreach (var codigoTurma in request.Notificacao.Turmas)
             {
                 var notificacaoTurma = new NotificacaoTurma();
-                notificacaoTurma.CodigoTurma =  Convert.ToInt64(codigoTurma);
+                notificacaoTurma.CodigoTurma = Convert.ToInt64(codigoTurma);
                 notificacaoTurma.NotificacaoId = request.Notificacao.Id;
                 notificacaoTurma.InserirAuditoria();
                 await _repository.InserirNotificacaoTurma(notificacaoTurma);
