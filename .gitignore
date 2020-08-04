@@ -268,3 +268,4 @@ firebase.json
 src/SME.SGP.WebClient/package-lock.json
 src/SME.SGP.Api/healthchecksdb
 /src/Benchmarks/SME.SGP.Benchmarks/BenchmarkDotNet.Artifacts/results
+src/SME.AE.Api/Properties/launchSettings.json

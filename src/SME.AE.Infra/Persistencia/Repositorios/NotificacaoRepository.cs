@@ -225,7 +225,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       )as notificacao
                       left join usuario_notificacao_leitura unl on 
                       unl.notificacao_id = notificacao.id 
-                      and unl.usuario_id = @usuarioId";
+                      and unl.usuario_id = @usuarioId
+                      and unl.codigo_eol_aluno = @codigoAluno";
         }
 
         private string QueryComunicadosSME()
