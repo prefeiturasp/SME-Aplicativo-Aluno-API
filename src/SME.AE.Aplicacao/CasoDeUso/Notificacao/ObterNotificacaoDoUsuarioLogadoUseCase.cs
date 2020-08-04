@@ -34,7 +34,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 throw new NegocioException($"Não encontrado usuário com o CPF {cpf}");
 
             List<string> grupos = await mediator.Send(new ObterGrupoNotificacaoPorResponsavelCommand(cpf));
-            
+
+            if (grupos == null || !grupos.Any() || grupos[0] == "")
+                throw new NegocioException("Não foi possivel obter os grupos do Aluno");
+
             RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpf));
 
             if (resposta.Data == null)
