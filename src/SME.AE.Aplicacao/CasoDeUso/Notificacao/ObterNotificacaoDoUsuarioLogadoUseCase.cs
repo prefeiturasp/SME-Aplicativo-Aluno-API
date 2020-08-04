@@ -33,11 +33,6 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
             if (usuario == null)
                 throw new NegocioException($"Não encontrado usuário com o CPF {cpf}");
 
-            List<string> grupos = await mediator.Send(new ObterGrupoNotificacaoPorResponsavelCommand(cpf));
-
-            if (grupos == null || !grupos.Any() || grupos[0] == "")
-                throw new NegocioException("Não foi possivel obter os grupos do Aluno");
-
             RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpf));
 
             if (resposta.Data == null)
@@ -46,6 +41,11 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
             var listaEscolas = (IEnumerable<ListaEscola>)resposta.Data;
 
             var aluno = listaEscolas.FirstOrDefault(x => x.Alunos.Any(z => z.CodigoEol == codigoAluno)).Alunos.FirstOrDefault(x => x.CodigoEol == codigoAluno);
+
+            if (aluno == null)
+                throw new NegocioException($"Não encontrado usuário com o codigo {codigoAluno}");
+
+            var grupos = listaEscolas.Where(x => x.Alunos.Any(z => z.CodigoEol == aluno.CodigoEol)).Select(x => x.CodigoGrupo);
 
             return await mediator.Send(new ListarNotificacaoAlunoQuery
             {
