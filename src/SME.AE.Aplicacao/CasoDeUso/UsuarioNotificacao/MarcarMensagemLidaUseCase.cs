@@ -20,7 +20,6 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
     {
         public async Task<NotificacaoResposta> Executar(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario)
         {
-
             RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpfUsuario));
 
             if (resposta.Data == null)
@@ -34,8 +33,8 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
             if (notificacao.TipoComunicado == TipoComunicado.ALUNO)
 
             {
-
                 var alunoEol = new Dominio.Entidades.Aluno();
+
                 foreach (var lista in listaEscolas)
                 {
                     foreach (var aluno in lista.Alunos)

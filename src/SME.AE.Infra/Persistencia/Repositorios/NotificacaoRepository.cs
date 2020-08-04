@@ -5,6 +5,7 @@ using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -15,29 +16,34 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class NotificacaoRepository : INotificacaoRepository
+    public class NotificacaoRepository : BaseRepositorio<Notificacao>, INotificacaoRepository
     {
+        public NotificacaoRepository() : base(ConnectionStrings.Conexao)
+        {
+
+        }
+
         public async Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf)
         {
             IEnumerable<NotificacaoPorUsuario> list = null;
 
             var query = NotificacaoConsultas.ObterPorUsuarioLogado
-                    //"WHERE UNL.usuario_cpf = @cpf" +
-                  +   " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
+                  //"WHERE UNL.usuario_cpf = @cpf" +
+                  + " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual) ";
 
-          
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                var dataAtual = DateTime.Now.Date;
-                list = await conn.QueryAsync<NotificacaoPorUsuario>(
-                    query, new
-                    {
-                        grupo,
-                        cpf,
-                        dataAtual
-                    });
-                conn.Close();
+
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            var dataAtual = DateTime.Now.Date;
+            list = await conn.QueryAsync<NotificacaoPorUsuario>(
+                query, new
+                {
+                    grupo,
+                    cpf,
+                    dataAtual
+                });
+            conn.Close();
             return list;
         }
 
@@ -96,58 +102,61 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<IEnumerable<string>> ObterResponsaveisPorGrupo(string where)
         {
+            await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
+            {
+                conn.Open();
+                var query = $"{NotificacaoConsultas.ResponsaveisPorGrupo}{where}";
+                var resultado = await conn.QueryAsync<string>(query);
+                conn.Close();
+                if (resultado.Any())
+                    return resultado;
+            }
 
-            try
-            {
-                await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
-                {
-                    conn.Open();
-                    var query = $"{NotificacaoConsultas.ResponsaveisPorGrupo}{where}";
-                    var resultado = await conn.QueryAsync<string>(query);
-                    conn.Close();
-                    if (resultado.Any())
-                        return resultado;
-                }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-            }
             return null;
         }
 
         public async Task Criar(Notificacao notificacao)
         {
-          
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                notificacao.InserirAuditoria();
-                notificacao.InserirCategoria();
-                 await conn.InsertAsync(notificacao);
-                conn.Close();
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            notificacao.InserirAuditoria();
+            notificacao.InserirCategoria();
+            await conn.InsertAsync(notificacao);
+            conn.Close();
         }
 
 
         public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
         {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                notificacaoAluno.InserirAuditoria();
-                await conn.InsertAsync(notificacaoAluno);
-                conn.Close();
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            notificacaoAluno.InserirAuditoria();
+            await conn.InsertAsync(notificacaoAluno);
+            conn.Close();
         }
 
         public async Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma)
         {
-             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-             conn.Open();
-             notificacaoTurma.InserirAuditoria();
-             await conn.InsertAsync(notificacaoTurma);
-             conn.Close();
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            conn.Open();
+            notificacaoTurma.InserirAuditoria();
+            await conn.InsertAsync(notificacaoTurma);
+            conn.Close();
         }
 
+        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                var consulta = MontarQueryListagemCompleta();
 
+                var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId });
 
+                conexao.Close();
+
+                return retorno;
+            }
+        }
 
         public async Task<Notificacao> Atualizar(Notificacao notificacao)
         {
@@ -196,6 +205,98 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
             return resultado;
+        }
+
+        private string MontarQueryListagemCompleta()
+        {
+            return $@"select {CamposConsultaNotificacao("notificacao", true)}
+                      unl.mensagemvisualizada from(
+                      {QueryComunicadosSME()}
+                      union
+                      {QueryComunicadosDRE()}
+                      union
+                      {QueryComunicadosUE()}
+                      union
+                      {QueryComunicadosUEMOD()}
+                      union
+                      {QueryComunicadosTurmas()}
+                      union
+                      {QueryComunicadosAlunos()}
+                      )as notificacao
+                      left join usuario_notificacao_leitura unl on 
+                      unl.notificacao_id = notificacao.id 
+                      and unl.usuario_id = @usuarioId";
+        }
+
+        private string QueryComunicadosSME()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                        from notificacao n 
+                        where n.tipocomunicado = 1
+                        and string_to_array(n.grupo,',') 
+                        && string_to_array(@gruposId,',')";
+        }
+
+        private string QueryComunicadosDRE()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n 
+                    where n.tipocomunicado = 2
+                    and n.dre_codigoeol = @codigoDre";
+        }
+
+        private string QueryComunicadosUE()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                      from notificacao n
+                      where n.tipocomunicado = 3
+                      and n.ue_codigoeol = @codigoUe";
+        }
+
+        private string QueryComunicadosUEMOD()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n
+                    where n.tipocomunicado = 4
+                    and n.ue_codigoeol = @codigoUe 
+                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')";
+        }
+
+        private string QueryComunicadosTurmas()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n
+                    inner join notificacao_turma nt on nt.notificacao_id = n.id
+                    where n.tipocomunicado = 5 
+                    and nt.codigo_eol_turma = @codigoTurma";
+        }
+
+        private string QueryComunicadosAlunos()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n
+                    inner join notificacao_aluno na 
+                    on na.notificacao_id = n.id
+                    where n.tipocomunicado = 6 
+                    and na.codigo_eol_aluno = @codigoAluno";
+        }
+
+        private string CamposConsultaNotificacao(string abreviacao, bool camposGeral = false)
+        {
+            return $@"{abreviacao}.Id,
+                    {abreviacao}.Mensagem,
+                    {abreviacao}.Titulo,
+                    {(camposGeral ? $"string_to_array({abreviacao}.Grupo,',') as GruposId" : $"{abreviacao}.grupo")},
+                    {abreviacao}.DataEnvio,
+                    {abreviacao}.DataExpiracao,
+                    {abreviacao}.CriadoEm,
+                    {abreviacao}.CriadoPor,
+                    {abreviacao}.AlteradoEm,
+                    {abreviacao}.AlteradoPor,
+                    {abreviacao}.TipoComunicado,
+                    {abreviacao}.CategoriaNotificacao,
+                    {abreviacao}.dre_codigoeol {(camposGeral ? "as CodigoDre" : "")},
+                    {abreviacao}.ue_codigoeol {(camposGeral ? "as CodigoUe," : "")}";
         }
     }
 }
