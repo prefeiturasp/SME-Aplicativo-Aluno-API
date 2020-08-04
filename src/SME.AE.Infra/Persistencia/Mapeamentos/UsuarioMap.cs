@@ -17,6 +17,9 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
             Map(x => x.UltimoLogin).ToColumn("ultimologin");
             Map(x => x.PrimeiroAcesso).ToColumn("primeiroacesso");
             Map(x => x.Celular).ToColumn("celular");
+            Map(x => x.Token).ToColumn("token_redefinicao");
+            Map(x => x.RedefinirSenha).ToColumn("redefinicao");
+            Map(x => x.ValidadeToken).ToColumn("validade_token");
         }
     }
 }
