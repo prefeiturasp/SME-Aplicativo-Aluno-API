@@ -45,7 +45,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("{codigoAluno}")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ObjectResult> ObterDoUsuarioLogado(long codigoAluno, [FromServices]IObterNotificacaoDoUsuarioLogadoUseCase obterDoUsuarioLogadoUseCase)
         {
             return Ok(await obterDoUsuarioLogadoUseCase.Executar(User.Identity.Name, codigoAluno));
