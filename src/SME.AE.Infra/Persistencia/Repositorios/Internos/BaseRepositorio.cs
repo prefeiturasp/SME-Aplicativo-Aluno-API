@@ -45,9 +45,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-       
-    
-
         public virtual T ObterPorId(long id)
         {
             using (var conexao = InstanciarConexao())
