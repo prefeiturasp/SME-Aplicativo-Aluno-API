@@ -47,31 +47,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return list;
         }
 
-        public async Task<Notificacao> ObterPorId(long id)
-        {
-            IEnumerable<Notificacao> list = null;
-
-            try
-            {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    list = await conn.QueryAsync<Notificacao>(NotificacaoConsultas.Select + "WHERE Id = @id", new
-                    {
-                        Id = id
-                    });
-                    conn.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return null;
-            }
-
-            return list.FirstOrDefault();
-        }
-
         // TODO Refatorar para montar a query aqui ao inves de receber por parametro
         public async Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos, string nomeGrupos)
         {
@@ -144,6 +119,25 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Close();
         }
 
+        public async Task<IEnumerable<NotificacaoTurma>> ObterTurmasPorNotificacao(long id)
+        {
+            var consulta = @"select nt.id, nt.notificacao_id, nt.codigo_eol_turma, nt.criadoem from notificacao_turma nt 
+                            where notificacao_id = @id";
+
+            IEnumerable<NotificacaoTurma> retorno = default;
+
+            using (var conexao = InstanciarConexao())
+            {
+                conexao.Open();
+
+                retorno = await conexao.QueryAsync<NotificacaoTurma>(consulta, new { id });
+
+                conexao.Close();
+            }
+
+            return retorno == null || !retorno.Any() ? default : retorno;  
+        }
+        
         public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId)
         {
             using (var conexao = InstanciarConexao())

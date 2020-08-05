@@ -14,19 +14,17 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
     public class ObterNotificacaoPorIdQueryHandler : IRequestHandler<ObterNotificacaoPorIdQuery, NotificacaoResposta>
     {
         private readonly INotificacaoRepository _repository;
-        private readonly IGrupoComunicadoRepository _grupoComunicadoRepository;
 
         public ObterNotificacaoPorIdQueryHandler(INotificacaoRepository repository, IGrupoComunicadoRepository grupoComunicadoRepository)
         {
             this._repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            this._grupoComunicadoRepository = grupoComunicadoRepository ?? throw new ArgumentNullException(nameof(grupoComunicadoRepository));
         }
 
         public async Task<NotificacaoResposta> Handle(ObterNotificacaoPorIdQuery request, CancellationToken cancellationToken)
         {
-            var Notificacao = await _repository.ObterPorId(request.Id);
-            var grupos = await _grupoComunicadoRepository.ObterTodos();
+            var Notificacao = await _repository.ObterPorIdAsync(request.Id);
 
+            var turmas = await _repository.ObterTurmasPorNotificacao(Notificacao.Id);
 
             var notificacaoResposta = new NotificacaoResposta()
             {
@@ -36,15 +34,15 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
                 CriadoPor = Notificacao.CriadoPor,
                 Id = Notificacao.Id,
                 //CodigoDre = Notificacao.CodigoDre,
-               // CodigoUe = Notificacao.CodigoUe,
-
+                // CodigoUe = Notificacao.CodigoUe,
+                Turmas = turmas == default ? default : turmas,
                 DataEnvio = Notificacao.DataEnvio,
                 DataExpiracao = Notificacao.DataExpiracao,
                 Mensagem = Notificacao.Mensagem,
-                Titulo = Notificacao.Titulo, 
+                Titulo = Notificacao.Titulo,
                 TipoComunicado = Notificacao.TipoComunicado,
                 CategoriaNotificacao = Notificacao.CategoriaNotificacao,
-              //  Grupos = SelecionarGrupos(Notificacao.Grupo, grupos)
+                GruposId = Notificacao.Grupo.Split(',')
             };
 
             return notificacaoResposta;
