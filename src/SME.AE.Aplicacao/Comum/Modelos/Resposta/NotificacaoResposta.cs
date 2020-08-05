@@ -1,5 +1,6 @@
 ﻿
 using SME.AE.Dominio.Comum.Enumeradores;
+using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 
@@ -18,6 +19,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
         public string? AlteradoPor { get; set; }
+        public IEnumerable<NotificacaoTurma> Turmas { get; set; }
         public bool MensagemVisualizada { get; internal set; }
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
