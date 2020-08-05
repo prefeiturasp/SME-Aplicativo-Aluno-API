@@ -21,9 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "poc", "poc", "{7FCC5C4B-CEB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FCMTestes", "poc\FCMTestes\FCMTestes.csproj", "{565F692F-91B2-4512-8393-5D04B85E92AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.AE.Dominio.Teste", "SME.AE.Dominio.Teste\SME.AE.Dominio.Teste.csproj", "{3666BDEA-7E5C-48B0-94F4-38383B3E3564}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.AE.Dominio.Teste", "SME.AE.Dominio.Teste\SME.AE.Dominio.Teste.csproj", "{3666BDEA-7E5C-48B0-94F4-38383B3E3564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.AE.Infra.Teste", "SME.AE.Infra.Teste\SME.AE.Infra.Teste.csproj", "{4018C164-4571-47E6-9426-B846A3113CB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.AE.Infra.Teste", "SME.AE.Infra.Teste\SME.AE.Infra.Teste.csproj", "{4018C164-4571-47E6-9426-B846A3113CB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
