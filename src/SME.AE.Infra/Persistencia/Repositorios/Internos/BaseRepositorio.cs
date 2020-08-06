@@ -113,7 +113,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public virtual object Salvar(T entidade)
+        public virtual long Salvar(T entidade)
         {
             if (entidade.Id == 0)
                 return Inserir(entidade);
@@ -121,7 +121,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return Atualizar(entidade);
         }
 
-        public virtual async Task<object> SalvarAsync(T entidade)
+        public virtual async Task<long> SalvarAsync(T entidade)
         {
             if (entidade.Id == 0)
                 return await InserirAsync(entidade);
@@ -129,31 +129,29 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return await AtualizarAsync(entidade);
         }
 
-
-
-        private object Inserir(T entidade)
+        private long Inserir(T entidade)
         {
             using (var conexao = InstanciarConexao())
             {
                 entidade.InserirAuditoria();
-                var entidadeRetorno = conexao.Insert(entidade);
+                var id = (long)conexao.Insert<T>(entidade);
 
                 conexao.Close();
 
-                return entidadeRetorno;
+                return id;
             }
         }
 
-        private async Task<object> InserirAsync(T entidade)
+        private async Task<long> InserirAsync(T entidade)
         {
             using (var conexao = InstanciarConexao())
             {
                 entidade.InserirAuditoria();
-                var retornoEntidade = await conexao.InsertAsync(entidade);
+                var id = await conexao.InsertAsync<T>(entidade);
 
                 conexao.Close();
 
-                return retornoEntidade;
+                return (long)id;
             }
         }
 
