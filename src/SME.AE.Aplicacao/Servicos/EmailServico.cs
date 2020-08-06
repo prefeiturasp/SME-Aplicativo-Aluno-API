@@ -2,12 +2,13 @@
 using MimeKit;
 using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Dominio.Entidades;
 using System.Linq;
 
 namespace SME.AE.Aplicacao.Servicos
 {
-    public class EmailServico
+    public class EmailServico : IEmailServico
     {
         private readonly ConfiguracaoEmail configuracaoEmail;
 
@@ -18,7 +19,7 @@ namespace SME.AE.Aplicacao.Servicos
 
             var configuracoes = repositorioConfiguracaoEmail.Listar();
 
-            configuracaoEmail = configuracoes?.FirstOrDefault() ?? throw new NegocioException("Não foi possível recuperar as configurações para envio de e-mail.");
+            //configuracaoEmail = configuracoes?.FirstOrDefault() ?? throw new NegocioException("Não foi possível recuperar as configurações para envio de e-mail.");
         }
 
         public void Enviar(string nomeDestinatario,string destinatario, string assunto, string mensagemHtml)

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Dapper.Dommel;
 using Dommel;
 using Npgsql;
 using Sentry;
@@ -24,27 +25,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
-            Usuario usuario;
+            using var conexao = InstanciarConexao();
 
-            try
-            {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                var resultado = await conn.QueryAsync<Usuario>(UsuarioConsultas.ObterPorCpf, new
-                {
-                    Cpf = cpf
-                });
-                usuario = resultado.FirstOrDefault();
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return null;
-            }
+            conexao.Open();
 
-            return usuario;
+            var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
 
+            conexao.Close();
+
+            return retorno;
         }
 
         public async Task<IEnumerable<string>> ObterTodos()
@@ -64,19 +53,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
 
         }
-        
-
-        public async Task Criar(Usuario usuario)
-        {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
-                conn.Open();
-                usuario.InserirAuditoria();
-                await conn.InsertAsync(usuario);
-                conn.Close();
-        }
-
-
-
+                     
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
@@ -94,7 +71,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 alteradoem=@AlteradoEm, alteradopor=@AlteradoPor
                 where id=@Id;";
 
-            using(var conexao = InstanciarConexao())
+            using (var conexao = InstanciarConexao())
             {
                 await conexao.ExecuteAsync(sql, usuario);
             }
@@ -105,7 +82,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             StringBuilder builder = new StringBuilder();
 
             builder.AppendLine(@"UPDATE usuario SET alteradopor='Sistema', alteradoem=@alteradoem");
-            
+
             if (!string.IsNullOrWhiteSpace(email))
                 builder.AppendLine(",email=@email");
 
@@ -132,6 +109,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 conexao.Close();
             }
+        }
+
+        public async Task<Usuario> ObterUsuarioPorTokenAutenticacao(string token)
+        {
+            //var sql = $@"select {UsuarioConsultas.ObterCampos} from usuario u where token_redefinicao = @token and redefinicao";
+
+            using var conexao = InstanciarConexao();
+
+            conexao.Open();
+
+            var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Token == token && x.RedefinirSenha);
+
+            conexao.Close();
+
+            return retorno;
         }
 
 

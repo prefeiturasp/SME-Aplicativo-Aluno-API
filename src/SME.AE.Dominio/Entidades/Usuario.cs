@@ -12,7 +12,7 @@ namespace SME.AE.Dominio.Entidades
         public bool PrimeiroAcesso { get; set; }
         public bool Excluido { get; set; }
         public bool RedefinirSenha { get; set; }
-        public string Token { get; internal set; }
+        public string Token { get; set; }
         public DateTime? ValidadeToken { get; set; }
 
         public void AtualizarLogin(bool primeiroAcesso = false)
@@ -25,7 +25,7 @@ namespace SME.AE.Dominio.Entidades
         public void InicarRedefinicaoSenha()
         {
             RedefinirSenha = true;
-            Token = Guid.NewGuid().ToString().Substring(0, 8);
+            Token = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
             ValidadeToken = DateTime.Now.AddHours(6);
         }
 

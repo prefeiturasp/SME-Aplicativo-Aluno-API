@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -46,22 +47,16 @@ namespace SME.AE.Api.Controllers
 
         [HttpPut("Senha/Token")]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> SolicitarRedefinicao([FromBody]GerarTokenDto redefinirSenhaDto)
+        public async Task<ActionResult<RespostaApi>> SolicitarRedefinicao([FromBody]GerarTokenDto gerarTokenDto, [FromServices]ISolicitarRedifinicaoSenhaUseCase solicitarRedifinicaoSenhaUseCase)
         {
-            return RespostaApi.Sucesso("fa373c54".ToUpper());
+            return await solicitarRedifinicaoSenhaUseCase.Executar(gerarTokenDto);
         }
 
         [HttpPut("Senha/Token/Validar")]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> ValidarToken([FromBody]ValidarTokenDto validarTokenDto)
+        public async Task<ActionResult<RespostaApi>> ValidarToken([FromBody]ValidarTokenDto validarTokenDto,[FromServices]IValidarTokenUseCase validarTokenUseCase)
         {
-            if (validarTokenDto.Token.ToUpper().Equals("fa373c54".ToUpper()))
-                return RespostaApi.Sucesso("alexsander.camargo@amcom.com.br");
-
-            if (validarTokenDto.Token.ToUpper().Equals("00000000".ToUpper()))
-                return RespostaApi.Falha("Token expirado, solicite o reenvio para o seu e-mail");
-
-            return RespostaApi.Falha("Token Invalido");
+            return await validarTokenUseCase.Executar(validarTokenDto);
         }
 
         [HttpPut("Senha/Redefinir")]
