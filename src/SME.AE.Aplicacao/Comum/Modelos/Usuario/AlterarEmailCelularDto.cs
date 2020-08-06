@@ -14,6 +14,9 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Usuario
         {
             get
             {
+                if (Celular == null)
+                    return default;
+
                 var apenasDigitos = new Regex(@"[^\d]");
                 return apenasDigitos.Replace(Celular, "");
             }
