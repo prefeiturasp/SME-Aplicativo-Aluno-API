@@ -29,7 +29,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             conexao.Open();
 
-            var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
+            var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Cpf == cpf);
 
             conexao.Close();
 
@@ -119,7 +119,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             conexao.Open();
 
-            var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Token == token && x.RedefinirSenha);
+            var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Token == token && x.RedefinirSenha);
 
             conexao.Close();
 
