@@ -68,7 +68,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var sql = @"UPDATE usuario
                 SET ultimologin=@ultimologin, excluido=@Excluido, primeiroacesso=@PrimeiroAcesso, 
-                alteradoem=@AlteradoEm, alteradopor=@AlteradoPor
+                alteradoem=@AlteradoEm, alteradopor=@AlteradoPor, token_redefinicao = '', redefinicao = false, validade_token = null
                 where id=@Id;";
 
             using (var conexao = InstanciarConexao())
