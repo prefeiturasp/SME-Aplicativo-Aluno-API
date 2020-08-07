@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao.Servicos
 
             var configuracoes = repositorioConfiguracaoEmail.Listar();
 
-            //configuracaoEmail = configuracoes?.FirstOrDefault() ?? throw new NegocioException("Não foi possível recuperar as configurações para envio de e-mail.");
+            configuracaoEmail = configuracoes?.FirstOrDefault() ?? throw new NegocioException("Não foi possível recuperar as configurações para envio de e-mail.");
         }
 
         public void Enviar(string nomeDestinatario,string destinatario, string assunto, string mensagemHtml)
