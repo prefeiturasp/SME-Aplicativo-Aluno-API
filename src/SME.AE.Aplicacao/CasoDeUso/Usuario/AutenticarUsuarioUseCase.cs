@@ -24,12 +24,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
         public async Task<RespostaApi> Executar(string cpf, string senha, string dispositivoId)
         {
             var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
+
             if (!resposta.Ok)
                 throw new NegocioException(resposta.Erros.Join());
             
             var token = await mediator.Send(new CriarTokenCommand(cpf));
+            await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
+
             var data = ((RespostaAutenticar)resposta.Data);
-            _ = mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
             data.Token = token;
             resposta.Data = data;
 

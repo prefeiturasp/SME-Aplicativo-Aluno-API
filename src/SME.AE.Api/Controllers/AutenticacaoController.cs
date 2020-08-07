@@ -61,9 +61,9 @@ namespace SME.AE.Api.Controllers
 
         [HttpPut("Senha/Redefinir")]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody]RedefinirSenhaDto redefinirSenhaDto)
+        public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody]RedefinirSenhaDto redefinirSenhaDto,[FromServices]IRedefinirSenhaUseCase redefinirSenhaUseCase)
         {
-            return RespostaApi.Sucesso("aqui vai o token de autenticacao");
+            return await redefinirSenhaUseCase.Executar(redefinirSenhaDto);
         }
     }
 }
