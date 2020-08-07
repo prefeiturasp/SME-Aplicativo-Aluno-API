@@ -4,6 +4,7 @@ using SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo;
+using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -46,6 +47,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             await AlterarSenhaUsuarioCoreSSO(usuarioCore);
 
             await IncluirSenhaHistorico(usuarioCore);
+
+            usuario.FinalizarRedefinicaoSenha();
+
+            await mediator.Send(new SalvarUsuarioCommand(usuario));
 
             return await AutenticarUsuario(dto, usuario);
         }
