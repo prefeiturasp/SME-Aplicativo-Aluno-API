@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenAutenticacao
+namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao
 {
-    public class ObterUsuarioPorTokenAutenticacaoCommand : IRequest<Usuario>
+    public class ObterUsuarioPorTokenRedefinicaoQuery : IRequest<Usuario>
     {
-        public ObterUsuarioPorTokenAutenticacaoCommand(string token)
+        public ObterUsuarioPorTokenRedefinicaoQuery(string token)
         {
             Token = token;
         }

@@ -8,18 +8,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenAutenticacao
+namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao
 {
-    public class ObterUsuarioPorTokenAutenticacaoCommandHandler : IRequestHandler<ObterUsuarioPorTokenAutenticacaoCommand, Usuario>
+    public class ObterUsuarioPorTokenRedefinicaoQueryHandler : IRequestHandler<ObterUsuarioPorTokenRedefinicaoQuery, Usuario>
     {
         private readonly IUsuarioRepository usuarioRepository;
 
-        public ObterUsuarioPorTokenAutenticacaoCommandHandler(IUsuarioRepository usuarioRepository)
+        public ObterUsuarioPorTokenRedefinicaoQueryHandler(IUsuarioRepository usuarioRepository)
         {
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
         }
 
-        public async Task<Usuario> Handle(ObterUsuarioPorTokenAutenticacaoCommand request, CancellationToken cancellationToken)
+        public async Task<Usuario> Handle(ObterUsuarioPorTokenRedefinicaoQuery request, CancellationToken cancellationToken)
         {
             var retorno = await usuarioRepository.ObterUsuarioPorTokenAutenticacao(request.Token);
 

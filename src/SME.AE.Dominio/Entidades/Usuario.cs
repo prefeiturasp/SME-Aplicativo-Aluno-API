@@ -29,12 +29,16 @@ namespace SME.AE.Dominio.Entidades
             ValidadeToken = DateTime.Now.AddHours(6);
         }
 
-        public bool ValidarTokenRedefinicao(string token)
+        public void ValidarTokenRedefinicao(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
                 throw new NegocioException("Deve ser obrigátorio informar o token");
 
-            return token.Equals(Token);
+            if (ValidadeToken < DateTime.Now)
+                throw new NegocioException("Token expirado");
+
+            if (!token.Equals(Token))
+                throw new NegocioException("Token inválido");
         }
 
         public void FinalizarRedefinicaoSenha()
