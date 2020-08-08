@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation.Results;
-using Microsoft.Practices.ObjectBuilder2;
 
-namespace SME.AE.Infra.Excecoes
+namespace SME.AE.Comum.Excecoes
 {
     public class ValidacaoException : Exception
     {
@@ -32,8 +31,6 @@ namespace SME.AE.Infra.Excecoes
         public ValidacaoException(IDictionary<string, string[]> errors)
         {
             Errors = errors;
-
-            //errors.ForEach(x => Errors.Add(x.Key, x.Value));
         }
 
         public IDictionary<string, string[]> Errors { get; }

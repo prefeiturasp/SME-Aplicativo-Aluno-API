@@ -1,8 +1,8 @@
 ﻿using FluentValidation.TestHelper;
 using Moq;
 using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
 using System.Threading;
 using System.Threading.Tasks;

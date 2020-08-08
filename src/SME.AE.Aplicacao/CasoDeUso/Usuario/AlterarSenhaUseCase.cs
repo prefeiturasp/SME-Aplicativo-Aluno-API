@@ -1,16 +1,13 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Aplicacao.Consultas.VerificarSenha;
 using SME.AE.Aplicacao.Validators;
+using SME.AE.Comum.Excecoes;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario

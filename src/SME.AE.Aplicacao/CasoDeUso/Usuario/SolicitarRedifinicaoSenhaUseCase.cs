@@ -2,7 +2,6 @@
 using Sentry;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Config;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -10,6 +9,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Aplicacao.Servicos;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;
 using System.IO;
