@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Sentry;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Excecoes;
