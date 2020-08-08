@@ -52,7 +52,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             var caminhot = Directory.GetCurrentDirectory();
 
-            SentrySdk.AddBreadcrumb($"caminho diretorio = {caminhot}");
+            SentrySdk.CaptureMessage($"caminho diretorio = {caminhot}");
 
             string caminho = $"{Directory.GetCurrentDirectory()}/wwwroot/ModelosEmail/RecuperacaoSenha.html";
             var textoArquivo = await File.ReadAllTextAsync(caminho);
