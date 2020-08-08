@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Sentry;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Excecoes;
@@ -52,7 +51,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             var caminhot = Directory.GetCurrentDirectory();
 
-            SentrySdk.AddBreadcrumb($"caminho diretorio = {caminhot}");
+            SentrySdk.CaptureMessage($"caminho diretorio = {caminhot}");
 
             string caminho = $"{Directory.GetCurrentDirectory()}/wwwroot/ModelosEmail/RecuperacaoSenha.html";
             var textoArquivo = await File.ReadAllTextAsync(caminho);
