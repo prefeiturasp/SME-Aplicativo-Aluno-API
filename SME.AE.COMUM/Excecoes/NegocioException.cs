@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Aplicacao.Comum.Excecoes
+namespace SME.AE.Comum.Excecoes
 {
     public class NegocioException : Exception
     {

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using SME.AE.Aplicacao.Comum.Excecoes;
+using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao.Comum.Middlewares
 {

@@ -1,19 +1,14 @@
 ﻿using MediatR;
-using Microsoft.Practices.ObjectBuilder2;
-using SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel;
-using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
-using SME.AE.Dominio.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comandos.Aluno;
-using System.Linq;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
-using System;
+using SME.AE.Comum.Excecoes;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
 {

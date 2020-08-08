@@ -1,14 +1,13 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida;
-using SME.AE.Dominio.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid;
-using SME.AE.Aplicacao.Consultas.ObterUsuario;
+using SME.AE.Comum.Excecoes;
+using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Dominio.Entidades;
 using System.Collections.Generic;
 using System.Linq;
