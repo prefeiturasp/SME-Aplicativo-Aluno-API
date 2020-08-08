@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SME.AE.Infra.Excecoes
+namespace SME.AE.Comum.Excecoes
 {
     public class NaoEncontradoException : Exception
     {

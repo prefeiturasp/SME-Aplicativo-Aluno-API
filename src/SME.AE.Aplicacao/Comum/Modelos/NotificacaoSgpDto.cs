@@ -1,5 +1,5 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Excecoes;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
