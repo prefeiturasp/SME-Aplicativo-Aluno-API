@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Internal;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 {

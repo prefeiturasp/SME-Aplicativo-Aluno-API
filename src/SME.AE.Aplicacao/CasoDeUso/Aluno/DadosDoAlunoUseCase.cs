@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
 using Sentry;
 using Xunit.Sdk;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Aluno
 {

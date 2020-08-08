@@ -1,11 +1,10 @@
-﻿
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using Moq;
 using SME.AE.Aplicacao.Comandos.CoreSSO.Usuario;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;

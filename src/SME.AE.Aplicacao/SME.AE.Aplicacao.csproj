@@ -8,19 +8,16 @@
     <Compile Remove="Compartilhado\**" />
     <Compile Remove="Comum\Modelos\Resposta\**" />
     <Compile Remove="Comum\Interfaces\IDateTime.cs" />
-    <Compile Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <Compile Remove="Autenticacao\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Compartilhado\**" />
-    <EmbeddedResource Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <EmbeddedResource Remove="Autenticacao\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Compartilhado\**" />
-    <None Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <None Remove="Autenticacao\**" />
   </ItemGroup>
 
@@ -79,6 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SME.AE.COMUM\SME.AE.Comum.csproj" />
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 

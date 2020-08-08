@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SME.AE.Comum.Excecoes;
+using System;
 
 namespace SME.AE.Dominio.Entidades
 {  

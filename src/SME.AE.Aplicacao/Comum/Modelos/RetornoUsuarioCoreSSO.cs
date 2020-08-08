@@ -1,6 +1,6 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Extensoes;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
