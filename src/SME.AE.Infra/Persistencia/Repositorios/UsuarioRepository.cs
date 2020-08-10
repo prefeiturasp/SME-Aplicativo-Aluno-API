@@ -113,8 +113,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<Usuario> ObterUsuarioPorTokenAutenticacao(string token)
         {
-            //var sql = $@"select {UsuarioConsultas.ObterCampos} from usuario u where token_redefinicao = @token and redefinicao";
-
             using var conexao = InstanciarConexao();
 
             conexao.Open();
@@ -133,7 +131,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Open();
             var dataHoraAtual = DateTime.Now;
             await conn.ExecuteAsync(
-                "update usuario set excluido = true , ultimoLogin = @dataHoraAtual  where cpf = @cpf", new { cpf, dataHoraAtual });
+                "update usuario set excluido = true , ultimoLogin = @dataHoraAtual, token_redefinicao = '', redefinicao = false, validade_token = null  where cpf = @cpf", new { cpf, dataHoraAtual });
             conn.Close();
         }
 
