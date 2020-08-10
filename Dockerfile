@@ -25,7 +25,7 @@ RUN apt-get update \
     && cp -R /src/src/SME.AE.Api/wwwroot /app/wwwroot \ 
     && rm -Rf /src
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-bionic AS runtime
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic AS runtime
 COPY --from=build /app /app
 EXPOSE 5000-5001
 CMD [ "dotnet", "/app/SME.AE.Api"]
