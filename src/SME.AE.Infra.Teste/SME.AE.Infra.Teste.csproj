@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\SME.AE.Dominio\SME.AE.Dominio.csproj" />
-    <ProjectReference Include="..\src\SME.AE.Infra\SME.AE.Infra.csproj" />
+    <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
+    <ProjectReference Include="..\SME.AE.Infra\SME.AE.Infra.csproj" />
   </ItemGroup>
 
 </Project>
