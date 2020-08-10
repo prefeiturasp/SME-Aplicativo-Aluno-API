@@ -25,7 +25,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-                IEnumerable<AlunoRespostaEol> listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos}{whereReponsavelAluno}", new { cpf });
+                IEnumerable<AlunoRespostaEol> listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
                 return listaAlunos.ToList();
             }
             catch (Exception ex)
