@@ -24,7 +24,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao
             var retorno = await usuarioRepository.ObterUsuarioPorTokenAutenticacao(request.Token);
 
             if (retorno == null)
-                throw new NegocioException("Token invalido");
+                throw new NegocioException("Token inválido");
 
             return retorno;
         }
