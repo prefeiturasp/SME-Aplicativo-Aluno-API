@@ -26,4 +26,4 @@ RUN apt-get update \
     && rm -Rf /src
 
 EXPOSE 5000-5001
-CMD [ "dotnet", "/app/SME.AE.Api"]
+CMD [ "dotnet", "/app/SME.AE.Api.dll"]
