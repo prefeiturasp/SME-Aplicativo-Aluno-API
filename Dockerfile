@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic AS build
+﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic
 
 ARG SME_AE_ENVIRONMENT=dev
 
@@ -25,7 +25,5 @@ RUN apt-get update \
     && cp -R /src/src/SME.AE.Api/wwwroot /app/wwwroot \ 
     && rm -Rf /src
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic AS runtime
-COPY --from=build /app /app
 EXPOSE 5000-5001
 CMD [ "dotnet", "/app/SME.AE.Api"]
