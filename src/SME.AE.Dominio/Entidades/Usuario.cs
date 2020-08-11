@@ -33,13 +33,13 @@ namespace SME.AE.Dominio.Entidades
         public void ValidarTokenRedefinicao(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
-                throw new NegocioException("Deve ser obrigátorio informar o token");
+                throw new NegocioException("Deve ser obrigátorio informar o Codigo de Verificação");
 
             if (ValidadeToken < DateTime.Now)
-                throw new NegocioException("Token expirado");
+                throw new NegocioException("Codigo de Verificação expirado");
 
             if (!token.Equals(Token))
-                throw new NegocioException("Token inválido");
+                throw new NegocioException("Codigo de Verificação inválido");
         }
 
         public void FinalizarRedefinicaoSenha()
