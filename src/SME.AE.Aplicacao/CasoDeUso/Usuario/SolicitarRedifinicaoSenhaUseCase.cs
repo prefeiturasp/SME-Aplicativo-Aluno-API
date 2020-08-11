@@ -51,7 +51,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             usuario.InicarRedefinicaoSenha();
 
-            //await EnvioEmail(usuario);
+            await EnvioEmail(usuario);
 
             await mediator.Send(new SalvarUsuarioCommand(usuario));
 
@@ -62,7 +62,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             try
             {
-                string caminho = $"/app/wwwroot/ModelosEmail/RecuperacaoSenha.html";
+                string caminho = $"{Directory.GetCurrentDirectory()}/wwwroot/ModelosEmail/RecuperacaoSenha.html";
                 var textoArquivo = await File.ReadAllTextAsync(caminho);
                 var urlFrontEnd = VariaveisAmbiente.UrlArquivosEstaticos;
                 var textoEmail = textoArquivo
