@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao
     {
         public ObterUsuarioPorTokenRedefinicaoQueryValidator()
         {
-            RuleFor(x => x.Token).NotEmpty().WithMessage("O Codigo de Verificação é Obrigátorio");
+            RuleFor(x => x.Token).NotEmpty().WithMessage("O Codigo de verificação é Obrigátorio");
             RuleFor(x => x.Token).Length(8).When(x => !string.IsNullOrWhiteSpace(x.Token)).WithMessage("O Codigo de Verificação possui tamanho inválido");
         }
     }
