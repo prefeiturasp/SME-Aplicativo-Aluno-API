@@ -22,7 +22,6 @@ RUN apt-get update \
     && dotnet restore \  
     && dotnet publish -c Release \   
     && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
-    && cp -R /src/src/SME.AE.Api/wwwroot /app/wwwroot \ 
     && rm -Rf /src
 
 WORKDIR /app 

@@ -10,6 +10,7 @@
         "SME_AE_JWT_TOKEN_SECRET": "***REMOVED***",
         "AEConnection": "***REMOVED***",
         "EolConnection": "***REMOVED***",
+        "SentryDsn": "https://86141fd46e504c4bb279b84c63b63139@sentry.sme.prefeitura.sp.gov.br/18",
         "SgpConnection": "***REMOVED***",
         "CoreSSOConnection": "***REMOVED***",
         "ChaveIntegracao": "***REMOVED***",
