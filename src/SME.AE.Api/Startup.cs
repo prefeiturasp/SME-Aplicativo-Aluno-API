@@ -2,20 +2,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SME.AE.Api.Configuracoes;
-using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra;
+using SME.AE.Infra.Persistencia.Mapeamentos;
 using System.Linq;
 using System.Text;
-using SME.AE.Infra.Persistencia.Mapeamentos;
 
 namespace SME.AE.Api
 {
@@ -32,13 +30,6 @@ namespace SME.AE.Api
         {
             AddAuthentication(services);
 
-#if DEBUG
-            services.Configure<KestrelServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
-#endif
-
             services.AddResponseCompression(options =>
             {
                 options.Providers.Add<GzipCompressionProvider>();
@@ -46,7 +37,7 @@ namespace SME.AE.Api
             });
             RegistrarMapeamentos.Registrar();
             RegistrarMvc.Registrar(services, Configuration);
-        
+
             services.AddInfrastructure();
             services.AddApplication();
 

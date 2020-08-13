@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Servicos
 {
@@ -22,7 +23,7 @@ namespace SME.AE.Aplicacao.Servicos
             configuracaoEmail = configuracoes?.FirstOrDefault() ?? throw new NegocioException("Não foi possível recuperar as configurações para envio de e-mail.");
         }
 
-        public void Enviar(string nomeDestinatario,string destinatario, string assunto, string mensagemHtml)
+        public async Task Enviar(string nomeDestinatario,string destinatario, string assunto, string mensagemHtml)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(configuracaoEmail.NomeRemetente, configuracaoEmail.EmailRemetente));
@@ -36,12 +37,13 @@ namespace SME.AE.Aplicacao.Servicos
 
             using (var client = new SmtpClient())
             {
-                client.Connect(configuracaoEmail.ServidorSmtp, configuracaoEmail.Porta, configuracaoEmail.UsarTls);
+                await client.ConnectAsync(configuracaoEmail.ServidorSmtp, configuracaoEmail.Porta, configuracaoEmail.UsarTls);
 
-                client.Authenticate(configuracaoEmail.Usuario, configuracaoEmail.Senha);
+                await client.AuthenticateAsync(configuracaoEmail.Usuario, configuracaoEmail.Senha);
 
-                client.Send(message);
-                client.Disconnect(true);
+                await client.SendAsync(message);
+
+                await client.DisconnectAsync(true);
             }
         }
     }
