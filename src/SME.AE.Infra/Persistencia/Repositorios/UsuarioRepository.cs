@@ -27,11 +27,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using var conexao = InstanciarConexao();
 
-            conexao.Open();
+            await conexao.OpenAsync();
 
             var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Cpf == cpf);
 
-            conexao.Close();
+            await conexao.CloseAsync();
 
             return retorno;
         }
