@@ -10,9 +10,9 @@ namespace SME.AE.Aplicacao.Validators
     {
         public ValidarTokenValidator()
         {
-            RuleFor(x => x.Token).NotEmpty().WithMessage("É Obrigátorio informar o token");
+            RuleFor(x => x.Token).NotEmpty().WithMessage("É Obrigátorio informar o Codigo de Verificação");
 
-            RuleFor(x => x.Token).Length(8).WithMessage("O Tamanho do token esta invalido").When(x => !string.IsNullOrWhiteSpace(x.Token));
+            RuleFor(x => x.Token).Length(8).WithMessage("O Tamanho do Codigo de Verificação esta invalido").When(x => !string.IsNullOrWhiteSpace(x.Token));
         }
     }
 }
