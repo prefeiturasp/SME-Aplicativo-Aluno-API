@@ -71,7 +71,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     .Replace("#URL_BASE#", urlFrontEnd)
                     .Replace("#VALIDADE", usuario.ValidadeToken?.ToString("dd/MM/yyyy HH:mm"));
 
-                emailServico.Enviar(usuario.Nome, usuario.Email, "Redefinição de Senha Escola Aqui", textoEmail);
+                await emailServico.Enviar(usuario.Nome, usuario.Email, "Redefinição de Senha Escola Aqui", textoEmail);
             }
             catch (Exception ex)
             {
