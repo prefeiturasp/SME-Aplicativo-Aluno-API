@@ -21,73 +21,31 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return new NpgsqlConnection(_connectionString);
         }
 
-        public virtual IEnumerable<T> Listar()
-        {
-            using (var conexao = InstanciarConexao())
-            {
-                var retorno = conexao.GetAll<T>();
-
-                conexao.Close();
-
-                return retorno;
-            }
-        }
-
         public virtual async Task<IEnumerable<T>> ListarAsync()
         {
             using (var conexao = InstanciarConexao())
             {
+                await conexao.OpenAsync();
+
                 var retorno = await conexao.GetAllAsync<T>();
 
-                conexao.Close();
+                await conexao.CloseAsync();
 
                 return retorno;
             }
         }
-
-        public virtual T ObterPorId(long id)
-        {
-            using (var conexao = InstanciarConexao())
-            {
-                var retorno = conexao.Get<T>(id);
-
-                conexao.Close();
-
-                return retorno;
-            }
-        }
-
+        
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
             using (var conexao = InstanciarConexao())
             {
+                await conexao.OpenAsync();
+
                 var retorno = await conexao.GetAsync<T>(id);
 
-                conexao.Close();
+                await conexao.CloseAsync();
 
                 return retorno;
-            }
-        }
-
-        public virtual void Remover(long id)
-        {
-            using (var conexao = InstanciarConexao())
-            {
-                var entidade = conexao.Get<T>(id);
-
-                conexao.Delete<T>(entidade);
-
-                conexao.Close();
-            }
-        }
-
-        public virtual void Remover(T entidade)
-        {
-            using (var conexao = InstanciarConexao())
-            {
-                conexao.Delete<T>(entidade);
-
-                conexao.Close();
             }
         }
 
@@ -95,11 +53,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using (var conexao = InstanciarConexao())
             {
+                await conexao.OpenAsync();
+
                 var entidade = await conexao.GetAsync<T>(id);
 
                 await conexao.DeleteAsync<T>(entidade);
 
-                conexao.Close();
+                await conexao.CloseAsync();
             }
         }
 
@@ -107,20 +67,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using (var conexao = InstanciarConexao())
             {
+                await conexao.OpenAsync();
+
                 await conexao.DeleteAsync<T>(entidade);
 
-                conexao.Close();
+                await conexao.CloseAsync();
             }
         }
-
-        public virtual long Salvar(T entidade)
-        {
-            if (entidade.Id == 0)
-                return Inserir(entidade);
-
-            return Atualizar(entidade);
-        }
-
+        
         public virtual async Task<long> SalvarAsync(T entidade)
         {
             if (entidade.Id == 0)
@@ -128,57 +82,39 @@ namespace SME.AE.Infra.Persistencia.Repositorios
            
             return await AtualizarAsync(entidade);
         }
-
-        private long Inserir(T entidade)
-        {
-            using (var conexao = InstanciarConexao())
-            {
-                entidade.InserirAuditoria();
-                var id = (long)conexao.Insert<T>(entidade);
-
-                conexao.Close();
-
-                return id;
-            }
-        }
-
+        
         private async Task<long> InserirAsync(T entidade)
         {
             using (var conexao = InstanciarConexao())
             {
+                await conexao.OpenAsync();
+
                 entidade.InserirAuditoria();
+
                 var id = await conexao.InsertAsync<T>(entidade);
 
-                conexao.Close();
+                await conexao.CloseAsync();
 
                 return (long)id;
             }
         }
 
-        private long Atualizar(T entidade)
-        {
-            using (var conexao = InstanciarConexao())
-            {
-                entidade.AtualizarAuditoria();
-                conexao.Update<T>(entidade);
-
-                conexao.Close();
-
-                return entidade.Id;
-            }
-        }
 
         private async Task<long> AtualizarAsync(T entidade)
         {
             using (var conexao = InstanciarConexao())
             {
+                await conexao.OpenAsync();
+
                 entidade.AtualizarAuditoria();
+
                 await conexao.UpdateAsync<T>(entidade);
 
-                conexao.Close();
+                await conexao.CloseAsync();
 
                 return entidade.Id;
             }
         }
+
     }
 }
