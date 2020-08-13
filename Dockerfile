@@ -25,5 +25,6 @@ RUN apt-get update \
     && cp -R /src/src/SME.AE.Api/wwwroot /app/wwwroot \ 
     && rm -Rf /src
 
+WORKDIR /app 
 EXPOSE 5000-5001
 CMD [ "dotnet", "/app/SME.AE.Api.dll"]
