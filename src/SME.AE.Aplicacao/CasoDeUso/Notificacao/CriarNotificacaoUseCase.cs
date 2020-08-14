@@ -14,6 +14,7 @@ using SME.AE.Aplicacao.Comum.Enumeradores;
 using FirebaseAdmin.Messaging;
 using System.Text;
 using SME.AE.Comum.Utilitarios;
+using System.Web;
 
 namespace SME.AE.Aplicacao
 {
@@ -52,8 +53,8 @@ namespace SME.AE.Aplicacao
             notificacao.InserirCategoria();
 
             List<int> grupos = notificacao.ObterGrupoLista();
-
-            string tituloUTF8 = UtilString.EncodeUTF8(notificacao.Titulo);
+                        
+            string bodyUTF8 = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.");
 
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
             {
@@ -67,8 +68,8 @@ namespace SME.AE.Aplicacao
 
             var Notificacao = new Notification
             {
-                Title = tituloUTF8,
-                Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
+                Title = notificacao.Titulo,
+                Body = bodyUTF8,
             };
 
             await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, Notificacao);
