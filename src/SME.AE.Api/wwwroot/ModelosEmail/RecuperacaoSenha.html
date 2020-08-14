@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Escola Aqui</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: #fafafa;
+        font-family: "Roboto", sans-serif;
+      }
+      .main {
+        margin: 0 auto;
+        max-width: 495px;
+        width: 100%;
+      }
+      .logo {
+        display: flex;
+        margin-bottom: 20px;
+      }
+      .imagem {
+        display: block;
+        height: 100%;
+        margin-right: 15px;
+        max-height: 78px;
+        max-width: 87.5px;
+        width: 100%;
+      }
+      .texto {
+        align-self: center;
+        color: #086397;
+        font-weight: bold;
+        max-width: 150px;
+      }
+      .mensagem {
+        color: #000;
+        display: block;
+        font-size: 14px;
+        line-height: 18px;
+      }
+      p {
+        margin-bottom: 20px;
+      }
+      .atencao {
+        color: #b40c02;
+        font-weight: bold;
+      }
+      .botao {
+        background: #6933ff;
+        border: 0 none;
+        border-radius: 3px;
+        color: #ffffff;
+        cursor: pointer;
+        display: block;
+        font-weight: bold;
+        height: 18px;
+        padding: 10px 0;
+        text-align: center;
+        text-decoration: none;
+        width: 142px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="logo">
+        <div class="imagem">
+          <img src="https://dev-novosgp.sme.prefeitura.sp.gov.br/imagens/LogoDoEscolaAqui.svg" width="200px" alt="SGP" />
+        </div>
+      </div>
+      <div class="mensagem">
+        <p>Olá, #NOME</p>
+        <p>
+          Você acionou a opção "Esqueci minha senha" do aplicativo Escola aqui.
+          Para redefinir sua senha você deverá utilizar o código abaixo.
+        </p>
+        <p>Código: <b>#CODIGO</b></p>
+        <p>Validade: <b>#VALIDADE</b></p>
+        <p>
+          Este código deverá ser informado no campo "Código de recuperação" e caso validado, 
+		  você irá informar uma senha de acesso pessoal e o código não poderá mais ser utilizado.
+        </p>
+        <p class="atencao">
+          Caso a validade do código tenha expirado você precisa solicitar um
+          novo código através da opção "Esqueci minha senha" do aplicativo.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

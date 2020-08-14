@@ -153,7 +153,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
             else
             {
-                await _repository.Criar(MapearDominioUsuario(usuario, primeiroAcesso));
+                await _repository.SalvarAsync(MapearDominioUsuario(usuario, primeiroAcesso));
             }
 
             return await _repository.ObterPorCpf(request.Cpf);

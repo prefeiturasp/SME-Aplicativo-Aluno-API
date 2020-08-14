@@ -31,27 +31,21 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
 
         public async Task<bool> Handle(RemoverNotificacaoPorIdCommand request, CancellationToken cancellationToken)
         {
-            var notificacao = await _repository.ObterPorId(request.Id);
+            var notificacao = await _repository.ObterPorIdAsync(request.Id);
+
             if (notificacao == null)
-            {
                 return false;
 
-            }
-
-            else
+            try
             {
-                try
-                {
-                    await _repository.Remover(notificacao);
-
-                }
-                catch
-                {
-                    return false;
-                }
-
-                return true;
+                await _repository.Remover(notificacao);
             }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

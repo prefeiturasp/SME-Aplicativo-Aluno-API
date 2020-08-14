@@ -17,14 +17,13 @@ RUN apt-get update && apt-get install -yq tzdata && dpkg-reconfigure --frontend 
 
 WORKDIR /app
 
-
-
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
 COPY ["src/SME.AE.Api/SME.AE.Api.csproj", "src/SME.AE.Api/"]
 COPY ["src/SME.AE.Infra/SME.AE.Infra.csproj", "src/SME.AE.Infra/"]
 COPY ["src/SME.AE.Dominio/SME.AE.Dominio.csproj", "src/SME.AE.Dominio/"]
 COPY ["src/SME.AE.Aplicacao/SME.AE.Aplicacao.csproj", "src/SME.AE.Aplicacao/"]
+RUN cp src/SME.AE.Api/wwwroot src/wwwroot
 RUN dotnet restore "src/SME.AE.Api/SME.AE.Api.csproj"
 COPY . .
 WORKDIR "/src/src/SME.AE.Api"

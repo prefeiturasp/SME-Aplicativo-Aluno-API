@@ -14,14 +14,16 @@ ENV SentryDsn=$SentryDsn
 ENV TZ=America/Sao_Paulo
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -yq tzdata && dpkg-reconfigure --frontend noninteractive tzdata
-
 ADD . /src
-WORKDIR /src
-RUN dotnet restore && \  
-    dotnet publish -c Release && \  
-    cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app && \ 
-    rm -Rf /src
+WORKDIR /src 
+RUN apt-get update \
+    && apt-get install -yq tzdata \
+    && dpkg-reconfigure --frontend noninteractive tzdata \ 
+    && dotnet restore \  
+    && dotnet publish -c Release \   
+    && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
+    && rm -Rf /src
 
+WORKDIR /app 
 EXPOSE 5000-5001
-ENTRYPOINT ["/app/SME.AE.Api"]
+CMD [ "dotnet", "/app/SME.AE.Api.dll"]

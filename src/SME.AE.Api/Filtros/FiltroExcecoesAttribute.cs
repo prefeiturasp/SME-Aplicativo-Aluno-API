@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Linq;
 using System.Net;
@@ -28,7 +28,7 @@ namespace SME.AE.Api.Filtros
         {
             using (SentrySdk.Init(sentryDSN))
             {
-                var internalIP = Dns.GetHostEntry(Dns.GetHostName()).AddressList?.Where(c => c.AddressFamily == AddressFamily.InterNetwork).ToString();
+                var internalIP = Dns.GetHostEntry(Dns.GetHostName()).AddressList?.FirstOrDefault(c => c.AddressFamily == AddressFamily.InterNetwork).ToString();
 
                 SentrySdk.AddBreadcrumb($"{Environment.MachineName ?? string.Empty} - {internalIP ?? string.Empty }", "Machine Identification");
 

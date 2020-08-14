@@ -42,14 +42,17 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
             ObterGrupoNotificacaoPorResponsavelCommand request, CancellationToken cancellationToken)
         {
             var grupos = await _grupoComunicadoRepository.ObterTodos();
+
             var query = (from g in grupos 
                 where g.TipoCicloId != null
                 select $"case when (se.cd_ciclo_ensino in ({g.TipoCicloId}) and se.cd_etapa_ensino IN ({g.EtapaEnsinoId})) then 1 else 0 end as \"{g.Nome}\",").Join("");
+
             query = query.Substring(0, query.Count() - 1);
 
             var nomeGrupos = (from n in grupos
                               where n.TipoCicloId != null
                               select $"max({n.Nome}){n.Nome},").Join("");
+
             nomeGrupos = nomeGrupos.Substring(0, nomeGrupos.Count() - 1);
 
             var gruposDoResponsavel = await _repository.ObterGruposDoResponsavel(request.Cpf, query, nomeGrupos);
@@ -58,6 +61,7 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
                 return new List<string>();
 
             string ids = "";
+
             foreach(var gr in gruposDoResponsavel.AsEnumerable())
             {
                 if (1.Equals(gr.Value))
@@ -70,7 +74,10 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
                     ids += $"{id},";
                 }
             }
-            ids = ids.Substring(0, ids.Count() - 1);
+
+            if (ids.Length > 0) 
+                ids = ids.Substring(0, ids.Count() - 1);
+
             return ids.Split(",").ToList();
         }
     }

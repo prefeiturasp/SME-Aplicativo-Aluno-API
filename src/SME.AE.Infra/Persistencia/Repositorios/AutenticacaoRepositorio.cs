@@ -15,7 +15,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
         {
             using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-            return await conexao.QueryAsync<RetornoUsuarioEol>($"{AutenticacaoConsultas.ObterResponsavel}{whereReponsavelAluno}", new { cpf });
+            return await conexao.QueryAsync<RetornoUsuarioEol>($"{AutenticacaoConsultas.ObterResponsavel} {whereReponsavelAluno}", new { cpf });
         }
     }
 }

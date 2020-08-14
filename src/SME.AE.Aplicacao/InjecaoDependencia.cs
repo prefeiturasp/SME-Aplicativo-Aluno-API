@@ -2,14 +2,18 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Middlewares;
+using SME.AE.Aplicacao.Servicos;
 using System;
 
 namespace SME.AE.Aplicacao
@@ -41,7 +45,10 @@ namespace SME.AE.Aplicacao
             services.AddSingleton(configuration.CreateMapper());
         }
 
-        private static void AddServices(this IServiceCollection services) { }
+        private static void AddServices(this IServiceCollection services)
+        {
+            services.TryAddScoped(typeof(IEmailServico), typeof(EmailServico));
+        }
 
         private static void AddFiltros(this IServiceCollection services)
         {
@@ -64,9 +71,9 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped(typeof(IAutenticarUsuarioUseCase), typeof(AutenticarUsuarioUseCase));
             services.TryAddScoped(typeof(IDadosDoAlunoUseCase), typeof(DadosDoAlunoUseCase));
             services.TryAddScoped(typeof(IAlterarSenhaUseCase), typeof(AlterarSenhaUseCase));
-            
-
-
+            services.TryAddScoped(typeof(ISolicitarRedifinicaoSenhaUseCase), typeof(SolicitarRedifinicaoSenhaUseCase));
+            services.TryAddScoped(typeof(IValidarTokenUseCase), typeof(ValidarTokenUseCase));
+            services.TryAddScoped<IRedefinirSenhaUseCase, RedefinirSenhaUseCase>();
         }
     }
 }

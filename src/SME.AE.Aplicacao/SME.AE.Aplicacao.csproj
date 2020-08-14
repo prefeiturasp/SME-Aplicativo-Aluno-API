@@ -8,19 +8,16 @@
     <Compile Remove="Compartilhado\**" />
     <Compile Remove="Comum\Modelos\Resposta\**" />
     <Compile Remove="Comum\Interfaces\IDateTime.cs" />
-    <Compile Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <Compile Remove="Autenticacao\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Compartilhado\**" />
-    <EmbeddedResource Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <EmbeddedResource Remove="Autenticacao\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Compartilhado\**" />
-    <None Remove="Comum\Excecoes\NaoEncontradoExcecao\**" />
     <None Remove="Autenticacao\**" />
   </ItemGroup>
 
@@ -47,6 +44,7 @@
     <PackageReference Include="FluentValidation" Version="8.6.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="8.6.2" />
+    <PackageReference Include="MailKit" Version="2.8.0" />
     <PackageReference Include="MediatR" Version="8.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -64,6 +62,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
+    <PackageReference Include="MimeKit" Version="2.9.1" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="Rocket.EntityFrameworkCore.InMemory" Version="5.0.0.26" />
     <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
@@ -77,6 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SME.AE.COMUM\SME.AE.Comum.csproj" />
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
