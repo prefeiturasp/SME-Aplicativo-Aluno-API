@@ -1,57 +1,46 @@
 ﻿version: '3.1'
 
-volumes:
-  postgres-data: {}
-
 services:
   web:
     env_file:
       - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5001;http://+:5000
+      - ASPNETCORE_HTTPS_PORT=5001
     container_name: smeae_container
     build: .
     ports:
       - "5001:5001"
       - "5000:5000"
     links:
-      - postgres
+      - sme-db-ae
     networks:
       - default
     depends_on:
-      - flyway
-  
-  postgres:
+      - sme-flyway-ae
+
+  sme-db-ae:
     env_file:
       - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
-    container_name: postgres_container
-    image: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      PGDATA: /data/postgres
-    volumes:
-      - postgres:/data/postgres
-    ports:
-      - "5000:5000"                  
-    networks:
-      - sme-ae-network
-    depends_on:
-      - 'sme-db-ae'      
-    env_file:
-      - smeae_api_dev.env  
-  sme-db-ae:
     container_name: sme-db-ae
     restart: always
     image: postgres:11-alpine
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: ae_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /data/postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - sme-ae-network
+
   sme-flyway-ae:
+    env_file:
+      - smeae_api_${SME_AE_ENVIRONMENT:-dev}.env
     container_name: sme-flyway-ae
     image: boxfuse/flyway:5.2.4
     command: -url=jdbc:postgresql://sme-db-ae:5432/ae_db?user=postgres&password=postgres -locations='filesystem:/opt/scripts' -outOfOrder=true migrate
@@ -61,6 +50,10 @@ services:
       - 'sme-db-ae'
     networks:
       - sme-ae-network
+
+volumes:
+  postgres-data: {}
+
 networks:
   sme-ae-network:
     driver: bridge

@@ -36,7 +36,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
           
             for (int i = 0;  i < request.Ids.Length; i++)
             {
-                var notificacao =  await _repository.ObterPorId(request.Ids[i]);
+                var notificacao =  await _repository.ObterPorIdAsync(request.Ids[i]);
                 if (notificacao == null)
                 {
                     errosArray.SetValue($"{request.Ids[i]} - Notificação não encontrada", i);

@@ -1,10 +1,10 @@
 ﻿using FluentValidation.Results;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Excecoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,6 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
         public DadosAlunoCommand(string cpf)
         {
             Cpf = cpf;
-
         }
 
         public string Cpf { get; set; }
