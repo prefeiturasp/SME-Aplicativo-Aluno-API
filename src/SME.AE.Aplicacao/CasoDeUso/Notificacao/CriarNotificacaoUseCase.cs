@@ -12,6 +12,8 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using AutoMapper;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using FirebaseAdmin.Messaging;
+using System.Text;
+using SME.AE.Comum.Utilitarios;
 
 namespace SME.AE.Aplicacao
 {
@@ -49,7 +51,9 @@ namespace SME.AE.Aplicacao
 
             notificacao.InserirCategoria();
 
-            List<int> grupos = notificacao.ObterGrupoLista();//
+            List<int> grupos = notificacao.ObterGrupoLista();
+
+            string tituloUTF8 = UtilString.EncodeUTF8(notificacao.Titulo);
 
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
             {
@@ -61,15 +65,14 @@ namespace SME.AE.Aplicacao
                 ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
             };
 
-
             var Notificacao = new Notification
             {
-                Title = notificacao.Titulo,
+                Title = tituloUTF8,
                 Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
             };
 
             await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, Notificacao);
-        }
+        }       
 
         private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
         {
