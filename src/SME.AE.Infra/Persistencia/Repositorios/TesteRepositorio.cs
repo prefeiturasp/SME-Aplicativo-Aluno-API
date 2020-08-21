@@ -1,15 +1,9 @@
 ﻿using Dapper;
+using Npgsql;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Dominio.Entidades;
-using SME.AE.Infra.Persistencia.Consultas;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Text;
 using System.Threading.Tasks;
-using Sentry;
-using Npgsql;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
