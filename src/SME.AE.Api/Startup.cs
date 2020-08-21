@@ -9,13 +9,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SME.AE.Api.Configuracoes;
-using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra;
 using System.Linq;
 using System.Text;
 using SME.AE.Infra.Persistencia.Mapeamentos;
+using SME.AE.Infra.Persistencia.Cache;
 
 namespace SME.AE.Api
 {
@@ -38,6 +38,7 @@ namespace SME.AE.Api
                 options.AllowSynchronousIO = true;
             });
 #endif
+            services.AdicionarRedis();
 
             services.AddResponseCompression(options =>
             {
@@ -46,12 +47,10 @@ namespace SME.AE.Api
             });
             RegistrarMapeamentos.Registrar();
             RegistrarMvc.Registrar(services, Configuration);
-        
+
             services.AddInfrastructure();
             services.AddApplication();
-
             services.AdicionarValidadoresFluentValidation();
-
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>
                 {
@@ -63,6 +62,11 @@ namespace SME.AE.Api
                 .AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
+            registrarSwagger(services);
+        }
+
+        private static void registrarSwagger(IServiceCollection services)
+        {
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
@@ -92,6 +96,7 @@ namespace SME.AE.Api
                 });
             });
         }
+
         private void AddAuthentication(IServiceCollection services)
         {
             byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
