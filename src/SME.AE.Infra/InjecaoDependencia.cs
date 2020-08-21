@@ -1,15 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Dapper.FluentMap;
-using IdentityModel;
-using IdentityServer4.Models;
-using IdentityServer4.Test;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
@@ -21,6 +12,8 @@ using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
 using SME.AE.Infra.Persistencia.Repositorios.Externos;
+using SME.AE.Infra.Persistencia.Cache;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace SME.AE.Infra
 {
@@ -33,6 +26,7 @@ namespace SME.AE.Infra
                     ConnectionStrings.Conexao,
                     b => b.MigrationsAssembly(typeof(AplicacaoContext).Assembly.FullName)));
 
+            services.AddTransient(typeof(IConnectionMultiplexerAe), typeof(ConnectionMultiplexerAe));
             services.AddTransient(typeof(IAplicacaoContext), typeof(AplicacaoContext));
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
             services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
@@ -45,12 +39,12 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddTransient(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddTransient(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
+            services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.AddTransient<IAutenticacaoService, AutenticacaoService>();
-
             services.AddAuthentication().AddIdentityServerJwt();
             return services;
         }
