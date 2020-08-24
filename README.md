@@ -2,11 +2,12 @@
 
 ## Ambiente de Desenvolvimento
 
-Api do aplicativo Escola Aqui utiliza arquitetura da API baseada em CQRS
+Api do aplicativo Escola Aqui utiliza as tecnologias abaixo:
 
-- Dotnet Core 3
+- Dotnet Core 3.1
 - C#
 - CQRS (Commands and Queries)
+- FluentValitation
 - Mediator
 - Reposittory
 - Dapper
