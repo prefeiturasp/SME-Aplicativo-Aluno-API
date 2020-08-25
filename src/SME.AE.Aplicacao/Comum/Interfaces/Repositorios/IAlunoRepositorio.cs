@@ -10,5 +10,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
   public  interface IAlunoRepositorio
     {
         Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf);
+        Task<List<AlunoRespostaEol>> ObterDadosAlunosCache(string cpf);
     }
 }
