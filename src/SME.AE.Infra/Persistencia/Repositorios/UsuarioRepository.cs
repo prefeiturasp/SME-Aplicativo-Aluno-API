@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Dapper.Dommel;
 using Dommel;
+using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
@@ -18,20 +19,29 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
-        public UsuarioRepository() : base(ConnectionStrings.Conexao)
-        {
 
+        private readonly ICacheRepositorio cacheRepositorio;
+
+        public UsuarioRepository(ICacheRepositorio cacheRepositorio) : base(ConnectionStrings.Conexao)
+        {
+            this.cacheRepositorio = cacheRepositorio;
         }
+
 
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
+
+            var chaveCache = $"Usuario-{cpf}";
+            var usuario = await cacheRepositorio.ObterAsync(chaveCache);
+            if (!string.IsNullOrWhiteSpace(usuario))
+                return JsonConvert.DeserializeObject<Usuario>(usuario);
+            
             using var conexao = InstanciarConexao();
-
             conexao.Open();
-
             var retorno = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Cpf == cpf);
-
             conexao.Close();
+
+            await cacheRepositorio.SalvarAsync(chaveCache, retorno, 1080, false);
 
             return retorno;
         }
@@ -40,11 +50,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
+                var chaveCache = $"Cpfs";
+                var cpfs = await cacheRepositorio.ObterAsync(chaveCache);
+                if (!string.IsNullOrWhiteSpace(cpfs))
+                    return JsonConvert.DeserializeObject<IEnumerable<string>>(cpfs);
+
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var resultado = await conn.QueryAsync<string>(UsuarioConsultas.ObterTodos);
+                var retorno = await conn.QueryAsync<string>(UsuarioConsultas.ObterTodos);
                 conn.Close();
-                return resultado;
+
+                await cacheRepositorio.SalvarAsync(chaveCache, retorno, 1080, false);
+                return retorno;
             }
             catch (Exception ex)
             {
@@ -56,9 +73,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                      
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
+            var dataHoraAtual = DateTime.Now;
+            //JsonConvert.SerializeObject<string>({$"ultimo-login-usuario-{cpf}-{dataHoraAtual}"});
+            
+            //var chaveCache = $"ultimo-login-usuario-{cpf}-{dataHoraAtual}";
+            //await cacheRepositorio.SalvarAsync(chaveCache,"", 720, false);
+
             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
             conn.Open();
-            var dataHoraAtual = DateTime.Now;
             await conn.ExecuteAsync(
                 "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
             conn.Close();
@@ -71,10 +93,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 alteradoem=@AlteradoEm, alteradopor=@AlteradoPor, token_redefinicao = '', redefinicao = false, validade_token = null
                 where id=@Id;";
 
-            using (var conexao = InstanciarConexao())
-            {
-                await conexao.ExecuteAsync(sql, usuario);
-            }
+            await using var conexao = InstanciarConexao();
+            conexao.Open();
+            await conexao.ExecuteAsync(sql, usuario);
+            conexao.Close();
         }
 
         public async Task AtualizarEmailTelefone(long id, string email, string celular)

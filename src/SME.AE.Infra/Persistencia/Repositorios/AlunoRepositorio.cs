@@ -38,8 +38,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 }
 
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-                IEnumerable<AlunoRespostaEol> listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
-                await SalvarDadosAlunosCache(cpf);
+                var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
+                await SalvarDadosAlunosCache(cpf, listaAlunos.ToList()) ;
                 return listaAlunos.ToList();
             }
             catch (Exception ex)
@@ -59,10 +59,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return null;
         }
 
-        public async Task SalvarDadosAlunosCache(string cpf)
+        public async Task SalvarDadosAlunosCache(string cpf, List<AlunoRespostaEol> dadosAluno)
         {
-            var dadosAluno = this.ObterDadosAlunos(cpf);
-            var chaveCache = $"Alunos-{cpf}-{dadosAluno}";
+            var chaveCache = $"Alunos-{cpf}";
             await cacheRepositorio.SalvarAsync(chaveCache, dadosAluno, 1080, false);
         }
 
