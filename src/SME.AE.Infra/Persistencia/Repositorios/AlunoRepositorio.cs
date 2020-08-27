@@ -31,15 +31,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var cache = ObterDadosAlunosCache(cpf);
-                if(cache.Result != null && cache.Result.Any())
-                {
-                    return cache.Result;
-                }
+                var chaveCache = $"dadosAlunos-{cpf}";
+                var dadosAlunos = await cacheRepositorio.ObterAsync(chaveCache);
+                if (!string.IsNullOrWhiteSpace(dadosAlunos))
+                    return JsonConvert.DeserializeObject<List<AlunoRespostaEol>>(dadosAlunos);
 
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
                 IEnumerable<AlunoRespostaEol> listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
-                await SalvarDadosAlunosCache(cpf);
+
+                await cacheRepositorio.SalvarAsync(chaveCache, listaAlunos, 1080, false);
+
                 return listaAlunos.ToList();
             }
             catch (Exception ex)
@@ -48,24 +49,5 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
-
-        public async Task<List<AlunoRespostaEol>> ObterDadosAlunosCache(string cpf) {
-
-            var chaveCache = $"Alunos-{cpf}";
-            var alunos = await cacheRepositorio.ObterAsync(chaveCache);
-            if (!string.IsNullOrWhiteSpace(alunos))
-                return JsonConvert.DeserializeObject<List<AlunoRespostaEol>>(alunos);
-
-            return null;
-        }
-
-        public async Task SalvarDadosAlunosCache(string cpf)
-        {
-            var dadosAluno = this.ObterDadosAlunos(cpf);
-            var chaveCache = $"Alunos-{cpf}-{dadosAluno}";
-            await cacheRepositorio.SalvarAsync(chaveCache, dadosAluno, 1080, false);
-        }
-
-
     }
 }
