@@ -14,8 +14,8 @@ using SME.AE.Infra;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System.Linq;
 using System.Text;
-using SME.AE.Infra.Persistencia.Mapeamentos;
 using SME.AE.Infra.Persistencia.Cache;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace SME.AE.Api
 {
@@ -32,12 +32,12 @@ namespace SME.AE.Api
         {
             AddAuthentication(services);
 
-#if DEBUG
-            services.Configure<KestrelServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
-#endif
+//#if DEBUG
+//            services.Configure<KestrelServerOptions>(options =>
+//            {
+//                options.AllowSynchronousIO = true;
+//            });
+//#endif
             services.AdicionarRedis();
 
             services.AddResponseCompression(options =>
