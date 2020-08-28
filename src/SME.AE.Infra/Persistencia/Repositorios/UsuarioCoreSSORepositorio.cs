@@ -17,6 +17,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioCoreSSORepositorio : IUsuarioCoreSSORepositorio
     {
+        private const string USUARIOPORCPF = "UsuarioCoreSSOCpf";
+        private const string USUARIOPORID = "UsuarioCoreSSOId";
+
+        private readonly ICacheRepositorio cacheRepositorio;
+
+        public UsuarioCoreSSORepositorio(ICacheRepositorio cacheRepositorio)
+        {
+            this.cacheRepositorio = cacheRepositorio;
+        }
+
         public async Task AlterarStatusUsuario(Guid usuId, StatusUsuarioCoreSSO novoStatus)
         {
             try
@@ -32,6 +42,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 transaction.Commit();
                 conn.Close();
+
+                await LimparUsuarioCachePorId(usuId);
             }
             catch (Exception ex)
             {
@@ -42,24 +54,44 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task AlterarSenha(Guid usuarioId, string senhaCriptografada)
         {
-            using var conexao = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
-            conexao.Open();
+            try
+            {
+                using var conexao = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                conexao.Open();
+                var sql = @"update SYS_Usuario 
+                               set usu_senha = @senhaCriptografada, usu_dataAlteracaoSenha = @dataAtual, usu_dataAlteracao = @dataAtual
+                                where usu_id = @usuarioId;";
 
-            var sql = @"update SYS_Usuario 
-                       set usu_senha = @senhaCriptografada, usu_dataAlteracaoSenha = @dataAtual, usu_dataAlteracao = @dataAtual
-                        where usu_id = @usuarioId;";
+                await conexao.ExecuteAsync(sql, new { usuarioId, senhaCriptografada, dataAtual = DateTime.Now });
+                conexao.Close();
 
-            await conexao.ExecuteAsync(sql, new { usuarioId, senhaCriptografada, dataAtual = DateTime.Now });
+                await LimparUsuarioCachePorId(usuarioId);
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
 
-            conexao.Close();
         }
 
         public async Task AtualizarCriptografiaUsuario(Guid usuId, string senha)
         {
-            using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
-            conn.Open();
-            await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
-            conn.Close();
+            try
+            {
+                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                conn.Open();
+                await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
+                conn.Close();
+
+                await LimparUsuarioCachePorId(usuId);
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+
         }
 
         public async Task<Guid> Criar(UsuarioCoreSSODto usuario)
@@ -83,7 +115,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 foreach (var grupo in usuario.Grupos)
                     await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
 
-
                 transaction.Commit();
                 conn.Close();
 
@@ -104,15 +135,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
 
                 conn.Open();
-
                 using var transaction = conn.BeginTransaction();
 
                 foreach (var grupo in gruposNaoIncluidos)
                     await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
 
                 transaction.Commit();
-
                 conn.Close();
+
+                await LimparUsuarioCachePorId(usuId);
             }
             catch (Exception ex)
             {
@@ -123,42 +154,134 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<RetornoUsuarioCoreSSO> ObterPorId(Guid id)
         {
-            using (var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+            try
             {
-                conn.Open();
+                var chaveUsuarioIdCache = $"{USUARIOPORID}-{id}";
+                var usuarioCoreSSO = cacheRepositorio.Obter<RetornoUsuarioCoreSSO>(chaveUsuarioIdCache);
+                if (usuarioCoreSSO == null)
+                {
+                    using (var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+                    {
+                        conn.Open();
 
-                var consulta = @"
-                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia
+                        var consulta = @"
+                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, u.usu_login as Cpf
                     FROM sys_usuario u
                         WHERE u.usu_id = @id";
 
-                return await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(consulta, new { id });
+                        usuarioCoreSSO = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(consulta, new { id });
+                        await SalvarUsuarioCache(usuarioCoreSSO);
+                    }
+                }
+                return usuarioCoreSSO;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
             }
         }
 
         public async Task<RetornoUsuarioCoreSSO> ObterPorCPF(string cpf)
         {
-            using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
-            conn.Open();
-            var resultado = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
-                    SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia
-                    FROM sys_usuario u
-                        WHERE u.usu_login = @cpf "
-                , new { cpf });
-            conn.Close();
-            return resultado;
+            try
+            {
+                var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{cpf}";
+
+                var usuarioCoreSSO = cacheRepositorio.Obter<RetornoUsuarioCoreSSO>(chaveUsuarioCpfCache);
+                if (usuarioCoreSSO == null)
+                {
+                    using (var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+                    {
+                        conn.Open();
+                        usuarioCoreSSO = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
+                            SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, u.usu_login as Cpf
+                            FROM sys_usuario u
+                            WHERE u.usu_login = @cpf "
+                            , new { cpf });
+                        conn.Close();
+                    }
+                    await SalvarUsuarioCache(usuarioCoreSSO);
+                }
+
+                return usuarioCoreSSO;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        private async Task SalvarUsuarioCache(RetornoUsuarioCoreSSO usuarioCoreSSO)
+        {
+            try
+            {
+                var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuarioCoreSSO.UsuId}";
+                var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuarioCoreSSO.Cpf}";
+
+                await Task.WhenAll(
+                    cacheRepositorio.SalvarAsync(chaveUsuarioIdCache, usuarioCoreSSO),
+                    cacheRepositorio.SalvarAsync(chaveUsuarioCpfCache, usuarioCoreSSO)
+                    );
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        private async Task LimparUsuarioCachePorId(Guid id)
+        {
+            try
+            {
+                var chaveUsuarioIdCache = $"{USUARIOPORID}-{id}";
+                var usuarioCoreSSO = cacheRepositorio.Obter<RetornoUsuarioCoreSSO>(chaveUsuarioIdCache);
+                if (usuarioCoreSSO != null)
+                {
+                    var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuarioCoreSSO.Cpf}";
+                    await Task.WhenAll(
+                        cacheRepositorio.RemoverAsync(chaveUsuarioIdCache),
+                        cacheRepositorio.RemoverAsync(chaveUsuarioCpfCache)
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
 
         public async Task<List<Guid>> SelecionarGrupos()
         {
-            using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
-            conn.Open();
-            var resultado = await conn.QueryAsync<Guid>(@"
+            try
+            {
+                var chaveGruposCache = "IdsGruposCoreSSO";
+
+                var listaIdGrupo = await cacheRepositorio.ObterAsync<List<Guid>>(
+                    chaveGruposCache,
+                    async () =>
+                    {
+                        using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                        conn.Open();
+                        var listaIdGrupoQry = await conn.QueryAsync<Guid>(@"
                     SELECT gru_id
                     FROM sys_grupo 
                         WHERE sis_id = 1001");
-            conn.Close();
-            return resultado.ToList();
+                        conn.Close();
+                        return listaIdGrupoQry.ToList();
+                    }
+                    );
+                return listaIdGrupo;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+
         }
     }
 }
