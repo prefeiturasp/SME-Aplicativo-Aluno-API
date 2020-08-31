@@ -32,12 +32,12 @@ namespace SME.AE.Api
         {
             AddAuthentication(services);
 
-//#if DEBUG
-//            services.Configure<KestrelServerOptions>(options =>
-//            {
-//                options.AllowSynchronousIO = true;
-//            });
-//#endif
+            
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
             services.AdicionarRedis();
 
             services.AddResponseCompression(options =>
