@@ -76,7 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SME.AE.COMUM\SME.AE.Comum.csproj" />
+    <ProjectReference Include="..\SME.AE.COMUM\SME.AE.Comum.csproj" />
     <ProjectReference Include="..\SME.AE.Dominio\SME.AE.Dominio.csproj" />
   </ItemGroup>
 
