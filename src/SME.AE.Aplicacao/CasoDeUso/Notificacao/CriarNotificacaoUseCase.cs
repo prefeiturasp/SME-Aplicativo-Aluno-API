@@ -1,20 +1,16 @@
 using MediatR;
-using Sentry;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Aplicacao.Comum.Modelos;
 using AutoMapper;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using FirebaseAdmin.Messaging;
-using System.Text;
 using SME.AE.Comum.Utilitarios;
-using System.Web;
 
 namespace SME.AE.Aplicacao
 {

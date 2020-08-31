@@ -14,6 +14,8 @@ using SME.AE.Infra;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System.Linq;
 using System.Text;
+using SME.AE.Infra.Persistencia.Cache;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace SME.AE.Api
 {
@@ -30,6 +32,14 @@ namespace SME.AE.Api
         {
             AddAuthentication(services);
 
+//#if DEBUG
+//            services.Configure<KestrelServerOptions>(options =>
+//            {
+//                options.AllowSynchronousIO = true;
+//            });
+//#endif
+            services.AdicionarRedis();
+
             services.AddResponseCompression(options =>
             {
                 options.Providers.Add<GzipCompressionProvider>();
@@ -40,9 +50,7 @@ namespace SME.AE.Api
 
             services.AddInfrastructure();
             services.AddApplication();
-
             services.AdicionarValidadoresFluentValidation();
-
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>
                 {
@@ -54,6 +62,11 @@ namespace SME.AE.Api
                 .AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
+            registrarSwagger(services);
+        }
+
+        private static void registrarSwagger(IServiceCollection services)
+        {
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
@@ -83,6 +96,7 @@ namespace SME.AE.Api
                 });
             });
         }
+
         private void AddAuthentication(IServiceCollection services)
         {
             byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
