@@ -20,34 +20,24 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
+        public async Task<RespostaApi> Executar(SolicitarReiniciarSenhaDto solicitarReiniciarSenhaDto)
         {
+            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            // Valida eh CPF Válido
-            // Mensagem CPF inválido
+            var alunos = await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            // Aluno eh ativo e tem responsável associado
-            // Mensagem padrão: Este CPF não está vinculado...
+            var usuario = await mediator.Send(new ObterUsuarioQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            // A senha do usuário 999.999.999-99 - Nome do usuário foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável.
-
-            // Se o usuário nunca acessou o APP antes, então ele não existirá na base do Escola aqui e a mensagem que deverá ser apresentada para o usuário do SGP é: 
-            // O usuário 999.999.999-99 - Nome do usuário deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha.
-
-
-            var usuario = await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
-
-            if (usuario == null)
-                throw new NegocioException("CPF não encontrado");
-
-            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(gerarTokenDto.CPF));
+            if (usuario == null && usuarioCoreSSO != null)
+                throw new NegocioException($"O usuário {usuario.Cpf} - {usuario.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
             if (usuarioCoreSSO == null)
                 throw new NegocioException("CPF não encontrado");
 
             await mediator.Send(new ReiniciarSenhaCommand() { Id = usuario.Id, PrimeiroAcesso = true });
+            var mensagemSucesso = $"A senha do usuário {usuario.Cpf} - {usuario.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
 
-            return RespostaApi.Sucesso();
+            return RespostaApi.Sucesso(mensagemSucesso);
         }
 
     }
