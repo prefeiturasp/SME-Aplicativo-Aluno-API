@@ -65,5 +65,12 @@ namespace SME.AE.Api.Controllers
         {
             return await redefinirSenhaUseCase.Executar(redefinirSenhaDto);
         }
+
+        [HttpPut("Senha/ReiniciarSenha")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> ReiniciarSenha([FromBody] GerarTokenDto gerarTokenDto, [FromServices] ISolicitarReiniciarSenhaUseCase solicitarReiniciarSenhaUseCase)
+        {
+            return await solicitarReiniciarSenhaUseCase.Executar(gerarTokenDto);
+        }
     }
 }

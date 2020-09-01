@@ -9,12 +9,9 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
-using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum.Excecoes;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -33,6 +30,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
         {
             Dominio.Entidades.Usuario usuario = await ObterUsuario(gerarTokenDto);
+
+            if (usuario == null)
+                throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
 
             if (string.IsNullOrWhiteSpace(usuario.Email))
                 throw new NegocioException("Usuário não possui e-mail cadastrado");
@@ -56,8 +56,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
             {
                 var usuario = await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
 
-                if (usuario == null)
-                    throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
+                //if (usuario == null)
+                //    throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
 
                 return usuario;
             }
