@@ -6,6 +6,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario
 {
     public interface ISolicitarReiniciarSenhaUseCase
     {
-        Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto);
+        Task<RespostaApi> Executar(SolicitarReiniciarSenhaDto reiniciarSenhaDto);
     }
 }
