@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.Practices.ObjectBuilder2;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Enumeradores;
@@ -215,20 +214,23 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private async Task SalvarUsuarioCache(RetornoUsuarioCoreSSO usuarioCoreSSO)
         {
-            try
+            if (usuarioCoreSSO != null)
             {
-                var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuarioCoreSSO.UsuId}";
-                var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuarioCoreSSO.Cpf}";
+                try
+                {
+                    var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuarioCoreSSO.UsuId}";
+                    var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuarioCoreSSO.Cpf}";
 
-                await Task.WhenAll(
-                    cacheRepositorio.SalvarAsync(chaveUsuarioIdCache, usuarioCoreSSO),
-                    cacheRepositorio.SalvarAsync(chaveUsuarioCpfCache, usuarioCoreSSO)
-                    );
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                throw ex;
+                    await Task.WhenAll(
+                        cacheRepositorio.SalvarAsync(chaveUsuarioIdCache, usuarioCoreSSO),
+                        cacheRepositorio.SalvarAsync(chaveUsuarioCpfCache, usuarioCoreSSO)
+                        );
+                }
+                catch (Exception ex)
+                {
+                    SentrySdk.CaptureException(ex);
+                    throw ex;
+                }
             }
         }
 
