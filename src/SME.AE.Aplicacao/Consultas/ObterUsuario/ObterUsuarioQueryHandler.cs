@@ -25,7 +25,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             else
                 usuario = await usuarioRepository.ObterPorIdAsync(request.Id);
 
-            return usuario;
+            return usuario ?? throw new NegocioException($"Usuário não encontrado");
         }
     }
 }
