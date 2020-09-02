@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using SME.AE.Dominio.Entidades;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterDadosAlunosQuery : IRequest<IEnumerable<Aluno>>
+    public class ObterDadosAlunosQuery : IRequest<IEnumerable<AlunoRespostaEol>>
     {
 
         public ObterDadosAlunosQuery(string cpf)
