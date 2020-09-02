@@ -37,10 +37,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     return JsonConvert.DeserializeObject<List<AlunoRespostaEol>>(dadosAlunos);
 
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-                IEnumerable<AlunoRespostaEol> listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
-
-                await cacheRepositorio.SalvarAsync(chaveCache, listaAlunos, 1080, false);
-
+                var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
                 return listaAlunos.ToList();
             }
             catch (Exception ex)

@@ -24,19 +24,15 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            var alunos = await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf));
+            await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf));
 
             var usuario = await mediator.Send(new ObterUsuarioQuery(solicitarReiniciarSenhaDto.Cpf));
 
             if (usuario == null && usuarioCoreSSO != null)
                 throw new NegocioException($"O usuário {usuario.Cpf} - {usuario.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
-            if (usuarioCoreSSO == null)
-                throw new NegocioException("CPF não encontrado");
-
             await mediator.Send(new ReiniciarSenhaCommand() { Id = usuario.Id, PrimeiroAcesso = true });
             var mensagemSucesso = $"A senha do usuário {usuario.Cpf} - {usuario.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
-
             return RespostaApi.Sucesso(mensagemSucesso);
         }
 
