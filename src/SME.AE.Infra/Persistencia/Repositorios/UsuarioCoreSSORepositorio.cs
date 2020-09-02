@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.Practices.ObjectBuilder2;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Enumeradores;
@@ -215,7 +214,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private async Task SalvarUsuarioCache(RetornoUsuarioCoreSSO usuarioCoreSSO)
         {
-            if (usuarioCoreSSO! != null)
+            if (usuarioCoreSSO != null)
             {
                 try
                 {
