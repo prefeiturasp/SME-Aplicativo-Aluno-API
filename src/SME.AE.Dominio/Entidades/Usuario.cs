@@ -23,7 +23,7 @@ namespace SME.AE.Dominio.Entidades
             PrimeiroAcesso = primeiroAcesso;
         }
 
-        public void InicarRedefinicaoSenha()
+        public void IniciarRedefinicaoSenha()
         {
             RedefinirSenha = true;
             Token = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
