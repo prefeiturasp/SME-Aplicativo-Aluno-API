@@ -29,19 +29,17 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
         {
-            Dominio.Entidades.Usuario usuario = await ObterUsuario(gerarTokenDto);
 
-            if (usuario == null)
-                throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
-
-            if (string.IsNullOrWhiteSpace(usuario.Email))
-                throw new NegocioException("Usuário não possui e-mail cadastrado");
+            var usuario = await ObterUsuario(gerarTokenDto);
 
             var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
 
             await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 
-            usuario.InicarRedefinicaoSenha();
+            usuario.IniciarRedefinicaoSenha();
+
+            if (string.IsNullOrEmpty(usuario.Email))
+                throw new NegocioException("Usuário não possui e-mail cadastrado");
 
             await EnvioEmail(usuario);
 
@@ -60,6 +58,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 //    throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
 
                 return usuario;
+
+                return await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
+
             }
             catch (Exception)
             {
