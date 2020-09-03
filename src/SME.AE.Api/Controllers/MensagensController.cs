@@ -14,10 +14,18 @@ namespace SME.AE.Api.Controllers
     {
         [HttpGet("{codigoAluno}/desde/{dataUltimaConsulta}")]
         [Authorize]
-        public async Task<ObjectResult> MensagensUsuarioLogadoAlunoDesdeData(long codigoAluno, DateTime dataUltimaConsulta, [FromServices]IMensagensUsuarioLogadoAlunoUseCase mensagensUsuarioLogadoAluno)
+        public async Task<ObjectResult> MensagensUsuarioLogadoAlunoDesdeData(long codigoAluno, DateTime dataUltimaConsulta, [FromServices] IMensagensUsuarioLogadoAlunoUseCase mensagensUsuarioLogadoAluno)
         {
 
             return Ok(await mensagensUsuarioLogadoAluno.Executar(User.Identity.Name, codigoAluno, dataUltimaConsulta));
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ObjectResult> MensagenPorId(long id, [FromServices] IMensagenUsuarioLogadoAlunoIdUseCase mensagenUsuarioLogadoAlunoId)
+        {
+
+            return Ok(await mensagenUsuarioLogadoAlunoId.Executar(id));
         }
     }
 }
