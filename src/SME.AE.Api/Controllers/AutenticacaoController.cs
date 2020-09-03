@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
@@ -64,6 +62,13 @@ namespace SME.AE.Api.Controllers
         public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody]RedefinirSenhaDto redefinirSenhaDto,[FromServices]IRedefinirSenhaUseCase redefinirSenhaUseCase)
         {
             return await redefinirSenhaUseCase.Executar(redefinirSenhaDto);
+        }
+
+        [HttpPut("Senha/ReiniciarSenha")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> ReiniciarSenha([FromBody] SolicitarReiniciarSenhaDto solicitarReiniciarSenhaDto, [FromServices] ISolicitarReiniciarSenhaUseCase solicitarReiniciarSenhaUseCase)
+        {
+            return await solicitarReiniciarSenhaUseCase.Executar(solicitarReiniciarSenhaDto);
         }
     }
 }
