@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Castle.DynamicProxy.Generators;
-using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Aplicacao.Comum.Modelos.Usuario;
+using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
 {
@@ -18,104 +13,62 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId)
+        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
         {
-            try
-            {
-                return Ok(await AutenticarUsuarioUseCase.Executar(Mediator, cpf, senha, dispositivoId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await autenticarUsuarioUseCase.Executar(cpf, senha, dispositivoId));
         }
 
         [HttpPost("Logout")]
         [AllowAnonymous]
         public async Task<ActionResult<RespostaApi>> Logout([FromQuery] string cpf, [FromQuery] string dispositivoId)
         {
-            try
-            {
-                return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf, dispositivoId));
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, ex.Message);
-            }
+            return Ok(await LogoutUsuarioUseCase.Executar(Mediator, cpf, dispositivoId));
         }
 
         [HttpPost("PrimeiroAcesso")]
-        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto)
+        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]IPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
         {
-            var validador = new NovaSenhaDtoValidator();
-
-            var result = await validador.ValidateAsync(novaSenhaDto);
-
-            var respostaAPI = new RespostaApi
-            {
-                Ok = result.IsValid
-            };
-
-            if (respostaAPI.Ok)
-                return Ok(respostaAPI);
-
-            respostaAPI.Erros = result.Errors.Select(x => x.ErrorMessage).ToArray();
-            return StatusCode(400, respostaAPI);
+            return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDto));
         }
 
         [HttpPost("AlterarEmailCelular")]
-        public async Task<ActionResult<RespostaApi>> AlterarEmailTelefone([FromBody]AlterarEmailCelularDto alterarEmailTelefoneDto)
+        public async Task<ActionResult<RespostaApi>> AlterarEmailCelular([FromBody] AlterarEmailCelularDto alterarEmailCelularDto, [FromServices]IAlterarEmailCelularUseCase alterarEmailCelularUseCase)
         {
-            var validador = new AlterarEmailTelefoneDtoValidator();
-
-            var result = await validador.ValidateAsync(alterarEmailTelefoneDto);
-
-            var respostaApi = new RespostaApi
-            {
-                Ok = result.IsValid
-            };
-
-            if (respostaApi.Ok)
-                return Ok(respostaApi);
-
-            respostaApi.Erros = result.Errors.Select(x => x.ErrorMessage).ToArray();
-            return StatusCode(400, respostaApi);
+            return Ok(await alterarEmailCelularUseCase.Executar(Mediator, alterarEmailCelularDto));
+        }
+        
+        [HttpPut("Senha/Alterar")]
+        public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody]SenhaDto senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)
+        {
+            return await alterarSenhaUseCase.Executar(new AlterarSenhaDto(User.Identity.Name, senha.NovaSenha), senha.SenhaAntiga);
         }
 
-        public class AlterarEmailCelularDto
+        [HttpPut("Senha/Token")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> SolicitarRedefinicao([FromBody]GerarTokenDto gerarTokenDto, [FromServices]ISolicitarRedifinicaoSenhaUseCase solicitarRedifinicaoSenhaUseCase)
         {
-            public long Id { get; set; }
-            public string Email { get; set; }
-            public string Celular { get; set; }
+            return await solicitarRedifinicaoSenhaUseCase.Executar(gerarTokenDto);
         }
 
-        public class NovaSenhaDto
+        [HttpPut("Senha/Token/Validar")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> ValidarToken([FromBody]ValidarTokenDto validarTokenDto,[FromServices]IValidarTokenUseCase validarTokenUseCase)
         {
-            public long Id { get; set; }
-            public string NovaSenha { get; set; }
+            return await validarTokenUseCase.Executar(validarTokenDto);
         }
 
-        public class AlterarEmailTelefoneDtoValidator : AbstractValidator<AlterarEmailCelularDto>
+        [HttpPut("Senha/Redefinir")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody]RedefinirSenhaDto redefinirSenhaDto,[FromServices]IRedefinirSenhaUseCase redefinirSenhaUseCase)
         {
-            public AlterarEmailTelefoneDtoValidator()
-            {
-                RuleFor(x => x.Id).NotNull().GreaterThan(0);
-                RuleFor(x => x.Celular).NotNull().NotEmpty().Matches(@"(\(\d{2}\)\s)(\d{4,5}\-\d{4})").When(x => string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Celular));
-                RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress().When(x => string.IsNullOrWhiteSpace(x.Celular) || !string.IsNullOrWhiteSpace(x.Email));
-            }
+            return await redefinirSenhaUseCase.Executar(redefinirSenhaDto);
         }
 
-        public class NovaSenhaDtoValidator : AbstractValidator<NovaSenhaDto>
+        [HttpPut("Senha/ReiniciarSenha")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> ReiniciarSenha([FromBody] SolicitarReiniciarSenhaDto solicitarReiniciarSenhaDto, [FromServices] ISolicitarReiniciarSenhaUseCase solicitarReiniciarSenhaUseCase)
         {
-            public NovaSenhaDtoValidator()
-            {
-                RuleFor(x => x.Id).NotNull().GreaterThan(0);
-                RuleFor(x => x.NovaSenha).MinimumLength(8)
-                .MaximumLength(12)
-                .Must(x => !x.Contains(" "))
-                .Matches(@"(?=.*?[A-Z])(?=.*?[a-z])(?=((?=.*[!@#$\-%&/\\\[\]|*()_=+])|(?=.*?[0-9]+)))");
-            }
+            return await solicitarReiniciarSenhaUseCase.Executar(solicitarReiniciarSenhaDto);
         }
     }
 }

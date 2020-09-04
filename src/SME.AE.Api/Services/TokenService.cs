@@ -11,7 +11,7 @@ namespace SME.AE.Api.Services
     public class 
         TokenService
     {
-        public static string GerarToken(Usuario usuario)
+        public static string GerarToken(UsuarioDto usuario)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Configs.Secret);
