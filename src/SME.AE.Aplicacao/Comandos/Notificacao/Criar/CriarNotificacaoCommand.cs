@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Dominio.Comum.Enumeradores;
+using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 {
-    public class CriarNotificacaoCommand : IRequest<Dominio.Entidades.Notificacao>
+    public class CriarNotificacaoCommand : IRequest<Unit>
     {
         public Dominio.Entidades.Notificacao Notificacao { get; set; }
 
@@ -17,27 +19,58 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
         }
     }
 
-    public class CriarNotificacaoCommandHandler : IRequestHandler<CriarNotificacaoCommand, Dominio.Entidades.Notificacao>
+    public class CriarNotificacaoCommandHandler : IRequestHandler<CriarNotificacaoCommand, Unit>
     {
         private readonly INotificacaoRepository _repository;
-        
+
         public CriarNotificacaoCommandHandler(INotificacaoRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<Dominio.Entidades.Notificacao> Handle
-            (CriarNotificacaoCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CriarNotificacaoCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var resultado = await _repository.Criar(request.Notificacao);
-                return resultado;
+                await _repository.Criar(request.Notificacao);
+
+                if (request.Notificacao.TipoComunicado == TipoComunicado.ALUNO)
+                    await IncluirNotificacaoAlunos(request);
+
+                else if (request.Notificacao.TipoComunicado == TipoComunicado.TURMA)
+                    await IncluirNotificacaoTurma(request);
+
+                return Unit.Value;
+
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
                 throw ex;
+            }
+        }
+
+        private async Task IncluirNotificacaoTurma(CriarNotificacaoCommand request)
+        {
+            foreach (var codigoTurma in request.Notificacao.Turmas)
+            {
+                var notificacaoTurma = new NotificacaoTurma();
+                notificacaoTurma.CodigoTurma = Convert.ToInt64(codigoTurma);
+                notificacaoTurma.NotificacaoId = request.Notificacao.Id;
+                notificacaoTurma.InserirAuditoria();
+                await _repository.InserirNotificacaoTurma(notificacaoTurma);
+            }
+        }
+
+        private async Task IncluirNotificacaoAlunos(CriarNotificacaoCommand request)
+        {
+            foreach (var codigoAluno in request.Notificacao.Alunos)
+            {
+                var notificacaoAluno = new NotificacaoAluno();
+                notificacaoAluno.CodigoAluno = Convert.ToInt64(codigoAluno);
+                notificacaoAluno.NotificacaoId = request.Notificacao.Id;
+                notificacaoAluno.InserirAuditoria();
+                await _repository.InserirNotificacaoAluno(notificacaoAluno);
             }
         }
     }

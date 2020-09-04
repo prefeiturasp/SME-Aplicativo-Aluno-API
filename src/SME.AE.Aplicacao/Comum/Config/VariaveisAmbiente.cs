@@ -9,5 +9,6 @@ namespace SME.AE.Aplicacao.Comum.Config
         public static string SentryDsn = Environment.GetEnvironmentVariable("SentryDsn");
         public static string FirebaseToken = Environment.GetEnvironmentVariable("FirebaseToken");
         public static string FirebaseProjectId = Environment.GetEnvironmentVariable("FirebaseProjectId");
+        public static string UrlArquivosEstaticos = Environment.GetEnvironmentVariable("UrlFrontEnd");
     }
 }

@@ -1,15 +1,29 @@
 ﻿using System.Threading.Tasks;
+using AutoMapper;
 using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Dominio.Entidades;
 
-namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
+namespace SME.AE.Aplicacao
 {
-    public class AtualizarNotificacaoUseCase
+    public class AtualizarNotificacaoUseCase : IAtualizarNotificacaoUseCase
     {
-        public static async Task<Dominio.Entidades.Notificacao> Executar(IMediator mediator, 
-            Dominio.Entidades.Notificacao notificacao)
+        private readonly IMediator mediator;
+        private readonly IMapper mapper;
+
+        public AtualizarNotificacaoUseCase(IMediator mediator, IMapper mapper)
         {
-            return await mediator.Send(new AtualizarNotificacaoCommand(notificacao));
+            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+            this.mapper = mapper ?? throw new System.ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
+        {
+            var resultado = await mediator.Send(new AtualizarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+
+            return mapper.Map<NotificacaoSgpDto>(resultado);
         }
     }
 }
