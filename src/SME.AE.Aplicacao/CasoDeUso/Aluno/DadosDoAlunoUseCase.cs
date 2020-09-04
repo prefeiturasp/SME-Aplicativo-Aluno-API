@@ -2,13 +2,7 @@
 using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
-using Sentry;
-using Xunit.Sdk;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Comum.Excecoes;
 
