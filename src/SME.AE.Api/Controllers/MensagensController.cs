@@ -27,5 +27,13 @@ namespace SME.AE.Api.Controllers
 
             return Ok(await mensagenUsuarioLogadoAlunoId.Executar(id));
         }
+
+        [HttpDelete("{idNotificacao}/{codigoAluno}")]
+        [Authorize]
+        public async Task<ObjectResult> ExcluirMensagenPorNotificacaoAluno(long idNotificacao, long codigoAluno, [FromServices] IMarcarExcluidaMensagenUsuarioAlunoIdUseCase marcarExcluidaMensagenUsuarioAlunoId)
+        {
+
+            return Ok(await marcarExcluidaMensagenUsuarioAlunoId.Executar(User.Identity.Name, codigoAluno, idNotificacao));
+        }
     }
 }

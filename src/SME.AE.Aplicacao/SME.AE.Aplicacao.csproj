@@ -84,7 +84,6 @@
     <Folder Include="Comandos\Usuario\AdicionarCoreSSO\" />
     <Folder Include="Comum\Interfaces\UseCase\TesteArquitetura\" />
     <Folder Include="Comum\Modelos\Validadores\" />
-    <Folder Include="Consultas\UsuarioNotificacao\" />
   </ItemGroup>
 
 </Project>
