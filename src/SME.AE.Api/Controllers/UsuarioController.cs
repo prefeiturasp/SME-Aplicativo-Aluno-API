@@ -7,11 +7,11 @@ namespace SME.AE.Api.Controllers
 {
     public class UsuarioController : ApiController
     {
-        [HttpGet("{cpf}")]
+        [HttpGet("dre/{codigoDre}/ue/{codigoUe}/cpf/{cpf}")]
         [AllowAnonymous]
-        public async Task<ObjectResult> ObterUsuariosPorCpf(string cpf, [FromServices] IObterUsuarioUseCase obterUsuarioUseCase)
+        public async Task<ObjectResult> ObterUsuariosPorCpf(string codigoDre, long codigoUe, string cpf, [FromServices] IObterUsuarioUseCase obterUsuarioUseCase)
         {
-            return Ok(await obterUsuarioUseCase.Executar(cpf));
+            return Ok(await obterUsuarioUseCase.Executar(codigoDre, codigoUe, cpf));
         }
 
     }
