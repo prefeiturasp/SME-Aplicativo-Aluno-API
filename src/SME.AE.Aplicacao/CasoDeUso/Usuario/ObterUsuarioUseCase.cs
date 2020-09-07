@@ -21,6 +21,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task<UsuarioDto> Executar(string cpf)
         {
+            if (ValidacaoCpf.Valida(cpf) == false)
+                throw new NegocioException($"CPF inválido!");
+
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(cpf));
 
             await mediator.Send(new ObterDadosAlunosQuery(cpf));
