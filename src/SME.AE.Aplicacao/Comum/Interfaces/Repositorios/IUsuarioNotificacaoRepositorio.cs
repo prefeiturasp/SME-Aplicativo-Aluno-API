@@ -14,5 +14,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task<UsuarioNotificacao> Selecionar(UsuarioNotificacao usuarioNotificacao);
         public Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf, long dreCodigoEol, string ueCodigoEol);
         public Task<bool> Atualizar(UsuarioNotificacao notificacao);
+        Task<UsuarioNotificacao> ObterPorUsuarioAlunoNotificacao(long usuarioId, long codigoAluno, long notificacaoId);
     }
 }
