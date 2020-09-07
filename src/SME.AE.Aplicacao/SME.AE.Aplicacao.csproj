@@ -27,6 +27,7 @@
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
+    <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
   </ItemGroup>
 
   <ItemGroup>
