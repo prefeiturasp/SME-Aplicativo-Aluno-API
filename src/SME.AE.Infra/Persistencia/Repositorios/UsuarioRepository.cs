@@ -28,6 +28,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
+            SentrySdk.CaptureEvent(new SentryEvent(new Exception("Teste 1234")));
+
             try
             {
                 var chaveCache = $"Usuario-{cpf}";
@@ -97,6 +99,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
                 await conexao.ExecuteAsync(sql, usuario);
                 conexao.Close();
+
+                var chaveCache = $"Usuario-{usuario.Cpf}";
+                await cacheRepositorio.RemoverAsync(chaveCache);
             }
             catch (Exception ex)
             {
