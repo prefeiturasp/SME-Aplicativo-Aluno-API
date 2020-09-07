@@ -5,11 +5,6 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
     public class ObterUsuarioPorCpfQuery : IRequest<Usuario>
     {
-        public ObterUsuarioPorCpfQuery()
-        {
-
-        }
-
         public ObterUsuarioPorCpfQuery(string cpf)
         {
             Cpf = cpf;
