@@ -137,7 +137,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             return retorno == null || !retorno.Any() ? default : retorno;  
         }
-        
+
         public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId)
         {
             using (var conexao = InstanciarConexao())
@@ -148,6 +148,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 conexao.Close();
 
+                return retorno;
+            }
+        }
+
+        public async Task<NotificacaoResposta> NotificacaoPorId(long Id)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                var consulta = QueryPorId();
+                var retorno = await conexao.QueryFirstOrDefaultAsync<NotificacaoResposta>(consulta, new { Id });
+                conexao.Close();
                 return retorno;
             }
         }
@@ -201,6 +212,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return resultado;
         }
 
+        private string QueryPorId()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n
+                    where n.id = @Id ";
+        }
+
         private string MontarQueryListagemCompleta()
         {
             return $@"select {CamposConsultaNotificacao("notificacao", true)}
@@ -220,7 +238,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       left join usuario_notificacao_leitura unl on 
                       unl.notificacao_id = notificacao.id 
                       and unl.usuario_id = @usuarioId
-                      and unl.codigo_eol_aluno = @codigoAluno";
+                      and unl.codigo_eol_aluno = @codigoAluno
+                      where unl.mensagemexcluida = false ";
         }
 
         private string QueryComunicadosSME()
