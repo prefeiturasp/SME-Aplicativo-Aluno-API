@@ -24,8 +24,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (usuario == null)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(cpf)} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
-
-
             return new UsuarioDto(usuario.Cpf, usuario.Nome);
         }
     }
