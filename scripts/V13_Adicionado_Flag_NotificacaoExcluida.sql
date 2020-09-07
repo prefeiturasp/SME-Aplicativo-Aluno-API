@@ -1,0 +1,1 @@
+ALTER TABLE if exists public.usuario_notificacao_leitura ADD if not exists mensagemexcluida bool NOT NULL DEFAULT false;
