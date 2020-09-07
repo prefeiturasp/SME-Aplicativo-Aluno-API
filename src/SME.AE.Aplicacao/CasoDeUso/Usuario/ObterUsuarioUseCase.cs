@@ -19,14 +19,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<UsuarioDto> Executar(string cpf)
+        public async Task<UsuarioDto> Executar(string codigoDre, long codigoUe, string cpf)
         {
             if (ValidacaoCpf.Valida(cpf) == false)
                 throw new NegocioException($"CPF inválido!");
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(cpf));
 
-            await mediator.Send(new ObterDadosAlunosQuery(cpf));
+            await mediator.Send(new ObterDadosAlunosPorDreUeCpfResponsavelQuery(codigoDre, codigoUe, cpf));
 
             var usuarioApp = await mediator.Send(new ObterUsuarioPorCpfQuery(cpf));
 
