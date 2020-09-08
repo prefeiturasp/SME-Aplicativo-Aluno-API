@@ -49,13 +49,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             string senhaCriptografada = string.Empty;
 
-            //verificar se as senhas são iguais
-            if (usuarioCoreSSO != null && (!Criptografia.EqualsSenha(request.Senha, usuarioCoreSSO.Senha, usuarioCoreSSO.TipoCriptografia)))
-            {                
-                validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário ou senha incorretos."));
-                return RespostaApi.Falha(validacao.Errors);
-            }
-
             //se for primeiro acesso
             if (usuarioCoreSSO == null)
             {
@@ -75,6 +68,19 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             //buscar o usuario 
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
+
+            //verificar se as senhas são iguais
+            if (usuarioRetorno != null)
+            {
+                if (!usuarioRetorno.PrimeiroAcesso)
+                {
+                    if (usuarioCoreSSO != null && (!Criptografia.EqualsSenha(request.Senha, usuarioCoreSSO.Senha, usuarioCoreSSO.TipoCriptografia)))
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário ou senha incorretos."));
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
+                }
+            }
 
             //selecionar alunos do responsável buscando apenas pelo cpf
             var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
