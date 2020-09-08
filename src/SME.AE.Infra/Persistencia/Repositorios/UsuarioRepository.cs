@@ -28,8 +28,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
-            SentrySdk.CaptureEvent(new SentryEvent(new Exception("Teste 1234")));
-
             try
             {
                 var chaveCache = $"Usuario-{cpf}";
