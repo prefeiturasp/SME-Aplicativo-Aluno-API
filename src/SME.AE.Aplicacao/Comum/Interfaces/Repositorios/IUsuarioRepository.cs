@@ -17,5 +17,9 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task<bool> RemoveUsuarioDispositivo(long idUsuario, string idDispositivo);
         Task<bool> ExisteUsuarioDispositivo(long idUsuario, string idDispositivo);
         Task<IEnumerable<string>> ObterTodos();
+        new Task<Usuario> ObterPorIdAsync(long id);
+        new Task RemoverAsync(long id);
+        new Task RemoverAsync(Usuario usuario);
+        new Task<long> SalvarAsync(Usuario usuario);
     }
 }
