@@ -68,15 +68,29 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             //buscar o usuario 
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
-
+            
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
             {
+                primeiroAcesso = usuarioRetorno.PrimeiroAcesso;
                 if (!usuarioRetorno.PrimeiroAcesso)
                 {
                     if (usuarioCoreSSO != null && (!Criptografia.EqualsSenha(request.Senha, usuarioCoreSSO.Senha, usuarioCoreSSO.TipoCriptografia)))
                     {
                         validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário ou senha incorretos."));
+                        return RespostaApi.Falha(validacao.Errors);
+                    }
+                }
+                else {
+                    var senha = Regex.Replace(request.Senha, @"\-\/", "");
+
+                    try
+                    {
+                        request.DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
+                    }
+                    catch
+                    {
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
@@ -101,7 +115,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             if (primeiroAcesso && (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento)))
             {
                 validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
-                ExcluiUsuarioSeExistir(request, usuarioRetorno);
+                //ExcluiUsuarioSeExistir(request, usuarioRetorno);
                 return RespostaApi.Falha(validacao.Errors);
             }
 
@@ -144,7 +158,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, informarCelularEmail);
+            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, informarCelularEmail || primeiroAcesso);
         }
 
         private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
@@ -159,6 +173,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
             else
             {
+                //
                 await _repository.SalvarAsync(MapearDominioUsuario(usuario, primeiroAcesso));
             }
 
