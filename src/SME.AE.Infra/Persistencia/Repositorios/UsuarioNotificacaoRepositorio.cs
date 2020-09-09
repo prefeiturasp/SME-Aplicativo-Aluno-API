@@ -27,7 +27,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                        ue_codigoeol, 
                         usuario_cpf,
                           criadopor,
-                     mensagemvisualizada)
+                     mensagemvisualizada,
+                     mensagemexcluida
+                        )
                     VALUES(@UsuarioId,
                            @NotificacaoId,
                            @dataAtual,
@@ -36,7 +38,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                            @UeCodigoEol,
                            @UsuarioCpf,
                            @CriadoPor,
-                           @MensagemVisualizada);",
+                           @MensagemVisualizada,
+                           @MensagemExcluida,
+                        );",
                     new
                     {
                         usuarioNotificacao.UsuarioId,
@@ -47,7 +51,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuarioNotificacao.UeCodigoEol,
                         usuarioNotificacao.UsuarioCpf,
                         usuarioNotificacao.CriadoPor,
-                        usuarioNotificacao.MensagemVisualizada
+                        usuarioNotificacao.MensagemVisualizada,
+                        usuarioNotificacao.MensagemExcluida
                     });
                 conn.Close();
                 return true;
@@ -76,6 +81,41 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Close();
 
             return true;
+        }
+
+
+        public async Task<UsuarioNotificacao> ObterPorUsuarioAlunoNotificacao(long usuarioId, long codigoAluno, long notificacaoId)
+        {
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+
+            await conn.OpenAsync();
+
+            var usuarioNotificacao = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
+                @"
+                    SELECT 
+                    	id, 
+                    	usuario_id usuarioid, 
+                    	codigo_eol_aluno codigoeolaluno, 
+                    	notificacao_id notificacaoid, 
+                    	criadoem, 
+                    	dre_codigoeol drecodigoeol, 
+                    	ue_codigoeol uecodigoeol, 
+                    	usuario_cpf usuariocpf, 
+                    	alteradoem, 
+                    	criadopor, 
+                    	alteradopor, 
+                    	mensagemvisualizada, 
+                    	mensagemexcluida
+                    FROM usuario_notificacao_leitura
+                    where
+                        usuario_id = @usuario_id and
+                        codigo_eol_aluno = @codigo_eol_aluno and
+                        notificacao_id = @notificacao_id
+                ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId});
+
+            await conn.CloseAsync();
+
+            return usuarioNotificacao;
         }
 
         public async Task<bool> Remover(long notificacaoId)
@@ -137,13 +177,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                          SET 
                              alteradoem= @dataAtual, 
                              alteradopor= @UsuarioId, 
-                             mensagemVisualizada= @MensagemVisualizada 
+                             mensagemVisualizada= @MensagemVisualizada,
+                             mensagemExcluida= @MensagemExcluida
                          WHERE id = @Id ;",
                 new
                 {
                     dataAtual,
                     usuarioNotificacao.UsuarioId,
                     usuarioNotificacao.MensagemVisualizada,
+                    usuarioNotificacao.MensagemExcluida,
                     usuarioNotificacao.Id
 
                 });

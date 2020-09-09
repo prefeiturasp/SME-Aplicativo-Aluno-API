@@ -22,12 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\Grupo.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
+    <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,7 +85,6 @@
     <Folder Include="Comandos\Usuario\AdicionarCoreSSO\" />
     <Folder Include="Comum\Interfaces\UseCase\TesteArquitetura\" />
     <Folder Include="Comum\Modelos\Validadores\" />
-    <Folder Include="Consultas\UsuarioNotificacao\" />
   </ItemGroup>
 
 </Project>

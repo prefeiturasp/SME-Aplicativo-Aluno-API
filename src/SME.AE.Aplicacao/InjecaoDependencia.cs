@@ -73,6 +73,9 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped(typeof(ISolicitarRedifinicaoSenhaUseCase), typeof(SolicitarRedifinicaoSenhaUseCase));
             services.TryAddScoped(typeof(IValidarTokenUseCase), typeof(ValidarTokenUseCase));
             services.TryAddScoped<IRedefinirSenhaUseCase, RedefinirSenhaUseCase>();
+            services.TryAddScoped<IMensagensUsuarioLogadoAlunoUseCase, MensagensUsuarioLogadoAlunoUseCase>();
+            services.TryAddScoped<IMensagenUsuarioLogadoAlunoIdUseCase, MensagenUsuarioLogadoAlunoIdUseCase>();
+            services.TryAddScoped<IMarcarExcluidaMensagenUsuarioAlunoIdUseCase, MarcarExcluidaMensagenUsuarioAlunoIdUseCase>();
             services.TryAddScoped<ISolicitarReiniciarSenhaUseCase, SolicitarReiniciarSenhaUseCase>();
             services.TryAddScoped<IObterUsuarioUseCase, ObterUsuarioUseCase>();
         }

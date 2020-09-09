@@ -6,6 +6,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
+using SME.AE.Comum.Utilitarios;
 using System;
 using System.Threading.Tasks;
 
@@ -22,17 +23,24 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task<RespostaApi> Executar(SolicitarReiniciarSenhaDto solicitarReiniciarSenhaDto)
         {
+
+            if (ValidacaoCpf.Valida(solicitarReiniciarSenhaDto.Cpf) == false)
+                throw new NegocioException($"CPF inválido!");
+
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(solicitarReiniciarSenhaDto.Cpf));
 
             await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            var usuario = await mediator.Send(new ObterUsuarioQuery(solicitarReiniciarSenhaDto.Cpf));
+            var usuario = await mediator.Send(new ObterUsuarioPorCpfQuery(solicitarReiniciarSenhaDto.Cpf));
 
             if (usuario == null && usuarioCoreSSO != null)
-                throw new NegocioException($"O usuário {usuario.Cpf} - {usuario.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
+                throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
+
+            if (usuario.PrimeiroAcesso == true)
+                throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuario.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
             await mediator.Send(new ReiniciarSenhaCommand() { Id = usuario.Id, PrimeiroAcesso = true });
-            var mensagemSucesso = $"A senha do usuário {usuario.Cpf} - {usuario.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
+            var mensagemSucesso = $"A senha do usuário {Formatacao.FormatarCpf(usuario.Cpf)} - {usuario.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
             return RespostaApi.Sucesso(mensagemSucesso);
         }
 
