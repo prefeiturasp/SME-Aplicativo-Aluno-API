@@ -27,6 +27,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                            AND responsavel.dt_fim IS NULL  
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
                                                            AND aluno.cd_tipo_sigilo is null";
+
+        private readonly string whereDreUeReponsavelAluno = @" WHERE responsavel.cd_cpf_responsavel = @cpf 
+                                                           AND responsavel.dt_fim IS NULL  
+                                                           AND dre.cd_unidade_educacao = @codigoDre
+                                                           AND vue.cd_unidade_educacao = @codigoUe
+                                                           AND responsavel.cd_cpf_responsavel IS NOT NULL
+                                                           AND aluno.cd_tipo_sigilo is null";
         public async Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf)
         {
             try
@@ -38,6 +45,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
                 var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
+                return listaAlunos.ToList();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        public async Task<List<AlunoRespostaEol>> ObterDadosAlunosPorDreUeCpfResponsavel(string codigoDre, long codigoUe, string cpf)
+        {
+            try
+            {
+                var chaveCache = $"dadosAlunosPorDreUeCpfResponsavel-{codigoDre}-{codigoUe}{cpf}";
+                var dadosAlunos = await cacheRepositorio.ObterAsync(chaveCache);
+                if (!string.IsNullOrWhiteSpace(dadosAlunos))
+                    return JsonConvert.DeserializeObject<List<AlunoRespostaEol>>(dadosAlunos);
+
+                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereDreUeReponsavelAluno}", new { codigoDre, codigoUe, cpf });
                 return listaAlunos.ToList();
             }
             catch (Exception ex)

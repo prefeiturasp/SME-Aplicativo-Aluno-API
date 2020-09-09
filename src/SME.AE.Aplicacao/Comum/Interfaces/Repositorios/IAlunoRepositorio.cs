@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public  interface IAlunoRepositorio
+    public interface IAlunoRepositorio
     {
         Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf);
+
+        Task<List<AlunoRespostaEol>> ObterDadosAlunosPorDreUeCpfResponsavel(string codigoDre, long codigoUe, string cpf);
     }
 }
