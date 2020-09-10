@@ -21,7 +21,6 @@ namespace SME.AE.Aplicacao
         private readonly IMapper mapper;
         public List<Dictionary<String, String>> listaDicionario = new List<Dictionary<String, String>>();
 
-
         public CriarNotificacaoUseCase(IMediator mediator, IMapper mapper)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -65,36 +64,37 @@ namespace SME.AE.Aplicacao
                 ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
             };
 
-            var Notificacao = new Notification
+            var notificacaoFirebase = new Notification
             {
                 Title = notificacao.Titulo,
                 Body = bodyUTF8,
             };
 
-            await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, Notificacao);
+
+            await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, notificacaoFirebase);
         }       
 
-        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             switch (notificacao.TipoComunicado)
             {
                 case TipoComunicado.SME:
-                    await EnviarNotificacaoSME(grupos, dicionarioNotificacao, Notificacao);
+                    await EnviarNotificacaoSME(grupos, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.DRE:
-                    await EnviarComunicadoDRE(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoDRE(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.UE:
-                    await EnviarComunicadoUE(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoUE(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.UEMOD:
-                    await EnviarComunicadoUEModalidade(notificacao, grupos, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoUEModalidade(notificacao, grupos, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.TURMA:
-                    await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.ALUNO:
-                    await EnviarComunicadoAlunos(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoAlunos(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 default:
                     break;
@@ -157,7 +157,7 @@ namespace SME.AE.Aplicacao
             await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
         }
 
-        private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             foreach (var grupo in grupos)
             {
@@ -165,18 +165,35 @@ namespace SME.AE.Aplicacao
 
                 var topico = "Grupo-" + grupo.ToString();
 
-                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
 
             }
         }
 
         private static Message MontaMensagem(string topico, Notification notificacao, Dictionary<string, string> data)
         {
-            var Mensagem = new Message();
-            Mensagem.Notification = notificacao;
-            Mensagem.Data = data;
-            Mensagem.Topic = topico;
+            Notification notificacaoUTF8 = MontaNotificacaoUTF8(notificacao);
+
+            var Mensagem = new Message
+            {
+                Notification = notificacaoUTF8,
+                Data = data,
+                Topic = topico
+            };
             return Mensagem;
+        }
+
+        private static Notification MontaNotificacaoUTF8(Notification notificacao)
+        {
+            SentrySdk.CaptureMessage($"Monta Mensagem: {notificacao.Title} {notificacao.Body}");
+            SentrySdk.CaptureMessage($"Monta Mensagem formatada: {UtilString.EncodeUTF8(notificacao.Title)} {UtilString.EncodeUTF8(notificacao.Body)}");
+
+            Notification notificacaoUTF8 = new Notification
+            {
+                Title = UtilString.EncodeUTF8(notificacao.Title),
+                Body = UtilString.EncodeUTF8(notificacao.Body)
+            };
+            return notificacaoUTF8;
         }
     }
 }
