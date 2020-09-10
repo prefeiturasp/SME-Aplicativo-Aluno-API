@@ -11,6 +11,7 @@ using AutoMapper;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using FirebaseAdmin.Messaging;
 using SME.AE.Comum.Utilitarios;
+using Sentry;
 
 namespace SME.AE.Aplicacao
 {
@@ -49,8 +50,10 @@ namespace SME.AE.Aplicacao
             notificacao.InserirCategoria();
 
             List<int> grupos = notificacao.ObterGrupoLista();
-                        
+
+            
             string bodyUTF8 = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.");
+            SentrySdk.CaptureMessage("Teste de mensagem: " + bodyUTF8);
 
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
             {
