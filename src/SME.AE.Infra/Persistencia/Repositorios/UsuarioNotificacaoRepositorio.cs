@@ -39,7 +39,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                            @UsuarioCpf,
                            @CriadoPor,
                            @MensagemVisualizada,
-                           @MensagemExcluida,
+                           @MensagemExcluida
                         );",
                     new
                     {
