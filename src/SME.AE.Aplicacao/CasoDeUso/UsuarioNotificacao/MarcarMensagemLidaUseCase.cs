@@ -175,7 +175,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
             listaEscolas.ForEach(escola =>
             {
-                var alunosAdicionar = escola.Alunos.Where(x => x.CodigoEol.Equals(usuarioMensagem.CodigoAlunoEol.ToString()));
+                var alunosAdicionar = escola.Alunos.Where(x => x.CodigoEol == usuarioMensagem.CodigoAlunoEol);
 
                 if (alunosAdicionar == null || !alunosAdicionar.Any())
                     return;
