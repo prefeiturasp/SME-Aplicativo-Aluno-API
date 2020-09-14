@@ -1,5 +1,5 @@
-﻿using SME.AE.Dominio.Entidades;
-using Dapper.FluentMap.Dommel.Mapping;
+﻿using Dapper.FluentMap.Dommel.Mapping;
+using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos
 {
@@ -7,7 +7,6 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
     {
         public BaseMap()
         {
-            
             Map(c => c.CriadoEm).ToColumn("criadoem");
             Map(c => c.CriadoPor).ToColumn("criadopor");
             Map(c => c.AlteradoEm).ToColumn("alteradoem");

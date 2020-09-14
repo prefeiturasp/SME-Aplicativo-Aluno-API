@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
 using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
@@ -78,6 +79,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IMarcarExcluidaMensagenUsuarioAlunoIdUseCase, MarcarExcluidaMensagenUsuarioAlunoIdUseCase>();
             services.TryAddScoped<ISolicitarReiniciarSenhaUseCase, SolicitarReiniciarSenhaUseCase>();
             services.TryAddScoped<IObterUsuarioUseCase, ObterUsuarioUseCase>();
+            services.TryAddScoped<IObterTermosDeUsoUseCase, ObterTermosDeUsoUseCase>();
         }
     }
 }
