@@ -5,7 +5,6 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -14,6 +13,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     {
 
         private const string ULTIMAVERSAOTERMOSDEUSO = "ultimaVersaoTermosDeUso";
+        private const string TERMODEUSOPORID = "termoDeUsoPorId";
         private readonly ICacheRepositorio cacheRepositorio;
 
         public TermosDeUsoRepositorio(ICacheRepositorio cacheRepositorio) : base(ConnectionStrings.Conexao)
@@ -50,8 +50,35 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return await base.SalvarAsync(termos);
         }
 
-        private TermosDeUso ObterUltimaVersaoCache()
-    => cacheRepositorio.Obter<TermosDeUso>($"{ULTIMAVERSAOTERMOSDEUSO}");
+        public async Task<TermosDeUso> ObterPorId(long id)
+        {
+            try
+            {
+                var termoDeUsoPorId = ObterTermosDeUsoPorIdCache(id);
+                if (termoDeUsoPorId != null)
+                    return termoDeUsoPorId;
 
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var termosDeUso = await conexao.QueryFirstAsync<TermosDeUso>($"{TermosDeUsoConsultas.ObterTermosDeUso} WHERE Id = @TermoDeUsoId", new { id });
+                conexao.Close();
+
+                var chaveTermoDeUsoPorId = $"{TERMODEUSOPORID}";
+                await cacheRepositorio.SalvarAsync(chaveTermoDeUsoPorId, termosDeUso);
+
+                return termosDeUso;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
+        private TermosDeUso ObterUltimaVersaoCache()
+=> cacheRepositorio.Obter<TermosDeUso>($"{ULTIMAVERSAOTERMOSDEUSO}");
+
+        private TermosDeUso ObterTermosDeUsoPorIdCache(long id)
+=> cacheRepositorio.Obter<TermosDeUso>($"{TERMODEUSOPORID}-{id}");
     }
 }
