@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao.Consultas.TermosDeUso
 
         private static RetornoTermosDeUsoDto MapearObjetoParaDto(Dominio.Entidades.TermosDeUso termosDeUso)
         {
-            return new RetornoTermosDeUsoDto(termosDeUso.DescricaoTermosDeUso, termosDeUso.DescricaoPoliticaPrivacidade, termosDeUso.Versao);
+            return new RetornoTermosDeUsoDto(termosDeUso.DescricaoTermosDeUso, termosDeUso.DescricaoPoliticaPrivacidade, termosDeUso.Versao, termosDeUso.Id);
         }
     }
 }
