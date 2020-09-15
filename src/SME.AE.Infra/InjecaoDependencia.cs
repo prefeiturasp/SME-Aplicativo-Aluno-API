@@ -1,19 +1,18 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
-using SME.AE.Infra.Persistencia.Repositorios;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
-using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
-using SME.AE.Infra.Persistencia.Repositorios.Externos;
 using SME.AE.Infra.Persistencia.Cache;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using SME.AE.Infra.Persistencia.Repositorios;
+using SME.AE.Infra.Persistencia.Repositorios.Externos;
+using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
 
 namespace SME.AE.Infra
 {
@@ -39,6 +38,7 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddTransient(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddTransient(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
+            services.AddTransient(typeof(ITermosDeUsoRepositorio), typeof(TermosDeUsoRepositorio));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();

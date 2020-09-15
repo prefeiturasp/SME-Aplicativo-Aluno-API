@@ -1,0 +1,37 @@
+﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum.Excecoes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace SME.AE.Aplicacao.Consultas.TermosDeUso
+{
+    public class ObterTermosDeUsoQueryHandler : IRequestHandler<ObterTermosDeUsoQuery, RetornoTermosDeUsoDto>
+    {
+        private readonly ITermosDeUsoRepositorio _termosDeUsoRepositorio;
+
+        public ObterTermosDeUsoQueryHandler(ITermosDeUsoRepositorio termosDeUsoRepositorio)
+        {
+            _termosDeUsoRepositorio = termosDeUsoRepositorio ?? throw new System.ArgumentNullException(nameof(termosDeUsoRepositorio));
+        }
+
+        public async Task<RetornoTermosDeUsoDto> Handle(ObterTermosDeUsoQuery request, CancellationToken cancellationToken)
+        {
+            var retorno = await _termosDeUsoRepositorio.ObterUltimaVersao();
+            if (retorno == null)
+                throw new NegocioException("Não foi possível encontrar os termos de uso.");
+            
+            var termosDeUsoDto = MapearObjetoParaDto(retorno);
+            return termosDeUsoDto;
+        }
+
+        private static RetornoTermosDeUsoDto MapearObjetoParaDto(Dominio.Entidades.TermosDeUso termosDeUso)
+        {
+            return new RetornoTermosDeUsoDto(termosDeUso.DescricaoTermosDeUso, termosDeUso.DescricaoPoliticaPrivacidade, termosDeUso.Versao);
+        }
+    }
+}
