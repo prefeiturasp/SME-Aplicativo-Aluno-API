@@ -1,4 +1,4 @@
-CREATE TABLE public.aceite_termos_de_uso (
+CREATE TABLE IF NOT EXISTS  public.aceite_termos_de_uso (
   id bigint not null generated always as identity UNIQUE,
   termos_de_uso_id bigint not null,
   usuario varchar(100) not null,
@@ -13,4 +13,4 @@ CREATE TABLE public.aceite_termos_de_uso (
   alterado_por varchar(100)
 );
 
-ALTER TABLE public.aceite_termos_de_uso ADD CONSTRAINT fk_termos_de_uso_id FOREIGN KEY (termos_de_uso_id) REFERENCES termos_de_uso(id);
+

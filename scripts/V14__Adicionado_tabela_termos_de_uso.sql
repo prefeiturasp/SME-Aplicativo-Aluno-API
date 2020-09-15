@@ -1,4 +1,4 @@
- CREATE TABLE public.termos_de_uso (
+ CREATE TABLE IF NOT EXISTS public.termos_de_uso (
   id bigint not null generated always as identity UNIQUE,
   descricao_termos_uso varchar,
   descricao_politica_privacidade varchar,
