@@ -2,6 +2,20 @@
 {
     public static class TermosDeUsoConsultas
     {
+
+
+        internal static string ObterTermosDeUso = @"
+        SELECT 
+            Id,
+            descricao_termos_uso, 
+            descricao_politica_privacidade, 
+            versao, 
+            criado_em, 
+            criado_por, 
+            alterado_em, 
+            alterado_por
+        FROM termos_de_uso tdu ";
+
         internal static string ObterUltimaVersaoDosTermosDeUso = @"
         SELECT 
             Id,
