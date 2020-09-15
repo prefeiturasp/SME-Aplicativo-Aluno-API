@@ -7,4 +7,5 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
     {
         Task<RetornoTermosDeUsoDto> Executar();
     }
+    
 }
