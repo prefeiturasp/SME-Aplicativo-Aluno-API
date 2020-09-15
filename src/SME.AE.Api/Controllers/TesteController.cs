@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,10 +55,17 @@ namespace SME.AE.Api.Controllers
         [AllowAnonymous]
         public async Task<ObjectResult> Teste()
         {
-            TesteEncodingDto testeEncode = new TesteEncodingDto();
-            testeEncode.Titulo = "Teste";
-            testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
-            return Ok(testeEncode);
+            //TesteEncodingDto testeEncode = new TesteEncodingDto();
+            //testeEncode.Titulo = "Teste";
+            //testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
+
+            Notification notificacaoSemUTF8 = new Notification
+            {
+                Title = "Teste",
+                Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes."
+            };
+
+            return Ok(notificacaoSemUTF8);
         }
     }
 
