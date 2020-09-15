@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FirebaseAdmin.Messaging;
@@ -58,6 +59,21 @@ namespace SME.AE.Api.Controllers
             //TesteEncodingDto testeEncode = new TesteEncodingDto();
             //testeEncode.Titulo = "Teste";
             //testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
+            Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
+            {
+                ["Titulo"] = "Teste",
+                ["Mensagem"] = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
+                ["categoriaNotificacao"] = "Categoria",
+                ["Id"] = "1",
+                ["CriadoEm"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
+                ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
+            };
+
+
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+
+            var topico = "ALU-" + "123456";
+
 
             Notification notificacaoSemUTF8 = new Notification
             {
@@ -65,7 +81,14 @@ namespace SME.AE.Api.Controllers
                 Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes."
             };
 
-            return Ok(notificacaoSemUTF8);
+            var mensagem = new Message
+            {
+                Notification = notificacaoSemUTF8,
+                Data = data,
+                Topic = topico
+            };
+
+            return Ok(mensagem);
         }
     }
 
