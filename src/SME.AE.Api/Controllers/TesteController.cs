@@ -50,5 +50,21 @@ namespace SME.AE.Api.Controllers
                 return StatusCode(400, ex.Message);
             }
         }
+        [HttpPost("teste-encoding")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> Teste()
+        {
+            TesteEncodingDto testeEncode = new TesteEncodingDto();
+            testeEncode.Titulo = "Teste";
+            testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
+            return Ok(testeEncode);
+        }
     }
+
+    public class TesteEncodingDto
+    {
+        public string Titulo { get; set; }
+        public string Mensagem { get; set; }
+    }
+
 }
