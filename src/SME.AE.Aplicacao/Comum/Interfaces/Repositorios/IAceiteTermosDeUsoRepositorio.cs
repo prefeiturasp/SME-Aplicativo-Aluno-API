@@ -5,7 +5,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IAceiteTermosDeUsoRepositorio : IBaseRepositorio<AceiteTermosDeUso>
     {
-        Task<bool> ValidarAceiteDoTermoDeUsoPorUsuarioEVersao(string usuario, double versao);
+        Task<bool> ValidarAceiteDoTermoDeUsoPorUsuarioEVersao(string cpfUsuario, double versao);
 
         Task<bool> RegistrarAceite(AceiteTermosDeUso aceiteTermosDeUso);
     }

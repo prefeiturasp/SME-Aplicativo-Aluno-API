@@ -17,7 +17,7 @@ namespace SME.AE.Aplicacao.Consultas.TermosDeUso
 
         public async Task<bool> Handle(ValidarAceiteDoTermoDeUsoPorUsuarioEVersaoQuery request, CancellationToken cancellationToken)
         {
-            var retorno = await _aceiteTermosDeUsoRepositorio.ValidarAceiteDoTermoDeUsoPorUsuarioEVersao(request.Usuario, request.Versao);
+            var retorno = await _aceiteTermosDeUsoRepositorio.ValidarAceiteDoTermoDeUsoPorUsuarioEVersao(request.CpfUsuario, request.Versao);
             if (retorno)
                 throw new NegocioException("Este usuário já aceitou os termos de uso!");
 

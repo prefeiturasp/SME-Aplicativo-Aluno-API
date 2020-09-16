@@ -7,22 +7,22 @@ namespace SME.AE.Dominio.Entidades
     public class AceiteTermosDeUso : EntidadeBase
     {
         public long TermosDeUsoId { get; private set; }
-        public string Usuario { get; private set; }
+        public string CpfUsuario { get; private set; }
         public string Device { get; private set; }
         public string Ip { get; private set; }
         public DateTime DataHoraAceite { get; private set; }
         public double Versao { get; private set; }
         public byte[] Hash { get; private set; }
 
-        public AceiteTermosDeUso(long termosDeUsoId, string usuario, string device, string ip, double versao)
+        public AceiteTermosDeUso(long termosDeUsoId, string cpfUsuario, string device, string ip, double versao)
         {
             TermosDeUsoId = termosDeUsoId;
-            Usuario = usuario;
+            CpfUsuario = cpfUsuario;
             Device = device;
             Ip = ip;
             DataHoraAceite = DateTime.Now;
             Versao = versao;
-            Hash = GerarHash($"{usuario}{device}{ip}{versao}");
+            Hash = GerarHash($"{termosDeUsoId}{cpfUsuario}{device}{ip}{versao}");
         }
 
         private byte[] GerarHash(string valor)
