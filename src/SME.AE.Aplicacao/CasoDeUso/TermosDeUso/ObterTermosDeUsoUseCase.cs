@@ -16,9 +16,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.TermosDeUso
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<RetornoTermosDeUsoDto> Executar()
+        public async Task<RetornoTermosDeUsoDto> Executar(string cpf)
         {
-            return await mediator.Send(new ObterTermosDeUsoQuery());
+            return await mediator.Send(new ObterTermosDeUsoQuery(cpf));
         }
     }
 }

@@ -21,9 +21,9 @@ namespace SME.AE.Aplicacao.Consultas.TermosDeUso
 
         public async Task<RetornoTermosDeUsoDto> Handle(ObterTermosDeUsoQuery request, CancellationToken cancellationToken)
         {
-            var retorno = await _termosDeUsoRepositorio.ObterUltimaVersao();
+            var retorno = await _termosDeUsoRepositorio.ObterTermosDeUsoPorCpf(request.CPF);
             if (retorno == null)
-                throw new NegocioException("Não foi possível encontrar os termos de uso.");
+                return null;
             
             var termosDeUsoDto = MapearObjetoParaDto(retorno);
             return termosDeUsoDto;
