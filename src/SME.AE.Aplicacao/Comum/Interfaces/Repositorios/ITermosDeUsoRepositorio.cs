@@ -5,7 +5,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface ITermosDeUsoRepositorio : IBaseRepositorio<TermosDeUso>
     {
-        Task<TermosDeUso> ObterUltimaVersao();
+        Task<TermosDeUso> ObterTermosDeUsoPorCpf(string cpf);
         Task<TermosDeUso> ObterPorId(long id);
         new Task<long> SalvarAsync(TermosDeUso termo);
     }
