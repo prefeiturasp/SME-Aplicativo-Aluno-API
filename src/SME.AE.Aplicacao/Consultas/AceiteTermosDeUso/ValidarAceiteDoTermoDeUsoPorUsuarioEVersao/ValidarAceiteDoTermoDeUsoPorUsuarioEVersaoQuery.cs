@@ -4,12 +4,12 @@ namespace SME.AE.Aplicacao.Consultas.TermosDeUso
 {
     public class ValidarAceiteDoTermoDeUsoPorUsuarioEVersaoQuery : IRequest<bool>
     {
-        public string Usuario { get; set; }
+        public string CpfUsuario { get; set; }
         public double Versao { get; set; }
 
-        public ValidarAceiteDoTermoDeUsoPorUsuarioEVersaoQuery(string usuario, double versao)
+        public ValidarAceiteDoTermoDeUsoPorUsuarioEVersaoQuery(string cpfUsuario, double versao)
         {
-            Usuario = usuario;
+            CpfUsuario = cpfUsuario;
             Versao = versao;
         }
     }

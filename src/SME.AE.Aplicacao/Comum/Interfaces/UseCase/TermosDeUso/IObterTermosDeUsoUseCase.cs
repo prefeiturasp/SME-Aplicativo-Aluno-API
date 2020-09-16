@@ -5,7 +5,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
 {
     public interface IObterTermosDeUsoUseCase
     {
-        Task<RetornoTermosDeUsoDto> Executar();
+        Task<RetornoTermosDeUsoDto> Executar(string cpf);
     }
     
 }
