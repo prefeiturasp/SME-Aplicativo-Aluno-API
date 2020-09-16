@@ -26,7 +26,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var retorno = await conn.ExecuteAsync(
                     @"INSERT INTO public.aceite_termos_de_uso 
                     (termos_de_uso_id,
-                     usuario,
+                     cpf_usuario,
                      device,
                      ip,
                      versao,
@@ -38,7 +38,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                      alterado_por
                     )
                     VALUES(@TermosDeUsoId,
-                           @Usuario,
+                           @CpfUsuario,
                            @Device,
                            @Ip,
                            @Versao,
@@ -52,7 +52,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     new
                     {
                         aceiteTermosDeUso.TermosDeUsoId,
-                        aceiteTermosDeUso.Usuario,
+                        aceiteTermosDeUso.CpfUsuario,
                         aceiteTermosDeUso.Device,
                         aceiteTermosDeUso.Ip,
                         aceiteTermosDeUso.Versao,
@@ -73,15 +73,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<bool> ValidarAceiteDoTermoDeUsoPorUsuarioEVersao(string usuario, double versao)
+        public async Task<bool> ValidarAceiteDoTermoDeUsoPorUsuarioEVersao(string cpfUsuario, double versao)
         {
             try
             {
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var aceiteExiste = await conexao.QueryFirstOrDefaultAsync<int>($"SELECT count(id) FROM public.aceite_termos_de_uso WHERE usuario = @usuario AND versao = @versao", new { usuario, versao });
+                var aceiteExiste = await conexao.QueryFirstOrDefaultAsync<int>($"SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao", new { cpfUsuario, versao });
                 conexao.Close();
-                return aceiteExiste == 1 ? true : false;
+                return aceiteExiste >= 1 ? true : false;
             }
             catch (Exception ex)
             {
