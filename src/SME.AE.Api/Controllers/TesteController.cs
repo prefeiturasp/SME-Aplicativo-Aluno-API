@@ -39,6 +39,15 @@ namespace SME.AE.Api.Controllers
             }
         }
 
+        [HttpPost("teste-encoding")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> Teste() {
+            TesteEncodingDto testeEncode = new TesteEncodingDto();
+            testeEncode.Titulo = "Teste";
+            testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
+            return Ok(testeEncode);
+        }
+
         [HttpGet("obter-data-hora-servidor")]
         [Authorize]
         public async Task<ActionResult> ObterDataHoraAtualBanco()
@@ -91,6 +100,7 @@ namespace SME.AE.Api.Controllers
             return Ok(mensagem);
         }
     }
+
 
     public class TesteEncodingDto
     {
