@@ -40,7 +40,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
                     break;
                 case TipoComunicado.UE:
                 case TipoComunicado.UEMOD:
-                    CategoriaNotificacao = String.IsNullOrEmpty(SeriesResumidas) ? "UE" : "TURMA";
+                    CategoriaNotificacao = SeriesResumidas.ToStringEnumerable().Any() ? "TURMA" : "UE";
                     break;
                 case TipoComunicado.TURMA:
                 case TipoComunicado.ALUNO:
