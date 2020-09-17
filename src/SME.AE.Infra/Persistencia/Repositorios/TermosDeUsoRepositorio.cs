@@ -12,6 +12,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class TermosDeUsoRepositorio : BaseRepositorio<TermosDeUso>, ITermosDeUsoRepositorio
     {
         private const string TERMODEUSOPORID = "termoDeUsoPorId";
+        private const string ULTIMAVERSAOTERMOSDEUSO = "ultimaVersaoTermosDeUso";
         private readonly ICacheRepositorio cacheRepositorio;
 
         public TermosDeUsoRepositorio(ICacheRepositorio cacheRepositorio) : base(ConnectionStrings.Conexao)
@@ -67,7 +68,36 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+
+
+        public async Task<TermosDeUso> ObterUltimaVersaoTermosDeUso()
+        {
+            try
+            {
+                var ultimaVersaoTermosDeUsoCache = ObterUltimaVersaoCache();
+                if (ultimaVersaoTermosDeUsoCache != null)
+                    return ultimaVersaoTermosDeUsoCache;
+
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var termosDeUso = await conexao.QueryFirstAsync<TermosDeUso>(TermosDeUsoConsultas.ObterUltimaVersaoDosTermosDeUso);
+                conexao.Close();
+
+                var chaveUltimaVersaoTermosDeUso = $"{ULTIMAVERSAOTERMOSDEUSO}";
+                await cacheRepositorio.SalvarAsync(chaveUltimaVersaoTermosDeUso, termosDeUso);
+                return termosDeUso;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
+        private TermosDeUso ObterUltimaVersaoCache()
+=> cacheRepositorio.Obter<TermosDeUso>($"{ULTIMAVERSAOTERMOSDEUSO}");
+
         private TermosDeUso ObterTermosDeUsoPorIdCache(long id)
-        => cacheRepositorio.Obter<TermosDeUso>($"{TERMODEUSOPORID}-{id}");
+=> cacheRepositorio.Obter<TermosDeUso>($"{TERMODEUSOPORID}-{id}");
     }
 }
