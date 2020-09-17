@@ -80,6 +80,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<ISolicitarReiniciarSenhaUseCase, SolicitarReiniciarSenhaUseCase>();
             services.TryAddScoped<IObterUsuarioUseCase, ObterUsuarioUseCase>();
             services.TryAddScoped<IObterTermosDeUsoUseCase, ObterTermosDeUsoUseCase>();
+            services.TryAddScoped<IObterTermosDeUsoPorCpfUseCase, ObterTermosDeUsoPorCpfUseCase>();
             services.TryAddScoped<IRegistrarAceiteDosTermosDeUsoUseCase, RegistrarAceiteDosTermosDeUsoUseCase>();
         }
     }
