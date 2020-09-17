@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
 {
-    public interface IObterTermosDeUsoUseCase
+    public interface IObterTermosDeUsoPorCpfUseCase
     {
-        Task<RetornoTermosDeUsoDto> Executar();
+        Task<RetornoTermosDeUsoDto> Executar(string cpf);
     }
 }
