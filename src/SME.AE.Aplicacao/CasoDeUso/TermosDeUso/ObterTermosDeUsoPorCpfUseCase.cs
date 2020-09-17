@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.TermosDeUso
 {
-    public class ObterTermosDeUsoUseCase : IObterTermosDeUsoUseCase
+    public class ObterTermosDeUsoPorCpfUseCase : IObterTermosDeUsoPorCpfUseCase
     {
         private readonly IMediator mediator;
 
-        public ObterTermosDeUsoUseCase(IMediator mediator)
+        public ObterTermosDeUsoPorCpfUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<RetornoTermosDeUsoDto> Executar()
+        public async Task<RetornoTermosDeUsoDto> Executar(string cpf)
         {
-            return await mediator.Send(new ObterTermosDeUsoQuery());
+            return await mediator.Send(new ObterTermosDeUsoPorCpfQuery(cpf));
         }
     }
 }
