@@ -15,18 +15,16 @@ ENV TZ=America/Sao_Paulo
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Set the locale
-RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8  
 ENV LANGUAGE en_US:en  
 ENV LC_ALL en_US.UTF-8   
 
 ADD . /src
 WORKDIR /src 
-RUN 
-	apt-get update \
-	&& apt-get install -y locales \
-    && apt-get install -yq tzdata \
+RUN apt-get update -y \
+    && apt-get install -yq tzdata locales -y \
     && dpkg-reconfigure --frontend noninteractive tzdata \ 
+	&& locale-gen en_US.UTF-8 \
     && dotnet restore \  
     && dotnet publish -c Release \   
     && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
