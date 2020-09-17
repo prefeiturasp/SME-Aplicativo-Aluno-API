@@ -12,9 +12,16 @@ namespace SME.AE.Api.Controllers
     {
         [HttpGet()]
         [AllowAnonymous]
-        public async Task<ObjectResult> ObterUsuariosPorCpf(string cpf, [FromServices] IObterTermosDeUsoUseCase obterTermosDeUsoUseCase)
+        public async Task<ObjectResult> ObterTermoDeUsoPorCpf(string cpf, [FromServices] IObterTermosDeUsoPorCpfUseCase obterTermosDeUsoPorCpfUseCase)
         {
-            return Ok(await obterTermosDeUsoUseCase.Executar(cpf));
+            return Ok(await obterTermosDeUsoPorCpfUseCase.Executar(cpf));
+        }
+
+        [HttpGet("logado")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterTermoDeUso([FromServices] IObterTermosDeUsoUseCase obterTermosDeUsoUseCase)
+        {
+            return Ok(await obterTermosDeUsoUseCase.Executar());
         }
 
         [HttpPost("registrar-aceite")]
