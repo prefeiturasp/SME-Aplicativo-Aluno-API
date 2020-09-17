@@ -52,7 +52,8 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 CodigoUE = aluno.CodigoEscola,
                 CodigoUsuario  = usuario.Id,
                 GruposId = string.Join(',', grupos),
-                DataUltimaConsulta = dataUltimaConsulta
+                DataUltimaConsulta = dataUltimaConsulta,
+                SerieResumida = aluno.SerieResumida
             });
         }
     }
