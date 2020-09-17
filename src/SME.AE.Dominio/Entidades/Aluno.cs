@@ -22,5 +22,6 @@ namespace SME.AE.Dominio.Entidades
         public string SituacaoMatricula { get; set; }
         public DateTime DataNascimento { get; set; }
         public DateTime DataSituacaoMatricula { get; set; }
+        public string SerieResumida { get; set; }
     }
 }

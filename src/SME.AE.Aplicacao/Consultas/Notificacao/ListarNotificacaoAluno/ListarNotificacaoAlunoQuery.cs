@@ -14,5 +14,6 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
         public string CodigoTurma { get; set; }
         public string CodigoAluno { get; set; }
         public long CodigoUsuario { get; set; }
+        public string SerieResumida { get; set; }
     }
 }

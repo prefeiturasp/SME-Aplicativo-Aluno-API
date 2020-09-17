@@ -12,7 +12,9 @@ namespace SME.AE.Aplicacao.Comum.Enumeradores
         UE = 3,
         UEMOD = 4,
         TURMA = 5,
-        ALUNO = 6
+        ALUNO = 6,
+        SME_ANO = 7,
+        DRE_ANO = 8
     }
 
 }

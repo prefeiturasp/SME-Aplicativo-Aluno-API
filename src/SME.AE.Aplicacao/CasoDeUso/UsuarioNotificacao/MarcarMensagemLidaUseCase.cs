@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid;
 using SME.AE.Comum.Excecoes;
+using SME.AE.Comum.Utilitarios;
 using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Dominio.Entidades;
 using System.Collections.Generic;
@@ -37,8 +38,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                 case TipoComunicado.SME:
                     await ConfirmarLeituraSME(mediator, usuarioMensagem, cpfUsuario, listaEscolas, notificacao);
                     break;
+                case TipoComunicado.SME_ANO:
+                    await ConfirmarLeituraSME_ANO(mediator, usuarioMensagem, cpfUsuario, listaEscolas, notificacao);
+                    break;
                 case TipoComunicado.DRE:
                     await ConfirmarLeituraDRE(mediator, usuarioMensagem, cpfUsuario, listaEscolas, notificacao);
+                    break;
+                case TipoComunicado.DRE_ANO:
+                    await ConfirmarLeituraDRE_ANO(mediator, usuarioMensagem, cpfUsuario, listaEscolas, notificacao);
                     break;
                 case TipoComunicado.UE:
                     await ConfirmarLeituraUE(mediator, usuarioMensagem, cpfUsuario, listaEscolas, notificacao);
@@ -90,6 +97,11 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
                 var alunosEscolaMod = escola.Alunos.Where(aluno => aluno.CodigoEscola.Equals(notificacao.CodigoUe.ToString()));
 
+                var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+                if (seriesResumidas.Any())
+                    alunosEscolaMod = alunosEscolaMod.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
+
+
                 if (alunosEscolaMod == null || !alunosEscolaMod.Any())
                     return;
 
@@ -110,6 +122,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
             listaEscolas.ForEach(escola =>
             {
                 var alunosAdicionar = escola.Alunos.Where(x => x.CodigoEscola.Equals(notificacao.CodigoUe.ToString()));
+
+                //var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+                //if (seriesResumidas.Any())
+                //    alunosAdicionar = alunosAdicionar.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
 
                 if (alunosAdicionar == null || !alunosAdicionar.Any())
                     return;
@@ -148,6 +164,34 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                 await ConfirmarLeitura(mediator, usuarioMensagem, cpfUsuario, aluno);
         }
 
+        private static async Task ConfirmarLeituraDRE_ANO(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario, IEnumerable<ListaEscola> listaEscolas, NotificacaoResposta notificacao)
+        {
+            List<Dominio.Entidades.Aluno> alunos = new List<Dominio.Entidades.Aluno>();
+
+            listaEscolas.ForEach(escola =>
+            {
+                if (notificacao.GruposId != null && notificacao.GruposId.Length > 0 && !notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())))
+                    return;
+
+                var adicionar = escola.Alunos.Where(aluno => aluno.CodigoDre.Equals(notificacao.CodigoDre.ToString()));
+
+                var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+                if (seriesResumidas.Any())
+                    adicionar = adicionar.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
+
+                if (adicionar == null || !adicionar.Any())
+                    return;
+
+                alunos.AddRange(adicionar);
+            });
+
+            if (alunos == null || !alunos.Any())
+                throw new NegocioException("Nenhum aluno deste usuário está matriculado na DRE desta Notificação");
+
+            foreach (var aluno in alunos)
+                await ConfirmarLeitura(mediator, usuarioMensagem, cpfUsuario, aluno);
+        }
+
         private static async Task ConfirmarLeituraSME(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario, IEnumerable<ListaEscola> listaEscolas, NotificacaoResposta notificacao)
         {
             List<Dominio.Entidades.Aluno> alunos = new List<Dominio.Entidades.Aluno>();
@@ -155,6 +199,31 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
             listaEscolas.ForEach(escola =>
             {
                 var alunosAdicionar = notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())) ? escola.Alunos : default;
+
+                if (alunosAdicionar == null || !alunosAdicionar.Any())
+                    return;
+
+                alunos.AddRange(alunosAdicionar);
+            });
+
+            if (alunos == null || !alunos.Any())
+                throw new NegocioException("Nenhum aluno deste usuário está matriculado no grupo desta Notificação");
+
+            foreach (var aluno in alunos)
+                await ConfirmarLeitura(mediator, usuarioMensagem, cpfUsuario, aluno);
+        }
+
+        private static async Task ConfirmarLeituraSME_ANO(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario, IEnumerable<ListaEscola> listaEscolas, NotificacaoResposta notificacao)
+        {
+            List<Dominio.Entidades.Aluno> alunos = new List<Dominio.Entidades.Aluno>();
+
+            listaEscolas.ForEach(escola =>
+            {
+                var alunosAdicionar = notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())) ? escola.Alunos : default;
+
+                var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+                if (seriesResumidas.Any())
+                    alunosAdicionar = alunosAdicionar.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
 
                 if (alunosAdicionar == null || !alunosAdicionar.Any())
                     return;

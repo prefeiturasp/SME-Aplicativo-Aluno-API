@@ -22,6 +22,7 @@
 	                                                        N.AlteradoPor,
                                                             N.TipoComunicado,
                                                             N.CategoriaNotificacao,
+                                                            N.SeriesResumidas,
 	                                                        UNL.mensagemvisualizada
                                                         from
 	                                                        Notificacao N
