@@ -22,7 +22,10 @@ ENV LC_ALL en_US.UTF-8
 
 ADD . /src
 WORKDIR /src 
-RUN apt-get update \
+RUN 
+	apt-get clean \
+	&& apt-get update \
+	&& apt-get install -y locales \
     && apt-get install -yq tzdata \
     && dpkg-reconfigure --frontend noninteractive tzdata \ 
     && dotnet restore \  
