@@ -14,6 +14,12 @@ ENV SentryDsn=$SentryDsn
 ENV TZ=America/Sao_Paulo
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Set the locale
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8   
+
 ADD . /src
 WORKDIR /src 
 RUN apt-get update \
