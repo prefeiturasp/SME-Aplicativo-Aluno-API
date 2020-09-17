@@ -29,5 +29,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public int CodigoEtapaEnsino { get; set; }
         public string Grupo { get; set; }
         public long CodigoGrupo { get; internal set; }
+        public string SerieResumida { get; set; }
     }
 }
