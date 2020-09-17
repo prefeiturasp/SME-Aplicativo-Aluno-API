@@ -18,6 +18,8 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
                 config.AddMap(new NotificacaoAlunoMap());
                 config.AddMap(new NotificacaoTurmaMap());
                 config.AddMap(new ConfiguracaoEmailMap());
+                config.AddMap(new TermosDeUsoMap());
+                config.AddMap(new AceiteTermosDeUsoMap());
                 config.ForDommel();
             });
         }
