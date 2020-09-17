@@ -63,7 +63,7 @@ namespace SME.AE.Api.Controllers
         }
         [HttpPost("teste-encoding")]
         [AllowAnonymous]
-        public async Task<ObjectResult> Teste()
+        public async Task<ObjectResult> TesteEncoding()
         {
             //TesteEncodingDto testeEncode = new TesteEncodingDto();
             //testeEncode.Titulo = "Teste";
