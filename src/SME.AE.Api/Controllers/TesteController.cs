@@ -39,15 +39,6 @@ namespace SME.AE.Api.Controllers
             }
         }
 
-        [HttpPost("teste-encoding")]
-        [AllowAnonymous]
-        public async Task<ObjectResult> Teste() {
-            TesteEncodingDto testeEncode = new TesteEncodingDto();
-            testeEncode.Titulo = "Teste";
-            testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
-            return Ok(testeEncode);
-        }
-
         [HttpGet("obter-data-hora-servidor")]
         [Authorize]
         public async Task<ActionResult> ObterDataHoraAtualBanco()
@@ -61,51 +52,5 @@ namespace SME.AE.Api.Controllers
                 return StatusCode(400, ex.Message);
             }
         }
-        [HttpPost("teste-encoding")]
-        [AllowAnonymous]
-        public async Task<ObjectResult> TesteEncoding()
-        {
-            //TesteEncodingDto testeEncode = new TesteEncodingDto();
-            //testeEncode.Titulo = "Teste";
-            //testeEncode.Mensagem = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.";
-            Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
-            {
-                ["Titulo"] = "Teste",
-                ["Mensagem"] = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.",
-                ["categoriaNotificacao"] = "Categoria",
-                ["Id"] = "1",
-                ["CriadoEm"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
-                ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
-            };
-
-
-            var data = new Dictionary<String, String>(dicionarioNotificacao);
-
-            var topico = "ALU-" + "123456";
-
-
-            Notification notificacaoSemUTF8 = new Notification
-            {
-                Title = "Teste",
-                Body = "Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes."
-            };
-
-            var mensagem = new Message
-            {
-                Notification = notificacaoSemUTF8,
-                Data = data,
-                Topic = topico
-            };
-
-            return Ok(mensagem);
-        }
     }
-
-
-    public class TesteEncodingDto
-    {
-        public string Titulo { get; set; }
-        public string Mensagem { get; set; }
-    }
-
 }
