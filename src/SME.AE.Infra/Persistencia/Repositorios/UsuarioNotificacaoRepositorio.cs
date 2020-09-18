@@ -110,7 +110,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where
                         usuario_id = @usuario_id and
                         codigo_eol_aluno = @codigo_eol_aluno and
-                        notificacao_id = @notificacao_id
+                        notificacao_id = @notificacaoId
                 ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId});
 
             await conn.CloseAsync();
