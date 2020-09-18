@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
@@ -51,8 +51,8 @@ namespace SME.AE.Aplicacao
             List<int> grupos = notificacao.ObterGrupoLista();
 
             
-            string bodyUTF8 = UtilString.EncodeUTF8("Voc� recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.");
-            SentrySdk.CaptureMessage("Teste de mensagem: " + bodyUTF8);
+            string bodyUTF8 = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.").Replace("�", "ê");
+            SentrySdk.CaptureMessage("Teste de mensagem: " + bodyUTF8.Replace("�", "ê"));
 
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
             {
@@ -186,7 +186,7 @@ namespace SME.AE.Aplicacao
         private static Notification MontaNotificacaoUTF8(Notification notificacao)
         {
             SentrySdk.CaptureMessage($"Monta Mensagem: {notificacao.Title} {notificacao.Body}");
-            SentrySdk.CaptureMessage($"Monta Mensagem formatada: {UtilString.EncodeUTF8(notificacao.Title)} {UtilString.EncodeUTF8(notificacao.Body)}");
+            SentrySdk.CaptureMessage($"Monta Mensagem formatada: {UtilString.EncodeUTF8(notificacao.Title)} {UtilString.EncodeUTF8(notificacao.Body.Replace("�", "ê"))}");
 
             Notification notificacaoUTF8 = new Notification
             {
