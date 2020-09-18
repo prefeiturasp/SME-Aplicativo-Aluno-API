@@ -12,6 +12,7 @@ using SME.AE.Aplicacao.Comum.Enumeradores;
 using FirebaseAdmin.Messaging;
 using SME.AE.Comum.Utilitarios;
 using Sentry;
+using System.Linq;
 
 namespace SME.AE.Aplicacao
 {
@@ -48,9 +49,6 @@ namespace SME.AE.Aplicacao
 
             notificacao.InserirCategoria();
 
-            List<int> grupos = notificacao.ObterGrupoLista();
-
-            
             string bodyUTF8 = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.").Replace("�", "ê");
             SentrySdk.CaptureMessage("Teste de mensagem: " + bodyUTF8.Replace("�", "ê"));
 
@@ -71,24 +69,37 @@ namespace SME.AE.Aplicacao
             };
 
 
-            await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, notificacaoFirebase);
+            await EnviarNotificacao(notificacao, dicionarioNotificacao, notificacaoFirebase);
         }       
 
-        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             switch (notificacao.TipoComunicado)
             {
                 case TipoComunicado.SME:
-                    await EnviarNotificacaoSME(grupos, dicionarioNotificacao, notificacaoFirebase);
+                    await EnviarNotificacaoSME(notificacao.ObterGrupoLista(), dicionarioNotificacao, notificacaoFirebase);
+                    break;
+                case TipoComunicado.SME_ANO:
+                    await EnviarNotificacaoSerieResumida(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.DRE:
                     await EnviarComunicadoDRE(notificacao, dicionarioNotificacao, notificacaoFirebase);
+                    break;
+                case TipoComunicado.DRE_ANO:
+                    await EnviarComunicadoDRE_ANO(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.UE:
                     await EnviarComunicadoUE(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.UEMOD:
-                    await EnviarComunicadoUEModalidade(notificacao, grupos, dicionarioNotificacao, notificacaoFirebase);
+                    if (notificacao.ObterSeriesResumidas().Any())
+                    {
+                        await EnviarNotificacaoSerieResumida(notificacao, dicionarioNotificacao, notificacaoFirebase);
+                    }
+                    else
+                    {
+                        await EnviarComunicadoUEModalidade(notificacao, dicionarioNotificacao, notificacaoFirebase);
+                    }
                     break;
                 case TipoComunicado.TURMA:
                     await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, notificacaoFirebase);
@@ -128,8 +139,9 @@ namespace SME.AE.Aplicacao
             }
         }
 
-        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
         {
+            var grupos = notificacao.ObterGrupoLista();
             foreach (var grupo in grupos)
             {
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
@@ -157,6 +169,18 @@ namespace SME.AE.Aplicacao
             await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
         }
 
+        private async Task EnviarComunicadoDRE_ANO(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        {
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+            var seriesResumidas = notificacao.ObterSeriesResumidas();
+
+            foreach (var serieResumida in seriesResumidas)
+            {
+                var topico = $"SERIERESUMIDA-{serieResumida}-DRE-{notificacao.CodigoDre}";
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+            }
+        }
+
         private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             foreach (var grupo in grupos)
@@ -167,6 +191,21 @@ namespace SME.AE.Aplicacao
 
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
 
+            }
+        }
+        private async Task EnviarNotificacaoSerieResumida(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        {
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+            var grupos = notificacao.ObterGrupoLista();
+            var seriesResumidas = notificacao.ObterSeriesResumidas();
+
+            foreach (var serieResumida in seriesResumidas)
+            {
+                foreach (var grupo in grupos)
+                {
+                    var topico = $"SERIERESUMIDA-{serieResumida}-MOD-{grupo}";
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+                }
             }
         }
 
