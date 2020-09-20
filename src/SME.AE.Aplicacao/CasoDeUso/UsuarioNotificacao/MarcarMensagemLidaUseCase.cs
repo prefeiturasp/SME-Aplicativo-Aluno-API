@@ -88,28 +88,18 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
         private static async Task ConfirmarLeituraUEMOD(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario, IEnumerable<ListaEscola> listaEscolas, NotificacaoResposta notificacao)
         {
-            List<Dominio.Entidades.Aluno> alunos = new List<Dominio.Entidades.Aluno>();
-
-            listaEscolas.ForEach(escola =>
-            {
-                if (notificacao.GruposId != null && notificacao.GruposId.Length > 0 && !notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())))
-                    return;
-
-                var alunosEscolaMod = escola.Alunos.Where(aluno => aluno.CodigoEscola.Equals(notificacao.CodigoUe.ToString()));
-
-                var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
-                if (seriesResumidas.Any())
-                    alunosEscolaMod = alunosEscolaMod.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
-
-
-                if (alunosEscolaMod == null || !alunosEscolaMod.Any())
-                    return;
-
-                alunos.AddRange(alunosEscolaMod);
-            });
+            var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+            var seriesResumidasNaoExistem = !seriesResumidas.Any();
+            var gruposNaoExistem = !notificacao.GruposId.Any();
+            var alunos =
+                listaEscolas
+                .Where(escola => gruposNaoExistem || notificacao.GruposId.Contains(escola.CodigoGrupo.ToString()))
+                .SelectMany(escola => escola.Alunos)
+                .Where(aluno => aluno.CodigoEscola == notificacao.CodigoUe.ToString())
+                .Where(aluno => (seriesResumidasNaoExistem || seriesResumidas.Contains(aluno.SerieResumida)));
 
             if (alunos == null || !alunos.Any())
-                throw new NegocioException("Nenhum Aluno está matriculado na modalidade da escola da notificação");
+                throw new NegocioException("Nenhum Aluno está matriculado na modalidade/ano da escola da notificação");
 
             foreach (var aluno in alunos)
                 await ConfirmarLeitura(mediator, usuarioMensagem, cpfUsuario, aluno);
@@ -166,27 +156,18 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
         private static async Task ConfirmarLeituraDRE_ANO(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario, IEnumerable<ListaEscola> listaEscolas, NotificacaoResposta notificacao)
         {
-            List<Dominio.Entidades.Aluno> alunos = new List<Dominio.Entidades.Aluno>();
-
-            listaEscolas.ForEach(escola =>
-            {
-                if (notificacao.GruposId != null && notificacao.GruposId.Length > 0 && !notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())))
-                    return;
-
-                var adicionar = escola.Alunos.Where(aluno => aluno.CodigoDre.Equals(notificacao.CodigoDre.ToString()));
-
-                var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
-                if (seriesResumidas.Any())
-                    adicionar = adicionar.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
-
-                if (adicionar == null || !adicionar.Any())
-                    return;
-
-                alunos.AddRange(adicionar);
-            });
+            var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+            var seriesResumidasNaoExistem = !seriesResumidas.Any();
+            var gruposNaoExistem = !notificacao.GruposId.Any();
+            var alunos =
+                listaEscolas
+                .Where(escola => gruposNaoExistem || notificacao.GruposId.Contains(escola.CodigoGrupo.ToString()))
+                .SelectMany(escola => escola.Alunos)
+                .Where(aluno => aluno.CodigoDre == notificacao.CodigoDre.ToString())
+                .Where(aluno => (seriesResumidasNaoExistem || seriesResumidas.Contains(aluno.SerieResumida)));
 
             if (alunos == null || !alunos.Any())
-                throw new NegocioException("Nenhum aluno deste usuário está matriculado na DRE desta Notificação");
+                throw new NegocioException("Nenhum aluno deste usuário está matriculado na DRE/Ano desta Notificação");
 
             foreach (var aluno in alunos)
                 await ConfirmarLeitura(mediator, usuarioMensagem, cpfUsuario, aluno);
@@ -215,24 +196,16 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
         private static async Task ConfirmarLeituraSME_ANO(IMediator mediator, UsuarioNotificacaoDto usuarioMensagem, string cpfUsuario, IEnumerable<ListaEscola> listaEscolas, NotificacaoResposta notificacao)
         {
-            List<Dominio.Entidades.Aluno> alunos = new List<Dominio.Entidades.Aluno>();
-
-            listaEscolas.ForEach(escola =>
-            {
-                var alunosAdicionar = notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())) ? escola.Alunos : default;
-
-                var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
-                if (seriesResumidas.Any())
-                    alunosAdicionar = alunosAdicionar.Where(aluno => seriesResumidas.Contains(aluno.SerieResumida));
-
-                if (alunosAdicionar == null || !alunosAdicionar.Any())
-                    return;
-
-                alunos.AddRange(alunosAdicionar);
-            });
+            var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
+            var seriesResumidasNaoExistem = !seriesResumidas.Any();
+            var alunos = 
+                listaEscolas
+                .Where(escola => notificacao.GruposId.Contains(escola.CodigoGrupo.ToString()))
+                .SelectMany(escola => escola.Alunos)
+                .Where(alunos => (seriesResumidasNaoExistem || seriesResumidas.Contains(alunos.SerieResumida)));
 
             if (alunos == null || !alunos.Any())
-                throw new NegocioException("Nenhum aluno deste usuário está matriculado no grupo desta Notificação");
+                throw new NegocioException("Nenhum aluno deste usuário está matriculado no grupo/ano desta Notificação");
 
             foreach (var aluno in alunos)
                 await ConfirmarLeitura(mediator, usuarioMensagem, cpfUsuario, aluno);
