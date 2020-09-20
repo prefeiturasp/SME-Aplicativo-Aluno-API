@@ -275,6 +275,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
                     where n.tipocomunicado = {(int)TipoComunicado.DRE}
+                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
         private string QueryComunicadosDRE_ANO()
@@ -282,6 +283,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
                     where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO}
+                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
 
