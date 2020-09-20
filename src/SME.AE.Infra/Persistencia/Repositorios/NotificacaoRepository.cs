@@ -222,7 +222,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private string MontarQueryListagemCompleta(string serieResumida)
         {
-            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,',') ";
+            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
 
             return $@"select {CamposConsultaNotificacao("notificacao", true)}
                       unl.mensagemvisualizada from(
