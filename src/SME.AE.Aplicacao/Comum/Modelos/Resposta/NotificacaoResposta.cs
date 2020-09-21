@@ -25,5 +25,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string CategoriaNotificacao { get; set; }
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
+        public string SeriesResumidas { get; set; }
     }
 }

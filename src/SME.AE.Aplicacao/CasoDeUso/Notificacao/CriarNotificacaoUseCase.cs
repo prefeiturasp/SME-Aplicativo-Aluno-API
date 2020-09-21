@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
@@ -11,6 +11,8 @@ using AutoMapper;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using FirebaseAdmin.Messaging;
 using SME.AE.Comum.Utilitarios;
+using Sentry;
+using System.Linq;
 
 namespace SME.AE.Aplicacao
 {
@@ -19,7 +21,6 @@ namespace SME.AE.Aplicacao
         private readonly IMediator mediator;
         private readonly IMapper mapper;
         public List<Dictionary<String, String>> listaDicionario = new List<Dictionary<String, String>>();
-
 
         public CriarNotificacaoUseCase(IMediator mediator, IMapper mapper)
         {
@@ -48,9 +49,8 @@ namespace SME.AE.Aplicacao
 
             notificacao.InserirCategoria();
 
-            List<int> grupos = notificacao.ObterGrupoLista();
-                        
-            string bodyUTF8 = UtilString.EncodeUTF8("Voc� recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.");
+            string bodyUTF8 = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.").Replace("�", "ê");
+            SentrySdk.CaptureMessage("Teste de mensagem: " + bodyUTF8.Replace("�", "ê"));
 
             Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
             {
@@ -62,36 +62,50 @@ namespace SME.AE.Aplicacao
                 ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
             };
 
-            var Notificacao = new Notification
+            var notificacaoFirebase = new Notification
             {
                 Title = notificacao.Titulo,
                 Body = bodyUTF8,
             };
 
-            await EnviarNotificacao(notificacao, grupos, dicionarioNotificacao, Notificacao);
+
+            await EnviarNotificacao(notificacao, dicionarioNotificacao, notificacaoFirebase);
         }       
 
-        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             switch (notificacao.TipoComunicado)
             {
                 case TipoComunicado.SME:
-                    await EnviarNotificacaoSME(grupos, dicionarioNotificacao, Notificacao);
+                    await EnviarNotificacaoSME(notificacao.ObterGrupoLista(), dicionarioNotificacao, notificacaoFirebase);
+                    break;
+                case TipoComunicado.SME_ANO:
+                    await EnviarNotificacaoSerieResumida(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.DRE:
-                    await EnviarComunicadoDRE(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoDRE(notificacao, dicionarioNotificacao, notificacaoFirebase);
+                    break;
+                case TipoComunicado.DRE_ANO:
+                    await EnviarComunicadoDRE_ANO(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.UE:
-                    await EnviarComunicadoUE(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoUE(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.UEMOD:
-                    await EnviarComunicadoUEModalidade(notificacao, grupos, dicionarioNotificacao, Notificacao);
+                    if (notificacao.ObterSeriesResumidas().Any())
+                    {
+                        await EnviarNotificacaoSerieResumida(notificacao, dicionarioNotificacao, notificacaoFirebase);
+                    }
+                    else
+                    {
+                        await EnviarComunicadoUEModalidade(notificacao, dicionarioNotificacao, notificacaoFirebase);
+                    }
                     break;
                 case TipoComunicado.TURMA:
-                    await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.ALUNO:
-                    await EnviarComunicadoAlunos(notificacao, dicionarioNotificacao, Notificacao);
+                    await EnviarComunicadoAlunos(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 default:
                     break;
@@ -125,8 +139,9 @@ namespace SME.AE.Aplicacao
             }
         }
 
-        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
         {
+            var grupos = notificacao.ObterGrupoLista();
             foreach (var grupo in grupos)
             {
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
@@ -154,7 +169,19 @@ namespace SME.AE.Aplicacao
             await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
         }
 
-        private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarComunicadoDRE_ANO(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        {
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+            var seriesResumidas = notificacao.ObterSeriesResumidas();
+
+            foreach (var serieResumida in seriesResumidas)
+            {
+                var topico = $"SERIERESUMIDA-{serieResumida}-DRE-{notificacao.CodigoDre}";
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+            }
+        }
+
+        private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             foreach (var grupo in grupos)
             {
@@ -162,18 +189,50 @@ namespace SME.AE.Aplicacao
 
                 var topico = "Grupo-" + grupo.ToString();
 
-                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
 
+            }
+        }
+        private async Task EnviarNotificacaoSerieResumida(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        {
+            var data = new Dictionary<String, String>(dicionarioNotificacao);
+            var grupos = notificacao.ObterGrupoLista();
+            var seriesResumidas = notificacao.ObterSeriesResumidas();
+
+            foreach (var serieResumida in seriesResumidas)
+            {
+                foreach (var grupo in grupos)
+                {
+                    var topico = $"SERIERESUMIDA-{serieResumida}-MOD-{grupo}";
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+                }
             }
         }
 
         private static Message MontaMensagem(string topico, Notification notificacao, Dictionary<string, string> data)
         {
-            var Mensagem = new Message();
-            Mensagem.Notification = notificacao;
-            Mensagem.Data = data;
-            Mensagem.Topic = topico;
+            Notification notificacaoUTF8 = MontaNotificacaoUTF8(notificacao);
+
+            var Mensagem = new Message
+            {
+                Notification = notificacaoUTF8,
+                Data = data,
+                Topic = topico
+            };
             return Mensagem;
+        }
+
+        private static Notification MontaNotificacaoUTF8(Notification notificacao)
+        {
+            SentrySdk.CaptureMessage($"Monta Mensagem: {notificacao.Title} {notificacao.Body}");
+            SentrySdk.CaptureMessage($"Monta Mensagem formatada: {UtilString.EncodeUTF8(notificacao.Title)} {UtilString.EncodeUTF8(notificacao.Body.Replace("�", "ê"))}");
+
+            Notification notificacaoUTF8 = new Notification
+            {
+                Title = UtilString.EncodeUTF8(notificacao.Title),
+                Body = UtilString.EncodeUTF8(notificacao.Body)
+            };
+            return notificacaoUTF8;
         }
     }
 }

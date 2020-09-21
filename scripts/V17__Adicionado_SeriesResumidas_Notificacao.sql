@@ -1,0 +1,1 @@
+ALTER TABLE if exists public.notificacao ADD if not exists seriesresumidas varchar(128) NULL;
