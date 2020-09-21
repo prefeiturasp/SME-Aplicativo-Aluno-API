@@ -73,7 +73,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
             listaEscolas.ForEach(x =>
             {
-                var alunosturma = x.Alunos.Where(z => notificacao.Turmas.Any(y => y.CodigoTurma.Equals(z.CodigoTurma.ToString())));
+                var alunosturma = x.Alunos.Where(z => notificacao.Turmas.Any(y => y.CodigoTurma.Equals(z.CodigoTurma)));
 
                 if (alunosturma != null && alunosturma.Any())
                     alunos.AddRange(alunosturma);
