@@ -29,7 +29,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf
 
         public async Task<Dominio.Entidades.Usuario> Handle(ObterUsuarioPorCpfCommand request, CancellationToken cancellationToken)
         {
-            return await _repository.ObterPorCpf(request.Cpf);
+            return await _repository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf);
         }
     }
 }
