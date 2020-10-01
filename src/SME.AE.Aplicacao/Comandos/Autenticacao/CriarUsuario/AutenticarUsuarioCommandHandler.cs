@@ -177,7 +177,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 await _repository.SalvarAsync(MapearDominioUsuario(usuario, primeiroAcesso));
             }
 
-            return await _repository.ObterPorCpf(request.Cpf);
+            return await _repository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf);
         }
 
         private void ExcluiUsuarioSeExistir(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno)

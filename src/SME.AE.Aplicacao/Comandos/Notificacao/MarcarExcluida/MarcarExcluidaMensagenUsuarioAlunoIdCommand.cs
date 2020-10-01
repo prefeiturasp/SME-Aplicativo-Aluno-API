@@ -32,7 +32,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
 
         public async Task<bool> Handle(MarcarExcluidaMensagenUsuarioAlunoIdCommand request, CancellationToken cancellationToken)
         {
-            var usuario = await usuarioRepository.ObterPorCpf(request.Cpf) ?? throw new ArgumentException($"CPF não encontrado {request.Cpf}");
+            var usuario = await usuarioRepository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf) ?? throw new ArgumentException($"CPF não encontrado {request.Cpf}");
 
             var usuarioNotificacao = await usuarioNotificacaoRepositorio.ObterPorUsuarioAlunoNotificacao(usuario.Id, request.CodigoAluno, request.NotificacaoId);
             if(usuarioNotificacao == null)
