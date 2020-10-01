@@ -82,7 +82,7 @@ namespace SME.AE.Aplicacao.Teste.Consultas
 
         private void InstanciarSetups()
         {
-            usuarioRepository.Setup(x => x.ObterPorCpf(It.IsAny<string>())).ReturnsAsync(new Usuario());
+            usuarioRepository.Setup(x => x.ObterUsuarioNaoExcluidoPorCpf(It.IsAny<string>())).ReturnsAsync(new Usuario());
 
             usuarioRepository.Setup(x => x.ObterPorIdAsync(It.IsAny<long>())).ReturnsAsync(new Usuario());
         }

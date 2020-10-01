@@ -2,12 +2,10 @@
 using Dapper;
 using Dapper.Dommel;
 using Dommel;
-using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -31,6 +29,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
         public async Task<Usuario> ObterPorCpf(string cpf)
+        {
+            try
+            {
+                var usuarioCache = ObterUsuarioCachePorCpf(cpf);
+                if (usuarioCache != null) return usuarioCache;
+
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
+                await SalvarUsuarioCache(usuario);
+                return usuario;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
+        public async Task<Usuario> ObterUsuarioNaoExcluidoPorCpf(string cpf)
         {
             try
             {
@@ -264,11 +282,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        private Usuario ObterUsuarioCachePorId(long id) 
+        private Usuario ObterUsuarioCachePorId(long id)
             => cacheRepositorio.Obter<Usuario>($"{USUARIOPORID}-{id}");
-        private Usuario ObterUsuarioCachePorCpf(string cpf) 
+        private Usuario ObterUsuarioCachePorCpf(string cpf)
             => cacheRepositorio.Obter<Usuario>($"{USUARIOPORCPF}-{cpf}");
-        private Usuario ObterUsuarioCachePorToken(string token) 
+        private Usuario ObterUsuarioCachePorToken(string token)
             => cacheRepositorio.Obter<Usuario>($"{USUARIOPORTOKEN}-{token}");
         private async Task LimparUsuarioCachePorId(long id)
             => await LimparUsuarioCache(ObterUsuarioCachePorId(id));
@@ -322,7 +340,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 }
             }
         }
-        public override async Task<Usuario> ObterPorIdAsync(long id) {
+        public override async Task<Usuario> ObterPorIdAsync(long id)
+        {
             var usuario = ObterUsuarioCachePorId(id);
             if (usuario == null)
             {
@@ -330,16 +349,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             return usuario;
         }
-        public override async Task RemoverAsync(long id) {
+        public override async Task RemoverAsync(long id)
+        {
             await LimparUsuarioCachePorId(id);
             await base.RemoverAsync(id);
         }
-        public override async Task RemoverAsync(Usuario usuario) {
+        public override async Task RemoverAsync(Usuario usuario)
+        {
             await LimparUsuarioCache(usuario);
             await base.RemoverAsync(usuario);
         }
-        public override async Task<long> SalvarAsync(Usuario usuario) {
-            if(usuario.Id != 0)
+        public override async Task<long> SalvarAsync(Usuario usuario)
+        {
+            if (usuario.Id != 0)
                 await LimparUsuarioCache(usuario);
             return await base.SalvarAsync(usuario);
         }

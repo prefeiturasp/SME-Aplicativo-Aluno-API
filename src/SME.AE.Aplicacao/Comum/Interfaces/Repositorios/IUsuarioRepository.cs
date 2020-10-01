@@ -6,6 +6,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IUsuarioRepository : IBaseRepositorio<Usuario>
     {
+        Task<Usuario> ObterUsuarioNaoExcluidoPorCpf(string cpf);
         Task<Usuario> ObterPorCpf(string cpf);
         Task AtualizarPrimeiroAcesso(long id, bool primeiroAcesso);
         Task AtualizarEmailTelefone(long id, string email, string celular);

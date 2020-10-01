@@ -32,7 +32,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao
 
             public async Task<bool> Handle(RemoveUsuarioDispositivoCommand request, CancellationToken cancellationToken)
             {
-                var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
+                var usuarioRetorno = await _repository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf);
                 if (usuarioRetorno == null)
                     return false;
 

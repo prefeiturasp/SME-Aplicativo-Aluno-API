@@ -2,9 +2,9 @@
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterUsuarioPorCpfQueryValidator : AbstractValidator<ObterUsuarioNaoExcluidoPorCpfQuery>
+    public class ObterUsuarioNaoExcluidoPorCpfQueryValidator : AbstractValidator<ObterUsuarioNaoExcluidoPorCpfQuery>
     {
-        public ObterUsuarioPorCpfQueryValidator()
+        public ObterUsuarioNaoExcluidoPorCpfQueryValidator()
         {
             RuleFor(x => x.Cpf).NotEmpty().WithMessage("O CPF é Obrigátorio");
         }
