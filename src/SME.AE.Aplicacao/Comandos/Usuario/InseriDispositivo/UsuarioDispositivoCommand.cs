@@ -33,7 +33,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo
                 try
                 {
                     //Veriicar essa arquitetura pois precido mesmo de um response aqui ? 
-                    var usuario = await _repository.ObterPorCpf(request.CpfUsuario);
+                    var usuario = await _repository.ObterUsuarioNaoExcluidoPorCpf(request.CpfUsuario);
                     if (usuario == null)
                         return false;
                  bool existeUsuarioDisposivo =  await _repository.ExisteUsuarioDispositivo(usuario.Id, request.DispositivoId);
