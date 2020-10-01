@@ -17,11 +17,11 @@ namespace SME.AE.Worker.Service
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class UseCaseWorkerAttribute: Attribute
     {
-        public string ParametroEscolaAqui { get; set; }
-        public string ParametroPadrao { get; set; }
+        public string CronParametroDB { get; set; }
+        public string CronPadrao { get; set; }
     }
 
-    public class UseCaseWorker<T> : BackgroundService
+    public class UseCaseWorker<T> : IHostedService
     {
         private readonly IParametrosEscolaAquiRepositorio parametrosEscolaAqui;
         private readonly IServiceProvider serviceProvider;
@@ -39,48 +39,23 @@ namespace SME.AE.Worker.Service
             var atributo = this.GetType().GetCustomAttribute<UseCaseWorkerAttribute>();
             if(atributo != null)
             {
-                if (!string.IsNullOrWhiteSpace(atributo.ParametroEscolaAqui)) {
-                    if (parametrosEscolaAqui.TentaObterString(atributo.ParametroEscolaAqui, out var valorParametro)) {
+                if (!string.IsNullOrWhiteSpace(atributo.CronParametroDB)) {
+                    if (parametrosEscolaAqui.TentaObterString(atributo.CronParametroDB, out var valorParametro)) {
                         if (!string.IsNullOrWhiteSpace(valorParametro))
                         {
                             return CrontabSchedule.Parse(valorParametro, new CrontabSchedule.ParseOptions { IncludingSeconds = false });
                         }
                     } 
                 }
-                if (!string.IsNullOrWhiteSpace(atributo.ParametroPadrao))
+                if (!string.IsNullOrWhiteSpace(atributo.CronPadrao))
                 {
-                    var cron = CrontabSchedule.Parse(atributo.ParametroPadrao, new CrontabSchedule.ParseOptions { IncludingSeconds = false });
-                    parametrosEscolaAqui.Salvar(atributo.ParametroEscolaAqui, atributo.ParametroPadrao);
+                    var cron = CrontabSchedule.Parse(atributo.CronPadrao, new CrontabSchedule.ParseOptions { IncludingSeconds = false });
+                    parametrosEscolaAqui.Salvar(atributo.CronParametroDB, atributo.CronPadrao);
                     return cron;
                 }
             }
-            parametrosEscolaAqui.Salvar(atributo.ParametroEscolaAqui, "* * * * *");
+            parametrosEscolaAqui.Salvar(atributo.CronParametroDB, "* * * * *");
             return CrontabSchedule.Parse("* * * * *"); 
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            try
-            {
-                var crontab = BuscaParametroCrontab();
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    var proximaOcorrencia = crontab.GetNextOccurrence(DateTime.Now);
-                    TimeSpan tempoAteProximaExec = proximaOcorrencia - DateTime.Now;
-                    await Task.Delay(tempoAteProximaExec, stoppingToken);
-
-                    if (!stoppingToken.IsCancellationRequested)
-                    {
-                        await ExecutaCasoDeUso();
-                    }
-                }
-            } catch (TaskCanceledException tce) { 
-                // normal, ignora
-            } catch (Exception ex) {
-                // adicionar sentry
-                logger.LogError(ex, "Worker error:");
-                throw ex;
-            }
         }
 
         private async Task ExecutaCasoDeUso()
@@ -100,6 +75,50 @@ namespace SME.AE.Worker.Service
                 await Task.CompletedTask;
             }
             return;
+        }
+
+        public Task StartAsync(CancellationToken cancelationTocken)
+        {
+            logger?.LogInformation("Hosted service starting");
+
+            return Task.Factory.StartNew(async () =>
+            {
+                // loop until a cancalation is requested
+                while (!cancelationTocken.IsCancellationRequested)
+                {
+                    logger?.LogInformation("Hosted service executing - {0}", DateTime.Now);
+                    try
+                    {
+                        var crontab = BuscaParametroCrontab();
+                        while (!cancelationTocken.IsCancellationRequested)
+                        {
+                            var proximaOcorrencia = crontab.GetNextOccurrence(DateTime.Now);
+                            TimeSpan tempoAteProximaExec = proximaOcorrencia - DateTime.Now;
+                            await Task.Delay(tempoAteProximaExec, cancelationTocken);
+
+                            if (!cancelationTocken.IsCancellationRequested)
+                            {
+                                await Task.WhenAll(
+                                    ExecutaCasoDeUso(),
+                                    Task.Delay(10000)
+                                );
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException) { }
+                    catch (Exception ex)
+                    {
+                        // adicionar sentry
+                        logger?.LogError(ex, "*** Worker error:");
+                        throw ex;
+                    }
+                }
+            }, cancelationTocken);
+        }
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            logger?.LogInformation("Hosted service stopping");
+            return Task.CompletedTask;
         }
     }
 }

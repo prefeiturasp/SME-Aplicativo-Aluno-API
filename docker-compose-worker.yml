@@ -1,0 +1,15 @@
+﻿version: '3.1'
+
+services:
+  worker:
+    environment: 
+      - AEConnection=$AEConnection
+      - EolConnection=$EolConnection
+      - SgpConnection=$SgpConnection
+      - CoreSSOConnection=$CoreSSOConnection
+    container_name: smeae_container_worker
+    build: 
+        context: .
+        dockerfile: src/SME.AE.Worker.Service/Dockerfile
+    image: sme.ae.worker:lastest
+    

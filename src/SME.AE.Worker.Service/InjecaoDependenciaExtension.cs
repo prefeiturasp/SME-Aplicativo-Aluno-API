@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Infra.Persistencia.Repositorios;
@@ -21,7 +22,7 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddHostedService<TransferirEventoSgpWorker>()
+                .AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 ;
         }
         #endregion
