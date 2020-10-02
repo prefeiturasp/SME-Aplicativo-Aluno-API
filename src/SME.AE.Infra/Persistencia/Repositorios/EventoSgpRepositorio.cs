@@ -62,7 +62,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							(et.evento_escolaaqui)
 						)
 					) as eae
-					where alterado_em > @alterado_em 
+					where alterado_em >= @alterado_em 
+					order by alterado_em
 				";
 
 			using var conn = CriaConexao();

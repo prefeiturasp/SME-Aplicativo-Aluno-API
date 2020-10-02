@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT exists evento (
 	evento_id varchar(50) NOT NULL,
-	nome varchar(50) NOT NULL,
-	descricao varchar(250) NULL,
+	nome varchar(200) NOT NULL,
+	descricao varchar(5000) NULL,
 	data_inicio timestamp NOT NULL,
 	data_fim timestamp NOT NULL,
 	dre_id varchar(50) NULL,

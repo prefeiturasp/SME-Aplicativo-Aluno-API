@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.CasoDeUso.AgendadoWorkerService
+namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class TranferirEventoSgpCasoDeUso
     {
@@ -54,12 +54,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.AgendadoWorkerService
                     dre_id = eventoSgp.dre_id,
                     ue_id = eventoSgp.ue_id,
                     ultima_alteracao_sgp = eventoSgp.alterado_em,
-                    modalidade = eventoSgp.modalidade_calendario.Value
+                    modalidade = eventoSgp.tipo_evento_id == (int)TipoEvento.Avaliacao 
+                                    ? ObterModalidadeCalendarioDeModalidadeTurma(eventoSgp) 
+                                    : eventoSgp.modalidade_calendario.Value
                 };
-                if (eventoSgp.tipo_evento_id == (int)TipoEvento.Avaliacao)
-                {
-                    evento.modalidade = ObterModalidadeCalendarioDeModalidadeTurma(eventoSgp);
-                }
                 yield return evento;
             }
         }

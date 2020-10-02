@@ -8,6 +8,10 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IParametrosEscolaAquiRepositorio
     {
+        DateTime? ObterDateTime(string chave);
+        int? ObterInt(string chave);
+        long? ObterLong(string chave);
+        string ObterString(string chave);
         bool TentaObterDateTime(string chave, out DateTime conteudo);
         bool TentaObterInt(string chave, out int conteudo);
         bool TentaObterLong(string chave, out long conteudo);
