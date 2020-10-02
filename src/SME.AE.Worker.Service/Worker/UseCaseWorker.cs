@@ -60,6 +60,8 @@ namespace SME.AE.Worker.Service
 
         private async Task ExecutaCasoDeUso()
         {
+            logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
+
             var servico = serviceProvider.GetService<T>() ?? throw new Exception($"Injeção de dependencia para o tipo {typeof(T).Name} não registrado.");
             var metodo = 
                 servico.GetType().GetMethod("ExecutarAsync") 
@@ -94,6 +96,8 @@ namespace SME.AE.Worker.Service
                         {
                             var proximaOcorrencia = crontab.GetNextOccurrence(DateTime.Now);
                             TimeSpan tempoAteProximaExec = proximaOcorrencia - DateTime.Now;
+
+                            logger?.LogInformation($"Agendado caso de uso {typeof(T).Name} => {proximaOcorrencia}");
                             await Task.Delay(tempoAteProximaExec, cancelationTocken);
 
                             if (!cancelationTocken.IsCancellationRequested)

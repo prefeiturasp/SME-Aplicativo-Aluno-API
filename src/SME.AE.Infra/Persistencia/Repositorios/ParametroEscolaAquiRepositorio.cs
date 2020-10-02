@@ -106,5 +106,41 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public void Salvar(string chave, int conteudo) => Salvar(chave, conteudo.ToString());
         public void Salvar(string chave, long conteudo) => Salvar(chave, conteudo.ToString());
         public void Salvar(string chave, DateTime conteudo) => Salvar(chave, conteudo.ToString("s"));
+
+        public DateTime? ObterDateTime(string chave)
+        {
+            if(TentaObterDateTime(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            return null;
+        }
+
+        public int? ObterInt(string chave)
+        {
+            if (TentaObterInt(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            return null;
+        }
+
+        public long? ObterLong(string chave)
+        {
+            if (TentaObterLong(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            return null;
+        }
+
+        public string ObterString(string chave)
+        {
+            if (TentaObterString(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            return null;
+        }
     }
 }
