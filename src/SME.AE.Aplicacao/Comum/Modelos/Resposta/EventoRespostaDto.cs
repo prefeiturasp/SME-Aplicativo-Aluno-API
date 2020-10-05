@@ -6,11 +6,11 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
     public class EventoRespostaDto
     {
-        public string nome { get; set; }
-        public string descricao { get; set; }
-        public DateTime data_inicio { get; set; }
-        public DateTime data_fim { get; set; }
-        public int tipo_evento { get; set; }
-        public int ano_letivo { get; set; }
+        public string Nome { get; set; }
+        public string Descricao { get; set; }
+        public DateTime DataInicio { get; set; }
+        public DateTime DataFim { get; set; }
+        public int TipoEvento { get; set; }
+        public int AnoLetivo { get; set; }
     }
 }

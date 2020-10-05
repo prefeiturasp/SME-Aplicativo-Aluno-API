@@ -46,12 +46,12 @@ namespace SME.AE.Aplicacao.Consultas
             var eventosResposta = eventos.Select(
                     e => new EventoRespostaDto
                     {
-                        nome = e.nome,
-                        descricao = e.descricao,
-                        data_inicio = e.data_inicio,
-                        data_fim = e.data_fim,
-                        ano_letivo = e.ano_letivo,
-                        tipo_evento = e.tipo_evento
+                        Nome = e.nome,
+                        Descricao = e.descricao,
+                        DataInicio = e.data_inicio,
+                        DataFim = e.data_fim,
+                        AnoLetivo = e.ano_letivo,
+                        TipoEvento = e.tipo_evento
                     }
                 ).Distinct();
 
