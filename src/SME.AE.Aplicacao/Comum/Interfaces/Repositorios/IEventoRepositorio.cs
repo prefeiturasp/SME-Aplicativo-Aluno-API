@@ -10,5 +10,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task<DateTime?> ObterUltimaAlteracao();
         Task Salvar(EventoDto evento);
+        Task<IEnumerable<EventoDto>> ObterPorDreUeTurmaMes(string dre_id, string ue_id, string turma_id, int modalidadeCalendario, DateTime mesAno);
     }
 }
