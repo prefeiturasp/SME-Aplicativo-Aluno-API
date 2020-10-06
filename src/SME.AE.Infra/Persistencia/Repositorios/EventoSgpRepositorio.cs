@@ -28,12 +28,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							t.ano_letivo,
 							t.modalidade_codigo modalidade_turma,
 							null::int modalidade_calendario,
-							greatest(aa.criado_em, aa.alterado_em) alterado_em
+							greatest(aa.criado_em, aa.alterado_em) alterado_em,
+							coalesce(aa.excluido, false) excluido
 						from atividade_avaliativa aa 
 						inner join turma t on t.turma_id = aa.turma_id 
 						where
-							(aa.migrado isnull or aa.migrado = false) and
-							(aa.excluido isnull or aa.excluido = false)
+							(aa.migrado isnull or aa.migrado = false) 
 						)
 						union 
 						(select
@@ -48,7 +48,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								e.criado_em, e.alterado_em,
 								tc.criado_em, tc.alterado_em,
 								wan.criado_em, wan.alterado_em,
-								n2.criado_em, n2.alterado_em) alterado_em
+								n2.criado_em, n2.alterado_em) alterado_em,
+							coalesce(e.excluido, false) excluido
 						from evento e
 						inner join evento_tipo et on et.id = e.tipo_evento_id
 						inner join tipo_calendario tc on tc.id = e.tipo_calendario_id 
@@ -58,7 +59,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 						where
 							(e.status = 1) and
 							(e.migrado isnull or e.migrado = false) and
-							(e.excluido isnull or e.excluido = false) and
 							(et.evento_escolaaqui)
 						)
 					) as eae

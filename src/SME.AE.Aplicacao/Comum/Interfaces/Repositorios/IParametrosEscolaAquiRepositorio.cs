@@ -12,6 +12,10 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         int? ObterInt(string chave);
         long? ObterLong(string chave);
         string ObterString(string chave);
+        DateTime ObterDateTime(string chave, DateTime padrao);
+        int ObterInt(string chave, int padrao);
+        long ObterLong(string chave, long padrao);
+        string ObterString(string chave, string padrao);
         bool TentaObterDateTime(string chave, out DateTime conteudo);
         bool TentaObterInt(string chave, out int conteudo);
         bool TentaObterLong(string chave, out long conteudo);
