@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
@@ -24,15 +25,6 @@ namespace SME.AE.Aplicacao.Consultas
         }
         public async Task<IEnumerable<EventoRespostaDto>> Handle(ObterEventosAlunoPorMesQuery request, CancellationToken cancellationToken)
         {
-            var mesInicial = parametrosEscolaAquiRepositorio.ObterInt("MesInicioTransferenciaEventos", 3);
-            var diaInicial = parametrosEscolaAquiRepositorio.ObterInt("DiaInicioTransferenciaEventos", 1);
-            var dataInicial = new DateTime(DateTime.Now.Year, mesInicial, diaInicial);
-
-            if (DateTime.Today < dataInicial)
-            {
-                return new EventoRespostaDto[] { };
-            }
-
             var aluno = (await alunoRepositorio.ObterDadosAlunos(request.Cpf)).Where(a => a.CodigoEol == request.CodigoAluno).FirstOrDefault();
 
             var modalidade = 0;
@@ -54,6 +46,16 @@ namespace SME.AE.Aplicacao.Consultas
                     break;
             }
             var eventos = await eventoRepositorio.ObterPorDreUeTurmaMes(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno);
+
+            var mesInicial = parametrosEscolaAquiRepositorio.ObterInt("MesInicioTransferenciaEventos", 3);
+            var diaInicial = parametrosEscolaAquiRepositorio.ObterInt("DiaInicioTransferenciaEventos", 1);
+            var dataInicial = new DateTime(DateTime.Now.Year, mesInicial, diaInicial);
+
+            if (DateTime.Today < dataInicial)
+            {
+                eventos = eventos.Where(e => e.tipo_evento == (int)TipoEvento.ReuniaoResponsaveis);
+            }
+
             var eventosResposta = eventos
                 .Select(
                     e => new EventoRespostaDto
