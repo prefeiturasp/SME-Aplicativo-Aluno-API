@@ -30,5 +30,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string Grupo { get; set; }
         public long CodigoGrupo { get; internal set; }
         public string SerieResumida { get; set; }
+        public int CodigoModalidadeTurma { get; set; }
     }
 }
