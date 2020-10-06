@@ -20,6 +20,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int? modalidade_turma { get; set; }
         public int? modalidade_calendario { get; set; }
         public DateTime alterado_em { get; set; }
+        public bool excluido { get; set; }
     }
 
     public static class EventoSgpDtoExtensions
