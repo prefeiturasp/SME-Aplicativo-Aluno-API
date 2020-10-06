@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,7 +27,16 @@ namespace SME.AE.Aplicacao.CasoDeUso
             DateTime ultimaData = await ObterUltimaDataEvento();
             IEnumerable<EventoSgpDto> listaEvendosSgp = await ObterListaEventosSgp(ultimaData);
             IEnumerable<EventoDto> listaEventos = MapearEventos(listaEvendosSgp);
-            await SalvarEventos(listaEventos);
+            await SalvarEventos(listaEventos.Where(e => !e.excluido));
+            await RemoverEventos(listaEventos.Where(e => e.excluido));
+        }
+
+        private async Task RemoverEventos(IEnumerable<EventoDto> listaEventos)
+        {
+            foreach (var evento in listaEventos)
+            {
+                await eventoRepositorio.Remover(evento);
+            }
         }
 
         private async Task SalvarEventos(IEnumerable<EventoDto> listaEventos)
@@ -56,7 +66,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     ultima_alteracao_sgp = eventoSgp.alterado_em,
                     modalidade = eventoSgp.tipo_evento_id == (int)TipoEvento.Avaliacao 
                                     ? ObterModalidadeCalendarioDeModalidadeTurma(eventoSgp) 
-                                    : eventoSgp.modalidade_calendario.Value
+                                    : eventoSgp.modalidade_calendario.Value,
+                    excluido = eventoSgp.excluido
                 };
                 yield return evento;
             }

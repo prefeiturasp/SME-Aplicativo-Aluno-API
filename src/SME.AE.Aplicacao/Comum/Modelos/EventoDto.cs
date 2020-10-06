@@ -19,5 +19,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int ano_letivo { get; set; }
         public int modalidade { get; set; }
         public DateTime ultima_alteracao_sgp { get; set; }
+        public bool excluido { get; set; }
     }
 }

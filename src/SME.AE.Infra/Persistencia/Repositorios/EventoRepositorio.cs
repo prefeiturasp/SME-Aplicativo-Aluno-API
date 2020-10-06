@@ -23,6 +23,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
             return ultimaAlteracao;
         }
+        public async Task Remover(EventoDto evento) 
+        {
+            var sql = @"
+                delete from evento
+                where evento_id = @evento_id
+            ";
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            await conn.ExecuteAsync(sql, evento);
+            await conn.CloseAsync();
+            return;
+        }
 
         public async Task Salvar(EventoDto evento)
         {
