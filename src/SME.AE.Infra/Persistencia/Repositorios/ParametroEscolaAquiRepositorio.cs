@@ -142,5 +142,55 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             return null;
         }
+        public DateTime ObterDateTime(string chave, DateTime padrao)
+        {
+            if (TentaObterDateTime(chave, out var conteudo))
+            {
+                return conteudo;
+            } else
+            {
+                Salvar(chave, padrao);
+                return padrao;
+            }
+        }
+
+        public int ObterInt(string chave, int padrao)
+        {
+            if (TentaObterInt(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            else
+            {
+                Salvar(chave, padrao);
+                return padrao;
+            }
+        }
+
+        public long ObterLong(string chave, long padrao)
+        {
+            if (TentaObterLong(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            else
+            {
+                Salvar(chave, padrao);
+                return padrao;
+            }
+        }
+
+        public string ObterString(string chave, string padrao)
+        {
+            if (TentaObterString(chave, out var conteudo))
+            {
+                return conteudo;
+            }
+            else
+            {
+                Salvar(chave, padrao);
+                return padrao;
+            }
+        }
     }
 }
