@@ -27,7 +27,7 @@ namespace SME.AE.Infra.Persistencia.Consultas
                etapa_ensino.cd_etapa_ensino AS CodigoEtapaEnsino,
                ciclo_ensino.cd_ciclo_ensino AS CodigoCicloEnsino,
                serie_ensino.sg_resumida_serie AS SerieResumida,
-               serie_ensino.cd_modalidade_ensino as CodigoModalidadeTurma
+               etapa_ensino.cd_etapa_ensino as CodigoModalidadeTurma
 
         FROM   v_aluno_cotic aluno 
                INNER JOIN responsavel_aluno responsavel 
