@@ -86,5 +86,6 @@ namespace SME.AE.Infra.Persistencia.Comandos
             UPDATE SYS_Usuario SET usu_criptografia = 1, usu_senha = @senha
             WHERE usu_id = @usuId
         ";
+
     }
 }
