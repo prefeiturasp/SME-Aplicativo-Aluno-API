@@ -24,7 +24,7 @@ namespace SME.AE.Aplicacao
         {
             var resultado = await mediator.Send(new AtualizarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
             
-            if (resultado != null)
+            if (resultado == null)
                 throw new NegocioException("Não foi possível atualizar o comunicado na base do Escola Aqui!");
 
             return mapper.Map<NotificacaoSgpDto>(resultado);
