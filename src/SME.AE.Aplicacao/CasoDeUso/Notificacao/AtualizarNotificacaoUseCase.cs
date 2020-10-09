@@ -4,6 +4,7 @@ using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao
@@ -22,6 +23,9 @@ namespace SME.AE.Aplicacao
         public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
             var resultado = await mediator.Send(new AtualizarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+            
+            if (resultado == null)
+                throw new NegocioException("Não foi possível atualizar o comunicado na base do Escola Aqui!");
 
             return mapper.Map<NotificacaoSgpDto>(resultado);
         }
