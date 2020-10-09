@@ -172,9 +172,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 {
                     conn.Open();
                     await conn.ExecuteAsync(
-                        @"UPDATE notificacao set mensagem=@Mensagem, titulo=@Titulo, grupo=@Grupo, seriesresumidas=@SeriesResumidas
-                                    dataEnvio=@DataEnvio, dataExpiracao=@DataExpiracao, criadoEm=@CriadoEm, 
-                                    criadoPor=@CriadoPor, alteradoEm=@AlteradoEm, alteradoPor=@AlteradoPor 
+                        @"UPDATE notificacao set mensagem=@Mensagem, 
+                                                 titulo=@Titulo, 
+                                                 grupo=@Grupo,
+                                                 seriesresumidas=@SeriesResumidas,
+                                                 dataEnvio=@DataEnvio, 
+                                                 dataExpiracao=@DataExpiracao, 
+                                                 criadoEm=@CriadoEm, 
+                                                 criadoPor=@CriadoPor, 
+                                                 alteradoEm=@AlteradoEm, 
+                                                 alteradoPor=@AlteradoPor 
                                WHERE id=@Id",
                         notificacao);
                     conn.Close();
