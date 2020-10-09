@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Atualizar
 {
@@ -28,7 +29,10 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Atualizar
         public async Task<Dominio.Entidades.Notificacao> Handle
             (AtualizarNotificacaoCommand request, CancellationToken cancellationToken)
         {
-            return await _repository.Atualizar(request.Notificacao);
+            var resultadoAtualizacao = await _repository.Atualizar(request.Notificacao);
+            if (resultadoAtualizacao == null)
+                throw new NegocioException("Não foi possível atualizar o comunicado na base do Escola Aqui!");
+            return resultadoAtualizacao;
         }
     }
 }
