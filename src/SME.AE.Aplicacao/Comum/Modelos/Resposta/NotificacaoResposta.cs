@@ -27,4 +27,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string CodigoUe { get; set; }
         public string SeriesResumidas { get; set; }
     }
+
+
+
 }
