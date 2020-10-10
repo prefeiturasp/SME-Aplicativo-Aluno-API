@@ -1,34 +1,28 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using System.Threading;
-using System.Threading.Tasks;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using System;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Atualizar
 {
-    public class AtualizarNotificacaoCommand : IRequest<Dominio.Entidades.Notificacao>
+    public class AtualizarNotificacaoCommand : IRequest<AtualizacaoNotificacaoResposta>
     {
-        public Dominio.Entidades.Notificacao Notificacao { get; set; }
+        public long Id { get; set; }
 
-        public AtualizarNotificacaoCommand(Dominio.Entidades.Notificacao notificacao)
+        public string Titulo { get; set; }
+
+        public string Mensagem { get; set; }
+
+        public DateTime DataExpiracao { get; set; }
+
+        public string AlteradoPor { get; set; }
+
+        public AtualizarNotificacaoCommand(long id, string titulo, string mensagem, DateTime dataExpiracao, string alteradoPor)
         {
-            Notificacao = notificacao;
-        }
-    }
-
-    public class AtualizarNotificacaoCommandHandler : IRequestHandler<AtualizarNotificacaoCommand,
-        Dominio.Entidades.Notificacao>
-    {
-        private readonly INotificacaoRepository _repository;
-
-        public AtualizarNotificacaoCommandHandler(INotificacaoRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<Dominio.Entidades.Notificacao> Handle
-            (AtualizarNotificacaoCommand request, CancellationToken cancellationToken)
-        {
-            return await _repository.Atualizar(request.Notificacao); ;
+            Id = id;
+            Titulo = titulo;
+            Mensagem = mensagem;
+            DataExpiracao = dataExpiracao;
+            AlteradoPor = alteradoPor;
         }
     }
 }
