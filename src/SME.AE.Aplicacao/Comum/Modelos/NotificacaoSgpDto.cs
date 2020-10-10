@@ -13,7 +13,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string AlteradoRF { get; set; }
         public string CriadoRF { get; set; }
         public DateTime DataEnvio { get; set; }
-        public DateTime? DataExpiracao { get; set; }
+        public DateTime DataExpiracao { get; set; }
         public string Grupo { get; set; }
         public IEnumerable<string> Alunos { get; set; }
         public string Mensagem { get; set; }
