@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
+using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Aplicacao.Consultas.VerificarSenha;
 using SME.AE.Aplicacao.Validators;
@@ -37,7 +39,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             await IncluirSenhaHistorico(usuario);
 
-            return RespostaApi.Sucesso();
+            var token = await mediator.Send(new CriarTokenCommand(usuario.Cpf));
+
+            return RespostaApi.Sucesso(new RetornoToken(token));
         }
 
         private async Task Validar5UltimasSenhas(RetornoUsuarioCoreSSO usuario)
