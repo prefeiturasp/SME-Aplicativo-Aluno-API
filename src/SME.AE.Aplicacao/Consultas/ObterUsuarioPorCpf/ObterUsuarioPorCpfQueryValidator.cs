@@ -2,7 +2,7 @@
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterUsuarioPorCpfQueryValidator : AbstractValidator<ObterUsuarioPorCpfQuery>
+    public class ObterUsuarioPorCpfQueryValidator : AbstractValidator<ObterUsuarioNaoExcluidoPorCpfQuery>
     {
         public ObterUsuarioPorCpfQueryValidator()
         {

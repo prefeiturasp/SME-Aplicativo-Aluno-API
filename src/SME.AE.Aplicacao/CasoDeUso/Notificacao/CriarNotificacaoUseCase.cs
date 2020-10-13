@@ -1,18 +1,17 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using FirebaseAdmin.Messaging;
+using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum.Utilitarios;
+using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using SME.AE.Dominio.Entidades;
-using SME.AE.Aplicacao.Comum.Modelos;
-using AutoMapper;
-using SME.AE.Aplicacao.Comum.Enumeradores;
-using FirebaseAdmin.Messaging;
-using SME.AE.Comum.Utilitarios;
-using Sentry;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
 {
@@ -48,11 +47,20 @@ namespace SME.AE.Aplicacao
                 return;
 
             notificacao.InserirCategoria();
+            Dictionary<string, string> dicionarioNotificacao = montarNotificacao(notificacao);
 
-            string bodyUTF8 = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.").Replace("�", "ê");
-            SentrySdk.CaptureMessage("Teste de mensagem: " + bodyUTF8.Replace("�", "ê"));
+            var notificacaoFirebase = new Notification
+            {
+                Title = notificacao.Titulo,
+                Body = UtilString.EncodeUTF8("Você recebeu uma nova mensagem da SME. Clique aqui para visualizar os detalhes.").Replace("�", "ê"),
+            };
 
-            Dictionary<string, string> dicionarioNotificacao = new Dictionary<String, String>
+            await EnviarNotificacao(notificacao, dicionarioNotificacao, notificacaoFirebase);
+        }
+
+        private static Dictionary<string, string> montarNotificacao(NotificacaoSgpDto notificacao)
+        {
+            return new Dictionary<String, String>
             {
                 ["Titulo"] = notificacao.Titulo,
                 ["Mensagem"] = notificacao.Mensagem,
@@ -61,16 +69,7 @@ namespace SME.AE.Aplicacao
                 ["CriadoEm"] = notificacao.CriadoEm.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
                 ["click_action"] = "FLUTTER_NOTIFICATION_CLICK",
             };
-
-            var notificacaoFirebase = new Notification
-            {
-                Title = notificacao.Titulo,
-                Body = bodyUTF8,
-            };
-
-
-            await EnviarNotificacao(notificacao, dicionarioNotificacao, notificacaoFirebase);
-        }       
+        }
 
         private async Task EnviarNotificacao(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
@@ -224,9 +223,6 @@ namespace SME.AE.Aplicacao
 
         private static Notification MontaNotificacaoUTF8(Notification notificacao)
         {
-            SentrySdk.CaptureMessage($"Monta Mensagem: {notificacao.Title} {notificacao.Body}");
-            SentrySdk.CaptureMessage($"Monta Mensagem formatada: {UtilString.EncodeUTF8(notificacao.Title)} {UtilString.EncodeUTF8(notificacao.Body.Replace("�", "ê"))}");
-
             Notification notificacaoUTF8 = new Notification
             {
                 Title = UtilString.EncodeUTF8(notificacao.Title),

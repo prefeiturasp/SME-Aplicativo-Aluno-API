@@ -26,7 +26,9 @@ namespace SME.AE.Infra.Persistencia.Consultas
                mte.dt_situacao_aluno                 DataSituacaoMatricula, 
                etapa_ensino.cd_etapa_ensino AS CodigoEtapaEnsino,
                ciclo_ensino.cd_ciclo_ensino AS CodigoCicloEnsino,
-               serie_ensino.sg_resumida_serie AS SerieResumida
+               serie_ensino.sg_resumida_serie AS SerieResumida,
+               etapa_ensino.cd_etapa_ensino as CodigoModalidadeTurma
+
         FROM   v_aluno_cotic aluno 
                INNER JOIN responsavel_aluno responsavel 
                        ON aluno.cd_aluno = responsavel.cd_aluno 
