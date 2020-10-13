@@ -4,6 +4,7 @@ using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using System.Threading.Tasks;
 
@@ -13,9 +14,9 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
+        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromBody] AutenticacaoDTO autenticacao,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
         {
-            return Ok(await autenticarUsuarioUseCase.Executar(cpf, senha, dispositivoId));
+            return Ok(await autenticarUsuarioUseCase.Executar(autenticacao.Cpf, autenticacao.Senha, autenticacao.DispositivoId));
         }
 
         [HttpPost("Logout")]
