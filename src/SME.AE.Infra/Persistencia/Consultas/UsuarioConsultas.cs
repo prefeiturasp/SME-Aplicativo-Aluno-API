@@ -16,6 +16,21 @@
                 Excluido,Id,CriadoEm,CriadoPor,AlteradoEm,AlteradoPor,
                 token_redefinicao, redefinicao, validade_token";
 
-           //  AND Usuario.excluido = false";
+        //  AND Usuario.excluido = false";
+
+
+        internal static string ObterTotalUsuariosComAcessoIncompleto = @"
+        select 
+            count(id) 
+        from Usuario 
+        where primeiroacesso = false 
+            and email isnull 
+            or celular isnull
+        union
+        select 
+            count(id) 
+        from Usuario 
+        where primeiroacesso = true ";
+        
     }
 }
