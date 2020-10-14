@@ -102,6 +102,23 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task<long> ObterTotalUsuariosValidos(string codigoDre, string codigoUe)
+        {
+            try
+            {
+                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalUsuariosValidos = await conn.ExecuteScalarAsync(UsuarioConsultas.ObterTotalUsuariosValidos);
+                conn.Close();
+                return (long)totalUsuariosValidos;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return 0;
+            }
+        }
+
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
             try

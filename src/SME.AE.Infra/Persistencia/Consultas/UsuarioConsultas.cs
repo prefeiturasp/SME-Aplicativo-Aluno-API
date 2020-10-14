@@ -31,6 +31,15 @@
             count(id) 
         from Usuario 
         where primeiroacesso = true ";
-        
+
+        internal static string ObterTotalUsuariosValidos = @"
+        select 
+            count(id) 
+        from Usuario 
+        where primeiroacesso = true 
+            and excluido = false 
+            and email is not null 
+            or celular is not null";
+
     }
 }
