@@ -85,6 +85,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IRegistrarAceiteDosTermosDeUsoUseCase, RegistrarAceiteDosTermosDeUsoUseCase>();
             services.TryAddScoped<IObterEventosAlunoPorMesUseCase, ObterEventosAlunoPorMesUseCase>();
             services.TryAddScoped<IObterTotalUsuariosComAcessoIncompletoUseCase, ObterTotalUsuariosComAcessoIncompletoUseCase>();
+            services.TryAddScoped<IObterTotalUsuariosValidosUseCase, ObterTotalUsuariosValidosUseCase>();
         }
     }
 }
