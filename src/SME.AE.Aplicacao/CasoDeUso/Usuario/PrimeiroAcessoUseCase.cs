@@ -3,12 +3,10 @@ using SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.Usuario;
-using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
@@ -46,9 +44,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             await IncluirSenhaHistorico(usuario.Cpf);
 
-            var token = await mediator.Send(new CriarTokenCommand(usuario.Cpf));
-
-            return RespostaApi.Sucesso(new RetornoToken(token));
+            return RespostaApi.Sucesso();
         }
 
         private async Task IncluirSenhaHistorico(string cpf)
@@ -92,7 +88,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
                 PrimeiroAcesso = false
             };
         }
-        
+
         private CriarUsuarioCoreSSOCommand MapearCriarUsuarioCoreSSOCommand(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)
         {
             return new CriarUsuarioCoreSSOCommand()
