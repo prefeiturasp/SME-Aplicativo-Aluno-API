@@ -85,6 +85,23 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task<long> ObterTotalUsuariosComAcessoIncompleto(string codigoDre, string codigoUe)
+        {
+            try
+            {
+                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(UsuarioConsultas.ObterTotalUsuariosComAcessoIncompleto);
+                conn.Close();
+                return (long)totalUsuariosComAcessoIncompleto;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return 0;
+            }
+        }
+
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
             try
