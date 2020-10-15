@@ -22,5 +22,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         new Task RemoverAsync(long id);
         new Task RemoverAsync(Usuario usuario);
         new Task<long> SalvarAsync(Usuario usuario);
+        Task<long> ObterTotalUsuariosComAcessoIncompleto(string codigoDre, string codigoUe);
     }
 }
