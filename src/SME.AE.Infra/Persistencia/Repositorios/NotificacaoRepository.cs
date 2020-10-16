@@ -5,6 +5,7 @@ using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
@@ -164,29 +165,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<Notificacao> Atualizar(Notificacao notificacao)
+        public async Task Atualizar(AtualizarNotificacaoDto notificacao)
         {
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    await conn.ExecuteAsync(
-                        @"UPDATE notificacao set mensagem=@Mensagem, titulo=@Titulo, grupo=@Grupo, seriesresumidas=@SeriesResumidas
-                                    dataEnvio=@DataEnvio, dataExpiracao=@DataExpiracao, criadoEm=@CriadoEm, 
-                                    criadoPor=@CriadoPor, alteradoEm=@AlteradoEm, alteradoPor=@AlteradoPor 
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                await conn.ExecuteAsync(
+                    @"UPDATE notificacao set mensagem=@Mensagem, 
+                                                 titulo=@Titulo, 
+                                                 dataExpiracao=@DataExpiracao, 
+                                                 alteradoEm=@AlteradoEm, 
+                                                 alteradoPor=@AlteradoPor 
                                WHERE id=@Id",
-                        notificacao);
-                    conn.Close();
-                }
+                    notificacao);
+                conn.Close();
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return null;
             }
-
-            return notificacao;
         }
 
         public async Task<bool> Remover(Notificacao notificacao)
