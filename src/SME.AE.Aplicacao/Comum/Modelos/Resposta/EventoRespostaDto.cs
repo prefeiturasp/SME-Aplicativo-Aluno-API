@@ -8,6 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
     {
         public string Nome { get; set; }
         public string Descricao { get; set; }
+        public string DiaSemana { get; set; }
         public DateTime DataInicio { get; set; }
         public DateTime DataFim { get; set; }
         public int TipoEvento { get; set; }
