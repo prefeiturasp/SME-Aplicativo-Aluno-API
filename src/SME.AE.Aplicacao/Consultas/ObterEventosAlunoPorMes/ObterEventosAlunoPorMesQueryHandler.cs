@@ -62,6 +62,7 @@ namespace SME.AE.Aplicacao.Consultas
                     {
                         Nome = e.nome,
                         Descricao = e.descricao,
+                        DiaSemana = e.data_inicio.ToString("ddd"),
                         DataInicio = e.data_inicio,
                         DataFim = e.data_fim,
                         AnoLetivo = e.ano_letivo,
@@ -69,6 +70,6 @@ namespace SME.AE.Aplicacao.Consultas
                     }
                 ).Distinct();
             return eventosResposta;
-        }
+        }        
     }
 }
