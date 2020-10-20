@@ -4,8 +4,8 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -62,10 +62,12 @@ namespace SME.AE.Aplicacao.Consultas
                     {
                         Nome = e.nome,
                         Descricao = e.descricao,
+                        DiaSemana = e.data_inicio.ToString("ddd", new CultureInfo("pt-BR")),
                         DataInicio = e.data_inicio,
                         DataFim = e.data_fim,
                         AnoLetivo = e.ano_letivo,
-                        TipoEvento = e.tipo_evento
+                        TipoEvento = e.tipo_evento,
+                        ComponenteCurricular = e.componente_curricular
                     }
                 ).Distinct();
             return eventosResposta;

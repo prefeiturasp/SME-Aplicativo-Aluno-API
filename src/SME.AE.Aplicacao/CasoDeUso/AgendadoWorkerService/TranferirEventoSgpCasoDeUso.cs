@@ -1,12 +1,9 @@
-﻿using MediatR;
-using Shouldly;
-using SME.AE.Aplicacao.Comum.Enumeradores;
+﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -41,7 +38,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         private async Task SalvarEventos(IEnumerable<EventoDto> listaEventos)
         {
-            foreach(var evento in listaEventos)
+            foreach (var evento in listaEventos)
             {
                 await eventoRepositorio.Salvar(evento);
             }
@@ -64,10 +61,12 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     dre_id = eventoSgp.dre_id,
                     ue_id = eventoSgp.ue_id,
                     ultima_alteracao_sgp = eventoSgp.alterado_em,
-                    modalidade = eventoSgp.tipo_evento_id == (int)TipoEvento.Avaliacao 
-                                    ? ObterModalidadeCalendarioDeModalidadeTurma(eventoSgp) 
+                    modalidade = eventoSgp.tipo_evento_id == (int)TipoEvento.Avaliacao
+                                    ? ObterModalidadeCalendarioDeModalidadeTurma(eventoSgp)
                                     : eventoSgp.modalidade_calendario.Value,
-                    excluido = eventoSgp.excluido
+                    excluido = eventoSgp.excluido,
+                    componente_curricular = eventoSgp.componente_curricular
+
                 };
                 yield return evento;
             }

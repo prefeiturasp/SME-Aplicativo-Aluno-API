@@ -40,9 +40,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var sql = @"
                 insert into evento
-	                (evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp)
+	                (evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular)
                 values
-	                (@evento_id, @nome, @descricao, @data_inicio, @data_fim, @dre_id, @ue_id, @tipo_evento, @turma_id, @ano_letivo, @modalidade, @ultima_alteracao_sgp)
+	                (@evento_id, @nome, @descricao, @data_inicio, @data_fim, @dre_id, @ue_id, @tipo_evento, @turma_id, @ano_letivo, @modalidade, @ultima_alteracao_sgp, @componente_curricular)
                 on conflict 
 	                (evento_id) 
                 do update set 
@@ -56,7 +56,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                turma_id = excluded.turma_id, 
 	                ano_letivo = excluded.ano_letivo, 
 	                modalidade = excluded.modalidade, 
-	                ultima_alteracao_sgp = excluded.ultima_alteracao_sgp
+	                ultima_alteracao_sgp = excluded.ultima_alteracao_sgp,
+                    componente_curricular = excluded.componente_curricular
             ";
             using var conn = CriaConexao();
             await conn.OpenAsync();
@@ -75,7 +76,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             var sql = @$"
                 Select
-	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp
+	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular
                 from
 	                evento
                 where
