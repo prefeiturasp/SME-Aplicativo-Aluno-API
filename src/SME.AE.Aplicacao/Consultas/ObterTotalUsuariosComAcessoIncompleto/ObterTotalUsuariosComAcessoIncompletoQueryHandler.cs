@@ -17,7 +17,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 
         public async Task<long> Handle(ObterTotalUsuariosComAcessoIncompletoQuery request, CancellationToken cancellationToken)
         {
-            return await usuarioRepository.ObterTotalUsuariosComAcessoIncompleto(request.CodigoDre, request.CodigoUe);
+            return await usuarioRepository.ObterTotalUsuariosComAcessoIncompleto(request.Cpfs);
         }
     }
 }

@@ -1,20 +1,20 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos;
+using SME.AE.Aplicacao.Consultas.ObterTotalUsuariosComAcessoIncompleto;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SME.AE.Aplicacao.CasoDeUso
 {
-    public class ObterTotalUsuariosValidosUseCase : IObterTotalUsuariosValidosUseCase
+    public class ObterTotalUsuariosComAcessoIncompletoUseCase : IObterTotalUsuariosComAcessoIncompletoUseCase
     {
         private readonly IMediator mediator;
 
-        public ObterTotalUsuariosValidosUseCase(IMediator mediator)
+        public ObterTotalUsuariosComAcessoIncompletoUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
@@ -27,10 +27,11 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 var cpfsDaAbrangencia = await mediator.Send(new ObterCpfsDeResponsaveisPorDreEUeQuery(codigoDre, codigoUe));
                 cpfsDeResponsaveis = ConverterCpfsParaLista(cpfsDaAbrangencia);
             }
-            return await mediator.Send(new ObterTotalUsuariosValidosQuery(cpfsDeResponsaveis));
+
+            return await mediator.Send(new ObterTotalUsuariosComAcessoIncompletoQuery(cpfsDeResponsaveis));
         }
-        private List<string> ConverterCpfsParaLista(IEnumerable<CpfResponsavelAlunoEol> cpfsResponsaveis)
-        {
+
+        private List<string> ConverterCpfsParaLista(IEnumerable<CpfResponsavelAlunoEol> cpfsResponsaveis) {
             return (cpfsResponsaveis.Select(item => item.CpfResponsavel)).ToList();
         }
     }
