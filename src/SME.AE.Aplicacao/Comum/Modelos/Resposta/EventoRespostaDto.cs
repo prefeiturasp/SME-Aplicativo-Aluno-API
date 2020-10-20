@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
@@ -13,5 +11,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public DateTime DataFim { get; set; }
         public int TipoEvento { get; set; }
         public int AnoLetivo { get; set; }
+        public string ComponenteCurricular { get; set; }
     }
 }
