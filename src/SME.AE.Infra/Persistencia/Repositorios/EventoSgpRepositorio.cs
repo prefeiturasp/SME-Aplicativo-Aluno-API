@@ -21,6 +21,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					select * from 
 					(
 						(select 
+							coalesce (cc.descricao_sgp, cc.descricao) as componente_curricular,							
 							aa.id, aa.nome_avaliacao nome, aa.descricao_avaliacao descricao, aa.data_avaliacao data_inicio, aa.data_avaliacao data_fim,
 							aa.dre_id, aa.ue_id, 
 							0::int tipo_evento_id,
@@ -31,12 +32,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							greatest(aa.criado_em, aa.alterado_em) alterado_em,
 							coalesce(aa.excluido, false) excluido
 						from atividade_avaliativa aa 
-						inner join turma t on t.turma_id = aa.turma_id 
+						inner join turma t on t.turma_id = aa.turma_id
+						inner join atividade_avaliativa_disciplina aad on aad.atividade_avaliativa_id = aa.id
+						inner join componente_curricular cc on cc.id::varchar = aad.disciplina_id 
 						where
 							(aa.migrado isnull or aa.migrado = false) 
 						)
 						union 
 						(select
+							null as componente_curricular,
 							e.id, e.nome, e.descricao, e.data_inicio, e.data_fim,
 							e.dre_id, e.ue_id,
 							e.tipo_evento_id,
