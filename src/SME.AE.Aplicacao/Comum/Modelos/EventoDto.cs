@@ -1,7 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
@@ -20,5 +17,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int modalidade { get; set; }
         public DateTime ultima_alteracao_sgp { get; set; }
         public bool excluido { get; set; }
+        public string componente_curricular { get; set; }
     }
 }
