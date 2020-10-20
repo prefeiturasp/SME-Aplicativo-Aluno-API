@@ -85,13 +85,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<long> ObterTotalUsuariosComAcessoIncompleto(string codigoDre, string codigoUe)
+        public async Task<long> ObterTotalUsuariosComAcessoIncompleto(List<string> cpfs)
         {
             try
             {
+                var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+                var query = new StringBuilder();
+                query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosComAcessoIncompleto}");
+
+                if (cpfs != null && cpfs.Any())
+                    query.AppendLine($" and cpf IN ({cpfsIN})");
+
                 using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(UsuarioConsultas.ObterTotalUsuariosComAcessoIncompleto);
+                var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(query.ToString());
                 conn.Close();
                 return (long)totalUsuariosComAcessoIncompleto;
             }
@@ -102,13 +109,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<long> ObterTotalUsuariosValidos(string codigoDre, string codigoUe)
+        public async Task<long> ObterTotalUsuariosValidos(List<string> cpfs)
         {
             try
             {
+                var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+                var query = new StringBuilder();
+                query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosValidos}");
+
+                if (cpfs != null && cpfs.Any())
+                    query.AppendLine($" and cpf IN ({cpfsIN})");
+
                 using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var totalUsuariosValidos = await conn.ExecuteScalarAsync(UsuarioConsultas.ObterTotalUsuariosValidos);
+                var totalUsuariosValidos = await conn.ExecuteScalarAsync(query.ToString());
                 conn.Close();
                 return (long)totalUsuariosValidos;
             }
