@@ -91,5 +91,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
             return eventos;
         }
+
+        public async Task<IEnumerable<EventoDto>> ObterPorDreUeTurmaDataEspecifica(string dre_id, string ue_id, string turma_id, int modalidadeCalendario, DateTime mesAno)
+        {
+            var dataInicio = new DateTime(mesAno.Year, mesAno.Month, mesAno.Day);
+            var dataFim = new DateTime(mesAno.Year, mesAno.Month, DateTime.DaysInMonth(mesAno.Year, mesAno.Month));
+            var queryDre = string.IsNullOrWhiteSpace(dre_id) ? "" : "and (dre_id isnull or dre_id = @dre_id)";
+            var queryUe = string.IsNullOrWhiteSpace(ue_id) ? "" : "and (ue_id isnull or ue_id = @ue_id)";
+            var queryTurmna = string.IsNullOrWhiteSpace(turma_id) ? "" : "and (turma_id isnull or turma_id = @turma_id)";
+
+            var sql = @$"
+                Select
+	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp
+                from
+	                evento
+                where
+                    (data_inicio >=  @dataInicio and data_fim <= @dataFim)
+                    and modalidade = @modalidadeCalendario
+                    {queryDre}
+                    {queryUe}
+                    {queryTurmna}
+            ";
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var eventos = await conn.QueryAsync<EventoDto>(sql, new { dataInicio, dataFim, dre_id, ue_id, turma_id, modalidadeCalendario });
+            await conn.CloseAsync();
+            return eventos;
+        }
+
     }
 }

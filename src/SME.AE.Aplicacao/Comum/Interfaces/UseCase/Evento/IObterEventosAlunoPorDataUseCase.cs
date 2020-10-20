@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
 {
-    public interface IObterEventosAlunoPorMesUseCase
+    public interface IObterEventosAlunoPorDataUseCase
     {
         Task<IEnumerable<EventoRespostaDto>> Executar(string cpf, long codigoAluno, int mes, int ano);
     }

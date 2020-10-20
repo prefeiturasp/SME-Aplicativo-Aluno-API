@@ -15,5 +15,13 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await obterDoAlunoLogado.Executar(User.Identity.Name, codigoAluno, mes, ano));
         }
+
+        [HttpGet("dashboard/{ano}/{mes}/{codigoAluno}")]
+        [Authorize]
+        public async Task<ActionResult<EventoRespostaDto>> ObterEventosDashboardAluno(long codigoAluno, int mes, int ano, [FromServices] IObterEventosAlunoPorDataUseCase obterEventosAlunoPorDataUseCase)
+        {
+            return Ok(await obterEventosAlunoPorDataUseCase.Executar(User.Identity.Name, codigoAluno, mes, ano));
+        }
+
     }
 }
