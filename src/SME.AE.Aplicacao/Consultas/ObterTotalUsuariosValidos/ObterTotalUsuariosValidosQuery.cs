@@ -1,17 +1,15 @@
 ﻿using MediatR;
+using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
 {
     public class ObterTotalUsuariosValidosQuery : IRequest<long>
     {
-        public string CodigoDre { get; set; }
+        public List<string> Cpfs { get; set; }
 
-        public string CodigoUe { get; set; }
-
-        public ObterTotalUsuariosValidosQuery(string codigoDre, string codigoUe)
+        public ObterTotalUsuariosValidosQuery(List<string> cpfs)
         {
-            CodigoDre = codigoDre;
-            CodigoUe = codigoUe;
+            Cpfs = cpfs;
         }
     }
 }

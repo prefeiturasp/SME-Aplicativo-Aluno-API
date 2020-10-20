@@ -23,23 +23,17 @@
         select 
             count(id) 
         from Usuario 
-        where primeiroacesso = false 
-            and email isnull 
-            or celular isnull
-        union
-        select 
-            count(id) 
-        from Usuario 
-        where primeiroacesso = true ";
+        where primeiroacesso = true 
+              and excluido = false ";
 
         internal static string ObterTotalUsuariosValidos = @"
         select 
             count(id) 
         from Usuario 
-        where primeiroacesso = true 
+        where primeiroacesso = false 
             and excluido = false 
             and email is not null 
-            or celular is not null";
+            or celular is not null ";
 
     }
 }

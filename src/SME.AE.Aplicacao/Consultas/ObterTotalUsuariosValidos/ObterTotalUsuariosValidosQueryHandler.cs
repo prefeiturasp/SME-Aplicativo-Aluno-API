@@ -16,7 +16,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
 
         public async Task<long> Handle(ObterTotalUsuariosValidosQuery request, CancellationToken cancellationToken)
         {
-            return await usuarioRepository.ObterTotalUsuariosValidos(request.CodigoDre, request.CodigoUe);
+            return await usuarioRepository.ObterTotalUsuariosValidos(request.Cpfs);
         }
     }
 }

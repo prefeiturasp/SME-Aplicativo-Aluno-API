@@ -1,17 +1,15 @@
 ﻿using MediatR;
+using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosComAcessoIncompleto
 {
     public class ObterTotalUsuariosComAcessoIncompletoQuery : IRequest<long>
     {
-        public string CodigoDre { get; set; }
+        public List<string> Cpfs { get; set; }
 
-        public string CodigoUe { get; set; }
-
-        public ObterTotalUsuariosComAcessoIncompletoQuery(string codigoDre, string codigoUe)
+        public ObterTotalUsuariosComAcessoIncompletoQuery(List<string> cpfs)
         {
-            CodigoDre = codigoDre;
-            CodigoUe = codigoUe;
+            Cpfs = cpfs;
         }
     }
 }

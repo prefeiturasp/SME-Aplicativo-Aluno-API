@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Include="Comum\Modelos\Resposta\AtualizacaiNotificacaoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\CpfResponsavelAlunoEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\EventoRespostaDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\Grupo.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoResposta.cs" />
