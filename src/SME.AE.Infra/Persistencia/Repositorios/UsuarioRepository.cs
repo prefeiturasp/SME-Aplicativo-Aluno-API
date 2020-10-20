@@ -85,6 +85,54 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task<long> ObterTotalUsuariosComAcessoIncompleto(List<string> cpfs)
+        {
+            try
+            {
+                var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+                var query = new StringBuilder();
+                query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosComAcessoIncompleto}");
+
+                if (cpfs != null && cpfs.Any())
+                    query.AppendLine($" and cpf IN ({cpfsIN})");
+
+                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(query.ToString());
+                conn.Close();
+                return (long)totalUsuariosComAcessoIncompleto;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return 0;
+            }
+        }
+
+        public async Task<long> ObterTotalUsuariosValidos(List<string> cpfs)
+        {
+            try
+            {
+                var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+                var query = new StringBuilder();
+                query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosValidos}");
+
+                if (cpfs != null && cpfs.Any())
+                    query.AppendLine($" and cpf IN ({cpfsIN})");
+
+                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalUsuariosValidos = await conn.ExecuteScalarAsync(query.ToString());
+                conn.Close();
+                return (long)totalUsuariosValidos;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return 0;
+            }
+        }
+
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
             try

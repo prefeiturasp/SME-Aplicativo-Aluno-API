@@ -9,13 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AlunoRepositorio : IAlunoRepositorio
     {
-
         private readonly ICacheRepositorio cacheRepositorio;
 
         public AlunoRepositorio(ICacheRepositorio cacheRepositorio)
@@ -66,6 +66,30 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
                 var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereDreUeReponsavelAluno}", new { codigoDre, codigoUe, cpf });
                 return listaAlunos.ToList();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        public async Task<List<CpfResponsavelAlunoEol>> ObterCpfsDeResponsaveis(string codigoDre, string codigoUe)
+        {
+            try
+            {
+                var query = new StringBuilder();
+                query.AppendLine($"{AlunoConsultas.ObterCpfsResponsaveis}");
+
+                if (!string.IsNullOrWhiteSpace(codigoDre))
+                    query.AppendLine(" AND dre.cd_unidade_educacao = @codigoDre ");
+
+                if (!string.IsNullOrWhiteSpace(codigoUe))
+                    query.AppendLine(" AND vue.cd_unidade_educacao = @codigoUe");
+
+                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                var cpfsResponsaveis = await conexao.QueryAsync<CpfResponsavelAlunoEol>($"{query}", new { codigoDre, codigoUe });
+                return cpfsResponsaveis.ToList();
             }
             catch (Exception ex)
             {
