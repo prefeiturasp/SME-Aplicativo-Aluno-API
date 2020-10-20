@@ -1,7 +1,5 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
@@ -21,6 +19,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int? modalidade_calendario { get; set; }
         public DateTime alterado_em { get; set; }
         public bool excluido { get; set; }
+        public string componente_curricular { get; set; }
     }
 
     public static class EventoSgpDtoExtensions
