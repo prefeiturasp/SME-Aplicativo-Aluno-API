@@ -76,7 +76,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             var sql = @$"
                 Select
-	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp
+	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular
                 from
 	                evento
                 where
