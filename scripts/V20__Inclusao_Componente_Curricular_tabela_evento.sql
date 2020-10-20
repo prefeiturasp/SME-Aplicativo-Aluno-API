@@ -1,0 +1,1 @@
+ALTER TABLE if exists public.evento ADD if not exists componente_curricular varchar(100) NULL;
