@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Worker.Service
 {
@@ -15,6 +13,10 @@ namespace SME.AE.Worker.Service
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
