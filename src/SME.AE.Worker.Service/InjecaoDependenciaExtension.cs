@@ -32,7 +32,6 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
-
                 .AddTransient<IEventoRepositorio, EventoRepositorio>()
                 .AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>()
             ;

@@ -1,21 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NCrontab;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SME.AE.Worker.Service
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class UseCaseWorkerAttribute: Attribute
+    public class UseCaseWorkerAttribute : Attribute
     {
         public string CronParametroDB { get; set; }
         public string CronPadrao { get; set; }
@@ -37,15 +34,17 @@ namespace SME.AE.Worker.Service
         private CrontabSchedule BuscaParametroCrontab()
         {
             var atributo = this.GetType().GetCustomAttribute<UseCaseWorkerAttribute>();
-            if(atributo != null)
+            if (atributo != null)
             {
-                if (!string.IsNullOrWhiteSpace(atributo.CronParametroDB)) {
-                    if (parametrosEscolaAqui.TentaObterString(atributo.CronParametroDB, out var valorParametro)) {
+                if (!string.IsNullOrWhiteSpace(atributo.CronParametroDB))
+                {
+                    if (parametrosEscolaAqui.TentaObterString(atributo.CronParametroDB, out var valorParametro))
+                    {
                         if (!string.IsNullOrWhiteSpace(valorParametro))
                         {
                             return CrontabSchedule.Parse(valorParametro, new CrontabSchedule.ParseOptions { IncludingSeconds = false });
                         }
-                    } 
+                    }
                 }
                 if (!string.IsNullOrWhiteSpace(atributo.CronPadrao))
                 {
@@ -55,7 +54,7 @@ namespace SME.AE.Worker.Service
                 }
             }
             parametrosEscolaAqui.Salvar(atributo.CronParametroDB, "* * * * *");
-            return CrontabSchedule.Parse("* * * * *"); 
+            return CrontabSchedule.Parse("* * * * *");
         }
 
         private async Task ExecutaCasoDeUso()
@@ -63,15 +62,16 @@ namespace SME.AE.Worker.Service
             logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
 
             var servico = serviceProvider.GetService<T>() ?? throw new Exception($"Injeção de dependencia para o tipo {typeof(T).Name} não registrado.");
-            var metodo = 
-                servico.GetType().GetMethod("ExecutarAsync") 
-                ?? servico.GetType().GetMethod("Executar") 
+            var metodo =
+                servico.GetType().GetMethod("ExecutarAsync")
+                ?? servico.GetType().GetMethod("Executar")
                 ?? throw new Exception($"Metodo Executar/ExecutarAsync não encontrado na classe {typeof(T).Name}.");
 
             if (metodo.ReturnType == typeof(Task))
             {
                 await (Task)metodo.Invoke(servico, null);
-            } else
+            }
+            else
             {
                 metodo.Invoke(servico, null);
                 await Task.CompletedTask;
@@ -112,7 +112,7 @@ namespace SME.AE.Worker.Service
                     catch (OperationCanceledException) { }
                     catch (Exception ex)
                     {
-                        // adicionar sentry
+                        SentrySdk.CaptureException(ex);
                         logger?.LogError(ex, "*** Worker error:");
                         throw ex;
                     }
