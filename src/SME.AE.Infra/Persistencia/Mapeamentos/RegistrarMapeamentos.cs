@@ -10,6 +10,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         {
             FluentMapper.Initialize(config =>
             {
+                config.AddMap(new AdesaoMap());
                 config.AddMap(new UsuarioMap());
                 config.AddMap(new NotificacaoMap());
                 config.AddMap(new UsuarioNotificacaoMap());
