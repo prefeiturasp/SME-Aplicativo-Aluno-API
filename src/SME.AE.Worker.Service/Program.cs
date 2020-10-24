@@ -13,10 +13,6 @@ namespace SME.AE.Worker.Service
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
-                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
@@ -24,6 +20,11 @@ namespace SME.AE.Worker.Service
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso()
                         ;
-                });
+                }).ConfigureLogging((context, logging) =>
+                {
+                    //logging.AddConfiguration(context.Configuration);
+                    //logging.AddSentry();
+                    //webBuilder.UseSentry(option => { option.Dsn = VariaveisAmbiente.WorkerSentryDsn; });
+                  });
     }
 }
