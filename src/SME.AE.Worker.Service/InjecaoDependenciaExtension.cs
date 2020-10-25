@@ -14,6 +14,7 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddTransient<TranferirEventoSgpCasoDeUso>()
+                .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
                 ;
         }
         #endregion
@@ -23,6 +24,7 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddSingleton<IHostedService, TransferirEventoSgpWorker>()
+                .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
                 ;
         }
         #endregion
@@ -35,6 +37,11 @@ namespace SME.AE.Worker.Service
 
                 .AddTransient<IEventoRepositorio, EventoRepositorio>()
                 .AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>()
+
+                .AddTransient<IResponsavelEOLRepositorio, ResponsavelEOLRepositorio>()
+                .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
+                .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
+
             ;
         }
         #endregion
