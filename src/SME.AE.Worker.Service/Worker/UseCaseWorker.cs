@@ -83,8 +83,6 @@ namespace SME.AE.Worker.Service
         {
             logger?.LogInformation("Hosted service starting");
 
-            SentrySdk.CaptureMessage("Teste sentry worker");
-
             return Task.Factory.StartNew(async () =>
             {
                 // loop until a cancalation is requested

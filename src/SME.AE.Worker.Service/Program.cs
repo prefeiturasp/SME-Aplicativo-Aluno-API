@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Worker.Service
@@ -22,9 +23,8 @@ namespace SME.AE.Worker.Service
                         ;
                 }).ConfigureLogging((context, logging) =>
                 {
-                    //logging.AddConfiguration(context.Configuration);
-                    //logging.AddSentry();
-                    //webBuilder.UseSentry(option => { option.Dsn = VariaveisAmbiente.WorkerSentryDsn; });
-                  });
+                    logging.AddConfiguration(context.Configuration);
+                    logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.WorkerSentryDsn; });
+                });
     }
 }
