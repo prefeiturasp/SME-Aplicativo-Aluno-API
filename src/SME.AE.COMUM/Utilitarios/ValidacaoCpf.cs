@@ -4,6 +4,30 @@
     {
         public static bool Valida(string cpf)
         {
+            cpf = cpf.Trim();
+            cpf = cpf.Replace(".", "").Replace("-", "");
+            if (cpf.Length != 11)
+            {
+                return false;
+            }
+            if(!long.TryParse(cpf, out _))
+            {
+                return false;
+            }
+            switch (cpf)
+            {
+                case "00000000000":
+                case "11111111111":
+                case "22222222222":
+                case "33333333333":
+                case "44444444444":
+                case "55555555555":
+                case "66666666666":
+                case "77777777777":
+                case "88888888888":
+                case "99999999999":
+                    return false;
+            }
 
             int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
@@ -16,14 +40,6 @@
             int soma;
 
             int resto;
-
-            cpf = cpf.Trim();
-
-            cpf = cpf.Replace(".", "").Replace("-", "");
-
-            if (cpf.Length != 11)
-
-                return false;
 
             tempCpf = cpf.Substring(0, 9);
 
