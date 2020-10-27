@@ -41,7 +41,7 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(ITermosDeUsoRepositorio), typeof(TermosDeUsoRepositorio));
             services.AddTransient(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
-
+            services.AddTransient(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
             services.AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>();
             services.AddTransient<IEventoRepositorio, EventoRepositorio>();
             services.AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>();
