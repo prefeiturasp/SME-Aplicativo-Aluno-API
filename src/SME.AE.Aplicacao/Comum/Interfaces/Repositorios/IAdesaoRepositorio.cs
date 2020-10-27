@@ -6,6 +6,10 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IAdesaoRepositorio
     {
-        Task<IEnumerable<TotaisAdesaoResultado>> ObterTotaisAdesao(string codigoDre, string codigoUe);
+        Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoSme();
+
+        Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoAgrupadosPorDreUeETurma(string codigoDre, string codigoUe);
     }
 }
+
+
