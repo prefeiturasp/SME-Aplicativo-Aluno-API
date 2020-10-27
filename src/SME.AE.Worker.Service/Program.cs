@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Infra.Persistencia.Mapeamentos;
 
 namespace SME.AE.Worker.Service
 {
@@ -9,6 +10,7 @@ namespace SME.AE.Worker.Service
     {
         public static void Main(string[] args)
         {
+            RegistrarMapeamentos.Registrar();
             CreateHostBuilder(args).Build().Run();
         }
 

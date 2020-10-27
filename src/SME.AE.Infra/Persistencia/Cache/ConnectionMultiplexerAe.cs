@@ -12,10 +12,14 @@ namespace SME.AE.Infra.Persistencia.Cache
         {
             try
             {
-                var teste = string.Concat(configuration.GetConnectionString("SGP-EA-REDIS"), $",ConnectTimeout={TimeSpan.FromSeconds(1).TotalMilliseconds}");
+                var connectionString = Environment.GetEnvironmentVariable("SGP-EA-REDIS");
+                if (string.IsNullOrWhiteSpace(connectionString))
+                    connectionString = configuration.GetConnectionString("SGP-EA-REDIS");
+
+                var connectionStringCompleta = $"{connectionString},ConnectTimeout=5000";
 
                 this.connectionMultiplexer = ConnectionMultiplexer
-                    .Connect(teste);
+                    .Connect(connectionStringCompleta);
             }
             catch (RedisConnectionException rcex)
             {

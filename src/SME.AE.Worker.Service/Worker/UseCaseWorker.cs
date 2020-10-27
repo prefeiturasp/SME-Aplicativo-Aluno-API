@@ -106,6 +106,7 @@ namespace SME.AE.Worker.Service
                                     ExecutaCasoDeUso(),
                                     Task.Delay(10000)
                                 );
+                                GC.Collect();
                             }
                         }
                     }
