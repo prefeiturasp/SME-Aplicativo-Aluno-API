@@ -8,6 +8,13 @@ namespace SME.AE.Api.Controllers
     [Route("api/v1/dashboard")]
     public class DashboardController : ApiController
     {
+        [HttpGet("adesao")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterTotaisAdesao([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromServices] IObterTotaisAdesaoUseCase obterTotaisAdesaoUseCase)
+        {
+            return Ok(await obterTotaisAdesaoUseCase.Executar(codigoDre, codigoUe));
+        }
+
         [HttpGet("adesao/usuarios/incompletos")]
         [AllowAnonymous]
         public async Task<ObjectResult> ObterTotalUsuariosComAcessoIncompleto([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromServices] IObterTotalUsuariosComAcessoIncompletoUseCase obterTotalUsuariosComAcessoIncompletoUseCase)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using SME.AE.Infra.Persistencia.Mapeamentos;
 
 namespace SME.AE.Worker.Service
 {
@@ -10,6 +11,7 @@ namespace SME.AE.Worker.Service
     {
         public static void Main(string[] args)
         {
+            RegistrarMapeamentos.Registrar();
             CreateHostBuilder(args).Build().Run();
         }
 
