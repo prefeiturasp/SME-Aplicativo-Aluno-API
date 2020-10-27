@@ -18,7 +18,10 @@ namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
 
         public async Task<IEnumerable<TotaisAdesaoResultado>> Handle(ObterTotaisAdesaoQuery request, CancellationToken cancellationToken)
         {
-            return await adesaoRepositorio.ObterTotaisAdesao(request.CodigoDre, request.CodigoUe);
+            if (string.IsNullOrEmpty(request.CodigoDre) && string.IsNullOrEmpty(request.CodigoUe))
+                return await adesaoRepositorio.ObterDadosAdesaoSme();
+
+            return await adesaoRepositorio.ObterDadosAdesaoAgrupadosPorDreUeETurma(request.CodigoDre, request.CodigoUe);
         }
     }
 }
