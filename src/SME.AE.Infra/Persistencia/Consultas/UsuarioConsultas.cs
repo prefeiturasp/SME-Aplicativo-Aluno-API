@@ -16,9 +16,6 @@
                 Excluido,Id,CriadoEm,CriadoPor,AlteradoEm,AlteradoPor,
                 token_redefinicao, redefinicao, validade_token";
 
-        //  AND Usuario.excluido = false";
-
-
         internal static string ObterTotalUsuariosComAcessoIncompleto = @"
         select 
             count(id) 
