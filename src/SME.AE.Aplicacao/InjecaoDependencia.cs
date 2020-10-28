@@ -11,6 +11,7 @@ using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.UltimaAtualizacaoWorker;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Middlewares;
@@ -87,7 +88,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterTotalUsuariosComAcessoIncompletoUseCase, ObterTotalUsuariosComAcessoIncompletoUseCase>();
             services.TryAddScoped<IObterTotalUsuariosValidosUseCase, ObterTotalUsuariosValidosUseCase>();
             services.TryAddScoped<IObterTotaisAdesaoUseCase, ObterTotaisAdesaoUseCase>();
-            
+            services.TryAddScoped<IObterUltimaAtualizacaoPorProcessoUseCase, ObterUltimaAtualizacaoPorProcessoUseCase>();
         }
     }
 }
