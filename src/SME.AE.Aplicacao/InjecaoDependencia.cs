@@ -89,6 +89,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterTotalUsuariosValidosUseCase, ObterTotalUsuariosValidosUseCase>();
             services.TryAddScoped<IObterTotaisAdesaoUseCase, ObterTotaisAdesaoUseCase>();
             services.TryAddScoped<IObterUltimaAtualizacaoPorProcessoUseCase, ObterUltimaAtualizacaoPorProcessoUseCase>();
+            services.AddTransient<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
         }
     }
 }
