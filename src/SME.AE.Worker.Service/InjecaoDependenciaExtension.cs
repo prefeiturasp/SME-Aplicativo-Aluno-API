@@ -48,6 +48,9 @@ namespace SME.AE.Worker.Service
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
+
+                .AddTransient<IFrequenciaAlunoRepositorio, FrequenciaAlunoRepositorio>()
+                .AddTransient<IFrequenciaAlunoSgpRepositorio, FrequenciaAlunoSgpRepositorio>()
             ;
         }
         #endregion

@@ -73,7 +73,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 UPDATE 
 	                frequencia_aluno
                 SET 
-	                ue_nome=NomeUe, 
+	                ue_nome=@NomeUe, 
 	                turma_descricao=@NomeTurma,
 	                componente_curricular=@ComponenteCurricular, 
 	                quantidade_aulas=@QuantidadeAulas, 
