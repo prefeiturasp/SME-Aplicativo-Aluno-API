@@ -45,6 +45,8 @@ namespace SME.AE.Infra
             services.AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>();
             services.AddTransient<IEventoRepositorio, EventoRepositorio>();
             services.AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>();
+            services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
+            services.AddTransient(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 

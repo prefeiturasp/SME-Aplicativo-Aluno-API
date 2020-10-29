@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using Npgsql;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -37,5 +39,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
 			await conn.CloseAsync();
 		}
-	}
+
+        public async Task<UltimaAtualizaoWorkerPorProcessoResultado> ObterUltimaAtualizacaoPorProcesso(string nomeProcesso)
+        {
+			try
+			{
+				using var conexao = CriaConexao();
+				conexao.Open();
+				var ultimaAtualizacao = await conexao.QueryFirstAsync<UltimaAtualizaoWorkerPorProcessoResultado>($"select nome_processo as NomeProcesso, data_ultima_atualizacao as DataUltimaAtualizacao from worker_processo_atualizacao wpa where nome_processo = @nomeProcesso", new { nomeProcesso });
+				conexao.Close();
+				return ultimaAtualizacao;
+			}
+			catch (Exception ex)
+			{
+				//SentrySdk.CaptureException(ex);
+				return null;
+			}
+		}
+    }
 }
