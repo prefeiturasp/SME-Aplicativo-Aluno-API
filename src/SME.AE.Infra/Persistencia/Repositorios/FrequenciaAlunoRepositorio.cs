@@ -4,9 +4,11 @@ using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -63,6 +65,89 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
+        }
+
+        public async Task SalvarFrequenciaAluno(FrequenciaAlunoSgpDto frequenciaAluno) {
+            const string sqlUpdate =
+                @"
+                UPDATE 
+	                frequencia_aluno
+                SET 
+	                ue_nome=NomeUe, 
+	                turma_descricao=@NomeTurma,
+	                componente_curricular=@ComponenteCurricular, 
+	                quantidade_aulas=@QuantidadeAulas, 
+	                quantidade_faltas=@QuantidadeAusencias, 
+	                quantidade_compensacoes=@QuantidadeCompensacoes
+                where 
+	                ano_letivo = @AnoLetivo and
+	                bimestre = @Bimestre and 
+	                ue_codigo = @CodigoUe and 
+	                turma_codigo = @CodigoTurma and 
+	                aluno_codigo = @CodigoAluno;
+                ";
+
+            const string sqlInsert =
+                @"
+                INSERT INTO frequencia_aluno
+                (
+	                ue_codigo, 
+	                ue_nome, 
+	                turma_codigo, 
+	                turma_descricao, 
+	                aluno_codigo, 
+	                bimestre, 
+	                componente_curricular, 
+	                quantidade_aulas, 
+	                quantidade_faltas, 
+	                quantidade_compensacoes, 
+	                ano_letivo
+                ) values (
+	                @CodigoUe, 
+	                @NomeUe, 
+	                @CodigoTurma, 
+	                @NomeTurma, 
+	                @CodigoAluno, 
+	                @Bimestre, 
+	                @ComponenteCurricular, 
+	                @QuantidadeAulas, 
+	                @QuantidadeAusencias, 
+	                @QuantidadeCompensacoes, 
+	                @AnoLetivo
+                )
+                ";
+
+            using var conn = CriaConexao();
+
+            try
+            {
+                conn.Open();
+                var alterado = (await conn.ExecuteAsync(sqlUpdate, frequenciaAluno)) > 0;
+                if (!alterado)
+                    await conn.ExecuteAsync(sqlInsert, frequenciaAluno);
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+        public async Task SalvarFrequenciaAlunosBatch(IEnumerable<FrequenciaAlunoSgpDto> frequenciaAlunosSgp)
+        {
+            try
+            {
+                frequenciaAlunosSgp
+                    .AsParallel()
+                    .WithDegreeOfParallelism(20)
+                    .ForAll(async frequenciaAluno => await SalvarFrequenciaAluno(frequenciaAluno));
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+            await Task.CompletedTask;
         }
     }
 }
