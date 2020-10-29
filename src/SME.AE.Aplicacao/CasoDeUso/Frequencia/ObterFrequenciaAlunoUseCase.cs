@@ -17,9 +17,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<IEnumerable<FrequenciaAlunoResposta>> Executar(string codigoUe, long codigoTurma, string codigoAluno)
+        public async Task<IEnumerable<FrequenciaAlunoResposta>> Executar(int anoLetivo, string codigoUe, long codigoTurma, string codigoAluno)
         {
-            return await mediator.Send(new ObterFrequenciaAlunoQuery(codigoUe, codigoTurma, codigoAluno));
+            return await mediator.Send(new ObterFrequenciaAlunoQuery(anoLetivo, codigoUe, codigoTurma, codigoAluno));
         }
 
 

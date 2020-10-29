@@ -2,6 +2,7 @@
 {
     public class FrequenciaAlunoResposta
     {
+        public string AnoLetivo { get; set; }
         public string CodigoUe { get; set; }
         public string NomeUe { get; set; }
         public string CodigoTurma { get; set; }
