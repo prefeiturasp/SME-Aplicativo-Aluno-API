@@ -17,9 +17,9 @@ namespace SME.AE.Api.Controllers
 
         [HttpGet("frequencia")]
         [AllowAnonymous]
-        public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] string codigoUe, [FromQuery] long codigoTurma, [FromQuery] string codigoAluno, [FromServices] IObterFrequenciaAlunoUseCase obterFrequenciaAlunoUseCase)
+        public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] int anoLetivo, [FromQuery] string codigoUe, [FromQuery] long codigoTurma, [FromQuery] string codigoAluno, [FromServices] IObterFrequenciaAlunoUseCase obterFrequenciaAlunoUseCase)
         {
-            return Ok(await obterFrequenciaAlunoUseCase.Executar(codigoUe, codigoTurma, codigoAluno));
+            return Ok(await obterFrequenciaAlunoUseCase.Executar(anoLetivo, codigoUe, codigoTurma, codigoAluno));
         }
     }
 }

@@ -6,6 +6,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IFrequenciaAlunoRepositorio
     {
-        Task<IEnumerable<FrequenciaAlunoResposta>> ObterFrequenciaAluno(string codigoUe, long codigoTurma, string codigoAluno);
+        Task<IEnumerable<FrequenciaAlunoResposta>> ObterFrequenciaAluno(int anoLetivo, string codigoUe, long codigoTurma, string codigoAluno);
     }
 }

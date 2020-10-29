@@ -15,17 +15,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     {
         private readonly ICacheRepositorio cacheRepositorio;
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private static string chaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, long codigoTurmna, string codigoAluno)
+            => $"frequenciaAluno-AnoUeTurmaAluno-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
 
         public FrequenciaAlunoRepositorio(ICacheRepositorio cacheRepositorio) 
         {
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<FrequenciaAlunoResposta>> ObterFrequenciaAluno(string codigoUe, long codigoTurma, string codigoAluno)
+        public async Task<IEnumerable<FrequenciaAlunoResposta>> ObterFrequenciaAluno(int anoLetivo, string codigoUe, long codigoTurma, string codigoAluno)
         {
             try
             {
-                var chaveCache = $"frequenciaAluno";
+                var chaveCache = chaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
+
                 var frequenciaAluno = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(frequenciaAluno))
                     return JsonConvert.DeserializeObject<IEnumerable<FrequenciaAlunoResposta>>(frequenciaAluno);
@@ -33,6 +36,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = CriaConexao();
                 conexao.Open();
                 var dadosFrequenciaAlunos = await conexao.QueryAsync<FrequenciaAlunoResposta>(@"SELECT 
+                                                                                                        ano_letivo as AnoLetivo,
                                                                                                         ue_codigo as CodigoUe,
                                                                                                         ue_nome as NomeUe,
                                                                                                         turma_codigo as CodigoTurma,
@@ -45,9 +49,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                                                                         quantidade_compensacoes as QuantidadeCompensacoes
                                                                                                     FROM public.frequencia_aluno 
                                                                                                     WHERE 
-                                                                                                        ue_codigo = @CodigoUe 
+                                                                                                        ano_letivo = @anoLetivo
+                                                                                                        AND ue_codigo = @CodigoUe 
                                                                                                         AND turma_codigo = @CodigoTurma 
-                                                                                                        AND aluno_codigo = @CodigoAluno ", new {  codigoUe, codigoTurma, codigoAluno });
+                                                                                                        AND aluno_codigo = @CodigoAluno ", new { anoLetivo, codigoUe, codigoTurma, codigoAluno });
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosFrequenciaAlunos, 720, false);
