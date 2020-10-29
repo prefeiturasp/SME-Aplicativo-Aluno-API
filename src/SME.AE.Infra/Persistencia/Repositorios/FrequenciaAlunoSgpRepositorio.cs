@@ -14,7 +14,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class FrequenciaAlunoSgpRepositorio : IFrequenciaAlunoSgpRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
 
         public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp()
         {
@@ -30,7 +30,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                        t.ano_letivo AnoLetivo,
 	                        ue.ue_id CodigoUe,
 	                        ue.nome NomeUe,
-	                        t.turma_id CodigoTurma,
+	                        t.turma_id::int8 CodigoTurma,
 	                        t.nome NomeTurma,
 	                        fa.codigo_aluno CodigoAluno,
 	                        fa.bimestre Bimestre,
