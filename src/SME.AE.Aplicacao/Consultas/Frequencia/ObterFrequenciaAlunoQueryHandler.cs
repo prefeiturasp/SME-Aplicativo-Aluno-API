@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
 
         public async Task<IEnumerable<FrequenciaAlunoResposta>> Handle(ObterFrequenciaAlunoQuery request, CancellationToken cancellationToken)
         {
-            return await _frequenciaAlunoRepositorio.ObterFrequenciaAluno(request.CodigoUe, request.CodigoTurma, request.CodigoAluno);
+            return await _frequenciaAlunoRepositorio.ObterFrequenciaAluno(request.AnoLetivo, request.CodigoUe, request.CodigoTurma, request.CodigoAluno);
         }
     }
 }
