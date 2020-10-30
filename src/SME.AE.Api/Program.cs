@@ -15,7 +15,7 @@ namespace SME.AE.Api
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .UseStartup<Startup>()
-            .UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; })
+            //.UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; })
             .UseUrls("http://0.0.0.0:5000;https://0.0.0.0:5001;");
     }
 }
