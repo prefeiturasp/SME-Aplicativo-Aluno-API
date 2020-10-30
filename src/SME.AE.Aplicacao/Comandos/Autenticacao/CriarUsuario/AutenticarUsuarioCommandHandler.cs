@@ -1,5 +1,6 @@
 ﻿using FluentValidation.Results;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Extensoes;
@@ -73,10 +74,16 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             if (usuarioRetorno != null)
             {
                 primeiroAcesso = usuarioRetorno.PrimeiroAcesso;
+
+                SentrySdk.CaptureMessage($"primeiro acesso: {usuarioRetorno.PrimeiroAcesso} - cpf: {request.Cpf}");
+
                 if (!usuarioRetorno.PrimeiroAcesso)
                 {
                     if (usuarioCoreSSO != null && (!Criptografia.EqualsSenha(request.Senha, usuarioCoreSSO.Senha, usuarioCoreSSO.TipoCriptografia)))
                     {
+                        var msg = $"senha:{request.Senha} - senhaCore: {usuarioCoreSSO.Senha} - tipo: {usuarioCoreSSO.TipoCriptografia}";
+                        SentrySdk.CaptureMessage(msg);
+
                         validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário ou senha incorretos."));
                         return RespostaApi.Falha(validacao.Errors);
                     }
