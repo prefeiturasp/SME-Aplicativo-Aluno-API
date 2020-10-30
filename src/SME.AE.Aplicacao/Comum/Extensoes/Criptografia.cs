@@ -22,9 +22,9 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
         public static bool EqualsSenha(string senha1, string senha2, TipoCriptografia tipo)
         {
             if (tipo == TipoCriptografia.TripleDES)
-                return CriptografarSenhaTripleDES(senha1).Equals(senha2);
+                return CriptografarSenhaTripleDES(senha1) == senha2;
             else
-                return CriptografarSenhaSHA512(senha1).Equals(senha2);
+                return CriptografarSenhaSHA512(senha1) == senha2;
         }
 
         public static string CriptografarSenhaTripleDES(string senha)
