@@ -17,6 +17,7 @@ namespace SME.AE.Worker.Service
                 .AddTransient<TranferirEventoSgpCasoDeUso>()
                 .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
                 .AddTransient<TransferirFrequenciaSgpCasoDeUso>()
+                .AddTransient<TransferirNotaSgpCasoDeUso>()
                 ;
         }
         #endregion
@@ -27,7 +28,8 @@ namespace SME.AE.Worker.Service
             return services
                 //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 //.AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                //.AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
                 ;
         }
         #endregion
