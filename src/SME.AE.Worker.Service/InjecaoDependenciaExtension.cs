@@ -26,9 +26,9 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
-                //.AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                //.AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                .AddSingleton<IHostedService, TransferirEventoSgpWorker>()
+                .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
+                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
                 .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
                 ;
         }
@@ -53,6 +53,9 @@ namespace SME.AE.Worker.Service
 
                 .AddTransient<IFrequenciaAlunoRepositorio, FrequenciaAlunoRepositorio>()
                 .AddTransient<IFrequenciaAlunoSgpRepositorio, FrequenciaAlunoSgpRepositorio>()
+
+                .AddTransient<INotaAlunoRepositorio, NotaAlunoRepositorio>()
+                .AddTransient<INotaAlunoSgpRepositorio, NotaAlunoSgpRepositorio>()
             ;
         }
         #endregion
