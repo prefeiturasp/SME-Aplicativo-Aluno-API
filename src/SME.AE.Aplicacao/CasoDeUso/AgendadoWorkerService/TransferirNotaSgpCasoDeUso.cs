@@ -10,13 +10,22 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class TransferirNotaSgpCasoDeUso
     {
-        public TransferirNotaSgpCasoDeUso()
+        private readonly INotaAlunoRepositorio notaAlunoRepositorio;
+        private readonly INotaAlunoSgpRepositorio notaAlunoSgpRepositorio;
+        private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
+
+        public TransferirNotaSgpCasoDeUso(INotaAlunoRepositorio notaAlunoRepositorio, INotaAlunoSgpRepositorio notaAlunoSgpRepositorio, IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio)
         {
+            this.notaAlunoRepositorio = notaAlunoRepositorio ?? throw new ArgumentNullException(nameof(notaAlunoRepositorio));
+            this.notaAlunoSgpRepositorio = notaAlunoSgpRepositorio ?? throw new ArgumentNullException(nameof(notaAlunoSgpRepositorio));
+            this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
         }
 
         public async Task ExecutarAsync()
         {
-            await Task.CompletedTask;
+            var notaAlunoSgp = await notaAlunoSgpRepositorio.ObterNotaAlunoSgp();
+            await notaAlunoRepositorio.SalvarNotaAlunosBatch(notaAlunoSgp);
+            await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirNotaSgp");
         }
     }
 }
