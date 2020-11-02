@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
+namespace SME.AE.Aplicacao.Consultas.ObterTotaisAdesao
 {
     public class ObterTotaisAdesaoQueryHandler : IRequestHandler<ObterTotaisAdesaoQuery, IEnumerable<TotaisAdesaoResultado>>
     {
@@ -18,10 +18,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
 
         public async Task<IEnumerable<TotaisAdesaoResultado>> Handle(ObterTotaisAdesaoQuery request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(request.CodigoDre) && string.IsNullOrEmpty(request.CodigoUe))
-                return await adesaoRepositorio.ObterDadosAdesaoSme();
-
-            return await adesaoRepositorio.ObterDadosAdesaoAgrupadosPorDreUeETurma(request.CodigoDre, request.CodigoUe);
+            return await adesaoRepositorio.ObterDadosAdesaoSintetico(request.CodigoDre, request.CodigoUe);
         }
     }
 }
