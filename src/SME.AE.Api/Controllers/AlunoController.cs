@@ -21,5 +21,12 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await obterFrequenciaAlunoUseCase.Executar(anoLetivo, codigoUe, codigoTurma, codigoAluno));
         }
+
+        [HttpGet("notas")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterNotasAluno([FromQuery] int anoLetivo, [FromQuery] string codigoUe, [FromQuery] string codigoTurma, [FromQuery] string codigoAluno, [FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
+        {
+            return Ok(await obterNotasAlunoUseCase.Executar(anoLetivo, codigoUe, codigoTurma, codigoAluno));
+        }
     }
 }
