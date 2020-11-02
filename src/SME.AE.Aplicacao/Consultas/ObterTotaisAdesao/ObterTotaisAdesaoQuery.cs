@@ -2,7 +2,7 @@
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 
-namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
+namespace SME.AE.Aplicacao.Consultas.ObterTotaisAdesao
 {
     public class ObterTotaisAdesaoQuery : IRequest<IEnumerable<TotaisAdesaoResultado>>
     {
