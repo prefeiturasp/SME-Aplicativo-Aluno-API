@@ -22,29 +22,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoAgrupadosPorDreUeETurma(string codigoDre, string codigoUe)
+        public async Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoAgrupadosPorDre()
         {
             try
             {
-                var chaveCache = $"dadosAdesaoAgrupadosPorDreUeETurma-{codigoDre}-{codigoUe}";
+                var chaveCache = $"dadosAdesaoAgrupadosPorDre";
                 var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(dashboardAdesao))
                     return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
                 var query = new StringBuilder();
-                query.AppendLine($"{AdesaoConsultas.ObterDadosAdesaoAgrupadosPorDreUeETurma}");
-
-                if (!string.IsNullOrEmpty(codigoDre))
-                    query.AppendLine($" AND dre_codigo = '{codigoDre}'");
-
-                if (!string.IsNullOrEmpty(codigoUe))
-                    query.AppendLine($" AND ue_codigo = '{codigoUe}'");
-
-                query.AppendLine($" GROUP BY dre_codigo, dre_nome, ue_codigo, ue_nome, codigo_turma ");
+                query.AppendLine($"{AdesaoConsultas.ObterDadosAdesaoAgrupadosPorDreUe}");
+                 
+                query.AppendLine($" GROUP BY dre_codigo, dre_nome ");
+                query.AppendLine($" ORDER BY dre_codigo ");
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(query.ToString(), new { codigoDre, codigoUe });
+                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(query.ToString());
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
@@ -57,18 +52,27 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoSme()
+        public async Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoSintetico(string codigoDre, string codigoUe)
         {
             try
             {
-                var chaveCache = $"dadosAdesaoSme";
+                var chaveCache = $"dadosAdesaoSme-{codigoDre}-{codigoUe}";
                 var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(dashboardAdesao))
                     return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
+                var query = new StringBuilder();
+                query.AppendLine($"{AdesaoConsultas.ObterDadosAdesaoSme}");
+
+                if (!string.IsNullOrEmpty(codigoDre))
+                    query.AppendLine($" AND dre_codigo = '{codigoDre}'");
+
+                if (!string.IsNullOrEmpty(codigoUe))
+                    query.AppendLine($" AND ue_codigo = '{codigoUe}'");
+
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosAdesaoSme = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesaoSme);
+                var dadosAdesaoSme = await conexao.QueryAsync<TotaisAdesaoResultado>(query.ToString());
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoSme, 720, false);
