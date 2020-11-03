@@ -2,7 +2,7 @@
 {
     public static class AdesaoConsultas
     {
-        internal static string ObterDadosAdesaoAgrupadosPorDreUeETurma = @"
+        internal static string ObterDadosAdesaoAgrupadosPorDreUe = @"
 		SELECT 	
 			concat(dre_codigo,'-',dre_nome) AS NomeCompletoDre,
 			concat(ue_codigo,'-',ue_nome) AS NomeCompletoUe,
