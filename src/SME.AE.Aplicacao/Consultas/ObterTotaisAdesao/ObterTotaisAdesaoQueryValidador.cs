@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos
+namespace SME.AE.Aplicacao.Consultas.ObterTotaisAdesao
 {
     public class ObterTotaisAdesaoQueryValidator : AbstractValidator<ObterTotaisAdesaoQuery>
     {
