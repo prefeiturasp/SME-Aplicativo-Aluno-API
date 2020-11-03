@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var frequenciaAlunosAE = await frequenciaAlunoRepositorio.ObterListaParaExclusao(desdeAnoLetivo);
             await RemoverExcetoSgp(frequenciaAlunosSgp, frequenciaAlunosAE);
-            await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirNotaSgp");
+            await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirFrequenciaSgp");
         }
 
         private async Task RemoverExcetoSgp(IEnumerable<FrequenciaAlunoSgpDto> frequenciaAlunoSgp, IEnumerable<FrequenciaAlunoSgpDto> frequenciaAlunoAE)
