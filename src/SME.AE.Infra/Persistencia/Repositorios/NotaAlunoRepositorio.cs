@@ -18,7 +18,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
 
 
-        public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno) {
+        public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
+        {
             const string sqlUpdate =
                 @"
                 update 
@@ -74,13 +75,42 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
+        public async Task ExcluirNotaAluno(NotaAlunoSgpDto notaAluno)
+        {
+            const string sqlDelete =
+                @"
+                delete from
+	                nota_aluno
+                where 
+	                ano_letivo = @AnoLetivo
+                and ue_codigo = @CodigoUe
+                and turma_codigo = @CodigoTurma
+                and bimestre = @Bimestre
+                and aluno_codigo = @CodigoAluno
+                and componente_curricular_codigo = @CodigoComponenteCurricular
+                ";
+
+            using var conn = CriaConexao();
+
+            try
+            {
+                conn.Open();
+                await conn.ExecuteAsync(sqlDelete, notaAluno);
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
         public async Task SalvarNotaAlunosBatch(IEnumerable<NotaAlunoSgpDto> notaAlunosSgp)
         {
             try
             {
                 notaAlunosSgp
                     .AsParallel()
-                    .WithDegreeOfParallelism(20)
+                    .WithDegreeOfParallelism(4)
                     .ForAll(async notaAluno => await SalvarNotaAluno(notaAluno));
             }
             catch (Exception ex)
@@ -89,6 +119,41 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
             await Task.CompletedTask;
+        }
+
+        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
+        {
+            const string sqlSelect =
+                @"
+                Select
+	                ano_letivo                      AnoLetivo,
+	                ue_codigo                       CodigoUe,
+	                turma_codigo                    CodigoTurma,
+	                bimestre                        Bimestre,
+	                aluno_codigo                    CodigoAluno,
+	                componente_curricular_codigo    CodigoComponenteCurricular,
+	                componente_curricular           ComponenteCurricular,
+	                nota                            Nota
+                from
+                    nota_aluno
+                where
+                    ano_letivo >= @anoLetivo
+                ";
+
+            using var conn = CriaConexao();
+
+            try
+            {
+                conn.Open();
+                var notaAlunoLista = await conn.QueryAsync<NotaAlunoSgpDto>(sqlSelect, new { anoLetivo = desdeAnoLetivo });
+                conn.Close();
+                return notaAlunoLista.ToArray();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }

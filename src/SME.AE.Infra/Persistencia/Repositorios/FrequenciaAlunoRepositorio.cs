@@ -139,7 +139,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 frequenciaAlunosSgp
                     .AsParallel()
-                    .WithDegreeOfParallelism(20)
+                    .WithDegreeOfParallelism(4)
                     .ForAll(async frequenciaAluno => await SalvarFrequenciaAluno(frequenciaAluno));
             }
             catch (Exception ex)
