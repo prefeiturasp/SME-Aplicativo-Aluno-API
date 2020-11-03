@@ -15,8 +15,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class NotaAlunoRepositorio : INotaAlunoRepositorio
     {
+        private readonly ICacheRepositorio cacheRepositorio;
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
 
+        public NotaAlunoRepositorio(ICacheRepositorio cacheRepositorio)
+        {
+            this.cacheRepositorio = cacheRepositorio;
+        }
+
+        private static string chaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno)
+    => $"notasAluno-AnoUeTurmaAluno-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
 
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
@@ -148,6 +156,44 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var notaAlunoLista = await conn.QueryAsync<NotaAlunoSgpDto>(sqlSelect, new { anoLetivo = desdeAnoLetivo });
                 conn.Close();
                 return notaAlunoLista.ToArray();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+        
+        public async Task<IEnumerable<NotaAlunoResposta>> ObterNotasAluno(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno)
+        {
+            try
+            {
+                var chaveCache = chaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
+
+                var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
+                if (!string.IsNullOrWhiteSpace(notasAluno))
+                    return JsonConvert.DeserializeObject<IEnumerable<NotaAlunoResposta>>(notasAluno);
+
+                using var conexao = CriaConexao();
+                conexao.Open();
+                var dadosNotasAluno = await conexao.QueryAsync<NotaAlunoResposta>(@"SELECT 
+                                                                                                        ano_letivo as AnoLetivo,
+                                                                                                        ue_codigo as CodigoUe,
+                                                                                                        turma_codigo as CodigoTurma,
+	                                                                                                    aluno_codigo as AlunoCodigo,
+                                                                                                        bimestre as Bimestre,
+                                                                                                        componente_curricular as ComponenteCurricular,
+                                                                                                        nota as Nota
+                                                                                                    FROM public.nota_aluno 
+                                                                                                    WHERE 
+                                                                                                        ano_letivo = @anoLetivo
+                                                                                                        AND ue_codigo = @CodigoUe 
+                                                                                                        AND turma_codigo = @CodigoTurma 
+                                                                                                        AND aluno_codigo = @CodigoAluno ", new { anoLetivo, codigoUe, codigoTurma, codigoAluno });
+                conexao.Close();
+
+                await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
+                return dadosNotasAluno;
             }
             catch (Exception ex)
             {
