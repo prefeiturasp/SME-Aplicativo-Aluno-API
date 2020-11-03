@@ -15,6 +15,13 @@ namespace SME.AE.Api.Controllers
             return Ok(await obterTotaisAdesaoUseCase.Executar(codigoDre, codigoUe));
         }
 
+        [HttpGet("adesao/agrupados")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterTotaisAdesaoAgrupadosPorDre([FromServices] IObterTotaisAdesaoAgrupadosPorDreUseCase obterTotaisAdesaoAgrupadosPorDreUseCase)
+        {
+            return Ok(await obterTotaisAdesaoAgrupadosPorDreUseCase.Executar());
+        }
+
         [HttpGet("adesao/usuarios/incompletos")]
         [AllowAnonymous]
         public async Task<ObjectResult> ObterTotalUsuariosComAcessoIncompleto([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromServices] IObterTotalUsuariosComAcessoIncompletoUseCase obterTotalUsuariosComAcessoIncompletoUseCase)
