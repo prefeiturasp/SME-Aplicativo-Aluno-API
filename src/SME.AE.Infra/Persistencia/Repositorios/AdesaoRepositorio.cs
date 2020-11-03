@@ -26,25 +26,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(codigoDre))
+                    codigoDre = "";
+
+                if (string.IsNullOrWhiteSpace(codigoUe))
+                    codigoUe = "";
+
                 var chaveCache = $"dadosAdesaoAgrupadosPorDreUeETurma-{codigoDre}-{codigoUe}";
                 var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(dashboardAdesao))
                     return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
-                var query = new StringBuilder();
-                query.AppendLine($"{AdesaoConsultas.ObterDadosAdesaoAgrupadosPorDreUeETurma}");
-
-                if (!string.IsNullOrEmpty(codigoDre))
-                    query.AppendLine($" AND dre_codigo = '{codigoDre}'");
-
-                if (!string.IsNullOrEmpty(codigoUe))
-                    query.AppendLine($" AND ue_codigo = '{codigoUe}'");
-
-                query.AppendLine($" GROUP BY dre_codigo, dre_nome, ue_codigo, ue_nome, codigo_turma ");
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(query.ToString(), new { codigoDre, codigoUe });
+                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesaoAgrupadosPorDreUeETurma, new { dre_codigo = codigoDre, ue_codigo = codigoUe });
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);

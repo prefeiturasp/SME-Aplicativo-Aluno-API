@@ -16,7 +16,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     {
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
 
-        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp()
+        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo)
         {
             try
             {
@@ -61,14 +61,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 						left join conceito_valores cv on cv.id = fn.conceito_id
 						left join conceito_valores cv2 on cv2.id = ccn.conceito_id 
 						left join sintese_valores sv on sv.id = fn.sintese_id 
-						where t.ano_letivo >= 2020
+						where (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
 							and (cca.id is null or (cca.id is not null and ccn.id is not null))
 							and not ftd.excluido 
 							and not fa.excluido 
 							and not fn.excluido 
 						order by 
 							cca.id desc
-                        ");
+                        ", new { desdeAnoLetivo });
                 conexao.Close();
 
                 return notaAlunosSgp;

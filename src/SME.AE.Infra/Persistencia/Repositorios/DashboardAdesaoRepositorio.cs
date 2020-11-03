@@ -43,7 +43,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
 			listaAdesao
 				.AsParallel()
-				.WithDegreeOfParallelism(16)
+				.WithDegreeOfParallelism(4)
 				.ForAll(adesao => {
 					var conn = CriaConexao();
 					try

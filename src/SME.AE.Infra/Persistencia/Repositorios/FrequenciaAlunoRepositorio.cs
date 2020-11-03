@@ -139,7 +139,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 frequenciaAlunosSgp
                     .AsParallel()
-                    .WithDegreeOfParallelism(20)
+                    .WithDegreeOfParallelism(4)
                     .ForAll(async frequenciaAluno => await SalvarFrequenciaAluno(frequenciaAluno));
             }
             catch (Exception ex)
@@ -148,6 +148,69 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
             await Task.CompletedTask;
+        }
+        public async Task ExcluirFrequenciaAluno(FrequenciaAlunoSgpDto frequenciaAluno)
+        {
+            const string sqlDelete =
+                @"
+                delete from
+	                frequencia_aluno
+                where 
+	                ano_letivo = @AnoLetivo and
+	                bimestre = @Bimestre and 
+	                ue_codigo = @CodigoUe and 
+	                turma_codigo = @CodigoTurma and 
+	                aluno_codigo = @CodigoAluno;
+                ";
+
+            using var conn = CriaConexao();
+
+            try
+            {
+                conn.Open();
+                await conn.ExecuteAsync(sqlDelete, frequenciaAluno);
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
+        {
+            const string sqlSelect =
+                @"
+                select
+                    ue_codigo CodigoUe, 
+                    ue_nome NomeUe,
+                    turma_codigo CodigoTurma, 
+                    turma_descricao NomeTurma,
+                    aluno_codigo CodigoAluno, 
+                    bimestre Bimestre,
+                    componente_curricular ComponenteCurricular, 
+                    quantidade_aulas QuantidadeAulas,
+                    quantidade_faltas QuantidadeAusencias, 
+                    quantidade_compensacoes QuantidadeCompensacoes,
+                    ano_letivo AnoLetivo
+                from
+                    frequencia_aluno
+                where ano_letivo >= @desdeAnoLetivo
+                ";
+
+            try
+            {
+                using var conn = CriaConexao();
+                conn.Open();
+                var frequenciaAlunoLista = await conn.QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo });
+                conn.Close();
+                return frequenciaAlunoLista;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }
