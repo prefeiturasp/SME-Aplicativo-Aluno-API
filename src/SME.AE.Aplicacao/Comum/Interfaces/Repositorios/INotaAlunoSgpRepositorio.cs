@@ -7,6 +7,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface INotaAlunoSgpRepositorio
     {
-        Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp();
+        Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo);
     }
 }
