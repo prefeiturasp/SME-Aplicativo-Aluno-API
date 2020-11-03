@@ -7,6 +7,8 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface INotaAlunoRepositorio
     {
+        Task ExcluirNotaAluno(NotaAlunoSgpDto notaAluno);
+        Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo);
         Task SalvarNotaAlunosBatch(IEnumerable<NotaAlunoSgpDto> notaAlunosSgp);
     }
 }

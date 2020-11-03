@@ -51,7 +51,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private async Task<IEnumerable<DashboardAdesaoDto>> ObterAdesaoConsolidada()
             => (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma())
             .AsParallel()
-            .WithDegreeOfParallelism(20)
+            .WithDegreeOfParallelism(4)
             .Select(r => ProcessaResponsavel(r))
             .GroupBy(
                 a => new { a.dre_codigo, a.ue_codigo, a.codigo_turma },
