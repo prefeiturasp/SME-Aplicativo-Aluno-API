@@ -31,15 +31,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (!string.IsNullOrWhiteSpace(dashboardAdesao))
                     return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
-                var query = new StringBuilder();
-                query.AppendLine($"{AdesaoConsultas.ObterDadosAdesaoAgrupadosPorDreUe}");
-                 
-                query.AppendLine($" GROUP BY dre_codigo, dre_nome ");
-                query.AppendLine($" ORDER BY dre_codigo ");
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(query.ToString());
+                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesaoPorDre);
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
@@ -56,27 +50,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = $"dadosAdesaoSme-{codigoDre}-{codigoUe}";
+                if (string.IsNullOrWhiteSpace(codigoDre))
+                    codigoDre = "";
+
+                if (string.IsNullOrWhiteSpace(codigoUe))
+                    codigoUe = "";
+
+                var chaveCache = $"dadosAdesaoAgrupadosPorDreUeETurma-{codigoDre}-{codigoUe}";
                 var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(dashboardAdesao))
                     return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
-                var query = new StringBuilder();
-                query.AppendLine($"{AdesaoConsultas.ObterDadosAdesaoSme}");
-
-                if (!string.IsNullOrEmpty(codigoDre))
-                    query.AppendLine($" AND dre_codigo = '{codigoDre}'");
-
-                if (!string.IsNullOrEmpty(codigoUe))
-                    query.AppendLine($" AND ue_codigo = '{codigoUe}'");
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosAdesaoSme = await conexao.QueryAsync<TotaisAdesaoResultado>(query.ToString());
+                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesao, new { dre_codigo = codigoDre, ue_codigo = codigoUe });
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoSme, 720, false);
-                return dadosAdesaoSme;
+                await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
+                return dadosAdesaoAgrupadosPorDreUeETurma;
             }
             catch (Exception ex)
             {

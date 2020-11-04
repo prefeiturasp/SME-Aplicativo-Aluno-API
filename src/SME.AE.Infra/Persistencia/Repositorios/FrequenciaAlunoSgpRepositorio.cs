@@ -16,7 +16,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     {
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
 
-        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp()
+        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo)
         {
             try
             {
@@ -44,10 +44,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         left join componente_curricular cc on cc.id::varchar = fa.disciplina_id 
                         where 
 	                        cc.permite_registro_frequencia
-	                        and t.ano_letivo >= 2020
+	                        and (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
                         order by 
 	                        ue.ue_id, t.turma_id, t.ano_letivo, fa.bimestre, fa.codigo_aluno 	
-                        ");
+                        ", new { desdeAnoLetivo });
                 conexao.Close();
 
                 return frequenciaAlunosSgp;
