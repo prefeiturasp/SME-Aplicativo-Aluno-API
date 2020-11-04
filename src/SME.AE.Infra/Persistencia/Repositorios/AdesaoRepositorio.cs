@@ -26,17 +26,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = $"dadosAdesaoAgrupadosPorDre";
-                var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(dashboardAdesao))
-                    return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
+                //var chaveCache = $"dadosAdesaoAgrupadosPorDre";
+                //var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
+                //if (!string.IsNullOrWhiteSpace(dashboardAdesao))
+                //    return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesaoPorDre);
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
+                //await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
                 return dadosAdesaoAgrupadosPorDreUeETurma;
             }
             catch (Exception ex)
@@ -56,17 +56,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (string.IsNullOrWhiteSpace(codigoUe))
                     codigoUe = "";
 
-                var chaveCache = $"dadosAdesaoAgrupadosPorDreUeETurma-{codigoDre}-{codigoUe}";
-                var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(dashboardAdesao))
-                    return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
+                //var chaveCache = $"dadosAdesaoAgrupadosPorDreUeETurma-{codigoDre}-{codigoUe}";
+                //var dashboardAdesao = await cacheRepositorio.ObterAsync(chaveCache);
+                //if (!string.IsNullOrWhiteSpace(dashboardAdesao))
+                //    return JsonConvert.DeserializeObject<IEnumerable<TotaisAdesaoResultado>>(dashboardAdesao);
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesao, new { dre_codigo = codigoDre, ue_codigo = codigoUe });
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
+                //await cacheRepositorio.SalvarAsync(chaveCache, dadosAdesaoAgrupadosPorDreUeETurma, 720, false);
                 return dadosAdesaoAgrupadosPorDreUeETurma;
             }
             catch (Exception ex)

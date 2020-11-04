@@ -4,8 +4,8 @@
     {
         internal static string ObterDadosAdesao = @"
 		SELECT 	
-			concat(dre_codigo,'-',dre_nome) AS NomeCompletoDre,
-			concat(ue_codigo,'-',ue_nome) AS NomeCompletoUe,
+			trim(concat(dre_codigo,'-',dre_nome)) AS NomeCompletoDre,
+			trim(concat(ue_codigo,'-',ue_nome)) AS NomeCompletoUe,
 			codigo_turma AS CodigoTurma, 
 				usuarios_cpf_invalidos AS TotalUsuariosComCpfInvalidos,
 				usuarios_sem_app_instalado AS TotalUsuariosSemAppInstalado, 
@@ -20,7 +20,7 @@
 
 		internal static string ObterDadosAdesaoPorDre = @"
 			SELECT 
-				concat(dre_codigo,'-',dre_nome) AS NomeCompletoDre,
+				trim(concat(dre_codigo,'-',dre_nome)) AS NomeCompletoDre,
 				usuarios_cpf_invalidos AS TotalUsuariosComCpfInvalidos,
 				usuarios_sem_app_instalado AS TotalUsuariosSemAppInstalado, 
 				usuarios_primeiro_acesso_incompleto AS TotalUsuariosPrimeiroAcessoIncompleto, 
