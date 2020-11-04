@@ -62,6 +62,7 @@ namespace SME.AE.Api
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             registrarSwagger(services);
+            services.AddApplicationInsightsTelemetry();
         }
 
         private static void registrarSwagger(IServiceCollection services)
