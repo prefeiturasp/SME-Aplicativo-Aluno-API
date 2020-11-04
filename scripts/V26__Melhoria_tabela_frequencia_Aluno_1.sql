@@ -1,0 +1,1 @@
+drop index concurrently if exists frequencia_aluno_ue_turma_aluno_idx;
