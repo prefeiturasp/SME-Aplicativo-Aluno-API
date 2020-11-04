@@ -82,9 +82,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where 
 	                ano_letivo = @AnoLetivo and
 	                bimestre = @Bimestre and 
-	                ue_codigo = @CodigoUe and 
+	                trim(ue_codigo) = @CodigoUe and 
 	                turma_codigo = @CodigoTurma and 
-	                aluno_codigo = @CodigoAluno;
+	                aluno_codigo = @CodigoAluno and
+                    componente_curricular = @ComponenteCurricular;
                 ";
 
             const string sqlInsert =
@@ -158,9 +159,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where 
 	                ano_letivo = @AnoLetivo and
 	                bimestre = @Bimestre and 
-	                ue_codigo = @CodigoUe and 
+	                trim(ue_codigo) = @CodigoUe and 
 	                turma_codigo = @CodigoTurma and 
-	                aluno_codigo = @CodigoAluno;
+	                aluno_codigo = @CodigoAluno and
+                    componente_curricular = @ComponenteCurricular;
                 ";
 
             using var conn = CriaConexao();
