@@ -1,13 +1,12 @@
 ﻿using SME.AE.Aplicacao.Comum.Modelos;
-using System;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public interface IFrequenciaAlunoSgpRepositorio
+    public interface INotaAlunoSgpRepositorio
     {
-        Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo);
+        Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo);
     }
 }
