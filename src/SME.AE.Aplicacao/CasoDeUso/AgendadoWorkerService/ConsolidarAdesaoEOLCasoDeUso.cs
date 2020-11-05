@@ -44,8 +44,12 @@ namespace SME.AE.Aplicacao.CasoDeUso
             UsuariosEscolaAquiDict.Clear();
             var usuariosEscolaAqui = await usuarioRepository.ListarAsync();
             usuariosEscolaAqui.ForEach(usuario => 
-            { 
-                UsuariosEscolaAquiDict.Add(usuario.Cpf, usuario); 
+            {
+                if (!usuario.Excluido)
+                {
+                    if(!UsuariosEscolaAquiDict.ContainsKey(usuario.Cpf))
+                        UsuariosEscolaAquiDict.Add(usuario.Cpf, usuario);
+                }
             });
         }
 
