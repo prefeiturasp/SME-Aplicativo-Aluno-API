@@ -23,9 +23,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        private static string chaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno)
+        private static string ChaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno)
     => $"notasAluno-AnoUeTurmaAluno-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
-
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
             const string sqlUpdate =
@@ -54,7 +53,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                aluno_codigo, 
 	                componente_curricular_codigo, 
 	                componente_curricular, 
-	                nota
+	                nota,
+                    recomendacoes_aluno,
+                    recomendacoes_familia,
                 ) values (
                     @AnoLetivo,
                     @CodigoUe,
@@ -63,7 +64,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     @CodigoAluno,
                     @CodigoComponenteCurricular,
                     @ComponenteCurricular,
-                    @Nota
+                    @Nota,
+                    @RecomendacoesAluno,
+                    @RecomendacoesFamilia
                 )
                 ";
 
@@ -128,7 +131,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             await Task.CompletedTask;
         }
-
         public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
         {
             const string sqlSelect =
@@ -141,7 +143,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                aluno_codigo                    CodigoAluno,
 	                componente_curricular_codigo    CodigoComponenteCurricular,
 	                componente_curricular           ComponenteCurricular,
-	                nota                            Nota
+	                nota                            Nota,
+                    recomendacoes_aluno             RecomendacoesAluno,
+                    recomendacoes_familia           RecomendacoesFamilia
                 from
                     nota_aluno
                 where
@@ -163,12 +167,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
-        
         public async Task<IEnumerable<NotaAlunoResposta>> ObterNotasAluno(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno)
         {
             try
             {
-                var chaveCache = chaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
+                var chaveCache = ChaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
 
                 var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(notasAluno))
@@ -183,7 +186,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                                                                                                    aluno_codigo as AlunoCodigo,
                                                                                                         bimestre as Bimestre,
                                                                                                         componente_curricular as ComponenteCurricular,
-                                                                                                        nota as Nota
+                                                                                                        nota as Nota,
+                                                                                                        recomendacoes_aluno as RecomendacoesAluno,
+                                                                                                        recomendacoes_familia as RecomendacoesFamilia
                                                                                                     FROM public.nota_aluno 
                                                                                                     WHERE 
                                                                                                         ano_letivo = @anoLetivo
