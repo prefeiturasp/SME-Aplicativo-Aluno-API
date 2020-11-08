@@ -46,7 +46,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                        frequenciaSgp.CodigoUe == frequenciaAE.CodigoUe &&
                        frequenciaSgp.CodigoTurma == frequenciaAE.CodigoTurma &&
                        frequenciaSgp.Bimestre == frequenciaAE.Bimestre &&
-                       frequenciaSgp.ComponenteCurricular == frequenciaAE.ComponenteCurricular
+                       frequenciaSgp.CodigoComponenteCurricular == frequenciaAE.CodigoComponenteCurricular
                    ))
                 .ToArray();
 
