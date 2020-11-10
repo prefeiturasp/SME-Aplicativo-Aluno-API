@@ -1,11 +1,9 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -41,11 +39,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								cc.descricao) 	ComponenteCurricular,
 							coalesce (
 								ccn.nota::varchar, cv2.valor,
-								fn.nota::varchar, cv.valor,
+								fn.nota::varchar, (concat(cv.valor,cv.descricao)), 
 								sv.valor,
 								''
-							) 					Nota,
-							cca.id 				conselho_classe_aluno_id
+						) 					Nota,
+							cca.id 				conselho_classe_aluno_id,
+							cca.recomendacoes_aluno AS RecomendacoesAluno,
+							cca.recomendacoes_familia AS RecomendacoesFamilia
 						from 
 							fechamento_turma ft
 						inner join fechamento_turma_disciplina ftd on ftd.fechamento_turma_id = ft.id 

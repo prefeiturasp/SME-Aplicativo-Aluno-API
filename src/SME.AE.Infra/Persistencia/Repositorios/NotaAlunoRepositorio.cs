@@ -34,7 +34,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                nota_aluno
                 set 
 	                componente_curricular=@ComponenteCurricular, 
-                    nota=@Nota
+                    nota=@Nota,
+                    recomendacoes_aluno=@RecomendacoesAluno,
+                    recomendacoes_familia=@RecomendacoesFamilia
                 where 
 	                ano_letivo = @AnoLetivo
                 and ue_codigo = @CodigoUe
@@ -54,7 +56,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                aluno_codigo, 
 	                componente_curricular_codigo, 
 	                componente_curricular, 
-	                nota
+	                nota,
+                    recomendacoes_aluno,
+                    recomendacoes_familia
                 ) values (
                     @AnoLetivo,
                     @CodigoUe,
@@ -63,7 +67,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     @CodigoAluno,
                     @CodigoComponenteCurricular,
                     @ComponenteCurricular,
-                    @Nota
+                    @Nota,
+                    @RecomendacoesAluno,
+                    @RecomendacoesFamilia
                 )
                 ";
 
@@ -128,7 +134,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             await Task.CompletedTask;
         }
-
         public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
         {
             const string sqlSelect =
@@ -141,7 +146,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                aluno_codigo                    CodigoAluno,
 	                componente_curricular_codigo    CodigoComponenteCurricular,
 	                componente_curricular           ComponenteCurricular,
-	                nota                            Nota
+	                nota                            Nota,
+                    recomendacoes_aluno             RecomendacoesAluno,
+                    recomendacoes_familia           RecomendacoesFamilia
                 from
                     nota_aluno
                 where
@@ -163,13 +170,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
+
         
         public async Task<IEnumerable<NotaAlunoResposta>> ObterNotasAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurma, string codigoAluno)
         {
             try
             {
                 var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
-
                 var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(notasAluno))
                     return JsonConvert.DeserializeObject<IEnumerable<NotaAlunoResposta>>(notasAluno);
