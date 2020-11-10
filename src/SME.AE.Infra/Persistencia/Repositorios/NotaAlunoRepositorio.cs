@@ -23,8 +23,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        private static string ChaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno)
-    => $"notasAluno-AnoUeTurmaAluno-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
+        private static string chaveCacheAnoBimestreUeTurmaAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurmna, string codigoAluno)
+            => $"notasAluno-AnoBimestreUeTurmaAluno-{anoLetivo}-{bimestre}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
+
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
             const string sqlUpdate =
@@ -169,12 +170,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
-        public async Task<IEnumerable<NotaAlunoResposta>> ObterNotasAluno(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno)
+
+        
+        public async Task<IEnumerable<NotaAlunoResposta>> ObterNotasAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurma, string codigoAluno)
         {
             try
             {
-                var chaveCache = ChaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
-
+                var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
                 var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(notasAluno))
                     return JsonConvert.DeserializeObject<IEnumerable<NotaAlunoResposta>>(notasAluno);
@@ -182,21 +184,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = CriaConexao();
                 conexao.Open();
                 var dadosNotasAluno = await conexao.QueryAsync<NotaAlunoResposta>(@"SELECT 
-                                                                                                        ano_letivo as AnoLetivo,
-                                                                                                        ue_codigo as CodigoUe,
-                                                                                                        turma_codigo as CodigoTurma,
-	                                                                                                    aluno_codigo as AlunoCodigo,
-                                                                                                        bimestre as Bimestre,
-                                                                                                        componente_curricular as ComponenteCurricular,
-                                                                                                        nota as Nota,
-                                                                                                        recomendacoes_aluno as RecomendacoesAluno,
-                                                                                                        recomendacoes_familia as RecomendacoesFamilia
-                                                                                                    FROM public.nota_aluno 
-                                                                                                    WHERE 
-                                                                                                        ano_letivo = @anoLetivo
-                                                                                                        AND ue_codigo = @CodigoUe 
-                                                                                                        AND turma_codigo = @CodigoTurma 
-                                                                                                        AND aluno_codigo = @CodigoAluno ", new { anoLetivo, codigoUe, codigoTurma, codigoAluno });
+                                                                                    ano_letivo as AnoLetivo,
+                                                                                    ue_codigo as CodigoUe,
+                                                                                    turma_codigo as CodigoTurma,
+	                                                                                aluno_codigo as AlunoCodigo,
+                                                                                    bimestre as Bimestre,
+                                                                                    componente_curricular as ComponenteCurricular,
+                                                                                    nota as Nota,
+                                                                                    nota_descricao AS NotaDescricao,
+                                                                                    recomendacoes_familia as RecomendacoesFamilia,
+                                                                                    recomendacoes_aluno as RecomendacoesAluno
+                                                                                FROM public.nota_aluno 
+                                                                                WHERE 
+                                                                                    ano_letivo = @anoLetivo
+                                                                                    AND bimestre = @bimestre
+                                                                                    AND ue_codigo = @CodigoUe 
+                                                                                    AND turma_codigo = @CodigoTurma 
+                                                                                    AND aluno_codigo = @CodigoAluno ", 
+                                                                                new { anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno });
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
