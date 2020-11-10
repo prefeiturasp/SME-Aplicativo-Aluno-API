@@ -33,7 +33,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                nota_aluno
                 set 
 	                componente_curricular=@ComponenteCurricular, 
-                    nota=@Nota
+                    nota=@Nota,
+                    recomendacoes_aluno=@RecomendacoesAluno,
+                    recomendacoes_familia=@RecomendacoesFamilia
                 where 
 	                ano_letivo = @AnoLetivo
                 and ue_codigo = @CodigoUe
@@ -55,7 +57,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                componente_curricular, 
 	                nota,
                     recomendacoes_aluno,
-                    recomendacoes_familia,
+                    recomendacoes_familia
                 ) values (
                     @AnoLetivo,
                     @CodigoUe,
