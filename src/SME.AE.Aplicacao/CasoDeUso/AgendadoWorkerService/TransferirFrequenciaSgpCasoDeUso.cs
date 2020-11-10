@@ -25,7 +25,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task ExecutarAsync()
         {
             var desdeAnoLetivo = DateTime.Today.Year - 1;
-            var frequenciaAlunosSgp = await frequenciaAlunoSgpRepositorio.ObterFrequenciaAlunoSgp(desdeAnoLetivo);
+            var frequenciaAlunosSgp = 
+                (await frequenciaAlunoSgpRepositorio.ObterFrequenciaAlunoSgp(desdeAnoLetivo))
+                .Where(freq => (
+                    string.IsNullOrWhiteSpace(freq.CodigoAluno) 
+                    ||
+                    !string.IsNullOrWhiteSpace(freq.DiasAusencias)
+                    ));
             await frequenciaAlunoRepositorio.SalvarFrequenciaAlunosBatch(frequenciaAlunosSgp);
 
             var frequenciaAlunosAE = await frequenciaAlunoRepositorio.ObterListaParaExclusao(desdeAnoLetivo);
@@ -46,7 +52,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                        frequenciaSgp.CodigoUe == frequenciaAE.CodigoUe &&
                        frequenciaSgp.CodigoTurma == frequenciaAE.CodigoTurma &&
                        frequenciaSgp.Bimestre == frequenciaAE.Bimestre &&
-                       frequenciaSgp.ComponenteCurricular == frequenciaAE.ComponenteCurricular
+                       frequenciaSgp.CodigoComponenteCurricular == frequenciaAE.CodigoComponenteCurricular
                    ))
                 .ToArray();
 
