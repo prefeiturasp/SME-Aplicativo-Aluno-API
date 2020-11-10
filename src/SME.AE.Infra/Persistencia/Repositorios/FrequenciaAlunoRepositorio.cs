@@ -76,16 +76,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                ue_nome=@NomeUe, 
 	                turma_descricao=@NomeTurma,
 	                componente_curricular=@ComponenteCurricular, 
+                    dias_ausencias=@DiasAusencias,
 	                quantidade_aulas=@QuantidadeAulas, 
 	                quantidade_faltas=@QuantidadeAusencias, 
 	                quantidade_compensacoes=@QuantidadeCompensacoes
                 where 
 	                ano_letivo = @AnoLetivo and
 	                bimestre = @Bimestre and 
-	                trim(ue_codigo) = @CodigoUe and 
+	                ue_codigo = @CodigoUe and 
 	                turma_codigo = @CodigoTurma and 
 	                aluno_codigo = @CodigoAluno and
-                    componente_curricular = @ComponenteCurricular;
+                    componente_curricular_Codigo = @CodigoComponenteCurricular;
                 ";
 
             const string sqlInsert =
@@ -98,10 +99,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                turma_descricao, 
 	                aluno_codigo, 
 	                bimestre, 
+	                componente_curricular_codigo, 
 	                componente_curricular, 
 	                quantidade_aulas, 
 	                quantidade_faltas, 
 	                quantidade_compensacoes, 
+                    dias_ausencias,
 	                ano_letivo
                 ) values (
 	                @CodigoUe, 
@@ -110,10 +113,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                @NomeTurma, 
 	                @CodigoAluno, 
 	                @Bimestre, 
+	                @CodigoComponenteCurricular, 
 	                @ComponenteCurricular, 
 	                @QuantidadeAulas, 
 	                @QuantidadeAusencias, 
 	                @QuantidadeCompensacoes, 
+                    @DiasAusencias,
 	                @AnoLetivo
                 )
                 ";
@@ -157,12 +162,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 delete from
 	                frequencia_aluno
                 where 
+	                ue_codigo = @CodigoUe and 
+	                turma_codigo = @CodigoTurma and 
+                    componente_curricular_codigo = @CodigoComponenteCurricular and
 	                ano_letivo = @AnoLetivo and
 	                bimestre = @Bimestre and 
-	                trim(ue_codigo) = @CodigoUe and 
-	                turma_codigo = @CodigoTurma and 
-	                aluno_codigo = @CodigoAluno and
-                    componente_curricular = @ComponenteCurricular;
+	                aluno_codigo = @CodigoAluno
                 ";
 
             using var conn = CriaConexao();
@@ -190,10 +195,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     turma_descricao NomeTurma,
                     aluno_codigo CodigoAluno, 
                     bimestre Bimestre,
+                    componente_curricular_codigo CodigoComponenteCurricular, 
                     componente_curricular ComponenteCurricular, 
                     quantidade_aulas QuantidadeAulas,
                     quantidade_faltas QuantidadeAusencias, 
                     quantidade_compensacoes QuantidadeCompensacoes,
+                    dias_ausencias DiasAusencias,
                     ano_letivo AnoLetivo
                 from
                     frequencia_aluno
