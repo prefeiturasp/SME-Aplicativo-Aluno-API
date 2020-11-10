@@ -183,7 +183,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                                                                                                    aluno_codigo as AlunoCodigo,
                                                                                                         bimestre as Bimestre,
                                                                                                         componente_curricular as ComponenteCurricular,
-                                                                                                        nota as Nota
+                                                                                                        nota as Nota,
+                                                                                                        recomendacoes_familia as RecomendacoesFamilia,
+                                                                                                        recomendacoes_aluno as RecomendacoesAluno
                                                                                                     FROM public.nota_aluno 
                                                                                                     WHERE 
                                                                                                         ano_letivo = @anoLetivo
