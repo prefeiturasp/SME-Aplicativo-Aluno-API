@@ -68,7 +68,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 									left join componente_curricular cc on cc.id = fn.disciplina_id 
 									left join conceito_valores cv on cv.id = fn.conceito_id 
 									left join sintese_valores sv on sv.id = fn.sintese_id 
-									where (t.ano_letivo >= 2020) and t.ano_letivo >= @desdeAnoLetivo)
+									where (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
 										and not ft.excluido 
 										and not ftd.excluido 
 										and not fa.excluido 
@@ -105,7 +105,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 									inner join componente_curricular cu on cu.id = ccn.componente_curricular_codigo 
 									left join periodo_escolar pe on pe.id = ft.periodo_escolar_id 
 									left join conceito_valores cv on cv.id = ccn.conceito_id 
-									where (t.ano_letivo >= 2020) and t.ano_letivo >= @desdeAnoLetivo)
+									where (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
 									and not cc.excluido 
 								) con 
 							on 	con.anoletivo = fec.anoletivo
