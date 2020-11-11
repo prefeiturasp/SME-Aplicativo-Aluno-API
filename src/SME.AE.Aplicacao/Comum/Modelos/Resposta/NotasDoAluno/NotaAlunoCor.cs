@@ -8,7 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno
         public const string NotaEntre7e5 = "NotaEntre7e5";
         public const string NotaAcimaDe7 = "NotaAcimaDe7";
 
-        public const string CorPadrao = "#FFFF00";
+        public const string CorPadrao = "#D4D4D4";
 
         public string Nota { get; set; }
 

@@ -5,6 +5,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno
 {
     public class NotaAlunoPorBimestreResposta
     {
+        public const int BimestreDeFechamento = 0;
+
         public int AnoLetivo { get; set; }
         public string CodigoUe { get; set; }
         public string CodigoTurma { get; set; }

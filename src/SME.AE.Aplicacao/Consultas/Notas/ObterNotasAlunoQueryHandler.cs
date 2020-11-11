@@ -39,7 +39,7 @@ namespace SME.AE.Aplicacao.Consultas.Notas
 
         private void DefinirCoresDasNotas(NotaAlunoPorBimestreResposta notasAlunoPorBimestreResposta, IEnumerable<NotaAlunoCor> notaAlunoCores)
         {
-            if (!notaAlunoCores?.Any() ?? true)
+            if (notasAlunoPorBimestreResposta.Bimestre != NotaAlunoPorBimestreResposta.BimestreDeFechamento || (!notaAlunoCores?.Any() ?? true))
             {
                 foreach (var notaAluno in notasAlunoPorBimestreResposta.NotasPorComponenteCurricular)
                 {
