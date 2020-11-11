@@ -48,6 +48,7 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.AddTransient(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
             services.AddTransient(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
+            services.AddTransient(typeof(IFrequenciaAlunoCorRepositorio), typeof(FrequenciaAlunoCorRepositorio));
 
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 

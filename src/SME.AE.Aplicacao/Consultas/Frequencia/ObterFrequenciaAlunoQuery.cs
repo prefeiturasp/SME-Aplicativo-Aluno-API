@@ -8,10 +8,10 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
     {
         public int AnoLetivo { get; set; }
         public string CodigoUe { get; set; }
-        public long CodigoTurma { get; set; }
+        public string CodigoTurma { get; set; }
         public string CodigoAluno { get; set; }
 
-        public ObterFrequenciaAlunoQuery(int anoLetivo, string codigoUe, long codigoTurma, string codigoAluno)
+        public ObterFrequenciaAlunoQuery(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno)
         {
             AnoLetivo = anoLetivo;
             CodigoUe = codigoUe;
