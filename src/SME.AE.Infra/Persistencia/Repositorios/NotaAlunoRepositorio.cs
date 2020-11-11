@@ -187,6 +187,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
 
                 var query = @"SELECT 
+                                distinct
                                 ano_letivo as AnoLetivo,
                                 ue_codigo as CodigoUe,
                                 turma_codigo as CodigoTurma,
