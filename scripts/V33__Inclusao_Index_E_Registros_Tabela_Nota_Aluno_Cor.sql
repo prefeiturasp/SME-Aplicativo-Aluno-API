@@ -1,6 +1,3 @@
-CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS nota_aluno_cor_nota_idx 
-ON public.nota_aluno_cor (nota);
-
 delete from nota_aluno_cor;
 insert into nota_aluno_cor (nota, cor) values ('NS', '#F6461F');
 insert into nota_aluno_cor (nota, cor) values ('PS', '#74C908');
