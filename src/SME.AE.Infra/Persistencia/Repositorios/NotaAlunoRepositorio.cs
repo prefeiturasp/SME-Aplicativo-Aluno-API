@@ -6,6 +6,8 @@ using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
+using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +25,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        private static string chaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno)
-    => $"notasAluno-AnoUeTurmaAluno-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
+        private static string chaveCacheAnoBimestreUeTurmaAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurmna, string codigoAluno)
+            => $"notasAluno-AnoBimestreUeTurmaAluno-{anoLetivo}-{bimestre}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
 
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
@@ -34,7 +36,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                nota_aluno
                 set 
 	                componente_curricular=@ComponenteCurricular, 
-                    nota=@Nota
+                    nota=@Nota,
+                    recomendacoes_aluno=@RecomendacoesAluno,
+                    recomendacoes_familia=@RecomendacoesFamilia
                 where 
 	                ano_letivo = @AnoLetivo
                 and ue_codigo = @CodigoUe
@@ -54,7 +58,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                aluno_codigo, 
 	                componente_curricular_codigo, 
 	                componente_curricular, 
-	                nota
+	                nota,
+                    recomendacoes_aluno,
+                    recomendacoes_familia
                 ) values (
                     @AnoLetivo,
                     @CodigoUe,
@@ -63,7 +69,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     @CodigoAluno,
                     @CodigoComponenteCurricular,
                     @ComponenteCurricular,
-                    @Nota
+                    @Nota,
+                    @RecomendacoesAluno,
+                    @RecomendacoesFamilia
                 )
                 ";
 
@@ -128,7 +136,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             await Task.CompletedTask;
         }
-
         public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
         {
             const string sqlSelect =
@@ -141,7 +148,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                aluno_codigo                    CodigoAluno,
 	                componente_curricular_codigo    CodigoComponenteCurricular,
 	                componente_curricular           ComponenteCurricular,
-	                nota                            Nota
+	                nota                            Nota,
+                    recomendacoes_aluno             RecomendacoesAluno,
+                    recomendacoes_familia           RecomendacoesFamilia
                 from
                     nota_aluno
                 where
@@ -163,33 +172,46 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
+
         
-        public async Task<IEnumerable<NotaAlunoResposta>> ObterNotasAluno(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno)
+        public async Task<NotaAlunoPorBimestreResposta> ObterNotasAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurma, string codigoAluno)
         {
             try
             {
-                var chaveCache = chaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
-
+                var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
                 var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
                 if (!string.IsNullOrWhiteSpace(notasAluno))
-                    return JsonConvert.DeserializeObject<IEnumerable<NotaAlunoResposta>>(notasAluno);
+                    return JsonConvert.DeserializeObject<NotaAlunoPorBimestreResposta>(notasAluno);
 
                 using var conexao = CriaConexao();
                 conexao.Open();
-                var dadosNotasAluno = await conexao.QueryAsync<NotaAlunoResposta>(@"SELECT 
-                                                                                                        ano_letivo as AnoLetivo,
-                                                                                                        ue_codigo as CodigoUe,
-                                                                                                        turma_codigo as CodigoTurma,
-	                                                                                                    aluno_codigo as AlunoCodigo,
-                                                                                                        bimestre as Bimestre,
-                                                                                                        componente_curricular as ComponenteCurricular,
-                                                                                                        nota as Nota
-                                                                                                    FROM public.nota_aluno 
-                                                                                                    WHERE 
-                                                                                                        ano_letivo = @anoLetivo
-                                                                                                        AND ue_codigo = @CodigoUe 
-                                                                                                        AND turma_codigo = @CodigoTurma 
-                                                                                                        AND aluno_codigo = @CodigoAluno ", new { anoLetivo, codigoUe, codigoTurma, codigoAluno });
+
+                var query = @"SELECT 
+                                distinct
+                                ano_letivo as AnoLetivo,
+                                ue_codigo as CodigoUe,
+                                turma_codigo as CodigoTurma,
+	                            aluno_codigo as AlunoCodigo,
+                                bimestre as Bimestre,
+                                recomendacoes_familia as RecomendacoesFamilia,
+                                recomendacoes_aluno as RecomendacoesAluno,
+                                '-' AS splitOn,
+                                componente_curricular as ComponenteCurricular,
+                                nota as Nota,
+                                nota_descricao AS NotaDescricao
+                            FROM public.nota_aluno 
+                            WHERE 
+                                ano_letivo = @anoLetivo
+                                AND bimestre = @bimestre
+                                AND ue_codigo = @CodigoUe 
+                                AND turma_codigo = @CodigoTurma 
+                                AND aluno_codigo = @CodigoAluno ";
+
+                var parametros = new { anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno };
+                var dadosNotasAluno = await conexao.QueryParentChildSingleAsync<NotaAlunoPorBimestreResposta, NotaAlunoComponenteCurricular, int>(query,
+                    notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.Bimestre, 
+                    notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.NotasPorComponenteCurricular, 
+                    parametros, splitOn: "splitOn");
                 conexao.Close();
 
                 await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);

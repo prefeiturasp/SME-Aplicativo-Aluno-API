@@ -1,7 +1,10 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using SME.AE.Aplicacao.Consultas.Notas;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,9 +20,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<IEnumerable<NotaAlunoResposta>> Executar(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno)
+        public async Task<NotaAlunoPorBimestreResposta> Executar(NotaAlunoDto notaAlunoDto)
         {
-            return await mediator.Send(new ObterNotasAlunoQuery(anoLetivo, codigoUe, codigoTurma, codigoAluno));
+            if(notaAlunoDto is null)
+            {
+                throw new NegocioException("Não existem informações de entrada para busca das notas do aluno.");
+            }
+
+            var query = new ObterNotasAlunoQuery(notaAlunoDto.AnoLetivo, notaAlunoDto.Bimestre, notaAlunoDto.CodigoUe, notaAlunoDto.CodigoTurma, notaAlunoDto.CodigoAluno);
+            return await mediator.Send(query);
         }
     }
 }
