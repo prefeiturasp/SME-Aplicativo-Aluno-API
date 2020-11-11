@@ -24,50 +24,95 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var notaAlunosSgp = await conexao
                     .QueryAsync<NotaAlunoSgpDto>(
 						@"
-						select 
-						distinct 
-							t.ano_letivo 		AnoLetivo,
-							ue.ue_id   			CodigoUe,
-							t.turma_id 			CodigoTurma,
-							coalesce(
-								pe.bimestre,
-								0)				Bimestre,
-							fa.aluno_codigo 	CodigoAluno,
-							cc.id 				CodigoComponenteCurricular,
-							coalesce(
-								cc.descricao_sgp, 
-								cc.descricao) 	ComponenteCurricular,
-							coalesce (
-								ccn.nota::varchar, cv2.valor,
-								fn.nota::varchar, (concat(cv.valor,cv.descricao)), 
-								sv.valor,
-								''
-						) 					Nota,
-							cca.id 				conselho_classe_aluno_id,
-							cca.recomendacoes_aluno AS RecomendacoesAluno,
-							cca.recomendacoes_familia AS RecomendacoesFamilia
-						from 
-							fechamento_turma ft
-						inner join fechamento_turma_disciplina ftd on ftd.fechamento_turma_id = ft.id 
-						inner join fechamento_aluno fa on fa.fechamento_turma_disciplina_id = ftd.id 
-						inner join fechamento_nota fn on fn.fechamento_aluno_id = fa.id 
-						inner join turma t on t.id = ft.turma_id
-						inner join ue on ue.id = t.ue_id 
-						left join periodo_escolar pe on pe.id = ft.periodo_escolar_id 
-						left join componente_curricular cc on cc.id = fn.disciplina_id
-						left join conselho_classe cc2 on cc2.fechamento_turma_id = ft.id 
-						left join conselho_classe_aluno cca on cca.aluno_codigo = fa.aluno_codigo and cca.conselho_classe_id = cc2.id and not cca.excluido 
-						left join conselho_classe_nota ccn on ccn.conselho_classe_aluno_id = cca.id and ccn.componente_curricular_codigo = cc.id and not ccn.excluido 
-						left join conceito_valores cv on cv.id = fn.conceito_id
-						left join conceito_valores cv2 on cv2.id = ccn.conceito_id 
-						left join sintese_valores sv on sv.id = fn.sintese_id 
-						where (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
-							and (cca.id is null or (cca.id is not null and ccn.id is not null))
-							and not ftd.excluido 
-							and not fa.excluido 
-							and not fn.excluido 
-						order by 
-							cca.id desc
+							select
+								coalesce(con.AnoLetivo, fec.AnoLetivo) AnoLetivo,
+								coalesce(con.CodigoUe, fec.CodigoUe) CodigoUe,
+								coalesce(con.CodigoTurma, fec.CodigoTurma) CodigoTurma,
+								coalesce(con.Bimestre, fec.Bimestre) Bimestre,
+								coalesce(con.CodigoAluno, fec.CodigoAluno) CodigoAluno,
+								coalesce(con.CodigoComponenteCurricular, fec.CodigoComponenteCurricular) CodigoComponenteCurricular,
+								coalesce(con.ComponenteCurricular, fec.ComponenteCurricular) ComponenteCurricular,
+								coalesce(con.Nota, fec.Nota) Nota,
+								coalesce(con.RecomendacoesAluno, fec.RecomendacoesAluno, '') RecomendacoesAluno,
+								coalesce(con.RecomendacoesFamilia, fec.RecomendacoesFamilia, '') RecomendacoesFamilia
+							from 
+								(
+									select 
+									distinct 
+										t.ano_letivo 		AnoLetivo,
+										ue.ue_id   			CodigoUe,
+										t.turma_id 			CodigoTurma,
+										coalesce(
+											pe.bimestre,
+											0)				Bimestre,
+										fa.aluno_codigo 	CodigoAluno,
+										cc.id 				CodigoComponenteCurricular,
+										coalesce(
+											cc.descricao_sgp, 
+											cc.descricao) 	ComponenteCurricular,
+										coalesce (
+											fn.nota::varchar, cv.valor,
+											sv.valor,
+											''
+										) 					Nota,
+										'' RecomendacoesAluno,
+										'' RecomendacoesFamilia
+									from 
+										fechamento_turma ft
+									inner join fechamento_turma_disciplina ftd on ftd.fechamento_turma_id = ft.id 
+									inner join fechamento_aluno fa on fa.fechamento_turma_disciplina_id = ftd.id 
+									inner join fechamento_nota fn on fn.fechamento_aluno_id = fa.id 
+									inner join turma t on t.id = ft.turma_id
+									inner join ue on ue.id = t.ue_id 
+									left join periodo_escolar pe on pe.id = ft.periodo_escolar_id
+									left join componente_curricular cc on cc.id = fn.disciplina_id 
+									left join conceito_valores cv on cv.id = fn.conceito_id 
+									left join sintese_valores sv on sv.id = fn.sintese_id 
+									where (t.ano_letivo >= 2020) and t.ano_letivo >= @desdeAnoLetivo)
+										and not ft.excluido 
+										and not ftd.excluido 
+										and not fa.excluido 
+										and not fn.excluido 
+								) fec
+							full outer join
+								(
+									select 
+									distinct 
+										t.ano_letivo 		AnoLetivo,
+										ue.ue_id   			CodigoUe,
+										t.turma_id 			CodigoTurma,
+										coalesce(
+											pe.bimestre,
+											0)				Bimestre,
+										cca.aluno_codigo 	CodigoAluno,
+										cu.id 				CodigoComponenteCurricular,
+										coalesce(
+											cu.descricao_sgp, 
+											cu.descricao) 	ComponenteCurricular,
+										coalesce (
+											ccn.nota::varchar, cv.valor,
+											''
+										) 					Nota,
+										cca.recomendacoes_aluno RecomendacoesAluno,
+										cca.recomendacoes_familia RecomendacoesFamilia
+									from
+										conselho_classe cc 
+									inner join conselho_classe_aluno cca on cca.conselho_classe_id = cc.id and not cca.excluido 
+									inner join conselho_classe_nota ccn on ccn.conselho_classe_aluno_id = cca.id and not ccn.excluido
+									inner join fechamento_turma ft on ft.id = cc.fechamento_turma_id and not ft.excluido 
+									inner join turma t on t.id = ft.turma_id
+									inner join ue on ue.id = t.ue_id 
+									inner join componente_curricular cu on cu.id = ccn.componente_curricular_codigo 
+									left join periodo_escolar pe on pe.id = ft.periodo_escolar_id 
+									left join conceito_valores cv on cv.id = ccn.conceito_id 
+									where (t.ano_letivo >= 2020) and t.ano_letivo >= @desdeAnoLetivo)
+									and not cc.excluido 
+								) con 
+							on 	con.anoletivo = fec.anoletivo
+							and con.codigoue  = fec.codigoue
+							and con.codigoturma = fec.codigoturma
+							and con.codigocomponentecurricular = fec.codigocomponentecurricular
+							and con.codigoaluno = fec.codigoaluno
                         ", new { desdeAnoLetivo });
                 conexao.Close();
 
