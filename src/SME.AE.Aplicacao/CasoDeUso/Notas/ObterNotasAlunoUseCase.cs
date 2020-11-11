@@ -2,6 +2,7 @@
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using SME.AE.Aplicacao.Consultas.Notas;
 using SME.AE.Comum.Excecoes;
 using System;
@@ -19,7 +20,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<IEnumerable<NotaAlunoResposta>> Executar(NotaAlunoDto notaAlunoDto)
+        public async Task<NotaAlunoPorBimestreResposta> Executar(NotaAlunoDto notaAlunoDto)
         {
             if(notaAlunoDto is null)
             {

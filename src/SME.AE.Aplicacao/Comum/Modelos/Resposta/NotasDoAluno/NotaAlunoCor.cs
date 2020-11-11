@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
+namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno
 {
     public class NotaAlunoCor
     {
