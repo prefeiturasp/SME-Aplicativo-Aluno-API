@@ -71,5 +71,12 @@ namespace SME.AE.Api.Controllers
         {
             return await solicitarReiniciarSenhaUseCase.Executar(solicitarReiniciarSenhaDto);
         }
+
+        [HttpGet("usuario/responsavel")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterSituacaoUsuario([FromQuery] string cpf, [FromServices] IValidarUsuarioEhResponsavelDeAlunoUseCase validarUsuarioEhResponsavelDeAlunoUseCase)
+        {
+            return Ok(await validarUsuarioEhResponsavelDeAlunoUseCase.Executar(cpf));
+        }
     }
 }
