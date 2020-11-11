@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System.Collections.Generic;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 
 namespace SME.AE.Aplicacao.Consultas.Notas
 {
-    public class ObterNotasAlunoQuery : IRequest<IEnumerable<NotaAlunoResposta>>
+    public class ObterNotasAlunoQuery : IRequest<NotaAlunoPorBimestreResposta>
     {
         public int AnoLetivo { get; set; }
         public short Bimestre { get; set; }
