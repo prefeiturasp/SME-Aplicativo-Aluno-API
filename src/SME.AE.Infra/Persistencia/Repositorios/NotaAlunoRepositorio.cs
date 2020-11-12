@@ -30,6 +30,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
+            const string sqlDelete =
+                @"
+                delete from
+	                nota_aluno
+                where 
+	                ano_letivo = @AnoLetivo
+                and ue_codigo = @CodigoUe
+                and turma_codigo = @CodigoTurma
+                and bimestre = @Bimestre
+                and aluno_codigo = @CodigoAluno
+                and componente_curricular_codigo = @CodigoComponenteCurricular
+                ";
+
             const string sqlUpdate =
                 @"
                 update 
@@ -80,9 +93,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
-                var alterado = (await conn.ExecuteAsync(sqlUpdate, notaAluno)) > 0;
-                if (!alterado)
+                var alterado = (await conn.ExecuteAsync(sqlUpdate, notaAluno));
+                if (alterado == 0)
+                {
                     await conn.ExecuteAsync(sqlInsert, notaAluno);
+                } else if (alterado > 1)
+                {
+                    await conn.ExecuteAsync(sqlDelete, notaAluno);
+                    await conn.ExecuteAsync(sqlInsert, notaAluno);
+                }
                 conn.Close();
             }
             catch (Exception ex)

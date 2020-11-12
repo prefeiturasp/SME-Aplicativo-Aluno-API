@@ -24,7 +24,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var notaAlunosSgp = await conexao
                     .QueryAsync<NotaAlunoSgpDto>(
 						@"
-							select
+						select * from(
+							select distinct 
 								coalesce(con.AnoLetivo, fec.AnoLetivo) AnoLetivo,
 								coalesce(con.CodigoUe, fec.CodigoUe) CodigoUe,
 								coalesce(con.CodigoTurma, fec.CodigoTurma) CodigoTurma,
@@ -34,7 +35,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								coalesce(con.ComponenteCurricular, fec.ComponenteCurricular) ComponenteCurricular,
 								coalesce(con.Nota, fec.Nota) Nota,
 								coalesce(con.RecomendacoesAluno, fec.RecomendacoesAluno, '') RecomendacoesAluno,
-								coalesce(con.RecomendacoesFamilia, fec.RecomendacoesFamilia, '') RecomendacoesFamilia
+								coalesce(con.RecomendacoesFamilia, fec.RecomendacoesFamilia, '') RecomendacoesFamilia,
+								coalesce(con.cca_id, fec.cca_id, 0) cca_id
 							from 
 								(
 									select 
@@ -55,15 +57,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											sv.valor,
 											''
 										) 					Nota,
-										'' RecomendacoesAluno,
-										'' RecomendacoesFamilia
+										cca.recomendacoes_aluno RecomendacoesAluno,
+										cca.recomendacoes_familia RecomendacoesFamilia,
+										cca.id cca_id
 									from 
 										fechamento_turma ft
 									inner join fechamento_turma_disciplina ftd on ftd.fechamento_turma_id = ft.id 
 									inner join fechamento_aluno fa on fa.fechamento_turma_disciplina_id = ftd.id 
-									inner join fechamento_nota fn on fn.fechamento_aluno_id = fa.id 
+									inner join fechamento_nota fn on fn.fechamento_aluno_id = fa.id
 									inner join turma t on t.id = ft.turma_id
 									inner join ue on ue.id = t.ue_id 
+									inner join conselho_classe cc2 on cc2.fechamento_turma_id = ft.id and not cc2.excluido 
+									inner join conselho_classe_aluno cca on cca.aluno_codigo = fa.aluno_codigo and cca.conselho_classe_id = cc2.id and not cca.excluido 
 									left join periodo_escolar pe on pe.id = ft.periodo_escolar_id
 									left join componente_curricular cc on cc.id = fn.disciplina_id 
 									left join conceito_valores cv on cv.id = fn.conceito_id 
@@ -94,7 +99,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											''
 										) 					Nota,
 										cca.recomendacoes_aluno RecomendacoesAluno,
-										cca.recomendacoes_familia RecomendacoesFamilia
+										cca.recomendacoes_familia RecomendacoesFamilia,
+										cca.id cca_id
 									from
 										conselho_classe cc 
 									inner join conselho_classe_aluno cca on cca.conselho_classe_id = cc.id and not cca.excluido 
@@ -106,13 +112,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 									left join periodo_escolar pe on pe.id = ft.periodo_escolar_id 
 									left join conceito_valores cv on cv.id = ccn.conceito_id 
 									where (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
-									and not cc.excluido 
+									and not cc.excluido
 								) con 
 							on 	con.anoletivo = fec.anoletivo
 							and con.codigoue  = fec.codigoue
 							and con.codigoturma = fec.codigoturma
 							and con.codigocomponentecurricular = fec.codigocomponentecurricular
 							and con.codigoaluno = fec.codigoaluno
+						) aaa
+						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
+						order by cca_id
                         ", new { desdeAnoLetivo });
                 conexao.Close();
 
