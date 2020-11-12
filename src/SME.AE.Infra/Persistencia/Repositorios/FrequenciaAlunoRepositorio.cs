@@ -68,6 +68,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
         public async Task SalvarFrequenciaAluno(FrequenciaAlunoSgpDto frequenciaAluno) {
+            const string sqlDelete =
+                @"
+                delete from
+	                frequencia_aluno
+                where 
+	                ue_codigo = @CodigoUe and 
+	                turma_codigo = @CodigoTurma and 
+                    componente_curricular_codigo = @CodigoComponenteCurricular and
+	                ano_letivo = @AnoLetivo and
+	                bimestre = @Bimestre and 
+	                aluno_codigo = @CodigoAluno
+                ";
+
             const string sqlUpdate =
                 @"
                 UPDATE 
@@ -128,9 +141,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
-                var alterado = (await conn.ExecuteAsync(sqlUpdate, frequenciaAluno)) > 0;
-                if (!alterado)
+                var alterado = (await conn.ExecuteAsync(sqlUpdate, frequenciaAluno));
+                if (alterado == 0)
+                {
                     await conn.ExecuteAsync(sqlInsert, frequenciaAluno);
+                } else if (alterado > 1)
+                {
+                    await conn.ExecuteAsync(sqlDelete, frequenciaAluno);
+                    await conn.ExecuteAsync(sqlInsert, frequenciaAluno);
+                }
                 conn.Close();
             }
             catch (Exception ex)
