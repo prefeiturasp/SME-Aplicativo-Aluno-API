@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System.Collections.Generic;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 
 namespace SME.AE.Aplicacao.Consultas.Frequencia
 {
-    public class ObterFrequenciaAlunoQuery : IRequest<IEnumerable<FrequenciaAlunoResposta>>
+    public class ObterFrequenciaAlunoQuery : IRequest<FrequenciaAlunoResposta>
     {
         public int AnoLetivo { get; set; }
         public string CodigoUe { get; set; }

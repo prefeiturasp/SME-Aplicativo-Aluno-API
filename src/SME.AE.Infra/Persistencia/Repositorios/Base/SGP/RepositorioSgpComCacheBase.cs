@@ -1,12 +1,12 @@
 ﻿using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
-namespace SME.AE.Infra.Persistencia.Repositorios.Base
+namespace SME.AE.Infra.Persistencia.Repositorios.Base.SGP
 {
-    public abstract class RepositorioComCacheBase : RepositorioBase
+    public class RepositorioSgpComCacheBase : RepositorioSgpBase
     {
         protected readonly ICacheRepositorio _cacheRepositorio;
 
-        public RepositorioComCacheBase(ICacheRepositorio cacheRepositorio)
+        public RepositorioSgpComCacheBase(ICacheRepositorio cacheRepositorio)
         {
             _cacheRepositorio = cacheRepositorio;
         }

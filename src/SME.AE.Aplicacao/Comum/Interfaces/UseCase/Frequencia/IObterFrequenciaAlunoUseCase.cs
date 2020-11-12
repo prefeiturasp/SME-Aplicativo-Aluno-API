@@ -1,12 +1,11 @@
-﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System.Collections.Generic;
+﻿using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
+namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia
 {
     public interface IObterFrequenciaAlunoUseCase
     {
-        Task<IEnumerable<FrequenciaAlunoResposta>> Executar(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno);
+        Task<FrequenciaAlunoResposta> Executar(ObterFrequenciaAlunoDto frequenciaAlunoDto);
     }
 }
-

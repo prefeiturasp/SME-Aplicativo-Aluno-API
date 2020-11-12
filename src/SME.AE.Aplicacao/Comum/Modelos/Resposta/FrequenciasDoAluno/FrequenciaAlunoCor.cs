@@ -4,6 +4,9 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno
 {
     public class FrequenciaAlunoCor
     {
+        public const string FrequenciaInsuficiente = "FrequenciaInsuficiente";
+        public const string FrequenciaEmAlerta = "FrequenciaEmAlerta";
+        public const string FrequenciaRegular = "FrequenciaRegular";
         public const string CorPadrao = "#D4D4D4";
 
         public string Frequencia { get; set; }

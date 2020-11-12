@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class FrequenciaAlunoCorRepositorio : RepositorioComCacheBase, IFrequenciaAlunoCorRepositorio
+    public class FrequenciaAlunoCorRepositorio : RepositorioAppComCacheBase, IFrequenciaAlunoCorRepositorio
     {
-        private const string ChaveCache = "";
+        private const string ChaveCache = "frequenciaAlunoCores";
 
         public FrequenciaAlunoCorRepositorio(ICacheRepositorio cacheRepositorio) 
             : base(cacheRepositorio)
