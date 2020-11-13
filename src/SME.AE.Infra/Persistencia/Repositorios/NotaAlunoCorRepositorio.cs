@@ -4,7 +4,7 @@ using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

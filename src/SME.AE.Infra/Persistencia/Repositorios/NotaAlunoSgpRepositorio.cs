@@ -128,8 +128,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							and con.codigoaluno = fec.codigoaluno
 						) aaa
 						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
-						order by cca_id
-                        ", new { desdeAnoLetivo });
+						order by cca_id ", new { desdeAnoLetivo });
                 conexao.Close();
 
                 return notaAlunosSgp;

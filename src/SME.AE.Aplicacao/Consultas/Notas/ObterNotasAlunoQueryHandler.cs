@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using SME.AE.Comum.Excecoes;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Consultas.Notas
 {
-    public class ObterNotasAlunoQueryHandler : IRequestHandler<ObterNotasAlunoQuery, IEnumerable<NotaAlunoResposta>>
+    public class ObterNotasAlunoQueryHandler : IRequestHandler<ObterNotasAlunoQuery, NotaAlunoPorBimestreResposta>
     {
         private readonly INotaAlunoRepositorio _notaAlunoRepositorio;
         private readonly INotaAlunoCorRepositorio _notaAlunoCorRepositorio;
@@ -20,34 +21,34 @@ namespace SME.AE.Aplicacao.Consultas.Notas
             _notaAlunoCorRepositorio = notaAlunoCorRepositorio ?? throw new System.ArgumentNullException(nameof(notaAlunoCorRepositorio));
         }
 
-        public async Task<IEnumerable<NotaAlunoResposta>> Handle(ObterNotasAlunoQuery request, CancellationToken cancellationToken)
+        public async Task<NotaAlunoPorBimestreResposta> Handle(ObterNotasAlunoQuery request, CancellationToken cancellationToken)
         {
-            var notaAlunoResposta = _notaAlunoRepositorio.ObterNotasAluno(request.AnoLetivo, request.Bimestre, request.CodigoUe, request.CodigoTurma, request.CodigoAluno);
+            var notaAlunoPorBimestreResposta = _notaAlunoRepositorio.ObterNotasAluno(request.AnoLetivo, request.Bimestre, request.CodigoUe, request.CodigoTurma, request.CodigoAluno);
             var notaAlunoCor = _notaAlunoCorRepositorio.ObterAsync();
-            await Task.WhenAll(notaAlunoResposta, notaAlunoCor);
+            await Task.WhenAll(notaAlunoPorBimestreResposta, notaAlunoCor);
 
-            var notasAlunoRespostaConsolidado = notaAlunoResposta.Result;
-            if (notasAlunoRespostaConsolidado is null)
+            var notasAlunoPorBimestreRespostaConsolidado = notaAlunoPorBimestreResposta.Result;
+            if (notasAlunoPorBimestreRespostaConsolidado is null)
             {
                 throw new NegocioException("Não foi possível obter as notas do aluno.");
             }
 
-            DefinirCoresDasNotas(notasAlunoRespostaConsolidado, notaAlunoCor.Result);
-            return notasAlunoRespostaConsolidado;
+            DefinirCoresDasNotas(notasAlunoPorBimestreRespostaConsolidado, notaAlunoCor.Result);
+            return notasAlunoPorBimestreRespostaConsolidado;
         }
 
-        private void DefinirCoresDasNotas(IEnumerable<NotaAlunoResposta> notasAlunoRespostas, IEnumerable<NotaAlunoCor> notaAlunoCores)
+        private void DefinirCoresDasNotas(NotaAlunoPorBimestreResposta notasAlunoPorBimestreResposta, IEnumerable<NotaAlunoCor> notaAlunoCores)
         {
-            if (!notaAlunoCores?.Any() ?? true)
+            if (notasAlunoPorBimestreResposta.Bimestre != NotaAlunoPorBimestreResposta.BimestreDeFechamento || (!notaAlunoCores?.Any() ?? true))
             {
-                foreach (var notaAluno in notasAlunoRespostas)
+                foreach (var notaAluno in notasAlunoPorBimestreResposta.NotasPorComponenteCurricular)
                 {
                     notaAluno.CorNotaAluno = NotaAlunoCor.CorPadrao;
                 }
                 return;
             }
 
-            foreach (var notaAluno in notasAlunoRespostas)
+            foreach (var notaAluno in notasAlunoPorBimestreResposta.NotasPorComponenteCurricular)
             {
                 notaAluno.CorNotaAluno = int.TryParse(notaAluno.Nota, out var notaEmValor)
                     ? DefinirCorDaNotaPorValor(notaEmValor, notaAlunoCores)
