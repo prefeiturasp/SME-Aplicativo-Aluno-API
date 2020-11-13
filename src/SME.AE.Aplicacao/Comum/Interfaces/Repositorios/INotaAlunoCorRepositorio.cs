@@ -1,4 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
