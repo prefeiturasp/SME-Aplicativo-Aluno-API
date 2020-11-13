@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using System.Threading.Tasks;
 
@@ -16,11 +17,18 @@ namespace SME.AE.Api.Controllers
             return Ok(await dadosDoAlunoUseCase.Executar(cpf));
         }
 
+        [HttpGet("frequencia/componente-curricular")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] ObterFrequenciaAlunoPorComponenteCurricularDto frequenciaAlunoDto, [FromServices] IObterFrequenciaAlunoPorComponenteCurricularUseCase obterFrequenciaAlunoPorComponenteCurricularUseCase)
+        {
+            return Ok(await obterFrequenciaAlunoPorComponenteCurricularUseCase.Executar(frequenciaAlunoDto));
+        }
+
         [HttpGet("frequencia")]
         [AllowAnonymous]
-        public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] int anoLetivo, [FromQuery] string codigoUe, [FromQuery] long codigoTurma, [FromQuery] string codigoAluno, [FromServices] IObterFrequenciaAlunoUseCase obterFrequenciaAlunoUseCase)
+        public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] ObterFrequenciaAlunoDto frequenciaAlunoDto, [FromServices] IObterFrequenciaAlunoUseCase obterFrequenciaGlobalAlunoUseCase)
         {
-            return Ok(await obterFrequenciaAlunoUseCase.Executar(anoLetivo, codigoUe, codigoTurma, codigoAluno));
+            return Ok(await obterFrequenciaGlobalAlunoUseCase.Executar(frequenciaAlunoDto));
         }
 
         [HttpGet("notas")]
