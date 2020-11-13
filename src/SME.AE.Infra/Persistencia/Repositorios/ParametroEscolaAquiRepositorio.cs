@@ -2,12 +2,10 @@
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Consultas.ObterUsuario;
-using SME.AE.Dominio.Entidades;
+using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -33,22 +31,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             if (string.IsNullOrWhiteSpace(conteudo))
             {
                 await conexao.ExecuteAsync("delete from parametroescolaaqui where chave = @chave", new { chave });
-            } else
+            }
+            else
             {
                 await conexao.ExecuteAsync(
                     @"
                         insert into parametroescolaaqui (chave, conteudo)
                         values (@chave, @conteudo)
-                        on conflict (chave) 
+                        on conflict (chave)
                         do update set conteudo = excluded.conteudo
                     ", new { chave, conteudo });
             }
 
             await conexao.CloseAsync();
         }
+
         private async Task<string> ObterPorChaveAsync(string chave)
         {
-            if(string.IsNullOrWhiteSpace(chave))
+            if (string.IsNullOrWhiteSpace(chave))
             {
                 return null;
             }
@@ -102,14 +102,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return false;
         }
 
-        public void Salvar(string chave, string conteudo) => Task.Run( async () => await SalvarAsync(chave, conteudo) ).Wait();
+        public void Salvar(string chave, string conteudo) => Task.Run(async () => await SalvarAsync(chave, conteudo)).Wait();
+
         public void Salvar(string chave, int conteudo) => Salvar(chave, conteudo.ToString());
+
         public void Salvar(string chave, long conteudo) => Salvar(chave, conteudo.ToString());
+
         public void Salvar(string chave, DateTime conteudo) => Salvar(chave, conteudo.ToString("s"));
 
         public DateTime? ObterDateTime(string chave)
         {
-            if(TentaObterDateTime(chave, out var conteudo))
+            if (TentaObterDateTime(chave, out var conteudo))
             {
                 return conteudo;
             }
@@ -142,12 +145,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             return null;
         }
+
+        public async Task<IEnumerable<ParametroEscolaAqui>> ObterParametros(IEnumerable<string> chaves)
+        {
+            var chavesConcatenadas = string.Join("','", chaves);
+            if (string.IsNullOrWhiteSpace(chavesConcatenadas)) return null;
+
+            using var conexao = InstanciarConexao();
+            await conexao.OpenAsync();
+            var parametros = await conexao.QueryAsync<ParametroEscolaAqui>($"select chave, conteudo from parametroescolaaqui where chave IN ('{chavesConcatenadas}')");
+            await conexao.CloseAsync();
+            return parametros;
+        }
+
         public DateTime ObterDateTime(string chave, DateTime padrao)
         {
             if (TentaObterDateTime(chave, out var conteudo))
             {
                 return conteudo;
-            } else
+            }
+            else
             {
                 Salvar(chave, padrao);
                 return padrao;
