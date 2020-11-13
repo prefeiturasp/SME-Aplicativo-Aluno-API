@@ -44,6 +44,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								''
 							) Nota,
 							coalesce (
+								ccn.nota::varchar, cv2.valor,
 								fn.nota::varchar, ltrim(cv.descricao, '	'),
 								ltrim(sv.descricao, '	'),
 								''
