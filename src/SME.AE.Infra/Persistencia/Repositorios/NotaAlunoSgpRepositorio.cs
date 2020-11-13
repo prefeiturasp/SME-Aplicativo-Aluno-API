@@ -39,10 +39,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								cc.descricao) 	ComponenteCurricular,
 							coalesce (
 								ccn.nota::varchar, cv2.valor,
-								fn.nota::varchar, (concat(cv.valor,cv.descricao)), 
+								fn.nota::varchar, cv.valor,
 								sv.valor,
 								''
-						) 					Nota,
+							) Nota,
+							coalesce (
+								fn.nota::varchar, ltrim(cv.descricao, '	'),
+								ltrim(sv.descricao, '	'),
+								''
+							) 					NotaDescricao,							
 							cca.id 				conselho_classe_aluno_id,
 							cca.recomendacoes_aluno AS RecomendacoesAluno,
 							cca.recomendacoes_familia AS RecomendacoesFamilia
