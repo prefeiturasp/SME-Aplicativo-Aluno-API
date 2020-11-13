@@ -5,6 +5,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface ITurmaRepositorio
     {
-        Task<TurmaModalidadeDeEnsinoDto> ObterModalidadeDeEnsinoAsync(string codigoTurma);
+        Task<TurmaModalidadeDeEnsinoDto> ObterModalidadeDeEnsino(string codigoTurma);
     }
 }

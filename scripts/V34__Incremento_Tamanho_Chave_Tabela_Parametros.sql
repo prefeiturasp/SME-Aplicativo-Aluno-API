@@ -1,0 +1,1 @@
+alter table parametroescolaaqui alter column chave type varchar(50);

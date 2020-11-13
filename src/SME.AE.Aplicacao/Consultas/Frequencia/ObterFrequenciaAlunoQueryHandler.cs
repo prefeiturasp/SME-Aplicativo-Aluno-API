@@ -16,26 +16,24 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
                                                     IRequestHandler<ObterFrequenciaAlunoQuery, FrequenciaAlunoResposta>
     {
         private readonly IFrequenciaAlunoRepositorio _frequenciaAlunoRepositorio;
-        private readonly IFrequenciaAlunoCorRepositorio _frequenciaAlunoCorRepositorio;
         private readonly ITurmaRepositorio _turmaRepositorio;
+        private readonly IParametrosEscolaAquiRepositorio _parametrosEscolaAquiRepositorio;
 
-        public ObterFrequenciaAlunoQueryHandler(IFrequenciaAlunoRepositorio frequenciaAlunoRepositorio, IFrequenciaAlunoCorRepositorio frequenciaAlunoCorRepositorio,
-            ITurmaRepositorio turmaRepositorio)
+        public ObterFrequenciaAlunoQueryHandler(IFrequenciaAlunoRepositorio frequenciaAlunoRepositorio, ITurmaRepositorio turmaRepositorio,
+            IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio)
         {
             _frequenciaAlunoRepositorio = frequenciaAlunoRepositorio ?? throw new System.ArgumentNullException(nameof(frequenciaAlunoRepositorio));
-            _frequenciaAlunoCorRepositorio = frequenciaAlunoCorRepositorio;
             _turmaRepositorio = turmaRepositorio;
+            _parametrosEscolaAquiRepositorio = parametrosEscolaAquiRepositorio;
         }
 
         public async Task<FrequenciaAlunoPorComponenteCurricularResposta> Handle(ObterFrequenciaAlunoPorComponenteCurricularQuery request, CancellationToken cancellationToken)
         {
             var obterFrequenciaAlunoPorComponenteCurricular = _frequenciaAlunoRepositorio.ObterFrequenciaAlunoPorComponenteCurricularAsync(request.AnoLetivo, request.CodigoUe, request.CodigoTurma, request.CodigoAluno, request.CodigoComponenteCurricular);
-            var obterFrequenciaAlunoCores = _frequenciaAlunoCorRepositorio.ObterAsync();
-            var obterTurmaModalidadeDeEnsino = _turmaRepositorio.ObterModalidadeDeEnsinoAsync(request.CodigoTurma);
-            await Task.WhenAll(obterFrequenciaAlunoPorComponenteCurricular, obterFrequenciaAlunoCores, obterTurmaModalidadeDeEnsino);
+            var obterTurmaModalidadeDeEnsino = _turmaRepositorio.ObterModalidadeDeEnsino(request.CodigoTurma);
+            await Task.WhenAll(obterFrequenciaAlunoPorComponenteCurricular, obterTurmaModalidadeDeEnsino);
 
             var frequenciaAluno = obterFrequenciaAlunoPorComponenteCurricular.Result;
-            var frequenciaAlunoCores = obterFrequenciaAlunoCores.Result;
             var turmaModalidadeDeEnsino = obterTurmaModalidadeDeEnsino.Result;
 
             if (frequenciaAluno is null)
@@ -48,17 +46,20 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
                 throw new NegocioException("Não foi possível obter a modalidade de ensino do aluno.");
             }
 
-            var modalidadeDeEnsinoInfantil = turmaModalidadeDeEnsino.ModalidadeDeEnsino == ModalidadeDeEnsino.Infantil;
-            DefinirCoresDasFrequenciasPorComponenteCurricular(frequenciaAluno, frequenciaAlunoCores, modalidadeDeEnsinoInfantil);
+            var obterFrequenciaAlunoCores = ObterFrequenciaAlunoCor(turmaModalidadeDeEnsino.ModalidadeDeEnsino);
+            var obterFrequenciaAlunoFaixa = ObterFrequenciaAlunoFaixa(turmaModalidadeDeEnsino.ModalidadeDeEnsino);
+            await Task.WhenAll(obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa);
+
+            DefinirCoresDasFrequenciasPorComponenteCurricular(frequenciaAluno, turmaModalidadeDeEnsino.ModalidadeDeEnsino, 
+                obterFrequenciaAlunoCores.Result, obterFrequenciaAlunoFaixa.Result);
             return frequenciaAluno;
         }
 
         public async Task<FrequenciaAlunoResposta> Handle(ObterFrequenciaAlunoQuery request, CancellationToken cancellationToken)
         {
             var obterFrequenciaDoAluno = _frequenciaAlunoRepositorio.ObterFrequenciaAlunoAsync(request.AnoLetivo, request.CodigoUe, request.CodigoTurma, request.CodigoAluno);
-            var obterFrequenciaAlunoCores = _frequenciaAlunoCorRepositorio.ObterAsync();
-            var obterTurmaModalidadeDeEnsino = _turmaRepositorio.ObterModalidadeDeEnsinoAsync(request.CodigoTurma);
-            await Task.WhenAll(obterFrequenciaDoAluno, obterFrequenciaAlunoCores, obterTurmaModalidadeDeEnsino);
+            var obterTurmaModalidadeDeEnsino = _turmaRepositorio.ObterModalidadeDeEnsino(request.CodigoTurma);
+            await Task.WhenAll(obterFrequenciaDoAluno, obterTurmaModalidadeDeEnsino);
 
             var frequenciaDoAluno = obterFrequenciaDoAluno.Result;
             var turmaModalidadeDeEnsino = obterTurmaModalidadeDeEnsino.Result;
@@ -73,14 +74,19 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
                 throw new NegocioException("Não foi possível obter a modalidade de ensino do aluno.");
             }
 
+            var obterFrequenciaAlunoCores = ObterFrequenciaAlunoCor(turmaModalidadeDeEnsino.ModalidadeDeEnsino);
+            var obterFrequenciaAlunoFaixa = ObterFrequenciaAlunoFaixa(turmaModalidadeDeEnsino.ModalidadeDeEnsino);
+            await Task.WhenAll(obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa);
+
             frequenciaDoAluno.CorDaFrequencia = turmaModalidadeDeEnsino.ModalidadeDeEnsino == ModalidadeDeEnsino.Infantil
-                    ? DefinirCorDaFrequenciaParaEnsinoInfantil(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result)
-                    : DefinirCoresDaFrequencia(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result);
+                ? DefinirCorDaFrequenciaParaEnsinoInfantil(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result, obterFrequenciaAlunoFaixa.Result)
+                : DefinirCorDaFrequencia(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result, obterFrequenciaAlunoFaixa.Result);
 
             return frequenciaDoAluno;
         }
 
-        private void DefinirCoresDasFrequenciasPorComponenteCurricular(FrequenciaAlunoPorComponenteCurricularResposta frequenciaAluno, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores, bool ensinoInfantil)
+        private void DefinirCoresDasFrequenciasPorComponenteCurricular(FrequenciaAlunoPorComponenteCurricularResposta frequenciaAluno, ModalidadeDeEnsino modalidadeDeEnsino,
+            IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores, IEnumerable<FrequenciaAlunoFaixa> frequenciaAlunoFaixas)
         {
             if (!frequenciaAlunoCores?.Any() ?? true)
             {
@@ -93,52 +99,90 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
 
             foreach (var frequenciaAlunoPorBimestre in frequenciaAluno.FrequenciasPorBimestre)
             {
-                frequenciaAlunoPorBimestre.CorDaFrequencia = ensinoInfantil
-                    ? DefinirCorDaFrequenciaParaEnsinoInfantil(frequenciaAlunoPorBimestre.Frequencia, frequenciaAlunoCores)
-                    : DefinirCoresDaFrequencia(frequenciaAlunoPorBimestre.Frequencia, frequenciaAlunoCores);
+                frequenciaAlunoPorBimestre.CorDaFrequencia = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+                    ? DefinirCorDaFrequenciaParaEnsinoInfantil(frequenciaAlunoPorBimestre.Frequencia, frequenciaAlunoCores, frequenciaAlunoFaixas)
+                    : DefinirCorDaFrequencia(frequenciaAlunoPorBimestre.Frequencia, frequenciaAlunoCores, frequenciaAlunoFaixas);
             }
         }
 
-        private string DefinirCoresDaFrequencia(decimal frequencia, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores)
+        private string DefinirCorDaFrequencia(decimal frequencia, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores, IEnumerable<FrequenciaAlunoFaixa> frequenciaAlunoFaixas)
         {
+            if(!frequenciaAlunoCores.Any() || !frequenciaAlunoFaixas.Any()) return FrequenciaAlunoCor.CorPadrao;
+            var frequenciaEmAlertaFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.FrequenciaEmAlertaFaixa)?.Faixa;
+            var frequenciaRegularFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.FrequenciaRegularFaixa)?.Faixa;
+
             string cor = null;
             switch (frequencia)
             {
-                case decimal n when (n < 75.00m):
-                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaInsuficiente)?.Cor;
+                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault()):
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaInsuficienteCor)?.Cor;
                     break;
 
-                case decimal n when (n <= 79.99m && n >= 75.00m):
-                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaEmAlerta)?.Cor;
+                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault()):
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaEmAlertaCor)?.Cor;
                     break;
 
-                case decimal n when (n >= 80.00m):
-                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaRegular)?.Cor;
+                default:
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaRegularCor)?.Cor;
                     break;
             }
 
             return cor ?? FrequenciaAlunoCor.CorPadrao;
         }
 
-        private string DefinirCorDaFrequenciaParaEnsinoInfantil(decimal frequencia, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores)
+        private string DefinirCorDaFrequenciaParaEnsinoInfantil(decimal frequencia, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores, IEnumerable<FrequenciaAlunoFaixa> frequenciaAlunoFaixas)
         {
+            if (!frequenciaAlunoCores.Any() || !frequenciaAlunoFaixas.Any()) return FrequenciaAlunoCor.CorPadrao;
+            var frequenciaEmAlertaFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.EnsinoInfantilFrequenciaEmAlertaFaixa)?.Faixa;
+            var frequenciaRegularFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.EnsinoInfantilFrequenciaRegularFaixa)?.Faixa;
+
             string cor = null;
             switch (frequencia)
             {
-                case decimal n when (n < 60.00m):
-                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaInsuficiente)?.Cor;
+                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault()):
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.EnsinoInfantilFrequenciaInsuficienteCor)?.Cor;
                     break;
 
-                case decimal n when (n <= 74.99m && n >= 60.00m):
-                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaEmAlerta)?.Cor;
+                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault()):
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.EnsinoInfantilFrequenciaEmAlertaCor)?.Cor;
                     break;
 
-                case decimal n when (n >= 75.00m):
-                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaRegular)?.Cor;
+                default:
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.EnsinoInfantilFrequenciaRegularCor)?.Cor;
                     break;
             }
 
             return cor ?? FrequenciaAlunoCor.CorPadrao;
+        }
+
+        public async Task<IEnumerable<FrequenciaAlunoCor>> ObterFrequenciaAlunoCor(ModalidadeDeEnsino modalidadeDeEnsino)
+        {
+            var parametros = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+                ? await _parametrosEscolaAquiRepositorio.ObterParametros(FrequenciaAlunoCor.ObterChavesDosParametrosParaEnsinoInfantil())
+                : await _parametrosEscolaAquiRepositorio.ObterParametros(FrequenciaAlunoCor.ObterChavesDosParametros());
+
+            return parametros
+                .Select(x => new FrequenciaAlunoCor
+                {
+                    Cor = x.Conteudo,
+                    Frequencia = x.Chave
+                })
+                .ToList();
+        }
+
+        public async Task<IEnumerable<FrequenciaAlunoFaixa>> ObterFrequenciaAlunoFaixa(ModalidadeDeEnsino modalidadeDeEnsino)
+        {
+            var parametros = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+                ? await _parametrosEscolaAquiRepositorio.ObterParametros(FrequenciaAlunoFaixa.ObterChavesDosParametrosParaEnsinoInfantil())
+                : await _parametrosEscolaAquiRepositorio.ObterParametros(FrequenciaAlunoFaixa.ObterChavesDosParametros());
+
+            return parametros
+                .Select(x => new FrequenciaAlunoFaixa
+                {
+                    Faixa = decimal.TryParse(x.Conteudo, out var faixa) ? faixa : default,
+                    Frequencia = x.Chave
+                })
+                .ToList();
         }
     }
 }
