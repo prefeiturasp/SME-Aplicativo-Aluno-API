@@ -2,6 +2,7 @@
 
 namespace SME.AE.Infra.Persistencia.Repositorios.Base.SGP
 {
+    // TO DO: Colocar os demais reposiórios para herdar da classe base
     public class RepositorioSgpComCacheBase : RepositorioSgpBase
     {
         protected readonly ICacheRepositorio _cacheRepositorio;

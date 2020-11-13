@@ -1,12 +1,20 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.RegularExpressions;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno
 {
     public class FrequenciaAlunoCor
     {
-        public const string FrequenciaInsuficiente = "FrequenciaInsuficiente";
-        public const string FrequenciaEmAlerta = "FrequenciaEmAlerta";
-        public const string FrequenciaRegular = "FrequenciaRegular";
+        public const string EnsinoInfantilFrequenciaInsuficienteCor = "EnsinoInfantilFrequenciaInsuficienteCor";
+        public const string EnsinoInfantilFrequenciaEmAlertaCor = "EnsinoInfantilFrequenciaEmAlertaCor";
+        public const string EnsinoInfantilFrequenciaRegularCor = "EnsinoInfantilFrequenciaRegularCor";
+
+        public const string FrequenciaInsuficienteCor = "FrequenciaInsuficienteCor";
+        public const string FrequenciaEmAlertaCor = "FrequenciaEmAlertaCor";
+        public const string FrequenciaRegularCor = "FrequenciaRegularCor";
+
         public const string CorPadrao = "#D4D4D4";
 
         public string Frequencia { get; set; }
@@ -20,5 +28,19 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno
         }
 
         private bool ValidarCor() => Regex.IsMatch(_cor, "^#((0x){0,1}|#{0,1})([0-9A-F]{8}|[0-9A-F]{6})$");
+
+        public static IEnumerable<string> ObterChavesDosParametrosParaEnsinoInfantil()
+        {
+            yield return EnsinoInfantilFrequenciaInsuficienteCor;
+            yield return EnsinoInfantilFrequenciaEmAlertaCor;
+            yield return EnsinoInfantilFrequenciaRegularCor;
+        }
+
+        public static IEnumerable<string> ObterChavesDosParametros()
+        {
+            yield return FrequenciaInsuficienteCor;
+            yield return FrequenciaEmAlertaCor;
+            yield return FrequenciaRegularCor;
+        }
     }
 }

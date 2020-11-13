@@ -18,7 +18,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
         }
 
-        public async Task<TurmaModalidadeDeEnsinoDto> ObterModalidadeDeEnsinoAsync(string codigoTurma)
+        public async Task<TurmaModalidadeDeEnsinoDto> ObterModalidadeDeEnsino(string codigoTurma)
         {
             try
             {
