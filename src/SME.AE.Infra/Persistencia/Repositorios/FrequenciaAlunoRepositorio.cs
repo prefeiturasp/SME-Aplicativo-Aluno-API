@@ -58,7 +58,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                 bimestre as Bimestre,
                                 quantidade_aulas as QuantidadeAulas,
                                 quantidade_faltas as QuantidadeFaltas,
-                                quantidade_compensacoes as QuantidadeCompensacoes
+                                quantidade_compensacoes as QuantidadeCompensacoes,
+                                dias_ausencias AS DiasAusencia
                             FROM public.frequencia_aluno
                             WHERE
                                 ano_letivo = @anoLetivo
@@ -133,7 +134,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                            ano_letivo = @anoLetivo
                                 AND ue_codigo = @codigoUe
                                 AND turma_codigo = @codigoTurma
-                                AND aluno_codigo = @codigoAluno;
+                                AND aluno_codigo = @codigoAluno
+                            ORDER BY componente_curricular;
 
                             SELECT
                                 glob.AnoLetivo,
