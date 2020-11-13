@@ -24,6 +24,7 @@
   <ItemGroup>
     <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\ComponenteCurricularDoAluno.cs" />
     <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoFaixa.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorBimestreAusencia.cs" />
     <Compile Include="Comum\Modelos\Resposta\TurmaModalidadeDeEnsinoDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\AtualizacaiNotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\CpfResponsavelAlunoEol.cs" />
