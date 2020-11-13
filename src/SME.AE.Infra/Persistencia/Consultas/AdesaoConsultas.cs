@@ -20,7 +20,7 @@
 
 		internal static string ObterDadosAdesaoPorDre = @"
 			SELECT 
-				trim(concat(dre_codigo,'-',dre_nome)) AS NomeCompletoDre,
+				dre_nome AS NomeCompletoDre,
 				usuarios_cpf_invalidos AS TotalUsuariosComCpfInvalidos,
 				usuarios_sem_app_instalado AS TotalUsuariosSemAppInstalado, 
 				usuarios_primeiro_acesso_incompleto AS TotalUsuariosPrimeiroAcessoIncompleto, 
@@ -30,6 +30,7 @@
 				codigo_turma = 0 and
 				ue_codigo  = '' and
 				dre_codigo <> '' 
+			ORDER BY dre_codigo 
 		";
 	}
 }
