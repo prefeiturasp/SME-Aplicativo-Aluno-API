@@ -50,7 +50,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 set 
 	                componente_curricular=@ComponenteCurricular, 
                     nota=@Nota,
-                    nota_descricao=@NotaDescricao,
                     recomendacoes_aluno=@RecomendacoesAluno,
                     recomendacoes_familia=@RecomendacoesFamilia
                 where 
@@ -73,7 +72,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                componente_curricular_codigo, 
 	                componente_curricular, 
 	                nota,
-                    nota_descricao,
                     recomendacoes_aluno,
                     recomendacoes_familia
                 ) values (
@@ -85,7 +83,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     @CodigoComponenteCurricular,
                     @ComponenteCurricular,
                     @Nota,
-                    @NotaDescricao,
                     @RecomendacoesAluno,
                     @RecomendacoesFamilia
                 )
@@ -171,7 +168,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                componente_curricular_codigo    CodigoComponenteCurricular,
 	                componente_curricular           ComponenteCurricular,
 	                nota                            Nota,
-                    nota_descricao                  NotaDescricao,
                     recomendacoes_aluno             RecomendacoesAluno,
                     recomendacoes_familia           RecomendacoesFamilia
                 from
