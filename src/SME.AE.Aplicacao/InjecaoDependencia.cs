@@ -95,6 +95,8 @@ namespace SME.AE.Aplicacao
             services.AddTransient<IObterFrequenciaAlunoPorComponenteCurricularUseCase, ObterFrequenciaAlunoPorComponenteCurricularUseCase>();
             services.AddTransient<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
             services.AddTransient<IObterNotasAlunoUseCase, ObterNotasAlunoUseCase>();
+            services.AddTransient<IValidarUsuarioEhResponsavelDeAlunoUseCase, ValidarUsuarioEhResponsavelDeAlunoUseCase>();
+
         }
     }
 }
