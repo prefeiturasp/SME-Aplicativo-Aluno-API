@@ -36,5 +36,12 @@ namespace SME.AE.Api.Controllers
             return Ok(await obterTotalUsuariosValidosUseCase.Executar(codigoDre, codigoUe));
         }
 
+        [HttpGet("leitura")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicados([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromServices] IObterDadosDeLeituraComunicadosUseCase obterDadosDeLeituraComunicados)
+        {
+            return Ok(await obterDadosDeLeituraComunicados.Executar(codigoDre, codigoUe));
+        }
+
     }
 }
