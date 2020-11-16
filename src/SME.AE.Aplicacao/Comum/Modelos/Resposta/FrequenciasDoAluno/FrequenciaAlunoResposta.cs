@@ -28,10 +28,10 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno
         {
             if (QuantidadeFaltas <= 0) return 1.00m;
 
-            var faltasNaoCompensadas = QuantidadeFaltas - QuantidadeCompensacoes;
+            decimal faltasNaoCompensadas = QuantidadeFaltas - QuantidadeCompensacoes;
             if (QuantidadeFaltas - QuantidadeCompensacoes <= 0) return 1.00m;
 
-            return 1.00m - (faltasNaoCompensadas / QuantidadeAulas);
+            return 1.00m - (faltasNaoCompensadas / (decimal)QuantidadeAulas);
         }
     }
 }
