@@ -20,14 +20,18 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno
             ComponentesCurricularesDoAluno = new List<ComponenteCurricularDoAluno>();
         }
 
+        /// <summary>
+        /// Realiza o cálculo de frequencia do aluno baseado nas quantidades de aulas, faltas e compensações.
+        /// O cálculo resulta em um decimal entre 0.0 (0%) e 1.0 (100%).
+        /// </summary>
         private decimal ObterFrequencia()
         {
-            if (QuantidadeFaltas <= 0) return 100.00m;
+            if (QuantidadeFaltas <= 0) return 1.00m;
 
             var faltasNaoCompensadas = QuantidadeFaltas - QuantidadeCompensacoes;
-            if (QuantidadeFaltas - QuantidadeCompensacoes <= 0) return 100.00m;
+            if (QuantidadeFaltas - QuantidadeCompensacoes <= 0) return 1.00m;
 
-            return 100.00m - (faltasNaoCompensadas * 100.00m / QuantidadeAulas);
+            return 1.00m - (faltasNaoCompensadas / QuantidadeAulas);
         }
     }
 }
