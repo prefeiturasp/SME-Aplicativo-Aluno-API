@@ -20,6 +20,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public DateTime alterado_em { get; set; }
         public bool excluido { get; set; }
         public string componente_curricular { get; set; }
+        public long? tipo_calendario_id { get; set; }
     }
 
     public static class EventoSgpDtoExtensions
