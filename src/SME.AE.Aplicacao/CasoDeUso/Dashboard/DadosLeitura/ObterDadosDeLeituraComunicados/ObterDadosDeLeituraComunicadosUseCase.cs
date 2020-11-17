@@ -17,7 +17,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
         }
 
-        public Task<IEnumerable<DadosLeituraResultado>> Executar(string codigoDre, string codigoUe)
+        public Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(string codigoDre, string codigoUe)
         {
             throw new NotImplementedException();
         }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 {
-    public class ObterDadosLeituraComunicadosQueryHandler : IRequestHandler<ObterDadosLeituraComunicadosQuery, IEnumerable<DadosLeituraResultado>>
+    public class ObterDadosLeituraComunicadosQueryHandler : IRequestHandler<ObterDadosLeituraComunicadosQuery, IEnumerable<DadosLeituraComunicadosResultado>>
     {
         private readonly IDadosLeituraRepositorio dadosLeituraRepositorio;
 
@@ -16,7 +16,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new System.ArgumentNullException(nameof(dadosLeituraRepositorio));
         }
 
-        public async Task<IEnumerable<DadosLeituraResultado>> Handle(ObterDadosLeituraComunicadosQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Handle(ObterDadosLeituraComunicadosQuery request, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }

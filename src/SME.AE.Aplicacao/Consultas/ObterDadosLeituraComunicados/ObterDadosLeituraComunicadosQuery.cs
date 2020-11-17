@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 {
-    public class ObterDadosLeituraComunicadosQuery : IRequest<IEnumerable<DadosLeituraResultado>>
+    public class ObterDadosLeituraComunicadosQuery : IRequest<IEnumerable<DadosLeituraComunicadosResultado>>
     {
         public string CodigoDre { get; set; }
 

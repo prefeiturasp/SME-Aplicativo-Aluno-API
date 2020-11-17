@@ -6,7 +6,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard
 {
     public interface IObterDadosDeLeituraComunicadosUseCase
     {
-        Task<IEnumerable<DadosLeituraResultado>> Executar(string codigoDre, string codigoUe);
+        Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(string codigoDre, string codigoUe);
     }
 
     

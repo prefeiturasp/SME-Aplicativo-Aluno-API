@@ -1,14 +1,11 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
-using SME.AE.Infra.Persistencia.Consultas;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -22,15 +19,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<DadosLeituraResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe)
+        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe)
         {
             try
             {
-                var sql = @"select * from consolidacao_notificacao cn";
+                var sql = "";
+                if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
+                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo = '' and ue_codigo = ''  ";
+
+                if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
+                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo <> '' and ue_codigo = ''  ";
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosLeituraResultado>(sql);
+                var dadosLeituraComunicados = await conexao.QueryAsync<DadosLeituraComunicadosResultado>(sql);
                 conexao.Close();
 
                 return dadosLeituraComunicados;
@@ -43,9 +45,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         }
 
-        public Task<IEnumerable<DadosLeituraResultado>> ObterDadosLeituraComunicadosPorDre()
+        public Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicadosPorDre()
         {
             throw new NotImplementedException();
         }
-   }
+    }
 }
