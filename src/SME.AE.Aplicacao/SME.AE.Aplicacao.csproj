@@ -22,12 +22,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\ComponenteCurricularDoAluno.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoFaixa.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorBimestreAusencia.cs" />
+    <Compile Include="Comum\Modelos\Resposta\TurmaModalidadeDeEnsinoDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\AtualizacaiNotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\CpfResponsavelAlunoEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\EventoRespostaDto.cs" />
-    <Compile Include="Comum\Modelos\Resposta\FrequenciaAlunoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorBimestre.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoCor.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorComponenteCurricularResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\Grupo.cs" />
-    <Compile Include="Comum\Modelos\Resposta\NotaAlunoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotasDoAluno\NotaAlunoCor.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotasDoAluno\NotaAlunoComponenteCurricular.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotasDoAluno\NotaAlunoPorBimestreResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
