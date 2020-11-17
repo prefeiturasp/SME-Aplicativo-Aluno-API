@@ -5,7 +5,6 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -23,7 +22,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
             return ultimaAlteracao;
         }
-        public async Task Remover(EventoDto evento) 
+        public async Task Remover(EventoDto evento)
         {
             var sql = @"
                 delete from evento
@@ -40,9 +39,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var sql = @"
                 insert into evento
-	                (evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular)
+	                (evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular, tipo_calendario_id)
                 values
-	                (@evento_id, @nome, @descricao, @data_inicio, @data_fim, @dre_id, @ue_id, @tipo_evento, @turma_id, @ano_letivo, @modalidade, @ultima_alteracao_sgp, @componente_curricular)
+	                (@evento_id, @nome, @descricao, @data_inicio, @data_fim, @dre_id, @ue_id, @tipo_evento, @turma_id, @ano_letivo, @modalidade, @ultima_alteracao_sgp, @componente_curricular, @tipo_calendario_id)
                 on conflict 
 	                (evento_id) 
                 do update set 
@@ -57,7 +56,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                ano_letivo = excluded.ano_letivo, 
 	                modalidade = excluded.modalidade, 
 	                ultima_alteracao_sgp = excluded.ultima_alteracao_sgp,
-                    componente_curricular = excluded.componente_curricular
+                    componente_curricular = excluded.componente_curricular,
+                    tipo_calendario_id = excluded.tipo_calendario_id
             ";
             using var conn = CriaConexao();
             await conn.OpenAsync();
@@ -70,13 +70,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var dataInicio = new DateTime(mesAno.Year, mesAno.Month, 1);
             var dataFim = dataInicio.AddMonths(1).AddMilliseconds(-1);
-            var queryDre = string.IsNullOrWhiteSpace(dre_id)        ? "" : "and (dre_id isnull or dre_id = @dre_id)";
-            var queryUe = string.IsNullOrWhiteSpace(ue_id)          ? "" : "and (ue_id isnull or ue_id = @ue_id)";
-            var queryTurmna = string.IsNullOrWhiteSpace(turma_id)   ? "" : "and (turma_id isnull or turma_id = @turma_id)";
+            var queryDre = string.IsNullOrWhiteSpace(dre_id) ? "" : "and (dre_id isnull or dre_id = @dre_id)";
+            var queryUe = string.IsNullOrWhiteSpace(ue_id) ? "" : "and (ue_id isnull or ue_id = @ue_id)";
+            var queryTurmna = string.IsNullOrWhiteSpace(turma_id) ? "" : "and (turma_id isnull or turma_id = @turma_id)";
 
             var sql = @$"
-                Select
-	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular
+                Select distinct
+	                evento_id, nome, descricao, data_inicio, data_fim, dre_id, ue_id, tipo_evento, turma_id, ano_letivo, modalidade, ultima_alteracao_sgp, componente_curricular, tipo_calendario_id
                 from
 	                evento
                 where

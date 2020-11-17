@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using SME.AE.Aplicacao.Consultas.Frequencia;
 
-namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao
+namespace SME.AE.Aplicacao.Consultas.Frequencia
 {
     public class ObterFrequenciaAlunoQueryValidator : AbstractValidator<ObterFrequenciaAlunoQuery>
     {
