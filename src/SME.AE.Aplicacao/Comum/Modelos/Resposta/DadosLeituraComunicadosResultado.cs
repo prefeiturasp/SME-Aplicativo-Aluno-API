@@ -1,6 +1,6 @@
 ﻿namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
-    public class DadosLeituraResultado
+    public class DadosLeituraComunicadosResultado
     {
         public string NomeCompletoDre { get; set; }
         public string NomeCompletoUe { get; set; }
