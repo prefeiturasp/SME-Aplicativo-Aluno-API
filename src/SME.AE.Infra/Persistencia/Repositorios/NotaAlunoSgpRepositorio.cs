@@ -55,7 +55,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											sv.valor::varchar, sv.descricao,
 											''
 										) 					Nota,
-											trim(coalesce (
+										trim(coalesce (
 											fn.nota::varchar, cv.descricao,
 											sv.descricao, '	',
 											''
