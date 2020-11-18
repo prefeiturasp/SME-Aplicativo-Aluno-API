@@ -29,7 +29,7 @@ RUN apk update \
     && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
     && rm -Rf /src
 
-FROM mcr.microsoft.com/dotnet/core/runtime:3.0-alpine as final
+FROM mcr.microsoft.com/dotnet/core/runtime:3.0.0-alpine as final
 COPY --from=build /app /app
 WORKDIR /app
 
