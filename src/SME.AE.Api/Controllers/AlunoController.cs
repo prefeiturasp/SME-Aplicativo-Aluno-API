@@ -35,6 +35,7 @@ namespace SME.AE.Api.Controllers
         [AllowAnonymous]
         public async Task<ObjectResult> ObterNotasAluno([FromQuery] NotaAlunoDto notaAlunoDto,[FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
         {
+            //teste
             return Ok(await obterNotasAlunoUseCase.Executar(notaAlunoDto));
         }
     }
