@@ -117,6 +117,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							on 	con.anoletivo = fec.anoletivo
 							and con.codigoue  = fec.codigoue
 							and con.codigoturma = fec.codigoturma
+							and con.bimestre = fec.bimestre
 							and con.codigocomponentecurricular = fec.codigocomponentecurricular
 							and con.codigoaluno = fec.codigoaluno
 						) aaa
