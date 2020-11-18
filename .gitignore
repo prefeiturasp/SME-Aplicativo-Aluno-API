@@ -262,6 +262,7 @@ __pycache__/
 *.pyc
 
 # Variáveis de ambiente para docker-compose
+.env
 sme-api.env
 variaveis.json
 firebase.json
