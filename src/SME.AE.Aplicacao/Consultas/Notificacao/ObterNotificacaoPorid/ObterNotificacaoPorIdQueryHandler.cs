@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum.Utilitarios;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -22,27 +23,28 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
 
         public async Task<NotificacaoResposta> Handle(ObterNotificacaoPorIdQuery request, CancellationToken cancellationToken)
         {
-            var Notificacao = await _repository.ObterPorIdAsync(request.Id);
+            var notificacao = await _repository.ObterPorIdAsync(request.Id);
 
-            var turmas = await _repository.ObterTurmasPorNotificacao(Notificacao.Id);
+            var turmas = await _repository.ObterTurmasPorNotificacao(notificacao.Id);
 
             var notificacaoResposta = new NotificacaoResposta()
             {
-                AlteradoEm = Notificacao.AlteradoEm,
-                AlteradoPor = Notificacao.AlteradoPor,
-                CriadoEm = Notificacao.CriadoEm,
-                CriadoPor = Notificacao.CriadoPor,
-                Id = Notificacao.Id,
-                CodigoDre = Notificacao.CodigoDre,
-                CodigoUe = Notificacao.CodigoUe,
+                AlteradoEm = notificacao.AlteradoEm,
+                AlteradoPor = notificacao.AlteradoPor,
+                CriadoEm = notificacao.CriadoEm,
+                CriadoPor = notificacao.CriadoPor,
+                Id = notificacao.Id,
+                CodigoDre = notificacao.CodigoDre,
+                CodigoUe = notificacao.CodigoUe,
                 Turmas = turmas == default ? default : turmas,
-                DataEnvio = Notificacao.DataEnvio,
-                DataExpiracao = Notificacao.DataExpiracao,
-                Mensagem = Notificacao.Mensagem,
-                Titulo = Notificacao.Titulo,
-                TipoComunicado = Notificacao.TipoComunicado,
-                CategoriaNotificacao = Notificacao.CategoriaNotificacao,
-                GruposId = Notificacao.Grupo.Split(',')
+                DataEnvio = notificacao.DataEnvio,
+                DataExpiracao = notificacao.DataExpiracao,
+                Mensagem = notificacao.Mensagem,
+                Titulo = notificacao.Titulo,
+                TipoComunicado = notificacao.TipoComunicado,
+                CategoriaNotificacao = notificacao.CategoriaNotificacao,
+                GruposId = notificacao.Grupo.ToStringEnumerable().ToArray(),
+                SeriesResumidas = notificacao.SeriesResumidas
             };
 
             return notificacaoResposta;

@@ -3,7 +3,9 @@ using Dommel;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
@@ -137,14 +139,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             return retorno == null || !retorno.Any() ? default : retorno;  
         }
-        
-        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId)
+
+        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida)
         {
             using (var conexao = InstanciarConexao())
             {
-                var consulta = MontarQueryListagemCompleta();
+                var consulta = MontarQueryListagemCompleta(serieResumida);
 
-                var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId });
+                var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
 
                 conexao.Close();
 
@@ -152,29 +154,37 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<Notificacao> Atualizar(Notificacao notificacao)
+        public async Task<NotificacaoResposta> NotificacaoPorId(long Id)
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                var consulta = QueryPorId();
+                var retorno = await conexao.QueryFirstOrDefaultAsync<NotificacaoResposta>(consulta, new { Id });
+                conexao.Close();
+                return retorno;
+            }
+        }
+
+        public async Task Atualizar(AtualizarNotificacaoDto notificacao)
         {
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
-                    await conn.ExecuteAsync(
-                        @"UPDATE notificacao set mensagem=@Mensagem, titulo=@Titulo, grupo=@Grupo, 
-                                    dataEnvio=@DataEnvio, dataExpiracao=@DataExpiracao, criadoEm=@CriadoEm, 
-                                    criadoPor=@CriadoPor, alteradoEm=@AlteradoEm, alteradoPor=@AlteradoPor 
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                await conn.ExecuteAsync(
+                    @"UPDATE notificacao set mensagem=@Mensagem, 
+                                                 titulo=@Titulo, 
+                                                 dataExpiracao=@DataExpiracao, 
+                                                 alteradoEm=@AlteradoEm, 
+                                                 alteradoPor=@AlteradoPor 
                                WHERE id=@Id",
-                        notificacao);
-                    conn.Close();
-                }
+                    notificacao);
+                conn.Close();
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                return null;
             }
-
-            return notificacao;
         }
 
         public async Task<bool> Remover(Notificacao notificacao)
@@ -201,17 +211,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return resultado;
         }
 
-        private string MontarQueryListagemCompleta()
+        private string QueryPorId()
         {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n
+                    where n.id = @Id ";
+        }
+
+        private string MontarQueryListagemCompleta(string serieResumida)
+        {
+            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
+
             return $@"select {CamposConsultaNotificacao("notificacao", true)}
                       unl.mensagemvisualizada from(
                       {QueryComunicadosSME()}
                       union
                       {QueryComunicadosDRE()}
                       union
+                      {QueryComunicadosSME_ANO()}
+                      {whereSerieResumida}
+                      union
+                      {QueryComunicadosDRE_ANO()}
+                      {whereSerieResumida}
+                      union
                       {QueryComunicadosUE()}
                       union
                       {QueryComunicadosUEMOD()}
+                      {whereSerieResumida}
                       union
                       {QueryComunicadosTurmas()}
                       union
@@ -220,23 +246,42 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       left join usuario_notificacao_leitura unl on 
                       unl.notificacao_id = notificacao.id 
                       and unl.usuario_id = @usuarioId
-                      and unl.codigo_eol_aluno = @codigoAluno";
+                      and unl.codigo_eol_aluno = @codigoAluno
+                      where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
+                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao > current_date)";
         }
 
         private string QueryComunicadosSME()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
-                        where n.tipocomunicado = 1
+                        where n.tipocomunicado = {(int)TipoComunicado.SME}
                         and string_to_array(n.grupo,',') 
                         && string_to_array(@gruposId,',')";
+        }
+        private string QueryComunicadosSME_ANO()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                        from notificacao n 
+                        where n.tipocomunicado = {(int)TipoComunicado.SME_ANO}
+                        and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                ";
         }
 
         private string QueryComunicadosDRE()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
-                    where n.tipocomunicado = 2
+                    where n.tipocomunicado = {(int)TipoComunicado.DRE}
+                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                    and n.dre_codigoeol = @codigoDre";
+        }
+        private string QueryComunicadosDRE_ANO()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                    from notificacao n 
+                    where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO}
+                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
 
@@ -244,7 +289,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             return $@"select {CamposConsultaNotificacao("n")}
                       from notificacao n
-                      where n.tipocomunicado = 3
+                      where n.tipocomunicado = {(int)TipoComunicado.UE}
                       and n.ue_codigoeol = @codigoUe";
         }
 
@@ -252,7 +297,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n
-                    where n.tipocomunicado = 4
+                    where n.tipocomunicado = {(int)TipoComunicado.UEMOD}
                     and n.ue_codigoeol = @codigoUe 
                     and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')";
         }
@@ -262,7 +307,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n
                     inner join notificacao_turma nt on nt.notificacao_id = n.id
-                    where n.tipocomunicado = 5 
+                    where n.tipocomunicado = {(int)TipoComunicado.TURMA}
                     and nt.codigo_eol_turma = @codigoTurma";
         }
 
@@ -272,7 +317,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     from notificacao n
                     inner join notificacao_aluno na 
                     on na.notificacao_id = n.id
-                    where n.tipocomunicado = 6 
+                    where n.tipocomunicado = {(int)TipoComunicado.ALUNO}
                     and na.codigo_eol_aluno = @codigoAluno";
         }
 

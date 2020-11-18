@@ -12,16 +12,26 @@ ENV FirebaseProjectId=$FirebaseProjectId
 ENV ChaveIntegracao=$ChaveIntegracao
 ENV SentryDsn=$SentryDsn
 
+ENV TZ America/Sao_Paulo
+ENV LANG pt_BR.UTF-8
+ENV LANGUAGE pt_BR.UTF-8
+ENV LC_ALL pt_BR.UTF-8 
+
 ADD . /src
 WORKDIR /src 
-RUN dotnet restore \  
+
+RUN apk update \
+    && apk add tzdata \ 
+    && cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime \
+    && echo "America/Sao_Paulo" > /etc/timezone \ 
+    && dotnet restore \
     && dotnet publish -c Release \   
     && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
-    && cp -R /src/src/SME.AE.Api/wwwroot /app/wwwroot \ 
     && rm -Rf /src
 
 FROM mcr.microsoft.com/dotnet/core/runtime:3.0-alpine as final
 COPY --from=build /app /app
+WORKDIR /app
 
 EXPOSE 5000-5001
 CMD [ "dotnet", "/app/SME.AE.Api.dll"]

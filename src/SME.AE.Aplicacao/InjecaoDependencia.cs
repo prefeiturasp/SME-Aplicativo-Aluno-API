@@ -4,14 +4,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
+using SME.AE.Aplicacao.CasoDeUso.Frequencia;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
 using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.UltimaAtualizacaoWorker;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Aplicacao.Servicos;
 using System;
@@ -74,6 +78,25 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped(typeof(ISolicitarRedifinicaoSenhaUseCase), typeof(SolicitarRedifinicaoSenhaUseCase));
             services.TryAddScoped(typeof(IValidarTokenUseCase), typeof(ValidarTokenUseCase));
             services.TryAddScoped<IRedefinirSenhaUseCase, RedefinirSenhaUseCase>();
+            services.TryAddScoped<IMensagensUsuarioLogadoAlunoUseCase, MensagensUsuarioLogadoAlunoUseCase>();
+            services.TryAddScoped<IMensagenUsuarioLogadoAlunoIdUseCase, MensagenUsuarioLogadoAlunoIdUseCase>();
+            services.TryAddScoped<IMarcarExcluidaMensagenUsuarioAlunoIdUseCase, MarcarExcluidaMensagenUsuarioAlunoIdUseCase>();
+            services.TryAddScoped<ISolicitarReiniciarSenhaUseCase, SolicitarReiniciarSenhaUseCase>();
+            services.TryAddScoped<IObterUsuarioUseCase, ObterUsuarioUseCase>();
+            services.TryAddScoped<IObterTermosDeUsoUseCase, ObterTermosDeUsoUseCase>();
+            services.TryAddScoped<IObterTermosDeUsoPorCpfUseCase, ObterTermosDeUsoPorCpfUseCase>();
+            services.TryAddScoped<IRegistrarAceiteDosTermosDeUsoUseCase, RegistrarAceiteDosTermosDeUsoUseCase>();
+            services.TryAddScoped<IObterEventosAlunoPorMesUseCase, ObterEventosAlunoPorMesUseCase>();
+            services.TryAddScoped<IObterTotalUsuariosComAcessoIncompletoUseCase, ObterTotalUsuariosComAcessoIncompletoUseCase>();
+            services.TryAddScoped<IObterTotalUsuariosValidosUseCase, ObterTotalUsuariosValidosUseCase>();
+            services.TryAddScoped<IObterTotaisAdesaoUseCase, ObterTotaisAdesaoUseCase>();
+            services.TryAddScoped<IObterTotaisAdesaoAgrupadosPorDreUseCase, ObterTotaisAdesaoAgrupadosPorDreUseCase>();
+            services.TryAddScoped<IObterUltimaAtualizacaoPorProcessoUseCase, ObterUltimaAtualizacaoPorProcessoUseCase>();
+            services.AddTransient<IObterFrequenciaAlunoPorComponenteCurricularUseCase, ObterFrequenciaAlunoPorComponenteCurricularUseCase>();
+            services.AddTransient<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
+            services.AddTransient<IObterNotasAlunoUseCase, ObterNotasAlunoUseCase>();
+            services.AddTransient<IValidarUsuarioEhResponsavelDeAlunoUseCase, ValidarUsuarioEhResponsavelDeAlunoUseCase>();
+
         }
     }
 }

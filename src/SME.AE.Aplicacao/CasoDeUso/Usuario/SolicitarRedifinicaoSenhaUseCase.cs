@@ -9,12 +9,9 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
-using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum.Excecoes;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -32,37 +29,62 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
         {
-            var usuario = await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
 
-            if (usuario == null)
-                throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
+            var usuario = await ObterUsuario(gerarTokenDto);
 
-            if (string.IsNullOrWhiteSpace(usuario.Email))
-                throw new NegocioException("Usuário não possui e-mail cadastrado");
-
-            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
-
-            if(usuarioCoreSSO == null)
-                throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
-
-            usuarioCoreSSO.Cpf = usuario.Cpf;
+            var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
 
             await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 
-            usuario.InicarRedefinicaoSenha();
+            usuario.IniciarRedefinicaoSenha();
 
-            //await EnvioEmail(usuario);
+            if (string.IsNullOrEmpty(usuario.Email))
+                throw new NegocioException("Usuário não possui e-mail cadastrado");
+
+            await EnvioEmail(usuario);
 
             await mediator.Send(new SalvarUsuarioCommand(usuario));
 
             return RespostaApi.Sucesso(usuario.Email);
         }
 
+        private async Task<Dominio.Entidades.Usuario> ObterUsuario(GerarTokenDto gerarTokenDto)
+        {
+            try
+            {
+                var usuario = await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
+
+                //if (usuario == null)
+                //    throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
+
+                return usuario;
+
+                return await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
+
+            }
+            catch (Exception)
+            {
+                throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");                
+            }
+        }
+
+        private async Task<RetornoUsuarioCoreSSO> ObterUsuarioCoreSSO(GerarTokenDto gerarTokenDto)
+        {
+            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(gerarTokenDto.CPF));
+
+            if (usuarioCoreSSO == null)
+                throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
+
+            usuarioCoreSSO.Cpf = gerarTokenDto.CPF;
+
+            return usuarioCoreSSO;
+        }
+
         private async Task EnvioEmail(Dominio.Entidades.Usuario usuario)
         {
             try
             {
-                string caminho = $"/app/wwwroot/ModelosEmail/RecuperacaoSenha.html";
+                string caminho = $"{Directory.GetCurrentDirectory()}/wwwroot/ModelosEmail/RecuperacaoSenha.html";
                 var textoArquivo = await File.ReadAllTextAsync(caminho);
                 var urlFrontEnd = VariaveisAmbiente.UrlArquivosEstaticos;
                 var textoEmail = textoArquivo
@@ -71,7 +93,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     .Replace("#URL_BASE#", urlFrontEnd)
                     .Replace("#VALIDADE", usuario.ValidadeToken?.ToString("dd/MM/yyyy HH:mm"));
 
-                emailServico.Enviar(usuario.Nome, usuario.Email, "Redefinição de Senha Escola Aqui", textoEmail);
+                await emailServico.Enviar(usuario.Nome, usuario.Email, "Redefinição de Senha Escola Aqui", textoEmail);
             }
             catch (Exception ex)
             {

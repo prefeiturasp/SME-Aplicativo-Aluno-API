@@ -75,7 +75,8 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                                     CodigoTurma = a.CodigoTurma,
                                     Turma = a.Turma,
                                     SituacaoMatricula = a.SituacaoMatricula,
-                                    DataSituacaoMatricula = a.DataSituacaoMatricula
+                                    DataSituacaoMatricula = a.DataSituacaoMatricula,
+                                    SerieResumida = a.SerieResumida
                                 })
                     });
 

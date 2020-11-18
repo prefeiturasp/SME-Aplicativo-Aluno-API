@@ -1,11 +1,11 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.AlterarEmailCelular;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
@@ -16,7 +16,11 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
         {
             await mediator.Send(new AlterarEmailCelularCommand(alterarEmailCelularDto));
 
-            return RespostaApi.Sucesso();
+            var usuario = await mediator.Send(new ObterUsuarioQuery() { Id = alterarEmailCelularDto.Id });
+
+            var token = await mediator.Send(new CriarTokenCommand(usuario.Cpf));
+
+            return RespostaApi.Sucesso(new RetornoToken(token));
         }
     }
 }

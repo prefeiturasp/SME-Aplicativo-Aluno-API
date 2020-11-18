@@ -1,8 +1,5 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
@@ -29,5 +26,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public int CodigoEtapaEnsino { get; set; }
         public string Grupo { get; set; }
         public long CodigoGrupo { get; internal set; }
+        public string SerieResumida { get; set; }
+        public int CodigoModalidadeTurma { get; set; }
     }
 }

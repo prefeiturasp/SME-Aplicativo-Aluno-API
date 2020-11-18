@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
@@ -13,7 +14,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 
         public Task Criar(Notificacao notificacao);
 
-        public Task<Notificacao> Atualizar(Notificacao notificacao);
+        public Task Atualizar(AtualizarNotificacaoDto notificacao);
 
         public Task<bool> Remover(Notificacao notificacao);
 
@@ -26,7 +27,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         public Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno);
 
         public Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma);
-
-        Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId);
+        Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida);
+        Task<NotificacaoResposta> NotificacaoPorId(long Id);
     }
 }

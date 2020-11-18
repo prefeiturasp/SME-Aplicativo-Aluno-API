@@ -14,8 +14,6 @@ using SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao;
 using SME.AE.Aplicacao.Consultas.VerificarSenha;
 using SME.AE.Comum.Excecoes;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario

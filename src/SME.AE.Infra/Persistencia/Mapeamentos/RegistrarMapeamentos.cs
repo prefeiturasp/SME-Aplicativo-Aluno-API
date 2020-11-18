@@ -10,6 +10,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         {
             FluentMapper.Initialize(config =>
             {
+                config.AddMap(new AdesaoMap());
                 config.AddMap(new UsuarioMap());
                 config.AddMap(new NotificacaoMap());
                 config.AddMap(new UsuarioNotificacaoMap());
@@ -18,6 +19,8 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
                 config.AddMap(new NotificacaoAlunoMap());
                 config.AddMap(new NotificacaoTurmaMap());
                 config.AddMap(new ConfiguracaoEmailMap());
+                config.AddMap(new TermosDeUsoMap());
+                config.AddMap(new AceiteTermosDeUsoMap());
                 config.ForDommel();
             });
         }
