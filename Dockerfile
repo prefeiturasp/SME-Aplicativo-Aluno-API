@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic
+﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine as build
 
 ARG SME_AE_ENVIRONMENT=dev
 
@@ -11,19 +11,17 @@ ENV FirebaseToken=$FirebaseToken
 ENV FirebaseProjectId=$FirebaseProjectId
 ENV ChaveIntegracao=$ChaveIntegracao
 ENV SentryDsn=$SentryDsn
-ENV TZ=America/Sao_Paulo
-ENV DEBIAN_FRONTEND=noninteractive
 
 ADD . /src
 WORKDIR /src 
-RUN apt-get update \
-    && apt-get install -yq tzdata \
-    && dpkg-reconfigure --frontend noninteractive tzdata \ 
-    && dotnet restore \  
+RUN dotnet restore \  
     && dotnet publish -c Release \   
     && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
     && cp -R /src/src/SME.AE.Api/wwwroot /app/wwwroot \ 
     && rm -Rf /src
+
+FROM mcr.microsoft.com/dotnet/core/runtime:3.0-alpine as final
+COPY --from=build /app /app
 
 EXPOSE 5000-5001
 CMD [ "dotnet", "/app/SME.AE.Api.dll"]
