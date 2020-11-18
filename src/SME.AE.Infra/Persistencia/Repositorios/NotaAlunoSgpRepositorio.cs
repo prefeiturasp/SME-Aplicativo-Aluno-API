@@ -23,8 +23,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var notaAlunosSgp = await conexao
                     .QueryAsync<NotaAlunoSgpDto>(
-						@"
-						select * from(
+						@"select * from(
 							select distinct 
 								coalesce(con.AnoLetivo, fec.AnoLetivo) AnoLetivo,
 								coalesce(con.CodigoUe, fec.CodigoUe) CodigoUe,
@@ -34,6 +33,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								coalesce(con.CodigoComponenteCurricular, fec.CodigoComponenteCurricular) CodigoComponenteCurricular,
 								coalesce(con.ComponenteCurricular, fec.ComponenteCurricular) ComponenteCurricular,
 								coalesce(con.Nota, fec.Nota) Nota,
+								coalesce(con.NotaDescricao, fec.NotaDescricao) NotaDescricao,
 								coalesce(con.RecomendacoesAluno, fec.RecomendacoesAluno, '') RecomendacoesAluno,
 								coalesce(con.RecomendacoesFamilia, fec.RecomendacoesFamilia, '') RecomendacoesFamilia,
 								coalesce(con.cca_id, fec.cca_id, 0) cca_id
@@ -49,14 +49,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											0)				Bimestre,
 										fa.aluno_codigo 	CodigoAluno,
 										cc.id 				CodigoComponenteCurricular,
-										coalesce(
-											cc.descricao_sgp, 
-											cc.descricao) 	ComponenteCurricular,
+										coalesce(cc.descricao_sgp, cc.descricao) 	ComponenteCurricular,										
 										coalesce (
 											fn.nota::varchar, cv.valor,
-											sv.valor,
+											sv.valor::varchar, sv.descricao,
 											''
 										) 					Nota,
+										coalesce (
+											fn.nota::varchar, ltrim(cv.descricao, '	'),
+											ltrim(sv.descricao, '	'),
+											''
+										) 					NotaDescricao,																	
 										cca.recomendacoes_aluno RecomendacoesAluno,
 										cca.recomendacoes_familia RecomendacoesFamilia,
 										cca.id cca_id
@@ -98,6 +101,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											ccn.nota::varchar, cv.valor,
 											''
 										) 					Nota,
+										coalesce (
+											ccn.nota::varchar, ltrim(cv.descricao, '	'),
+											''
+										) 					NotaDescricao,							
 										cca.recomendacoes_aluno RecomendacoesAluno,
 										cca.recomendacoes_familia RecomendacoesFamilia,
 										cca.id cca_id
@@ -122,8 +129,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							and con.codigoaluno = fec.codigoaluno
 						) aaa
 						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
-						order by cca_id
-                        ", new { desdeAnoLetivo });
+						order by cca_id ", new { desdeAnoLetivo });
                 conexao.Close();
 
                 return notaAlunosSgp;
