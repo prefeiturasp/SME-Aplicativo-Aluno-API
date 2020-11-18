@@ -1,5 +1,6 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Comum.Excecoes;
+using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,13 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string AlteradoRF { get; set; }
         public string CriadoRF { get; set; }
         public DateTime DataEnvio { get; set; }
-        public DateTime? DataExpiracao { get; set; }
+        public DateTime DataExpiracao { get; set; }
         public string Grupo { get; set; }
         public IEnumerable<string> Alunos { get; set; }
         public string Mensagem { get; set; }
         public string Titulo { get; set; }
         public int AnoLetivo { get; set; }
+        public string SeriesResumidas { get; set; }
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
         public IEnumerable<string> Turmas { get; set; }
@@ -29,12 +31,16 @@ namespace SME.AE.Aplicacao.Comum.Modelos
             switch (TipoComunicado)
             {
                 case TipoComunicado.SME:
+                case TipoComunicado.SME_ANO:
                     CategoriaNotificacao = "SME";
                     break;
                 case TipoComunicado.DRE:
+                case TipoComunicado.DRE_ANO:
+                    CategoriaNotificacao = "UE";
+                    break;
                 case TipoComunicado.UE:
                 case TipoComunicado.UEMOD:
-                    CategoriaNotificacao = "UE";
+                    CategoriaNotificacao = SeriesResumidas.ToStringEnumerable().Any() ? "TURMA" : "UE";
                     break;
                 case TipoComunicado.TURMA:
                 case TipoComunicado.ALUNO:
@@ -45,9 +51,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
             }
         }
 
-        public List<int> ObterGrupoLista()
-        {
-            return Grupo?.Split(',').Select(i => Int32.Parse(i)).ToList() ?? null;
-        }
+        public List<int> ObterGrupoLista() => Grupo.ToIntEnumerable().ToList();
+        public IEnumerable<string> ObterSeriesResumidas() => SeriesResumidas.ToStringEnumerable();
     }
 }

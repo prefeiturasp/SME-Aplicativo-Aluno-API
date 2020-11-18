@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
@@ -15,9 +14,9 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromQuery] string cpf, [FromQuery] string senha, [FromQuery] string dispositivoId,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
+        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromBody] AutenticacaoDTO autenticacao,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
         {
-            return Ok(await autenticarUsuarioUseCase.Executar(cpf, senha, dispositivoId));
+            return Ok(await autenticarUsuarioUseCase.Executar(autenticacao.Cpf, autenticacao.Senha, autenticacao.DispositivoId));
         }
 
         [HttpPost("Logout")]
@@ -64,6 +63,20 @@ namespace SME.AE.Api.Controllers
         public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody]RedefinirSenhaDto redefinirSenhaDto,[FromServices]IRedefinirSenhaUseCase redefinirSenhaUseCase)
         {
             return await redefinirSenhaUseCase.Executar(redefinirSenhaDto);
+        }
+
+        [HttpPut("Senha/ReiniciarSenha")]
+        [AllowAnonymous]
+        public async Task<ActionResult<RespostaApi>> ReiniciarSenha([FromBody] SolicitarReiniciarSenhaDto solicitarReiniciarSenhaDto, [FromServices] ISolicitarReiniciarSenhaUseCase solicitarReiniciarSenhaUseCase)
+        {
+            return await solicitarReiniciarSenhaUseCase.Executar(solicitarReiniciarSenhaDto);
+        }
+
+        [HttpGet("usuario/responsavel")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterSituacaoUsuario([FromQuery] string cpf, [FromServices] IValidarUsuarioEhResponsavelDeAlunoUseCase validarUsuarioEhResponsavelDeAlunoUseCase)
+        {
+            return Ok(await validarUsuarioEhResponsavelDeAlunoUseCase.Executar(cpf));
         }
     }
 }

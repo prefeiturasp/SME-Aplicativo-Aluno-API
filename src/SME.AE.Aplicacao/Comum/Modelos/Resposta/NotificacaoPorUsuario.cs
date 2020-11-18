@@ -21,5 +21,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario
         public bool MensagemVisualizada { get; set; }
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
+        public string SeriesResumidas { get; set; }
     }
 }
