@@ -55,11 +55,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											sv.valor::varchar, sv.descricao,
 											''
 										) 					Nota,
-										coalesce (
-											fn.nota::varchar, ltrim(cv.descricao, '	'),
-											ltrim(sv.descricao, '	'),
+											trim(coalesce (
+											fn.nota::varchar, cv.descricao,
+											sv.descricao, '	',
 											''
-										) 					NotaDescricao,																	
+										), '	') 					NotaDescricao,																
 										cca.recomendacoes_aluno RecomendacoesAluno,
 										cca.recomendacoes_familia RecomendacoesFamilia,
 										cca.id cca_id
@@ -101,10 +101,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 											ccn.nota::varchar, cv.valor,
 											''
 										) 					Nota,
-										coalesce (
-											ccn.nota::varchar, ltrim(cv.descricao, '	'),
+										trim(coalesce(
+											ccn.nota::varchar, cv.descricao,
 											''
-										) 					NotaDescricao,							
+										), '	') 					NotaDescricao,									
 										cca.recomendacoes_aluno RecomendacoesAluno,
 										cca.recomendacoes_familia RecomendacoesFamilia,
 										cca.id cca_id
