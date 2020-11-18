@@ -197,10 +197,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
-                var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(notasAluno))
-                    return JsonConvert.DeserializeObject<NotaAlunoPorBimestreResposta>(notasAluno);
+                //var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
+                //var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
+                //if (!string.IsNullOrWhiteSpace(notasAluno))
+                //    return JsonConvert.DeserializeObject<NotaAlunoPorBimestreResposta>(notasAluno);
 
                 using var conexao = CriaConexao();
                 conexao.Open();
@@ -233,7 +233,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     parametros, splitOn: "splitOn");
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
+                //await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
                 return dadosNotasAluno;
             }
             catch (Exception ex)
