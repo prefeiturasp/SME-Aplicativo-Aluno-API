@@ -1,11 +1,11 @@
 ﻿using Dapper;
 using Newtonsoft.Json;
-using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.UnidadeEscolar;
 using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -13,7 +13,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class UnidadeEscolarRepositorio : IUnidadeEscolarRepositorio
     {
         private readonly ICacheRepositorio cacheRepositorio;
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoEol);
+        private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
 
         public UnidadeEscolarRepositorio(ICacheRepositorio cacheRepositorio)
         {
@@ -39,8 +39,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                            distinct
 	                            concat(ue.cd_unidade_educacao,'-', ue.nm_exibicao_unidade) nomeCompletoUe, 
 	                            tp.dc_tp_logradouro tipoLogradouro,
-	                            ue.nm_logradouro logradouro, 
-	                            ue.cd_nr_endereco numero, 
+	                            trim(ue.nm_logradouro logradouro), 
+	                            ue.cd_nr_endereco numero, para
 	                            ue.nm_bairro bairro, 
 	                            ue.cd_cep cep, 
 	                            mun.nm_municipio municipio,
