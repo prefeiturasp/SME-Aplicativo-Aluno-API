@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
+﻿namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
 {
     public class RegistrarAceiteDosTermosDeUsoDto
     {

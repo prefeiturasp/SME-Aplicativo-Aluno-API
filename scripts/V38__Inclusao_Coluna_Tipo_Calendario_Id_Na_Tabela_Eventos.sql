@@ -1,0 +1,1 @@
+ALTER TABLE if exists public.evento ADD if not exists tipo_calendario_id int8 NULL;

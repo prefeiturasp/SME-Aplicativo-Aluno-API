@@ -1,5 +1,4 @@
 ﻿using Microsoft.Practices.ObjectBuilder2;
-using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
@@ -50,7 +49,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                    ))
                 .ToArray();
 
-            await Task.Run(() => 
+            await Task.Run(() =>
                 notaAlunoSobrando
                     .ForEach(async notaExcluir => await notaAlunoRepositorio.ExcluirNotaAluno(notaExcluir))
             );
