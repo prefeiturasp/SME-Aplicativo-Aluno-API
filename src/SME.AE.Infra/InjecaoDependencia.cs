@@ -13,6 +13,7 @@ using SME.AE.Infra.Persistencia.Cache;
 using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Infra.Persistencia.Repositorios.Externos;
 using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
+using System.Runtime.CompilerServices;
 
 namespace SME.AE.Infra
 {
@@ -48,7 +49,8 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.AddTransient(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
             services.AddTransient(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
-
+            services.AddTransient(typeof(ITurmaRepositorio), typeof(TurmaRepositorio));
+            services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();

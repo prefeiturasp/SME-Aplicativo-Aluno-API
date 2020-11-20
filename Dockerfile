@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.0-bionic
+﻿FROM mcr.microsoft.com/dotnet/sdk:3.1-alpine as build
 
 ARG SME_AE_ENVIRONMENT=dev
 
@@ -11,25 +11,29 @@ ENV FirebaseToken=$FirebaseToken
 ENV FirebaseProjectId=$FirebaseProjectId
 ENV ChaveIntegracao=$ChaveIntegracao
 ENV SentryDsn=$SentryDsn
-ENV TZ=America/Sao_Paulo
-ENV DEBIAN_FRONTEND=noninteractive
 
-# Set the locale
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8   
+ENV TZ America/Sao_Paulo
+ENV LANG pt_BR.UTF-8
+ENV LANGUAGE pt_BR.UTF-8
+ENV LC_ALL pt_BR.UTF-8 
 
 ADD . /src
 WORKDIR /src 
-RUN apt-get update -y \
-    && apt-get install -yq tzdata locales -y \
-    && dpkg-reconfigure --frontend noninteractive tzdata \ 
-	&& locale-gen en_US.UTF-8 \
-    && dotnet restore \  
+
+RUN apk update \
+    && apk add tzdata \ 
+    && cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime \
+    && echo "America/Sao_Paulo" > /etc/timezone \ 
+    && dotnet restore \
+    && dotnet build \ 
     && dotnet publish -c Release \   
-    && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.0/publish /app \ 
+    && ls -la  /src/src/SME.AE.Api/bin/Release/ \ 
+    && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.1/publish /app \ 
     && rm -Rf /src
 
-WORKDIR /app 
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-alpine as final
+COPY --from=build /app /app
+WORKDIR /app
+
 EXPOSE 5000-5001
-CMD [ "dotnet", "/app/SME.AE.Api.dll"]
+CMD ["/app/SME.AE.Api"]
