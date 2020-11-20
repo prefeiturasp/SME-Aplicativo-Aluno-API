@@ -25,5 +25,11 @@ namespace SME.AE.Comum.Utilitarios
                 if (Int32.TryParse(stringId, out var numero))
                     yield return numero;
         }
+        public static IEnumerable<int> ToShortEnumerable(this string stringLista)
+        {
+            foreach (var stringId in stringLista.ToStringEnumerable())
+                if (Int16.TryParse(stringId, out var numero))
+                    yield return numero;
+        }
     }
 }

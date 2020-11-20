@@ -18,6 +18,7 @@ namespace SME.AE.Worker.Service
                 .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
                 .AddTransient<TransferirFrequenciaSgpCasoDeUso>()
                 .AddTransient<TransferirNotaSgpCasoDeUso>()
+                .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 ;
         }
         #endregion
@@ -26,10 +27,11 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddSingleton<IHostedService, TransferirEventoSgpWorker>()
-                .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
-                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
+                //.AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
+                //.AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                //.AddSingleton<IHostedService, TransferirNotaSgpWorker>()
+                .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
                 ;
         }
         #endregion
@@ -56,6 +58,10 @@ namespace SME.AE.Worker.Service
 
                 .AddTransient<INotaAlunoRepositorio, NotaAlunoRepositorio>()
                 .AddTransient<INotaAlunoSgpRepositorio, NotaAlunoSgpRepositorio>()
+
+                .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
+                .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
+
             ;
         }
         #endregion
