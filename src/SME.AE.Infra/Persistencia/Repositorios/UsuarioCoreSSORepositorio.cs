@@ -207,6 +207,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureMessage(ex.Message, Sentry.Protocol.SentryLevel.Error);
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
