@@ -34,41 +34,48 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             var usuariosAlunos = await ObterUsuariosAlunos();
             var comunicadosAtivos = await ObterComunicadosAtivos();
-            var consolidacaoNotificacoes = ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos);
-            await consolidarLeituraNotificacaoRepositorio.SalvarConsolidacaoNotificacoesEmBatch(consolidacaoNotificacoes);
+            var usuariosAlunosNotificacoesApp = await ObterUsuariosAlunosNotificacoesApp();
+
+            await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos, usuariosAlunosNotificacoesApp);
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarLeituraNotificacao");
         }
 
-        private IEnumerable<ConsolidacaoNotificacaoDto> ConsolidarComunicadosUsuariosAlunos(IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, IEnumerable<ComunicadoSgpDto> comunicadosAtivos)
+        private async Task<IEnumerable<UsuarioAlunoNotificacaoApp>> ObterUsuariosAlunosNotificacoesApp()
         {
-            var consolidado = comunicadosAtivos
-                .SelectMany(comunicado => ConsolidarComunicado(comunicado, usuariosAlunos))
+            var usuariosAlunosNotificacoesApp = 
+                (await consolidarLeituraNotificacaoRepositorio.ObterUsuariosAlunosNotificacoesApp())
                 .ToArray();
-            return consolidado;
+            return usuariosAlunosNotificacoesApp;
         }
 
-        private IEnumerable<ConsolidacaoNotificacaoDto> ConsolidarComunicado(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos)
+        private async Task ConsolidarComunicadosUsuariosAlunos(IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, IEnumerable<ComunicadoSgpDto> comunicadosAtivos, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
         {
-            var alunosComunicado = 
+            comunicadosAtivos
+                .AsParallel()
+                .ForAll(comunicado => {
+                    var consolidacaoNotificacoes = ConsolidarComunicado(comunicado, usuariosAlunos, usuariosAlunosNotificacoesApp);
+                    consolidarLeituraNotificacaoRepositorio.SalvarConsolidacaoNotificacoesEmBatch(consolidacaoNotificacoes).Wait();
+                });
+            await Task.CompletedTask;
+        }
+
+        private IEnumerable<ConsolidacaoNotificacaoDto> ConsolidarComunicado(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        {
+            var alunosComunicado =
                 ObterAlunosDoComunicado(comunicado, usuariosAlunos)
                 .Distinct()
-                .ToArray();
+                .ToArray()
+                ;
 
             var smeConsolidado = new ConsolidacaoNotificacaoDto[] { new ConsolidacaoNotificacaoDto {
                 NotificacaoId = comunicado.Id,
                 AnoLetivo = comunicado.AnoLetivo,
                 DreCodigo = "",
                 UeCodigo = "",
-                QuantidadeAlunos =
-                    alunosComunicado
-                        .Select(aluno => aluno.CodigoAluno)
-                        .Distinct()
-                        .Count(),
-                QuantidadeResponsaveis =
-                    alunosComunicado
-                        .Select(aluno => aluno.CpfResponsavel)
-                        .Distinct()
-                        .Count()
+                QuantidadeAlunosSemApp = ObterAlunosSemApp(alunosComunicado, usuariosAlunosNotificacoesApp),
+                QuantidadeResponsaveisSemApp = ObterResponsaveisSemApp(alunosComunicado, usuariosAlunosNotificacoesApp),
+                QuantidadeAlunosSemLer = ObterAlunosSemLer(comunicado, alunosComunicado, usuariosAlunosNotificacoesApp),
+                QuantidadeResponsaveisSemLer = ObterResponsaveisSemLer(comunicado, alunosComunicado, usuariosAlunosNotificacoesApp),
             } };
 
             var dreConsolidado =
@@ -81,16 +88,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
                                     AnoLetivo = comunicado.AnoLetivo,
                                     DreCodigo = alunosDre.First().CodigoDre,
                                     UeCodigo = "",
-                                    QuantidadeAlunos =
-                                        alunosDre
-                                            .Select(aluno => aluno.CodigoAluno)
-                                            .Distinct()
-                                            .Count(),
-                                    QuantidadeResponsaveis =
-                                        alunosDre
-                                            .Select(aluno => aluno.CpfResponsavel)
-                                            .Distinct()
-                                            .Count(),
+                                    QuantidadeAlunosSemApp = ObterAlunosSemApp(alunosDre, usuariosAlunosNotificacoesApp),
+                                    QuantidadeResponsaveisSemApp = ObterResponsaveisSemApp(alunosDre, usuariosAlunosNotificacoesApp),
+                                    QuantidadeAlunosSemLer = ObterAlunosSemLer(comunicado, alunosDre, usuariosAlunosNotificacoesApp),
+                                    QuantidadeResponsaveisSemLer = ObterResponsaveisSemLer(comunicado, alunosDre, usuariosAlunosNotificacoesApp),
                                 }
                             ).ToArray();
 
@@ -105,18 +106,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
                                     AnoLetivo = comunicado.AnoLetivo,
                                     DreCodigo = alunosUe.First().CodigoDre,
                                     UeCodigo = alunosUe.First().CodigoUe,
-                                    QuantidadeAlunos =
-                                        alunosUe
-                                            .Select(aluno => aluno.CodigoAluno)
-                                            .Distinct()
-                                            .Count(),
-                                    QuantidadeResponsaveis =
-                                        alunosUe
-                                            .Select(aluno => aluno.CpfResponsavel)
-                                            .Distinct()
-                                            .Count(),
+                                    QuantidadeAlunosSemApp = ObterAlunosSemApp(alunosUe, usuariosAlunosNotificacoesApp),
+                                    QuantidadeResponsaveisSemApp = ObterResponsaveisSemApp(alunosUe, usuariosAlunosNotificacoesApp),
+                                    QuantidadeAlunosSemLer = ObterAlunosSemLer(comunicado, alunosUe, usuariosAlunosNotificacoesApp),
+                                    QuantidadeResponsaveisSemLer = ObterResponsaveisSemLer(comunicado, alunosUe, usuariosAlunosNotificacoesApp),
                                 }
                             ).ToArray();
+
             var tudoConsolidado =
                 smeConsolidado
                 .Union(dreConsolidado)
@@ -126,9 +122,108 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return tudoConsolidado;
         }
 
+        private long ObterResponsaveisSemLer(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        {
+            var valido = alunosComunicado
+                .AsParallel()
+                .Where(aluno =>
+                    usuariosAlunosNotificacoesApp
+                    .Any(uan => uan.CpfResponsavel == aluno.CpfResponsavel)
+                )
+                .Select(aluno => aluno.CpfResponsavel)
+                .Distinct()
+                .Count();
+
+            var leu = usuariosAlunosNotificacoesApp
+                .AsParallel()
+                .Where(uan=>
+                    uan.AnoLetivo == comunicado.AnoLetivo
+                &&  uan.NotificacaoId == comunicado.Id
+                &&  uan.CodigoAluno == comunicado.AlunoCodigo
+                )
+                .Select(aluno => aluno.CpfResponsavel)
+                .Distinct()
+                .Count();
+
+            var qtd = valido - leu;
+            return qtd;
+        }
+
+        private long ObterAlunosSemLer(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        {
+            var valido = alunosComunicado
+                .AsParallel()
+                .Where(aluno =>
+                    usuariosAlunosNotificacoesApp
+                    .Any(uan => uan.CpfResponsavel == aluno.CpfResponsavel)
+                )
+                .Select(aluno => aluno.CodigoAluno)
+                .Distinct()
+                .Count();
+
+            var leu = usuariosAlunosNotificacoesApp
+                .AsParallel()
+                .Where(uan =>
+                    uan.AnoLetivo == comunicado.AnoLetivo
+                 && uan.NotificacaoId == comunicado.Id
+                 && uan.CodigoAluno == comunicado.AlunoCodigo
+                )
+                .Select(aluno => aluno.CodigoAluno)
+                .Distinct()
+                .Count();
+
+            var qtd = valido - leu;
+            return qtd;
+        }
+
+        private long ObterResponsaveisSemApp(IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        {
+            var valido = alunosComunicado
+                .AsParallel()
+                .Where(aluno =>
+                    usuariosAlunosNotificacoesApp
+                    .Any(uan => uan.CpfResponsavel == aluno.CpfResponsavel)
+                )
+                .Select(aluno => aluno.CpfResponsavel)
+                .Distinct()
+                .Count();
+
+            var total = alunosComunicado
+                .AsParallel()
+                .Select(aluno => aluno.CpfResponsavel)
+                .Distinct()
+                .Count();
+
+            var qtd = total - valido;
+            return qtd;
+        }
+
+        private long ObterAlunosSemApp(IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        {
+            var valido = alunosComunicado
+                .AsParallel()
+                .Where(aluno =>
+                    usuariosAlunosNotificacoesApp
+                    .Any(uan => uan.CpfResponsavel == aluno.CpfResponsavel)
+                )
+                .Select(aluno => aluno.CodigoAluno)
+                .Distinct()
+                .Count();
+
+            var total = alunosComunicado
+                .AsParallel()
+                .Select(aluno => aluno.CodigoAluno)
+                .Distinct()
+                .Count();
+
+            var qtd = total - valido;
+            return qtd;
+        }
+
         private IEnumerable<ResponsavelAlunoEOLDto> ObterAlunosDoComunicado(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos)
         {
             var alunosComunicado = usuariosAlunos;
+
             if (!string.IsNullOrWhiteSpace(comunicado.CodigoDre))
                 alunosComunicado = alunosComunicado.Where(aluno => aluno.CodigoDre == comunicado.CodigoDre);
 
