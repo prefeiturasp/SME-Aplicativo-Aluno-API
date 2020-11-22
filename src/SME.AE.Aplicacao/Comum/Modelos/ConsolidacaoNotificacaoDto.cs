@@ -10,7 +10,9 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public long NotificacaoId { get; set; }
         public string DreCodigo { get; set; }
         public string UeCodigo { get; set; }
-        public long QuantidadeResponsaveis { get; set; }
-        public long QuantidadeAlunos { get; set; }
+        public long QuantidadeResponsaveisSemApp { get; set; }
+        public long QuantidadeAlunosSemApp { get; set; }
+        public long QuantidadeResponsaveisSemLer { get; set; }
+        public long QuantidadeAlunosSemLer { get; set; }
     }
 }
