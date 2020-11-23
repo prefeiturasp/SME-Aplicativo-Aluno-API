@@ -12,7 +12,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string UeCodigo { get; set; }
         public long QuantidadeResponsaveisSemApp { get; set; }
         public long QuantidadeAlunosSemApp { get; set; }
-        public long QuantidadeResponsaveisSemLer { get; set; }
-        public long QuantidadeAlunosSemLer { get; set; }
+        public long QuantidadeResponsaveisComApp { get; set; }
+        public long QuantidadeAlunosComApp { get; set; }
     }
 }
