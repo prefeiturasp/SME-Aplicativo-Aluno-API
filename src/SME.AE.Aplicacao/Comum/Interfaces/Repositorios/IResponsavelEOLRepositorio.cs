@@ -8,6 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IResponsavelEOLRepositorio
     {
+        Task<IEnumerable<ResponsavelAlunoEOLDto>> ListarCpfResponsavelAlunoDaDreUeTurma();
         Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma();
     }
 }
