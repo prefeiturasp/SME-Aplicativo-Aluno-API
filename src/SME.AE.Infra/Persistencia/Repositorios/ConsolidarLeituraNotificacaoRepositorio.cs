@@ -90,8 +90,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 set
 	                quantidade_alunos_sem_app = @QuantidadeAlunosSemApp,
 	                quantidade_responsaveis_sem_app = @QuantidadeResponsaveisSemApp,
-	                quantidade_alunos_sem_ler = @QuantidadeAlunosSemLer,
-	                quantidade_responsaveis_sem_ler = @QuantidadeResponsaveisSemLer 
+	                quantidade_alunos_com_app = @QuantidadeAlunosComApp,
+	                quantidade_responsaveis_com_app = @QuantidadeResponsaveisComApp 
                 where 
 	                notificacao_id=@NotificacaoId 
                 and dre_codigo=@DreCodigo
@@ -109,8 +109,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                ue_codigo,
 	                quantidade_responsaveis_sem_app,
 	                quantidade_alunos_sem_app,
-	                quantidade_responsaveis_sem_ler,
-	                quantidade_alunos_sem_ler
+	                quantidade_responsaveis_com_app,
+	                quantidade_alunos_com_app
                 ) values (
                     @AnoLetivo,
 	                @NotificacaoId,
@@ -118,8 +118,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                @UeCodigo,
 	                @QuantidadeResponsaveisSemApp,
 	                @QuantidadeAlunosSemApp,
-	                @QuantidadeResponsaveisSemLer,
-	                @QuantidadeAlunosSemLer
+	                @QuantidadeResponsaveisComApp,
+	                @QuantidadeAlunosComApp
                 )
                 ";
 

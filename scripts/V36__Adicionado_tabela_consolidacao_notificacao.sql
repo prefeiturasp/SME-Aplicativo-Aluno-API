@@ -3,8 +3,8 @@ CREATE TABLE if not exists public.consolidacao_notificacao (
 	notificacao_id int8 NOT NULL,
 	dre_codigo varchar(15) NOT NULL,
 	ue_codigo varchar(15) NOT NULL,
-	quantidade_responsaveis_sem_ler int8 NOT null default 0,
-	quantidade_alunos_sem_ler int8 NOT null default 0,
+	quantidade_responsaveis_com_app int8 NOT null default 0,
+	quantidade_alunos_com_app int8 NOT null default 0,
 	quantidade_responsaveis_sem_app int8 NOT null default 0,
 	quantidade_alunos_sem_app int8 NOT null default 0
 );
