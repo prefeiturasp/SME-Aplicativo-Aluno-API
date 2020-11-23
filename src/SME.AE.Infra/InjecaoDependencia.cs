@@ -51,6 +51,7 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
             services.AddTransient(typeof(ITurmaRepositorio), typeof(TurmaRepositorio));
             services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
+            services.AddTransient(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
 
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
