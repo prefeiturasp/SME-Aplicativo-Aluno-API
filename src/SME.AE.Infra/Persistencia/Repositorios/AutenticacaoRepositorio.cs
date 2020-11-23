@@ -23,18 +23,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         private readonly string whereReponsavelAluno = @"WHERE responsavel.cd_cpf_responsavel = @cpf AND responsavel.dt_fim IS NULL  AND responsavel.cd_cpf_responsavel IS NOT NULL";
         public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
         {
-            var chaveAlunosResponsavelCache = $"AlunosResponsavel-{cpf}";
-
-            return await cacheRepositorio.ObterAsync<List<RetornoUsuarioEol>>(
-                chaveAlunosResponsavelCache,
-                async () =>
-                {
-                    using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
-                    return (await conexao.QueryAsync<RetornoUsuarioEol>(
-                        $"{AutenticacaoConsultas.ObterResponsavel} {whereReponsavelAluno}",
-                        new { cpf }
-                        )).ToList();
-                });
+            using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+            return (await conexao.QueryAsync<RetornoUsuarioEol>(
+                $"{AutenticacaoConsultas.ObterResponsavel} {whereReponsavelAluno}",
+                new { cpf }
+                )).ToList();
         }
     }
 }
