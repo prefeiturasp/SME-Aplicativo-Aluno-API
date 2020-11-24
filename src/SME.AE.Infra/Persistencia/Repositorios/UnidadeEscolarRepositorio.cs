@@ -39,8 +39,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                            distinct
 	                            concat(ue.cd_unidade_educacao,'-', ue.nm_exibicao_unidade) nomeCompletoUe, 
 	                            tp.dc_tp_logradouro tipoLogradouro,
-	                            trim(ue.nm_logradouro logradouro), 
-	                            ue.cd_nr_endereco numero, para
+	                            ue.nm_logradouro logradouro, 
+	                            ue.cd_nr_endereco numero,
 	                            ue.nm_bairro bairro, 
 	                            ue.cd_cep cep, 
 	                            mun.nm_municipio municipio,
