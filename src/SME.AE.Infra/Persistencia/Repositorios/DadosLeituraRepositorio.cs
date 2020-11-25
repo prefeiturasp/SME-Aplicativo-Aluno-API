@@ -42,12 +42,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
 
-        public Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicadosPorDre()
+        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicadosPorDre(long notificaoId, int modoVisualizacao)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo <> '' and ue_codigo = '' ";
+
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var dadosLeituraComunicados = await conexao.QueryAsync<DadosLeituraComunicadosResultado>(sql);
+                conexao.Close();
+
+                return dadosLeituraComunicados;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }

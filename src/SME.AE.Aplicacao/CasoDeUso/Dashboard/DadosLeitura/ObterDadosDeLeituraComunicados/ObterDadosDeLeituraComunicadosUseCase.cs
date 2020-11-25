@@ -22,4 +22,22 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return mediator.Send(new ObterDadosLeituraComunicadosQuery(codigoDre, codigoUe, notificacaoId, modoVisualizacao));
         }
     }
+
+    public class ObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase : IObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase
+    {
+
+        private readonly IMediator mediator;
+
+        public ObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase(IMediator mediator)
+        {
+            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+        }
+
+        public Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(long notificacaoId, int modoVisualizacao)
+        {
+            return mediator.Send(new ObterDadosLeituraComunicadosQuery(notificacaoId, modoVisualizacao));
+        }
+    }
+
+    
 }
