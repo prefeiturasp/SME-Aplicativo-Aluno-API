@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System;
+using SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,9 +17,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
         }
 
-        public Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(string codigoDre, string codigoUe)
+        public Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(string codigoDre, string codigoUe, long notificacaoId, int modoVisualizacao)
         {
-            throw new NotImplementedException();
+            return mediator.Send(new ObterDadosLeituraComunicadosQuery(codigoDre, codigoUe, notificacaoId, modoVisualizacao));
         }
     }
 }

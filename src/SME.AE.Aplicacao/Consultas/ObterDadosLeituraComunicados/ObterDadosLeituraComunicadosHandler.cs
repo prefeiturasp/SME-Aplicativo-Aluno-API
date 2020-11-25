@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Handle(ObterDadosLeituraComunicadosQuery request, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            return await dadosLeituraRepositorio.ObterDadosLeituraComunicados(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.ModoVisualizacao);
         }
     }
 }

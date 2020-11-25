@@ -19,16 +19,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe)
+        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificaoId, int modoVisualizacao)
         {
             try
             {
                 var sql = "";
                 if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
-                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo = '' and ue_codigo = ''  ";
+                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo = '' and ue_codigo = '' ";
 
                 if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
-                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo <> '' and ue_codigo = ''  ";
+                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo <> '' and ue_codigo = '' ";
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
