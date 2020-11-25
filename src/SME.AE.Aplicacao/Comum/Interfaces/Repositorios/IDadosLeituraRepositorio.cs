@@ -8,7 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificaoId, int modoVisualizacao);
 
-        Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicadosPorDre();
+        Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicadosPorDre(long notificaoId, int modoVisualizacao);
     }
 }
 

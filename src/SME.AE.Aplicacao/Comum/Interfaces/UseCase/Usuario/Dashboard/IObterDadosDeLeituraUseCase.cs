@@ -8,6 +8,4 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard
     {
         Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(string codigoDre, string codigoUe, long notificacaoId, int modoVisualizacao);
     }
-
-    
 }
