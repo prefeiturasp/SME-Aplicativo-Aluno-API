@@ -3,6 +3,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Utilitarios;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,11 +33,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task ExecutarAsync()
         {
-            var usuariosAlunos = await ObterUsuariosAlunos();
             var comunicadosAtivos = await ObterComunicadosAtivos();
-            var usuariosAlunosNotificacoesApp = await ObterUsuariosAlunosNotificacoesApp();
+            var usuariosAlunos = await ObterUsuariosAlunos();
 
-            await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos, usuariosAlunosNotificacoesApp);
+            await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos);
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarLeituraNotificacao");
         }
 
@@ -48,122 +48,196 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return usuariosAlunosNotificacoesApp;
         }
 
-        private async Task ConsolidarComunicadosUsuariosAlunos(IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, IEnumerable<ComunicadoSgpDto> comunicadosAtivos, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        private async Task ConsolidarComunicadosUsuariosAlunos(IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, IEnumerable<ComunicadoSgpDto> comunicadosAtivos)
         {
+            var listasParaGravar = new ConcurrentQueue<ConsolidacaoNotificacaoDto[]>();
+            var taskParaGravar = Task.CompletedTask;
+            var taskSemaforo = new object();
+
             comunicadosAtivos
                 .AsParallel()
+                .GroupBy(
+                    comunicadoChave => comunicadoChave.Id,
+                    comunicadoLista => comunicadoLista,
+                    (id, comunicados) =>
+                    {
+
+                        var alunosComunidado = comunicados
+                            .SelectMany(comunicado => ObterAlunosDoComunicado(comunicado, usuariosAlunos))
+                            .Distinct()
+                            .ToArray();
+
+                        var umComunicado = comunicados.First();
+
+                        return new { id, umComunicado.AnoLetivo, alunosComunidado, TemUe = !String.IsNullOrWhiteSpace(umComunicado.CodigoUe) };
+                    }
+                )
                 .ForAll(comunicado => {
-                    var consolidacaoNotificacoes = ConsolidarComunicado(comunicado, usuariosAlunos, usuariosAlunosNotificacoesApp);
-                    consolidarLeituraNotificacaoRepositorio.SalvarConsolidacaoNotificacoesEmBatch(consolidacaoNotificacoes).Wait();
+                    var consolidacaoNotificacoes = ConsolidarComunicado(comunicado.id, comunicado.AnoLetivo, comunicado.alunosComunidado, comunicado.TemUe);
+
+                    while (listasParaGravar.Count > 0) Task.Delay(100).Wait();
+
+                    listasParaGravar.Enqueue(consolidacaoNotificacoes.ToArray());
+                    lock (taskSemaforo)
+                    {
+                        if (taskParaGravar.IsCompleted)
+                        {
+                            taskParaGravar = taskParaGravar.ContinueWith(async (_) =>
+                            {
+                                while (listasParaGravar.TryDequeue(out var consolidacoes))
+                                {
+                                    await consolidarLeituraNotificacaoRepositorio.SalvarConsolidacaoNotificacoesEmBatch(consolidacoes);
+                                }
+                            });
+                        }
+                    }
                 });
-            await Task.CompletedTask;
+
+            await taskParaGravar;
         }
 
-        private IEnumerable<ConsolidacaoNotificacaoDto> ConsolidarComunicado(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        private IEnumerable<ConsolidacaoNotificacaoDto> ConsolidarComunicado(long comunicadoId, short AnoLetivo, IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos, bool temUe)
         {
             var alunosComunicado =
-                ObterAlunosDoComunicado(comunicado, usuariosAlunos)
-                .Distinct()
-                .ToArray()
-                .AsParallel()
-                ;
+                usuariosAlunos
+                .AsParallel();
 
             var smeConsolidado = new ConsolidacaoNotificacaoDto[] { 
                 ConsolidaNotificacoes(
                     new ConsolidacaoNotificacaoDto {
-                        NotificacaoId = comunicado.Id,
-                        AnoLetivo = comunicado.AnoLetivo,
+                        NotificacaoId = comunicadoId,
+                        AnoLetivo = AnoLetivo,
                         DreCodigo = "",
-                        UeCodigo = ""
+                        UeCodigo = "",
+                        ModalidadeCodigo = 0,
+                        TurmaCodigo = 0,
+                        Turma = ""
                     },
-                    alunosComunicado,
-                    usuariosAlunosNotificacoesApp
+                    alunosComunicado
                 )
             };
 
             var dreConsolidado =
                 alunosComunicado
-                        .GroupBy(
-                                responsavelChave => responsavelChave.CodigoDre,
-                                responsavelValor => responsavelValor,
-                                (chave, alunosDre) => ConsolidaNotificacoes(
-                                    new ConsolidacaoNotificacaoDto {
-                                        NotificacaoId = comunicado.Id,
-                                        AnoLetivo = comunicado.AnoLetivo,
-                                        DreCodigo = alunosDre.First().CodigoDre,
-                                        UeCodigo = "",
-                                    },
-                                    alunosDre,
-                                    usuariosAlunosNotificacoesApp
-                                )
-                            );
+                .GroupBy(
+                        responsavelChave => responsavelChave.CodigoDre,
+                        responsavelValor => responsavelValor,
+                        (chave, alunosDre) => ConsolidaNotificacoes(
+                            new ConsolidacaoNotificacaoDto
+                            {
+                                NotificacaoId = comunicadoId,
+                                AnoLetivo = AnoLetivo,
+                                DreCodigo = alunosDre.First().CodigoDre,
+                                UeCodigo = "",
+                                ModalidadeCodigo = 0,
+                                TurmaCodigo = 0,
+                                Turma = ""
+                            },
+                            alunosDre
+                        )
+                    );
 
             var ueConsolidado =
                 alunosComunicado
-                        .GroupBy(
-                                responsavelChave => responsavelChave.CodigoUe,
-                                responsavelValor => responsavelValor,
-                                (chave, alunosUe) => ConsolidaNotificacoes(
-                                    new ConsolidacaoNotificacaoDto
-                                    {
-                                        NotificacaoId = comunicado.Id,
-                                        AnoLetivo = comunicado.AnoLetivo,
-                                        DreCodigo = alunosUe.First().CodigoDre,
-                                        UeCodigo = alunosUe.First().CodigoUe,
-                                    },
-                                    alunosUe,
-                                    usuariosAlunosNotificacoesApp
-                                )
-                            );
+                .GroupBy(
+                        responsavelChave => responsavelChave.CodigoUe,
+                        responsavelValor => responsavelValor,
+                        (chave, alunosUe) => ConsolidaNotificacoes(
+                            new ConsolidacaoNotificacaoDto
+                            {
+                                NotificacaoId = comunicadoId,
+                                AnoLetivo = AnoLetivo,
+                                DreCodigo = alunosUe.First().CodigoDre,
+                                UeCodigo = alunosUe.First().CodigoUe,
+                                ModalidadeCodigo = 0,
+                                TurmaCodigo = 0,
+                                Turma = ""
+                            },
+                            alunosUe
+                        )
+                    );
 
             var tudoConsolidado =
                 smeConsolidado
                 .Union(dreConsolidado)
-                .Union(ueConsolidado)
-                .ToArray();
+                .Union(ueConsolidado);
 
-            return tudoConsolidado;
+            if (temUe)
+            {
+                var modalidadeConsolidado =
+                    alunosComunicado
+                    .GroupBy(
+                            responsavelChave => new { responsavelChave.CodigoUe, responsavelChave.CodigoModalidadeTurma },
+                            responsavelValor => responsavelValor,
+                            (chave, alunosModalidade) => ConsolidaNotificacoes(
+                                new ConsolidacaoNotificacaoDto
+                                {
+                                    NotificacaoId = comunicadoId,
+                                    AnoLetivo = AnoLetivo,
+                                    DreCodigo = alunosModalidade.First().CodigoDre,
+                                    UeCodigo = alunosModalidade.First().CodigoUe,
+                                    ModalidadeCodigo = alunosModalidade.First().CodigoModalidadeTurma,
+                                    TurmaCodigo = 0,
+                                    Turma = ""
+                                },
+                                alunosModalidade
+                            )
+                        );
+
+                var turmaConsolidado =
+                    alunosComunicado
+                    .GroupBy(
+                            responsavelChave => new { responsavelChave.CodigoUe, responsavelChave.CodigoModalidadeTurma, responsavelChave.CodigoTurma },
+                            responsavelValor => responsavelValor,
+                            (chave, alunosTurma) => ConsolidaNotificacoes(
+                                new ConsolidacaoNotificacaoDto
+                                {
+                                    NotificacaoId = comunicadoId,
+                                    AnoLetivo = AnoLetivo,
+                                    DreCodigo = alunosTurma.First().CodigoDre,
+                                    UeCodigo = alunosTurma.First().CodigoUe,
+                                    ModalidadeCodigo = alunosTurma.First().CodigoModalidadeTurma,
+                                    TurmaCodigo = alunosTurma.First().CodigoTurma,
+                                    Turma = alunosTurma.First().Turma
+                                },
+                                alunosTurma
+                            )
+                        );
+
+                tudoConsolidado =
+                    tudoConsolidado
+                    .Union(modalidadeConsolidado)
+                    .Union(turmaConsolidado);
+            }
+
+
+
+            return 
+                tudoConsolidado
+                .ToArray();
         }
 
-        private ConsolidacaoNotificacaoDto ConsolidaNotificacoes(ConsolidacaoNotificacaoDto consolidacao, IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado, IEnumerable<UsuarioAlunoNotificacaoApp> usuariosAlunosNotificacoesApp)
+        private ConsolidacaoNotificacaoDto ConsolidaNotificacoes(ConsolidacaoNotificacaoDto consolidacao, IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado)
         {
+
             var comApp = alunosComunicado
-                .AsParallel()
-                .Where(aluno =>
-                    usuariosAlunosNotificacoesApp
-                    .Any(uan => uan.CpfResponsavel == aluno.CpfResponsavel)
-                );
+                .Where(aluno => aluno.TemAppInstalado)
+                .ToArray();
 
             var responsaveisTotal = alunosComunicado
-                .AsParallel()
+                .Select(aluno => aluno.CpfResponsavel)
+                .Distinct()
+                .Count();
+
+            var responsaveisComApp = comApp
                 .Select(aluno => aluno.CpfResponsavel)
                 .Distinct()
                 .Count();
 
             var alunosTotal = alunosComunicado
-                .AsParallel()
-                .Select(aluno => aluno.CodigoAluno)
-                .Distinct()
                 .Count();
 
-            var responsaveisComApp = alunosComunicado
-                .AsParallel()
-                .Where(aluno =>
-                    usuariosAlunosNotificacoesApp
-                    .Any(uan => uan.CpfResponsavel == aluno.CpfResponsavel)
-                )
-                .Select(aluno => aluno.CpfResponsavel)
-                .Distinct()
-                .Count();
-
-            var alunosComApp = alunosComunicado
-                .AsParallel()
-                .Where(aluno =>
-                    usuariosAlunosNotificacoesApp
-                    .Any(uan => uan.CodigoAluno == aluno.CodigoAluno.ToString())
-                )
-                .Select(aluno => aluno.CodigoAluno)
-                .Distinct()
+            var alunosComApp = comApp
                 .Count();
 
             consolidacao.QuantidadeAlunosComApp = alunosComApp;
@@ -176,7 +250,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         private IEnumerable<ResponsavelAlunoEOLDto> ObterAlunosDoComunicado(ComunicadoSgpDto comunicado, IEnumerable<ResponsavelAlunoEOLDto> usuariosAlunos)
         {
-            var alunosComunicado = usuariosAlunos;
+            var alunosComunicado = usuariosAlunos
+                .AsParallel();
 
             if (!string.IsNullOrWhiteSpace(comunicado.CodigoDre))
                 alunosComunicado = alunosComunicado.Where(aluno => aluno.CodigoDre == comunicado.CodigoDre);
@@ -204,30 +279,53 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (tipoEscolaId.Any())
             {
                 alunosComunicado = alunosComunicado.Where(aluno => tipoEscolaId.Contains(aluno.CodigoTipoEscola));
-                return alunosComunicado;
+
+                return 
+                    alunosComunicado
+                    .Distinct()
+                    .ToArray();
+
             } else if(tipoCicloId.Any() && etapaEnsinoId.Any())
             {
                 alunosComunicado = alunosComunicado.Where(aluno => tipoCicloId.Contains(aluno.CodigoCicloEnsino) && etapaEnsinoId.Contains(aluno.CodigoEtapaEnsino));
-                return alunosComunicado;
+
+                return
+                    alunosComunicado
+                    .Distinct()
+                    .ToArray();
+
             }
             return new ResponsavelAlunoEOLDto[] { };
         }
 
         private async Task<IEnumerable<ResponsavelAlunoEOLDto>> ObterUsuariosAlunos()
         {
+            var usuariosComApp =
+                (await ObterUsuariosAlunosNotificacoesApp())
+                .Select(usuario => usuario.CpfResponsavel)
+                .Distinct()
+                .OrderBy(u => u)
+                .ToArray();
+
             var responsaveisEOL =
                 (await responsavelEOLRepositorio.ListarCpfResponsavelAlunoDaDreUeTurma())
                 .AsParallel()
                 .Where(resp => ValidacaoCpf.Valida(resp.CpfResponsavel.ToString("00000000000")))
+                .Select(usuarioAluno =>
+                {
+                    usuarioAluno
+                        .TemAppInstalado =
+                            Array
+                            .BinarySearch(usuariosComApp, usuarioAluno.CpfResponsavel) >= 0;
+                    return usuarioAluno;
+                })
                 .ToArray();
             return responsaveisEOL;
         }
 
         private async Task<IEnumerable<ComunicadoSgpDto>> ObterComunicadosAtivos()
         {
-            return (await consolidarLeituraNotificacaoSgpRepositorio.ObterComunicadosSgp())
-                ///.Where(a => a.Id == 661)
-                ;
+            return (await consolidarLeituraNotificacaoSgpRepositorio.ObterComunicadosSgp());
         }
 
     }
