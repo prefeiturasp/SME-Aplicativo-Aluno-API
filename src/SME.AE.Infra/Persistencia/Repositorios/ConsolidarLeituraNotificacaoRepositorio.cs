@@ -81,6 +81,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                    notificacao_id=@NotificacaoId 
                     AND dre_codigo=@DreCodigo
                     AND ue_codigo=@UeCodigo
+                    and modalidade_codigo=@ModalidadeCodigo
+                    and turma_codigo=@TurmaCodigo
                     AND ano_letivo=@AnoLetivo
                 ";
 
@@ -96,6 +98,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                notificacao_id=@NotificacaoId 
                 and dre_codigo=@DreCodigo
                 and ue_codigo=@UeCodigo
+                and modalidade_codigo=@ModalidadeCodigo
+                and turma_codigo=@TurmaCodigo
                 and ano_letivo=@AnoLetivo
                 ";
 
@@ -107,6 +111,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                notificacao_id,
 	                dre_codigo,
 	                ue_codigo,
+                    modalidade_codigo,
+                    turma_codigo,
+                    turma,
 	                quantidade_responsaveis_sem_app,
 	                quantidade_alunos_sem_app,
 	                quantidade_responsaveis_com_app,
@@ -116,6 +123,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                @NotificacaoId,
 	                @DreCodigo,
 	                @UeCodigo,
+                    @ModalidadeCodigo,
+                    @TurmaCodigo,
+                    @Turma,
 	                @QuantidadeResponsaveisSemApp,
 	                @QuantidadeAlunosSemApp,
 	                @QuantidadeResponsaveisComApp,
@@ -156,6 +166,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                    notificacao_id=@NotificacaoId 
                     AND dre_codigo=@DreCodigo
                     AND ue_codigo=@UeCodigo
+                    and modalidade_codigo=@ModalidadeCodigo
+                    and turma_codigo=@TurmaCodigo
                     AND ano_letivo=@AnoLetivo
                 ";
 
