@@ -19,20 +19,54 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificaoId, int modoVisualizacao)
+        public async Task<IEnumerable<DadosConsolidacaoNotificacaoResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificacaoId)
         {
             try
             {
                 var sql = "";
                 if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
-                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo = '' and ue_codigo = '' ";
+                    sql = @"SELECT 
+                                ano_letivo as AnoLetivo,
+                                notificacao_id as NotificacaoId,
+                                dre_codigo as DreCodigo,
+                                ue_codigo as UeCodigo,
+	                            quantidade_alunos_com_app as QuantidadeAlunosComApp,
+	                            quantidade_alunos_sem_app as QuantidadeAlunosSemApp,
+	                            quantidade_responsaveis_com_app as QuantidadeResponsaveisComApp,
+	                            quantidade_responsaveis_sem_app as QuantidadeResponsaveisSemApp,
+                                turma as Turma,
+                                turma_codigo as TurmaCodigo,
+                                modalidade_codigo as ModalidadeCodigo
+                            FROM consolidacao_notificacao 
+                            where dre_codigo = '' 
+                            and ue_codigo = '' 
+                            and modalidade_codigo = 0 
+                            and turma_codigo = 0 
+                            and notificacao_id = @notificacaoId ";
 
-                if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
-                    sql = @"select * from consolidacao_notificacao cn where ano_letivo = 2020 and dre_codigo <> '' and ue_codigo = '' ";
+                if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe))
+                    sql = @"SELECT 
+                                ano_letivo as AnoLetivo,
+                                notificacao_id as NotificacaoId,
+                                dre_codigo as DreCodigo,
+                                ue_codigo as UeCodigo,
+	                            quantidade_alunos_com_app as QuantidadeAlunosComApp,
+	                            quantidade_alunos_sem_app as QuantidadeAlunosSemApp,
+	                            quantidade_responsaveis_com_app as QuantidadeResponsaveisComApp,
+	                            quantidade_responsaveis_sem_app as QuantidadeResponsaveisSemApp,
+                                turma as Turma,
+                                turma_codigo as TurmaCodigo,
+                                modalidade_codigo as ModalidadeCodigo
+                            FROM consolidacao_notificacao 
+                            where dre_codigo = @codigoDre 
+                            and ue_codigo = @codigoUe 
+                            and modalidade_codigo = 0 
+                            and turma_codigo = 0 
+                            and notificacao_id = @notificacaoId ";
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosLeituraComunicadosResultado>(sql);
+                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId });
                 conexao.Close();
 
                 return dadosLeituraComunicados;
@@ -44,7 +78,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> ObterDadosLeituraComunicadosPorDre(long notificaoId, int modoVisualizacao)
+        public async Task<IEnumerable<DadosConsolidacaoNotificacaoResultado>> ObterDadosLeituraComunicadosPorDre(long notificaoId)
         {
             try
             {
@@ -52,7 +86,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosLeituraComunicadosResultado>(sql);
+                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql);
                 conexao.Close();
 
                 return dadosLeituraComunicados;

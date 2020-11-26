@@ -8,5 +8,4 @@
         public long ReceberamENaoVisualizaram { get; set; }
         public long VisualizaramComunicado { get; set; }
     }
-
 }

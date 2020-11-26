@@ -33,11 +33,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
         }
 
-        public Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(long notificacaoId, int modoVisualizacao)
+        public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(long notificacaoId, int modoVisualizacao)
         {
-            return mediator.Send(new ObterDadosLeituraComunicadosQuery(notificacaoId, modoVisualizacao));
+            throw new System.NotImplementedException();
         }
     }
-
-    
 }
