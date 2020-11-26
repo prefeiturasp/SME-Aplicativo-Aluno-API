@@ -194,14 +194,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return true;
         }
 
-        public async Task<long> ObterTotalNotificacoesLeituraPorResponsavel(long notificacaoId, long dreCodigoEol, string ueCodigoEol)
+        public async Task<long> ObterTotalNotificacoesLeituraPorResponsavel(long notificacaoId)
         {
             try
             {
                 var query = @"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId";
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query, new { notificacaoId, dreCodigoEol, ueCodigoEol });
+                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query, new { notificacaoId });
                 conn.Close();
                 return totalNotificacoesLeituraPorReponsavel;
             }
@@ -212,14 +212,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<long> ObterTotalNotificacoesLeituraPorAluno(long notificacaoId, long dreCodigoEol, string ueCodigoEol)
+        public async Task<long> ObterTotalNotificacoesLeituraPorAluno(long notificacaoId)
         {
             try
             {
                 var query = @"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId";
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query, new { notificacaoId, dreCodigoEol, ueCodigoEol });
+                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query, new { notificacaoId});
                 conn.Close();
                 return totalNotificacoesLeituraPorAluno;
             }

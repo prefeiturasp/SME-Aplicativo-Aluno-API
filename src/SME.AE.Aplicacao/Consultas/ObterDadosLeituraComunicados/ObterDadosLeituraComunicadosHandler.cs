@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
@@ -22,43 +23,59 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Handle(ObterDadosLeituraComunicadosQuery request, CancellationToken cancellationToken)
         {
-            var dadosLeituraComunicados =  await dadosLeituraRepositorio.ObterDadosLeituraComunicados(request.CodigoDre, request.CodigoUe, request.NotificaoId);
+            var dadosLeituraComunicados = await dadosLeituraRepositorio.ObterDadosLeituraComunicados(request.CodigoDre, request.CodigoUe, request.NotificaoId);
 
             if (dadosLeituraComunicados == null || !dadosLeituraComunicados.Any())
                 throw new Exception("Não foram encontrados dados de leitura de comunicados");
-            
-            var resultado = new List<DadosLeituraComunicadosResultado>();
+
+            var retornoDadosLeituraComunicadosResultado = new List<DadosLeituraComunicadosResultado>();
             var dadosLeituraComunicadosResultado = new DadosLeituraComunicadosResultado();
             
-            // Por responsável
-            if (request.ModoVisualizacao == 1)
+            if (request.ModoVisualizacao == ModoVisualizacao.Responsavel)
+                await ObterTotaisDeLeituraPorResponsavel(request, dadosLeituraComunicados, dadosLeituraComunicadosResultado);
+
+            if (request.ModoVisualizacao == ModoVisualizacao.Aluno)
+                await ObterTotaisDeLeituraPorAluno(request, dadosLeituraComunicados, dadosLeituraComunicadosResultado);
+
+            retornoDadosLeituraComunicadosResultado.Add(dadosLeituraComunicadosResultado);
+            return retornoDadosLeituraComunicadosResultado;
+        }
+
+        private async Task ObterTotaisDeLeituraPorAluno(ObterDadosLeituraComunicadosQuery request, IEnumerable<DadosConsolidacaoNotificacaoResultado> dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
+        {
+            var totalNotificacoesLeituraPorAluno = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorAluno(request.NotificaoId);
+
+            if (dadosLeituraComunicados.Count() == 1)
             {
-                try
-                {
-                    var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId, long.Parse(request.CodigoDre), request.CodigoUe);
-
-                    dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);
-                    dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp;
-                    dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorResponsavel;
-
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
+                dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeAlunosComApp - totalNotificacoesLeituraPorAluno);
+                dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.FirstOrDefault().QuantidadeAlunosSemApp;
+                dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorAluno;                
             }
 
-            // Por aluno
-            if (request.ModoVisualizacao == 2) {
-                var totalNotificacoesLeituraPorAluno = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorAluno(request.NotificaoId, long.Parse(request.CodigoDre), request.CodigoUe);
-
-                dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorAluno);
-                dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp;
+            if (dadosLeituraComunicados.Count() > 1)
+            {
+                dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.Select(x => x.QuantidadeAlunosComApp).Sum() - totalNotificacoesLeituraPorAluno);
+                dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.Select(x => x.QuantidadeAlunosSemApp).Sum();
                 dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorAluno;
             }
+        }
 
-            resultado.Add(dadosLeituraComunicadosResultado);
-            return resultado;
+        private async Task ObterTotaisDeLeituraPorResponsavel(ObterDadosLeituraComunicadosQuery request, IEnumerable<DadosConsolidacaoNotificacaoResultado> dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
+        {
+            var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId);
+            if (dadosLeituraComunicados.Count() == 1)
+            {
+                dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);
+                dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisSemApp;
+                dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorResponsavel;
+            }
+
+            if (dadosLeituraComunicados.Count() > 1)
+            {
+                dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.Select(x => x.QuantidadeResponsaveisComApp).Sum() - totalNotificacoesLeituraPorResponsavel);
+                dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.Select(x => x.QuantidadeResponsaveisSemApp).Sum();
+                dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorResponsavel;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 
@@ -12,9 +13,9 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public long NotificaoId { get; set; }
 
-        public int ModoVisualizacao { get; set; }
+        public ModoVisualizacao ModoVisualizacao { get; set; }
 
-        public ObterDadosLeituraComunicadosQuery(string codigoDre, string codigoUe, long notificaoId, int modoVisualizacao)
+        public ObterDadosLeituraComunicadosQuery(string codigoDre, string codigoUe, long notificaoId, ModoVisualizacao modoVisualizacao)
         {
             CodigoDre = codigoDre;
             CodigoUe = codigoUe;

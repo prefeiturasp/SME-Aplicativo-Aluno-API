@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using System.Threading.Tasks;
 
@@ -39,7 +40,7 @@ namespace SME.AE.Api.Controllers
         [HttpGet("leitura")]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]]
-        public async Task<ObjectResult> ObterDadosDeLeituraComunicados([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, int modoVisualizacao, [FromServices] IObterDadosDeLeituraComunicadosUseCase obterDadosDeLeituraComunicados)
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicados([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraComunicadosUseCase obterDadosDeLeituraComunicados)
         {
             return Ok(await obterDadosDeLeituraComunicados.Executar(codigoDre, codigoUe, notificacaoId, modoVisualizacao));
         }
@@ -47,7 +48,7 @@ namespace SME.AE.Api.Controllers
         [HttpGet("leitura/agrupados")]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]]
-        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosAgrupadosPorDre([FromQuery] long notificacaoId, int modoVisualizacao, [FromServices] IObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase obterDadosDeLeituraComunicadosAgrupadosPorDreUseCase)
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosAgrupadosPorDre([FromQuery] long notificacaoId, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase obterDadosDeLeituraComunicadosAgrupadosPorDreUseCase)
         {
             return Ok(await obterDadosDeLeituraComunicadosAgrupadosPorDreUseCase.Executar(notificacaoId, modoVisualizacao));
         }

@@ -44,6 +44,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
 
+                if (!string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
+                    sql = @"SELECT 
+                                ano_letivo as AnoLetivo,
+                                notificacao_id as NotificacaoId,
+                                dre_codigo as DreCodigo,
+                                ue_codigo as UeCodigo,
+	                            quantidade_alunos_com_app as QuantidadeAlunosComApp,
+	                            quantidade_alunos_sem_app as QuantidadeAlunosSemApp,
+	                            quantidade_responsaveis_com_app as QuantidadeResponsaveisComApp,
+	                            quantidade_responsaveis_sem_app as QuantidadeResponsaveisSemApp,
+                                turma as Turma,
+                                turma_codigo as TurmaCodigo,
+                                modalidade_codigo as ModalidadeCodigo
+                            FROM consolidacao_notificacao 
+                            where dre_codigo = @codigoDre 
+                            and ue_codigo <> '' 
+                            and modalidade_codigo = 0 
+                            and turma_codigo = 0 
+                            and notificacao_id = @notificacaoId ";
+
                 if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe))
                     sql = @"SELECT 
                                 ano_letivo as AnoLetivo,
@@ -66,7 +86,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId });
+                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId, codigoDre, codigoUe });
                 conexao.Close();
 
                 return dadosLeituraComunicados;
