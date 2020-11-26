@@ -45,7 +45,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                mun.nm_municipio municipio,
                                mun.sg_uf uf,
                                (
-                                  select
+                                  select top 1
                                      dcu.dc_dispositivo as email 
                                   from
                                      v_cadastro_unidade_educacao cue 
@@ -61,8 +61,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                )
                                email,
                                (
-                                  select
-                                     concat(REPLACE(dcu.cd_ddd, '00', '0'), dcu.dc_dispositivo) as telefone 
+                                  select top 1
+                                     concat(dcu.cd_ddd, dcu.dc_dispositivo) as telefone  
                                   from
                                      v_cadastro_unidade_educacao cue 
                                      inner join
