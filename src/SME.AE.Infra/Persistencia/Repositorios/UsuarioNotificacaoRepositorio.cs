@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -194,14 +195,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return true;
         }
 
-        public async Task<long> ObterTotalNotificacoesLeituraPorResponsavel(long notificacaoId)
+        public async Task<long> ObterTotalNotificacoesLeituraPorResponsavel(long notificacaoId, long codigoDre)
         {
             try
             {
-                var query = @"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId";
+                var query = new StringBuilder();
+                query.AppendLine(@"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+                if (codigoDre > 0)
+                    query.AppendLine(" and dre_codigoeol = @codigoDre ");
+
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query, new { notificacaoId });
+                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre });
                 conn.Close();
                 return totalNotificacoesLeituraPorReponsavel;
             }
@@ -212,14 +217,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<long> ObterTotalNotificacoesLeituraPorAluno(long notificacaoId)
+        public async Task<long> ObterTotalNotificacoesLeituraPorAluno(long notificacaoId, long codigoDre)
         {
             try
             {
-                var query = @"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId";
+                var query = new StringBuilder();
+                query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+
+                if (codigoDre > 0) 
+                    query.AppendLine(" and dre_codigoeol = @codigoDre ");
+
                 await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
-                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query, new { notificacaoId});
+                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre});
                 conn.Close();
                 return totalNotificacoesLeituraPorAluno;
             }
