@@ -50,6 +50,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 set 
 	                componente_curricular=@ComponenteCurricular, 
                     nota=@Nota,
+                    nota_descricao=@NotaDescricao,
                     recomendacoes_aluno=@RecomendacoesAluno,
                     recomendacoes_familia=@RecomendacoesFamilia
                 where 
@@ -72,6 +73,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                componente_curricular_codigo, 
 	                componente_curricular, 
 	                nota,
+                    nota_descricao,
                     recomendacoes_aluno,
                     recomendacoes_familia
                 ) values (
@@ -83,6 +85,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     @CodigoComponenteCurricular,
                     @ComponenteCurricular,
                     @Nota,
+                    @NotaDescricao,
                     @RecomendacoesAluno,
                     @RecomendacoesFamilia
                 )
@@ -168,6 +171,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                componente_curricular_codigo    CodigoComponenteCurricular,
 	                componente_curricular           ComponenteCurricular,
 	                nota                            Nota,
+                    nota_descricao                  NotaDescricao,
                     recomendacoes_aluno             RecomendacoesAluno,
                     recomendacoes_familia           RecomendacoesFamilia
                 from
@@ -197,10 +201,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
-                var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(notasAluno))
-                    return JsonConvert.DeserializeObject<NotaAlunoPorBimestreResposta>(notasAluno);
+                //var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
+                //var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
+                //if (!string.IsNullOrWhiteSpace(notasAluno))
+                //    return JsonConvert.DeserializeObject<NotaAlunoPorBimestreResposta>(notasAluno);
 
                 using var conexao = CriaConexao();
                 conexao.Open();
@@ -233,7 +237,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     parametros, splitOn: "splitOn");
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
+                //await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
                 return dadosNotasAluno;
             }
             catch (Exception ex)
