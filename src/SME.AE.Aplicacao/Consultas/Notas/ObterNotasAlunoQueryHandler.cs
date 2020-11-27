@@ -50,26 +50,26 @@ namespace SME.AE.Aplicacao.Consultas.Notas
 
             foreach (var notaAluno in notasAlunoPorBimestreResposta.NotasPorComponenteCurricular)
             {
-                notaAluno.CorNotaAluno = int.TryParse(notaAluno.Nota, out var notaEmValor)
+                notaAluno.CorNotaAluno = decimal.TryParse(notaAluno.Nota, out var notaEmValor)
                     ? DefinirCorDaNotaPorValor(notaEmValor, notaAlunoCores)
                     : DefinirCorDaNotaPorConceito(notaAluno.Nota, notaAlunoCores);
             }
         }
 
-        private string DefinirCorDaNotaPorValor(int nota, IEnumerable<NotaAlunoCor> notaAlunoCores)
+        private string DefinirCorDaNotaPorValor(decimal nota, IEnumerable<NotaAlunoCor> notaAlunoCores)
         {
             string cor = null;
             switch (nota)
             {
-                case int n when (n < 5):
+                case decimal n when (n < 5.00m):
                     cor = notaAlunoCores.FirstOrDefault(x => x.Nota == NotaAlunoCor.NotaAbaixo5)?.Cor;
                     break;
 
-                case int n when (n <= 7 && n >= 5):
+                case decimal n when (n <= 6.99m && n >= 5.00m):
                     cor = notaAlunoCores.FirstOrDefault(x => x.Nota == NotaAlunoCor.NotaEntre7e5)?.Cor;
                     break;
 
-                case int n when (n > 7):
+                case decimal n when (n >= 7.00m):
                     cor = notaAlunoCores.FirstOrDefault(x => x.Nota == NotaAlunoCor.NotaAcimaDe7)?.Cor;
                     break;
             }

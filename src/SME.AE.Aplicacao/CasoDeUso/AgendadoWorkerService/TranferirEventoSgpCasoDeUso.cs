@@ -65,8 +65,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                                     ? ObterModalidadeCalendarioDeModalidadeTurma(eventoSgp)
                                     : eventoSgp.modalidade_calendario.Value,
                     excluido = eventoSgp.excluido,
-                    componente_curricular = eventoSgp.componente_curricular
-
+                    componente_curricular = eventoSgp.componente_curricular,
+                    tipo_calendario_id = eventoSgp.tipo_calendario_id
                 };
                 yield return evento;
             }

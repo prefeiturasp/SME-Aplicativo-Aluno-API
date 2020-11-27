@@ -1,0 +1,1 @@
+UPDATE nota_aluno_cor SET nota = 'NotaAcimaDe7' WHERE nota = 'NotaAcimaDe75'
