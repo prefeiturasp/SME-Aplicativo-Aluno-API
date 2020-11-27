@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         private async Task ObterTotaisDeLeituraPorAluno(ObterDadosLeituraComunicadosQuery request, IEnumerable<DadosConsolidacaoNotificacaoResultado> dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
         {
-            var totalNotificacoesLeituraPorAluno = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorAluno(request.NotificaoId);
+            var totalNotificacoesLeituraPorAluno = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorAluno(request.NotificaoId, long.Parse(dadosLeituraComunicados.FirstOrDefault().DreCodigo));
 
             if (dadosLeituraComunicados.Count() == 1)
             {
@@ -62,7 +62,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         private async Task ObterTotaisDeLeituraPorResponsavel(ObterDadosLeituraComunicadosQuery request, IEnumerable<DadosConsolidacaoNotificacaoResultado> dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
         {
-            var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId);
+            var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId, long.Parse(dadosLeituraComunicados.FirstOrDefault().DreCodigo));
             if (dadosLeituraComunicados.Count() == 1)
             {
                 dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);
