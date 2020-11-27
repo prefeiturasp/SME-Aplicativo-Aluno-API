@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Npgsql;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
@@ -62,7 +63,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 throw ex;
             }
-          
+
         }
 
         public Task<UsuarioNotificacao> ObterPorId(long id)
@@ -111,7 +112,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuario_id = @usuario_id and
                         codigo_eol_aluno = @codigo_eol_aluno and
                         notificacao_id = @notificacaoId
-                ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId});
+                ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId });
 
             await conn.CloseAsync();
 
@@ -191,6 +192,42 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 });
             conn.Close();
             return true;
+        }
+
+        public async Task<long> ObterTotalNotificacoesLeituraPorResponsavel(long notificacaoId)
+        {
+            try
+            {
+                var query = @"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId";
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query, new { notificacaoId });
+                conn.Close();
+                return totalNotificacoesLeituraPorReponsavel;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        public async Task<long> ObterTotalNotificacoesLeituraPorAluno(long notificacaoId)
+        {
+            try
+            {
+                var query = @"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId";
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query, new { notificacaoId});
+                conn.Close();
+                return totalNotificacoesLeituraPorAluno;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }
