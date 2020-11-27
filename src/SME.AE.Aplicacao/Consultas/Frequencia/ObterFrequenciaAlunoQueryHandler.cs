@@ -66,7 +66,7 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
 
             if (frequenciaDoAluno is null)
             {
-                throw new NegocioException("Não foi possível obter a frequência do aluno.");
+                throw new NegocioException("Não existem registros de frequência para o aluno informado.");
             }
 
             if (turmaModalidadeDeEnsino is null)
