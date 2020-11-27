@@ -43,7 +43,8 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         private async Task ObterTotaisDeLeituraPorAluno(ObterDadosLeituraComunicadosQuery request, IEnumerable<DadosConsolidacaoNotificacaoResultado> dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
         {
-            var totalNotificacoesLeituraPorAluno = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorAluno(request.NotificaoId);
+            var codigoDre = long.Parse(dadosLeituraComunicados.FirstOrDefault().DreCodigo == "" ? "0" : dadosLeituraComunicados.FirstOrDefault().DreCodigo);
+            var totalNotificacoesLeituraPorAluno = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorAluno(request.NotificaoId, codigoDre);
 
             if (dadosLeituraComunicados.Count() == 1)
             {
@@ -62,7 +63,8 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         private async Task ObterTotaisDeLeituraPorResponsavel(ObterDadosLeituraComunicadosQuery request, IEnumerable<DadosConsolidacaoNotificacaoResultado> dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
         {
-            var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId);
+            var codigoDre = long.Parse(dadosLeituraComunicados.FirstOrDefault().DreCodigo == "" ? "0" : dadosLeituraComunicados.FirstOrDefault().DreCodigo);
+            var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId, codigoDre);
             if (dadosLeituraComunicados.Count() == 1)
             {
                 dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);
