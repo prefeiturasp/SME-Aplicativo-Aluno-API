@@ -23,7 +23,8 @@ namespace SME.AE.Dominio.Entidades
         public IEnumerable<string> Turmas { get; set; }
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
-        
+        public bool EnviadoPushNotification { get; set; }
+
         public void InserirCategoria()
         {
             switch (TipoComunicado)

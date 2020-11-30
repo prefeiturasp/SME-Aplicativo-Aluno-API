@@ -5,6 +5,7 @@ using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
@@ -144,9 +145,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using (var conexao = InstanciarConexao())
             {
-                var consulta = MontarQueryListagemCompleta(serieResumida);
+                var consulta =
+                    MontarQueryListagemCompleta(serieResumida);
 
                 var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
+
+                conexao.Close();
+
+                return retorno;
+            }
+        }
+
+        public async Task<IEnumerable<NotificacaoSgpDto>> ListarNotificacoesNaoEnviadas()
+        {
+            using (var conexao = InstanciarConexao())
+            {
+                var consulta = MontarQueryListagemCompletaNaoEnviadoPushNotification();
+
+                var retorno = await conexao.QueryAsync<NotificacaoSgpDto>(consulta);
 
                 conexao.Close();
 
@@ -176,7 +192,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                  titulo=@Titulo, 
                                                  dataExpiracao=@DataExpiracao, 
                                                  alteradoEm=@AlteradoEm, 
-                                                 alteradoPor=@AlteradoPor 
+                                                 alteradoPor=@AlteradoPor,
+                                                 enviadopushnotification=@EnviadoPushNotification
                                WHERE id=@Id",
                     notificacao);
                 conn.Close();
@@ -222,7 +239,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
 
-            return $@"select {CamposConsultaNotificacao("notificacao", true)}
+            return 
+                $@"
+                    select {CamposConsultaNotificacao("notificacao", true)}
                       unl.mensagemvisualizada from(
                       {QueryComunicadosSME()}
                       union
@@ -248,9 +267,27 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       and unl.usuario_id = @usuarioId
                       and unl.codigo_eol_aluno = @codigoAluno
                       where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
-                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao > current_date)";
+                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao > current_date) and 
+                        notificacao.enviadopushnotification
+                ";
         }
 
+        private string MontarQueryListagemCompletaNaoEnviadoPushNotification()
+        {
+            return
+                $@"
+                    select {CamposConsultaNotificacao("n")},
+					  array(select codigo_eol_aluno::varchar from notificacao_aluno na where na.notificacao_id = n.id) alunos,
+					  array(select codigo_eol_turma::varchar from notificacao_turma nt where nt.notificacao_id = n.id) turmas
+                      from notificacao n
+                      left join usuario_notificacao_leitura unl on 
+                      unl.notificacao_id = n.id 
+                      where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false)
+                      and date_trunc('day', n.dataenvio) <= current_date
+                      and date_trunc('day', n.dataexpiracao) >= current_date
+                      and (not n.enviadopushnotification)
+                ";
+        }
         private string QueryComunicadosSME()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -334,6 +371,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {abreviacao}.AlteradoEm,
                     {abreviacao}.AlteradoPor,
                     {abreviacao}.TipoComunicado,
+                    {abreviacao}.SeriesResumidas,
+                    {abreviacao}.ano_letivo AnoLetivo,
                     {abreviacao}.CategoriaNotificacao,
                     {abreviacao}.dre_codigoeol {(camposGeral ? "as CodigoDre" : "")},
                     {abreviacao}.ue_codigoeol {(camposGeral ? "as CodigoUe," : "")}";
