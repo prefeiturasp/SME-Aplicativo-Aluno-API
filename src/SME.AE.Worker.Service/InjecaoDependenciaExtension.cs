@@ -1,7 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AutoMapper;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Infra.Persistencia.Cache;
 using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Worker.Service.CasoDeUsoWorker;
@@ -19,10 +23,11 @@ namespace SME.AE.Worker.Service
                 .AddTransient<TransferirFrequenciaSgpCasoDeUso>()
                 .AddTransient<TransferirNotaSgpCasoDeUso>()
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
+                .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
+                .AddTransient<ICriarNotificacaoUseCase, CriarNotificacaoUseCase>()
                 ;
         }
         #endregion
-
         #region Workers
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
@@ -32,6 +37,7 @@ namespace SME.AE.Worker.Service
                 .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
                 .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
+                .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
                 ;
         }
         #endregion
@@ -62,6 +68,7 @@ namespace SME.AE.Worker.Service
                 .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
                 .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
 
+                .AddTransient<INotificacaoRepository, NotificacaoRepository>()
             ;
         }
         #endregion
