@@ -268,6 +268,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       and unl.codigo_eol_aluno = @codigoAluno
                       where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
                       	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao > current_date) and 
+                        date_trunc('day', notificacao.dataenvio) <= current_date and
                         notificacao.enviadopushnotification
                 ";
         }
