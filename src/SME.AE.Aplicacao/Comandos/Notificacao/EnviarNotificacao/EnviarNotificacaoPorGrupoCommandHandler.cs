@@ -13,7 +13,8 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
     {
         public async Task<bool> Handle(EnviarNotificacaoPorGrupoCommand request, CancellationToken cancellationToken)
         {
-            var firebaseCredential = GoogleCredential.FromJson(VariaveisAmbiente.FirebaseToken);
+            var firebaseToken = VariaveisAmbiente.FirebaseToken;
+            var firebaseCredential = GoogleCredential.FromJson(firebaseToken);
             FirebaseApp app = FirebaseApp.DefaultInstance;
 
             if (app == null)
