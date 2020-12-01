@@ -242,6 +242,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return 
                 $@"
                     select {CamposConsultaNotificacao("notificacao", true)}
+                      notificacao.ano_letivo AnoLetivo,
                       unl.mensagemvisualizada from(
                       {QueryComunicadosSME()}
                       union
@@ -373,8 +374,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {abreviacao}.AlteradoPor,
                     {abreviacao}.TipoComunicado,
                     {abreviacao}.SeriesResumidas,
-                    {abreviacao}.ano_letivo AnoLetivo,
+                    {abreviacao}.ano_letivo,
                     {abreviacao}.CategoriaNotificacao,
+                    {abreviacao}.enviadopushnotification,
                     {abreviacao}.dre_codigoeol {(camposGeral ? "as CodigoDre" : "")},
                     {abreviacao}.ue_codigoeol {(camposGeral ? "as CodigoUe," : "")}";
         }
