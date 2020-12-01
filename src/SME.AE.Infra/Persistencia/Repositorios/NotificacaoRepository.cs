@@ -282,10 +282,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					  array(select codigo_eol_aluno::varchar from notificacao_aluno na where na.notificacao_id = n.id) alunos,
 					  array(select codigo_eol_turma::varchar from notificacao_turma nt where nt.notificacao_id = n.id) turmas
                       from notificacao n
-                      left join usuario_notificacao_leitura unl on 
-                      unl.notificacao_id = n.id 
-                      where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false)
-                      and date_trunc('day', n.dataenvio) <= current_date
+                      where 
+                          date_trunc('day', n.dataenvio) <= current_date
                       and date_trunc('day', n.dataexpiracao) >= current_date
                       and (not n.enviadopushnotification)
                 ";
