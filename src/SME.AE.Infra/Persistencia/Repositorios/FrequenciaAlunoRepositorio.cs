@@ -94,7 +94,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     				                        AND a.ue_codigo = b.ue_codigo 
     				                        AND a.turma_codigo = b.turma_codigo
     				                        and a.bimestre = b.bimestre 
-   					                        AND aluno_codigo = '7128291'
+   					                        AND aluno_codigo = @codigoAluno
     				                        AND a.componente_curricular_codigo = b.componente_curricular_codigo)";
 
                 var parametros = new { anoLetivo, codigoUe, codigoTurma, codigoAluno, codigoComponenteCurricular };
