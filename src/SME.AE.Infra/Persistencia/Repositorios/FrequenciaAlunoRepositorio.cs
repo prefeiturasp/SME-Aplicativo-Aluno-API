@@ -36,11 +36,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = chaveCacheAnoUeTurmaAlunoComponenteCurricular(anoLetivo, codigoUe, codigoTurma, codigoAluno, codigoComponenteCurricular);
+                //var chaveCache = chaveCacheAnoUeTurmaAlunoComponenteCurricular(anoLetivo, codigoUe, codigoTurma, codigoAluno, codigoComponenteCurricular);
 
-                var frequenciaAluno = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(frequenciaAluno))
-                    return JsonConvert.DeserializeObject<FrequenciaAlunoPorComponenteCurricularResposta>(frequenciaAluno);
+                //var frequenciaAluno = await cacheRepositorio.ObterAsync(chaveCache);
+                //if (!string.IsNullOrWhiteSpace(frequenciaAluno))
+                //    return JsonConvert.DeserializeObject<FrequenciaAlunoPorComponenteCurricularResposta>(frequenciaAluno);
 
                 using var conexao = CriaConexao();
                 conexao.Open();
@@ -103,7 +103,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     query, x => x.CodigoComponenteCurricular, x => x.FrequenciasPorBimestre, parametros, splitOn: "splitOn");
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosFrequenciaAlunos, 720, false);
+                //await cacheRepositorio.SalvarAsync(chaveCache, dadosFrequenciaAlunos, 720, false);
                 return dadosFrequenciaAlunos;
             }
             catch (Exception ex)
