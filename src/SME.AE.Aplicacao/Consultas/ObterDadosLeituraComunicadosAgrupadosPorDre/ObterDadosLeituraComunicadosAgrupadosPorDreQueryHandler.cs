@@ -28,7 +28,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Handle(ObterDadosLeituraComunicadosAgrupadosPorDreQuery request, CancellationToken cancellationToken)
         {
-            var dadosLeituraComunicadosAgrupadosPorDre = await dadosLeituraRepositorio.ObterDadosLeituraComunicadosPorDre(request.NotificaoId);
+            Corrvar dadosLeituraComunicadosAgrupadosPorDre = await dadosLeituraRepositorio.ObterDadosLeituraComunicadosPorDre(request.NotificaoId);
 
             if (dadosLeituraComunicadosAgrupadosPorDre == null || !dadosLeituraComunicadosAgrupadosPorDre.Any())
                 throw new Exception("Não foram encontrados dados de leitura de comunicados");
@@ -67,7 +67,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
             var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId, long.Parse(dadosLeituraComunicados.DreCodigo));
             
             var nomeAbreviadoDre = await ObterNomeAvreviadoDrePorCodigo(dadosLeituraComunicados);
-
+            dadosLeituraComunicadosResultado.NomeAbreviadoDre = nomeAbreviadoDre.NomeAbreviado;
             dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);
             dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.QuantidadeResponsaveisSemApp;
             dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorResponsavel;
