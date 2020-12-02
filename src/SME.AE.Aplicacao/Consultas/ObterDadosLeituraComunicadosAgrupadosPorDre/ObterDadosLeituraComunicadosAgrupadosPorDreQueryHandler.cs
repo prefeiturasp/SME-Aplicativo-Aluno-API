@@ -67,7 +67,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
             var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId, long.Parse(dadosLeituraComunicados.DreCodigo));
             
             var nomeAbreviadoDre = await ObterNomeAvreviadoDrePorCodigo(dadosLeituraComunicados);
-
+            dadosLeituraComunicadosResultado.NomeAbreviadoDre = nomeAbreviadoDre.NomeAbreviado;
             dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);
             dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.QuantidadeResponsaveisSemApp;
             dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorResponsavel;
