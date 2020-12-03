@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text.RegularExpressions;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno
