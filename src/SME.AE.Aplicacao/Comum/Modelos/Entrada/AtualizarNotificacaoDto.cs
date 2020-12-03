@@ -16,5 +16,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
         public string AlteradoPor { get; set; }
 
         public DateTime AlteradoEm { get; set; }
+        public bool EnviadoPushNotification { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace SME.AE.Api.Controllers
     public class UnidadeEscolarController : ApiController
     {
         [HttpGet("{codigoUe}")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ObjectResult> ObterDadosUnidadeEscolarPorCodigo(string codigoUe, [FromServices] IObterDadosUnidadeEscolarUseCase obterDadosUnidadeEscolarUseCase)
         {
             return Ok(await obterDadosUnidadeEscolarUseCase.Executar(codigoUe));

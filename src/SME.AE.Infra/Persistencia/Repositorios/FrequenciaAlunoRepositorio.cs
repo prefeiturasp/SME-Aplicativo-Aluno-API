@@ -46,29 +46,59 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
 
                 var query = @"SELECT
-                                ano_letivo as AnoLetivo,
-                                ue_codigo as CodigoUe,
-                                ue_nome as NomeUe,
-                                turma_codigo as CodigoTurma,
-                                turma_descricao as NomeTurma,
-	                            aluno_codigo as AlunoCodigo,
-                                componente_curricular_codigo AS CodigoComponenteCurricular,
-                                componente_curricular as ComponenteCurricular,
-                                '-' AS splitOn,
-                                bimestre as Bimestre,
-                                quantidade_aulas as QuantidadeAulas,
-                                quantidade_faltas as QuantidadeFaltas,
-                                quantidade_compensacoes as QuantidadeCompensacoes,
-                                dias_ausencias AS DiasAusencia
-                            FROM public.frequencia_aluno
-                            WHERE
-                                ano_letivo = @anoLetivo
-                                AND ue_codigo = @codigoUe
-                                AND turma_codigo = @codigoTurma
-                                AND aluno_codigo = @codigoAluno
-                                AND componente_curricular_codigo = @codigoComponenteCurricular";
+                            ano_letivo as AnoLetivo,
+                            ue_codigo as CodigoUe,
+                            ue_nome as NomeUe,
+                            turma_codigo as CodigoTurma,
+                            turma_descricao as NomeTurma,
+                            aluno_codigo as AlunoCodigo,
+                            componente_curricular_codigo AS CodigoComponenteCurricular,
+                            componente_curricular as ComponenteCurricular,
+                            '-' AS splitOn,
+                            bimestre as Bimestre,
+                            quantidade_aulas as QuantidadeAulas,
+                            quantidade_faltas as QuantidadeFaltas,
+                            quantidade_compensacoes as QuantidadeCompensacoes,
+                            dias_ausencias AS DiasAusencia
+                        FROM public.frequencia_aluno
+                        WHERE
+                            ano_letivo = @anoLetivo
+                            AND ue_codigo = @codigoUe
+                            AND turma_codigo = @codigoTurma
+                            AND aluno_codigo = @codigoAluno
+                            AND componente_curricular_codigo = @codigoComponenteCurricular
+                        UNION 
+                        SELECT
+                            ano_letivo as AnoLetivo,
+                            ue_codigo as CodigoUe,
+                            ue_nome as NomeUe,
+                            turma_codigo as CodigoTurma,
+                            turma_descricao as NomeTurma,
+                            @codigoAluno as AlunoCodigo,
+                            componente_curricular_codigo AS CodigoComponenteCurricular,
+                            componente_curricular as ComponenteCurricular,
+                            '-' AS splitOn,
+                            bimestre as Bimestre,
+                            quantidade_aulas as QuantidadeAulas,
+                            quantidade_faltas as QuantidadeFaltas,
+                            quantidade_compensacoes as QuantidadeCompensacoes,
+                            dias_ausencias AS DiasAusencia
+                        FROM public.frequencia_aluno a
+                        WHERE
+                            ano_letivo = @anoLetivo
+                            AND ue_codigo = @codigoUe
+                            AND turma_codigo = @codigoTurma
+                            AND aluno_codigo = ''
+                            AND componente_curricular_codigo = @codigoComponenteCurricular
+                            and not exists (select 1 FROM public.frequencia_aluno b WHERE a.ano_letivo = b.ano_letivo
+    				                        AND a.ue_codigo = b.ue_codigo 
+    				                        AND a.turma_codigo = b.turma_codigo
+    				                        and a.bimestre = b.bimestre 
+   					                        AND aluno_codigo = @codigoAluno
+    				                        AND a.componente_curricular_codigo = b.componente_curricular_codigo)";
 
                 var parametros = new { anoLetivo, codigoUe, codigoTurma, codigoAluno, codigoComponenteCurricular };
+
                 var dadosFrequenciaAlunos = await conexao.QueryParentChildSingleAsync<FrequenciaAlunoPorComponenteCurricularResposta, FrequenciaAlunoPorBimestre, short>(
                     query, x => x.CodigoComponenteCurricular, x => x.FrequenciasPorBimestre, parametros, splitOn: "splitOn");
                 conexao.Close();
@@ -98,7 +128,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var query = @"DROP TABLE IF EXISTS tmp_frequencia_aluno_global;
 
-                            SELECT
+                            select 
+                                AnoLetivo,
+                                CodigoUe,
+                                CodigoTurma,
+                                AlunoCodigo,
+                                SUM(QuantidadeAulas) as QuantidadeAulas,
+                                SUM(QuantidadeFaltas) as QuantidadeFaltas,
+                                SUM(QuantidadeCompensacoes) as QuantidadeCompensacoes
+                                INTO temp tmp_frequencia_aluno_global
+                            from 
+                            (SELECT
                                 ano_letivo as AnoLetivo,
                                 ue_codigo as CodigoUe,
                                 turma_codigo as CodigoTurma,
@@ -106,18 +146,47 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                 SUM(quantidade_aulas) as QuantidadeAulas,
                                 SUM(quantidade_faltas) as QuantidadeFaltas,
                                 SUM(quantidade_compensacoes) as QuantidadeCompensacoes
-                            INTO temp tmp_frequencia_aluno_global
                             FROM public.frequencia_aluno
                             WHERE
-	                            ano_letivo = @anoLetivo
+                                ano_letivo = @anoLetivo
                                 AND ue_codigo = @codigoUe
                                 AND turma_codigo = @codigoTurma
-                                AND aluno_codigo = @codigoAluno
+   	                            AND aluno_codigo = @codigoAluno
                             GROUP BY
                                 ano_letivo,
                                 ue_codigo,
                                 turma_codigo,
-                                aluno_codigo;
+                                aluno_codigo
+                             union
+                            SELECT
+                                ano_letivo as AnoLetivo,
+                                ue_codigo as CodigoUe,
+                                turma_codigo as CodigoTurma,
+                                @codigoAluno as AlunoCodigo,
+                                SUM(quantidade_aulas) as QuantidadeAulas,
+                                SUM(quantidade_faltas) as QuantidadeFaltas,
+                                SUM(quantidade_compensacoes) as QuantidadeCompensacoes
+                            FROM public.frequencia_aluno a
+                            WHERE
+                                ano_letivo = @anoLetivo
+                                AND ue_codigo = @codigoUe
+                                AND turma_codigo = @codigoTurma
+   	                            AND aluno_codigo = ''
+	                            and not exists (select 1 FROM public.frequencia_aluno b WHERE a.ano_letivo = b.ano_letivo
+    				                            AND a.ue_codigo = b.ue_codigo 
+    				                            AND a.turma_codigo = b.turma_codigo
+    				                            and a.bimestre = b.bimestre 
+   					                            AND aluno_codigo = @codigoAluno)   	   	
+                            GROUP BY
+                                ano_letivo,
+                                ue_codigo,
+                                turma_codigo,
+                                aluno_codigo) aaa
+                            GROUP BY
+                                AnoLetivo,
+                                CodigoUe,
+                                CodigoTurma,
+                                AlunoCodigo;
 
                             DROP TABLE IF EXISTS tmp_frequencia_aluno_componentes_curriculares;
                             SELECT
