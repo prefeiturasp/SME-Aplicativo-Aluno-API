@@ -9,6 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
         public long CodigoTurma { get; set; }
+        public string Turma { get; set; }
         public long CpfResponsavel { get; set; }
         public long CodigoAluno { get; set; }
         public short CodigoTipoEscola { get; set; }
@@ -16,6 +17,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public short CodigoCicloEnsino { get; set; }
         public string SerieResumida { get; set; }
         public short CodigoModalidadeTurma { get; set; }
+        public bool TemAppInstalado { get; set; }
     }
 }
 
