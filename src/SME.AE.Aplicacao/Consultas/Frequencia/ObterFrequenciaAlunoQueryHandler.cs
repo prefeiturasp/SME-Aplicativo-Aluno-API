@@ -5,7 +5,9 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno.PorComponenteCurricular;
 using SME.AE.Aplicacao.Consultas.Frequencia.PorComponenteCurricular;
 using SME.AE.Comum.Excecoes;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -112,13 +114,13 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
             var frequenciaRegularFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.FrequenciaRegularFaixa)?.Faixa;
 
             string cor = null;
-            switch (frequencia)
+            switch (Math.Round((decimal)frequencia, 2))
             {
-                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault()):
+                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault() / 100):
                     cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaInsuficienteCor)?.Cor;
                     break;
 
-                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault()):
+                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault() / 100):
                     cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaEmAlertaCor)?.Cor;
                     break;
 
@@ -137,13 +139,13 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
             var frequenciaRegularFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.EnsinoInfantilFrequenciaRegularFaixa)?.Faixa;
 
             string cor = null;
-            switch (frequencia)
+            switch (Math.Round((decimal)frequencia, 2))
             {
-                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault()):
+                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault() / 100):
                     cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.EnsinoInfantilFrequenciaInsuficienteCor)?.Cor;
                     break;
 
-                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault()):
+                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault() / 100):
                     cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.EnsinoInfantilFrequenciaEmAlertaCor)?.Cor;
                     break;
 
