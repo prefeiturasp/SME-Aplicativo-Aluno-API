@@ -62,7 +62,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                email,
                                (
                                   select top 1
-                                     concat(dcu.cd_ddd, dcu.dc_dispositivo) as telefone  
+                                     dcu.dc_dispositivo as telefone  
                                   from
                                      v_cadastro_unidade_educacao cue 
                                      inner join
