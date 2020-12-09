@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Include="Comum\Modelos\Resposta\DadosConsolidacaoNotificacaoResultado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\DadosLeituraComunicadosPorModalidadeTurmaResultado.cs" />
     <Compile Include="Comum\Modelos\Resposta\DadosLeituraComunicadosResultado.cs" />
     <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\ComponenteCurricularDoAluno.cs" />
     <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoFaixa.cs" />
