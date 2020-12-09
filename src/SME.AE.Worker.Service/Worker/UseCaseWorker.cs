@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NCrontab;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Reflection;
@@ -58,6 +59,8 @@ namespace SME.AE.Worker.Service
 
         private async Task ExecutaCasoDeUso()
         {
+
+            SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
             logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
 
             var servico = serviceProvider.GetService<T>() ?? throw new Exception($"Injeção de dependencia para o tipo {typeof(T).Name} não registrado.");
@@ -112,7 +115,8 @@ namespace SME.AE.Worker.Service
                     catch (OperationCanceledException) { }
                     catch (Exception ex)
                     {
-                        // adicionar sentry
+                        SentrySdk.CaptureMessage("*** Worker error:" + ex.Message);
+                        SentrySdk.CaptureException(ex);
                         logger?.LogError(ex, "*** Worker error:");
                         throw ex;
                     }

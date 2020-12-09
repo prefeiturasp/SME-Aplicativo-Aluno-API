@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra.Persistencia.Mapeamentos;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace SME.AE.Worker.Service
 {
@@ -34,7 +34,7 @@ namespace SME.AE.Worker.Service
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
                     AdicionarAutoMapper(services);
@@ -44,6 +44,10 @@ namespace SME.AE.Worker.Service
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso()
                         ;
+                }).ConfigureLogging((context, logging) =>
+                {
+                    logging.AddConfiguration(context.Configuration);
+                    logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
                 });
     }
 }
