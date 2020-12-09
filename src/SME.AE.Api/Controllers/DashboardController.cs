@@ -53,5 +53,19 @@ namespace SME.AE.Api.Controllers
             return Ok(await obterDadosDeLeituraComunicadosAgrupadosPorDreUseCase.Executar(notificacaoId, modoVisualizacao));
         }
 
+        [HttpGet("leitura/modalidade")]
+        [AllowAnonymous]
+        //[ChaveIntegracaoFiltro]]
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosModalidade([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraModalidadeUseCase obterDadosDeLeituraModalidade)
+        {
+            return Ok(await obterDadosDeLeituraModalidade.Executar(codigoDre, codigoUe, notificacaoId, modoVisualizacao));
+        }
+        [HttpGet("leitura/turma")]
+        [AllowAnonymous]
+        //[ChaveIntegracaoFiltro]]
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosTurma([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, [FromQuery] short modalidade, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraTurmaUseCase obterDadosDeLeituraTurma)
+        {
+            return Ok(await obterDadosDeLeituraTurma.Executar(codigoDre, codigoUe, notificacaoId, modalidade, modoVisualizacao));
+        }
     }
 }
