@@ -17,7 +17,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
 
-
         private Dictionary<string, Dominio.Entidades.Usuario> UsuariosEscolaAquiDict = new Dictionary<string, Dominio.Entidades.Usuario>();
 
         public ConsolidarAdesaoEOLCasoDeUso(IResponsavelEOLRepositorio responsavelEOLRepositorio,
