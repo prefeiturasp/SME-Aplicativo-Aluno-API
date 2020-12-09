@@ -81,7 +81,7 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
 
             frequenciaDoAluno.CorDaFrequencia = turmaModalidadeDeEnsino.ModalidadeDeEnsino == ModalidadeDeEnsino.Infantil
                 ? DefinirCorDaFrequenciaParaEnsinoInfantil(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result, obterFrequenciaAlunoFaixa.Result)
-                : DefinirCorDaFrequencia(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result, obterFrequenciaAlunoFaixa.Result);
+                : DefinirCorDaFrequenciaGlobal(frequenciaDoAluno.Frequencia, obterFrequenciaAlunoCores.Result, obterFrequenciaAlunoFaixa.Result);
 
             return frequenciaDoAluno;
         }
@@ -104,6 +104,31 @@ namespace SME.AE.Aplicacao.Consultas.Frequencia
                     ? DefinirCorDaFrequenciaParaEnsinoInfantil(frequenciaAlunoPorBimestre.Frequencia, frequenciaAlunoCores, frequenciaAlunoFaixas)
                     : DefinirCorDaFrequencia(frequenciaAlunoPorBimestre.Frequencia, frequenciaAlunoCores, frequenciaAlunoFaixas);
             }
+        }
+
+        private string DefinirCorDaFrequenciaGlobal(decimal frequencia, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores, IEnumerable<FrequenciaAlunoFaixa> frequenciaAlunoFaixas)
+        {
+            if (!frequenciaAlunoCores.Any() || !frequenciaAlunoFaixas.Any()) return FrequenciaAlunoCor.CorPadrao;
+            var frequenciaEmAlertaFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.FrequenciaEmAlertaFaixa)?.Faixa;
+            var frequenciaRegularFaixa = frequenciaAlunoFaixas.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoFaixa.FrequenciaRegularFaixa)?.Faixa;
+
+            string cor = null;
+            switch (Math.Round((decimal)frequencia, 2))
+            {
+                case decimal n when (n < frequenciaEmAlertaFaixa.GetValueOrDefault() / 100):
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaInsuficienteCor)?.Cor;
+                    break;
+
+                case decimal n when (n < frequenciaRegularFaixa.GetValueOrDefault() / 100):
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaEmAlertaCor)?.Cor;
+                    break;
+
+                default:
+                    cor = frequenciaAlunoCores.FirstOrDefault(x => x.Frequencia == FrequenciaAlunoCor.FrequenciaRegularCor)?.Cor;
+                    break;
+            }
+
+            return cor ?? FrequenciaAlunoCor.CorPadrao;
         }
 
         private string DefinirCorDaFrequencia(decimal frequencia, IEnumerable<FrequenciaAlunoCor> frequenciaAlunoCores, IEnumerable<FrequenciaAlunoFaixa> frequenciaAlunoFaixas)

@@ -17,7 +17,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
 
-
         private Dictionary<string, Dominio.Entidades.Usuario> UsuariosEscolaAquiDict = new Dictionary<string, Dominio.Entidades.Usuario>();
 
         public ConsolidarAdesaoEOLCasoDeUso(IResponsavelEOLRepositorio responsavelEOLRepositorio,
@@ -168,7 +167,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                             dre_nome = valor.First().dre_nome,
                             ue_codigo = valor.First().ue_codigo,
                             ue_nome = valor.First().ue_nome,
-                            codigo_turma = 0,
+                            codigo_turma = valor.First().codigo_turma,
                             usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
                             usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
                             usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
