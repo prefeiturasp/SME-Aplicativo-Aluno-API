@@ -22,9 +22,41 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> Handle(ObterDadosLeituraTurmaQuery request, CancellationToken cancellationToken)
         {
             var dadosLeituraComunicados =  await dadosLeituraRepositorio
-                    .ObterDadosLeituraTurma(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.Modalidade, request.ModoVisualizacao == ModoVisualizacao.Responsavel);
+                    .ObterDadosLeituraTurma(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.Modalidades, request.CodigoTurma, request.ModoVisualizacao == ModoVisualizacao.Responsavel);
 
-            return dadosLeituraComunicados;
+            return ObterNomeModalidade(dadosLeituraComunicados);
+        }
+
+        private static List<DadosLeituraComunicadosPorModalidadeTurmaResultado> ObterNomeModalidade(IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado> dadosLeituraComunicados)
+        {
+            var resultado = new List<DadosLeituraComunicadosPorModalidadeTurmaResultado>();
+            foreach (var item in dadosLeituraComunicados)
+            {
+                item.Modalidade = ObterModalidade(item.ModalidadeCodigo);
+                resultado.Add(item);
+            }
+            return resultado;
+        }
+        private static string ObterModalidade(string modalidade)
+        {
+            switch (modalidade)
+            {
+                case "1":
+                    modalidade = ModalidadeDeEnsino.Infantil.ToString();
+                    break;
+                case "5":
+                    modalidade = ModalidadeDeEnsino.Fundamental.ToString();
+                    break;
+                case "6":
+                    modalidade = ModalidadeDeEnsino.Medio.ToString();
+                    break;
+                case "3":
+                    modalidade = ModalidadeDeEnsino.EJA.ToString();
+                    break;
+                default:
+                    break;
+            }
+            return modalidade;
         }
 
     }
