@@ -22,7 +22,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> Handle(ObterDadosLeituraTurmaQuery request, CancellationToken cancellationToken)
         {
             var dadosLeituraComunicados =  await dadosLeituraRepositorio
-                    .ObterDadosLeituraTurma(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.Modalidade, request.CodigoTurma, request.ModoVisualizacao == ModoVisualizacao.Responsavel);
+                    .ObterDadosLeituraTurma(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.Modalidades, request.CodigoTurma, request.ModoVisualizacao == ModoVisualizacao.Responsavel);
 
             return ObterNomeModalidade(dadosLeituraComunicados);
         }
