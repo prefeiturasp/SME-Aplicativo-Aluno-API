@@ -18,9 +18,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
         }
 
-        public Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> Executar(string codigoDre, string codigoUe, long notificacaoId, short modalidade, ModoVisualizacao modoVisualizacao)
+        public Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> Executar(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long codigoTurma, ModoVisualizacao modoVisualizacao)
         {
-            return mediator.Send(new ObterDadosLeituraTurmaQuery(codigoDre, codigoUe, notificacaoId, modalidade, modoVisualizacao));
+            return mediator.Send(new ObterDadosLeituraTurmaQuery(codigoDre, codigoUe, notificacaoId, modalidades, codigoTurma, modoVisualizacao));
         }
     }
 }
