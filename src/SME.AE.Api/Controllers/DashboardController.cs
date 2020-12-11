@@ -63,9 +63,9 @@ namespace SME.AE.Api.Controllers
         [HttpGet("leitura/turma")]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]]
-        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosTurma([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, [FromQuery] short modalidade, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraTurmaUseCase obterDadosDeLeituraTurma)
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosTurma([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, [FromQuery] short[] modalidade, [FromQuery] long codigoTurma, [FromQuery] ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraTurmaUseCase obterDadosDeLeituraTurma)
         {
-            return Ok(await obterDadosDeLeituraTurma.Executar(codigoDre, codigoUe, notificacaoId, modalidade, modoVisualizacao));
+            return Ok(await obterDadosDeLeituraTurma.Executar(codigoDre, codigoUe, notificacaoId, modalidade, codigoTurma, modoVisualizacao));
         }
     }
 }
