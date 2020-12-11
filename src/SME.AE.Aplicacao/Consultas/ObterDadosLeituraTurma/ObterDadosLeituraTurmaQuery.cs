@@ -10,17 +10,17 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
         public long NotificaoId { get; set; }
-        public short[] Modalidade { get; set; }
+        public short[] Modalidades { get; set; }
         public long CodigoTurma { get; set; }
         public ModoVisualizacao ModoVisualizacao { get; set; }
 
-        public ObterDadosLeituraTurmaQuery(string codigoDre, string codigoUe, long notificaoId, short[] modalidade, long codigoTurma, ModoVisualizacao modoVisualizacao)
+        public ObterDadosLeituraTurmaQuery(string codigoDre, string codigoUe, long notificaoId, short[] modalidades, long codigoTurma, ModoVisualizacao modoVisualizacao)
         {
             CodigoDre = codigoDre;
             CodigoUe = codigoUe;
             NotificaoId = notificaoId;
             ModoVisualizacao = modoVisualizacao;
-            Modalidade = modalidade;
+            Modalidades = modalidades;
             CodigoTurma = codigoTurma;
         }
     }
