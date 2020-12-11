@@ -6,6 +6,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -19,13 +20,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short modalidade, bool porResponsavel)
+        public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long codigoTurma, bool porResponsavel)
         {
-            var sqlResponsavel =
-                @"
+
+            var sqlResponsavel = new StringBuilder(@"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_responsaveis_sem_app NaoReceberamComunicado,
@@ -45,14 +46,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
 	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = @modalidade and
-	                cn.turma_codigo <> 0
-                ";
-            var sqlAluno =
-                @"
+	                cn.modalidade_codigo = ANY(@modalidades)
+                ");
+
+            if (codigoTurma > 0)
+            {
+                sqlResponsavel.Append(" and cn.turma_codigo = @codigoTurma");
+            }
+            else
+            {
+                sqlResponsavel.Append(" and cn.turma_codigo <> 0");
+            }
+
+            var sqlAluno = new StringBuilder(@"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_alunos_sem_app NaoReceberamComunicado,
@@ -72,9 +81,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
 	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = @modalidade and
-	                cn.turma_codigo <> 0
-                ";
+	                cn.modalidade_codigo = ANY(@modalidades) 
+                ");
+
+            if (codigoTurma > 0)
+            {
+                sqlAluno.Append(" and cn.turma_codigo = @codigoTurma");
+            }
+            else
+            {
+                sqlAluno.Append(" and cn.turma_codigo <> 0");
+            }
 
             try
             {
@@ -82,8 +99,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
                 var dadosLeituraComunicados =
                     await conexao.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(
-                        porResponsavel ? sqlResponsavel : sqlAluno,
-                        new { notificacaoId, codigoDre, codigoUe, modalidade }
+                        porResponsavel ? sqlResponsavel.ToString() : sqlAluno.ToString(),
+                        new { notificacaoId, codigoDre, codigoUe, modalidades, codigoTurma }
                         );
                 conexao.Close();
 
@@ -101,7 +118,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 @"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_responsaveis_sem_app NaoReceberamComunicado,
@@ -127,7 +144,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 @"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_alunos_sem_app NaoReceberamComunicado,
