@@ -59,8 +59,8 @@ namespace SME.AE.Worker.Service
 
         private async Task ExecutaCasoDeUso()
         {
-
-            SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
+            //SentrySdk.CaptureException(new Exception($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}"));
+            //SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
             logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
 
             var servico = serviceProvider.GetService<T>() ?? throw new Exception($"Injeção de dependencia para o tipo {typeof(T).Name} não registrado.");
@@ -115,8 +115,8 @@ namespace SME.AE.Worker.Service
                     catch (OperationCanceledException) { }
                     catch (Exception ex)
                     {
-                        SentrySdk.CaptureMessage("*** Worker error:" + ex.Message);
-                        SentrySdk.CaptureException(ex);
+                        //SentrySdk.CaptureMessage("*** Worker error: " + ex.Message);
+                        //SentrySdk.CaptureException(ex);
                         logger?.LogError(ex, "*** Worker error:");
                         throw ex;
                     }
