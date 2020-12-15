@@ -24,6 +24,7 @@ namespace SME.AE.Dominio.Entidades
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
         public bool EnviadoPushNotification { get; set; }
+        public string Modalidades { get; set; }
 
         public void InserirCategoria()
         {
