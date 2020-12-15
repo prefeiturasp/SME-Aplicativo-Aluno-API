@@ -26,6 +26,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }
         public bool EnviadoPushNotification { get; set; }
+        public string Modalidades { get; set; }
 
         public void InserirCategoria()
         {
