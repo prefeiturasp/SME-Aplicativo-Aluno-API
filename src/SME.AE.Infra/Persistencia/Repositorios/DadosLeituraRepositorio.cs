@@ -6,6 +6,8 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -19,13 +21,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short modalidade, bool porResponsavel)
+        public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long[] codigosTurmas, bool porResponsavel)
         {
-            var sqlResponsavel =
-                @"
+
+            var sqlResponsavel = new StringBuilder(@"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_responsaveis_sem_app NaoReceberamComunicado,
@@ -35,24 +37,32 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
                 left join 
                 (
-	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,',')) modalidade, nt.codigo_eol_turma, count(distinct usuario_cpf) leram
+	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, nt.codigo_eol_turma, count(distinct usuario_cpf) leram
 	                from usuario_notificacao_leitura unl 
 	                left join notificacao n on n.id = unl.notificacao_id
 	                left join notificacao_turma nt on nt.notificacao_id = unl.notificacao_id 
-	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,',')), nt.codigo_eol_turma 
+	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), nt.codigo_eol_turma 
                 ) ul on ul.notificacao_id = cn.notificacao_id and ul.dre_codigoeol::varchar = cn.dre_codigo and ul.ue_codigoeol = cn.ue_codigo and ul.modalidade = cn.modalidade_codigo::text and ul.codigo_eol_turma = cn.turma_codigo 
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
 	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = @modalidade and
-	                cn.turma_codigo <> 0
-                ";
-            var sqlAluno =
-                @"
+	                cn.modalidade_codigo = ANY(@modalidades)
+                ");
+
+            if (codigosTurmas != null && codigosTurmas.Any())
+            {
+                sqlResponsavel.Append(" and cn.turma_codigo = ANY(@codigosTurmas)");
+            }
+            else
+            {
+                sqlResponsavel.Append(" and cn.turma_codigo <> 0");
+            }
+
+            var sqlAluno = new StringBuilder(@"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_alunos_sem_app NaoReceberamComunicado,
@@ -62,19 +72,27 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
                 left join 
                 (
-	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,',')) modalidade, nt.codigo_eol_turma, count(distinct codigo_eol_aluno) leram
+	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, nt.codigo_eol_turma, count(distinct codigo_eol_aluno) leram
 	                from usuario_notificacao_leitura unl 
 	                left join notificacao n on n.id = unl.notificacao_id
 	                left join notificacao_turma nt on nt.notificacao_id = unl.notificacao_id 
-	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,',')), nt.codigo_eol_turma 
+	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), nt.codigo_eol_turma 
                 ) ul on ul.notificacao_id = cn.notificacao_id and ul.dre_codigoeol::varchar = cn.dre_codigo and ul.ue_codigoeol = cn.ue_codigo and ul.modalidade = cn.modalidade_codigo::text and ul.codigo_eol_turma = cn.turma_codigo 
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
 	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = @modalidade and
-	                cn.turma_codigo <> 0
-                ";
+	                cn.modalidade_codigo = ANY(@modalidades) 
+                ");
+
+            if (codigosTurmas != null && codigosTurmas.Any())
+            {
+                sqlAluno.Append(" and cn.turma_codigo = ANY(@codigosTurmas)");
+            }
+            else
+            {
+                sqlAluno.Append(" and cn.turma_codigo <> 0");
+            }
 
             try
             {
@@ -82,8 +100,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
                 var dadosLeituraComunicados =
                     await conexao.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(
-                        porResponsavel ? sqlResponsavel : sqlAluno,
-                        new { notificacaoId, codigoDre, codigoUe, modalidade }
+                        porResponsavel ? sqlResponsavel.ToString() : sqlAluno.ToString(),
+                        new { notificacaoId, codigoDre, codigoUe, modalidades, codigosTurmas }
                         );
                 conexao.Close();
 
@@ -101,7 +119,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 @"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_responsaveis_sem_app NaoReceberamComunicado,
@@ -111,10 +129,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
                 left join 
                 (
-	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,',')) modalidade, count(distinct usuario_cpf) leram
+	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, count(distinct usuario_cpf) leram
 	                from usuario_notificacao_leitura unl 
 	                left join notificacao n on n.id = unl.notificacao_id
-	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,','))
+	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,','))
                 ) ul on ul.notificacao_id = cn.notificacao_id and ul.dre_codigoeol::varchar = cn.dre_codigo and ul.ue_codigoeol = cn.ue_codigo and ul.modalidade = cn.modalidade_codigo::text
                 where
 	                cn.dre_codigo = @codigoDre and
@@ -127,7 +145,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 @"
                 select
 	                da.dre_nome NomeAbreviadoDre,
-	                cn.modalidade_codigo Modalidade,
+	                cn.modalidade_codigo ModalidadeCodigo,
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_alunos_sem_app NaoReceberamComunicado,
@@ -137,10 +155,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
                 left join 
                 (
-	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,',')) modalidade, count(distinct codigo_eol_aluno) leram
+	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, count(distinct codigo_eol_aluno) leram
 	                from usuario_notificacao_leitura unl 
 	                left join notificacao n on n.id = unl.notificacao_id
-	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.grupo,','))
+	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,','))
                 ) ul on ul.notificacao_id = cn.notificacao_id and ul.dre_codigoeol::varchar = cn.dre_codigo and ul.ue_codigoeol = cn.ue_codigo and ul.modalidade = cn.modalidade_codigo::text
                 where
 	                cn.dre_codigo = @codigoDre and

@@ -3,6 +3,7 @@
     public class DadosLeituraComunicadosPorModalidadeTurmaResultado
     {
         public string NomeAbreviadoDre { get; set; }
+        public string ModalidadeCodigo { get; set; }
         public string Modalidade { get; set; }
         public string CodigoTurma { get; set; }
         public string Turma { get; set; }
