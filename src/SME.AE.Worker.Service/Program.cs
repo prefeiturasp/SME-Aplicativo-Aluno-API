@@ -42,12 +42,12 @@ namespace SME.AE.Worker.Service
                     services
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
-                        .AdicionarWorkerCasosDeUso()
-                        ;
-                }).ConfigureLogging((context, logging) =>
-                {
-                    logging.AddConfiguration(context.Configuration);
-                    logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
+                        .AdicionarWorkerCasosDeUso();
                 });
+        //}).ConfigureLogging((context, logging) =>
+        //{
+        //    logging.AddConfiguration(context.Configuration);
+        //    logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
+        //});
     }
 }
