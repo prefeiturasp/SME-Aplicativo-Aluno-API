@@ -6,6 +6,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
-        public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long codigoTurma, bool porResponsavel)
+        public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long[] codigosTurmas, bool porResponsavel)
         {
 
             var sqlResponsavel = new StringBuilder(@"
@@ -49,9 +50,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.modalidade_codigo = ANY(@modalidades)
                 ");
 
-            if (codigoTurma > 0)
+            if (codigosTurmas != null && codigosTurmas.Any())
             {
-                sqlResponsavel.Append(" and cn.turma_codigo = @codigoTurma");
+                sqlResponsavel.Append(" and cn.turma_codigo = ANY(@codigosTurmas)");
             }
             else
             {
@@ -84,9 +85,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.modalidade_codigo = ANY(@modalidades) 
                 ");
 
-            if (codigoTurma > 0)
+            if (codigosTurmas != null && codigosTurmas.Any())
             {
-                sqlAluno.Append(" and cn.turma_codigo = @codigoTurma");
+                sqlAluno.Append(" and cn.turma_codigo = ANY(@codigosTurmas)");
             }
             else
             {
@@ -100,7 +101,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var dadosLeituraComunicados =
                     await conexao.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(
                         porResponsavel ? sqlResponsavel.ToString() : sqlAluno.ToString(),
-                        new { notificacaoId, codigoDre, codigoUe, modalidades, codigoTurma }
+                        new { notificacaoId, codigoDre, codigoUe, modalidades, codigosTurmas }
                         );
                 conexao.Close();
 
