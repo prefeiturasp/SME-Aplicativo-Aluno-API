@@ -9,7 +9,6 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
             RuleFor(x => x.CodigoDre).NotEmpty().WithMessage("O código DRE é obrigatório");
             RuleFor(x => x.CodigoUe).NotEmpty().WithMessage("O código UE é obrigatório");
             RuleFor(x => x.NotificaoId).NotEmpty().WithMessage("O ID da notificação é obrigatório");
-            RuleFor(x => x.Modalidades).NotEmpty().WithMessage("O código da modalidade é obrigatório");
             RuleFor(x => x.ModoVisualizacao).NotEmpty().WithMessage("O Modo de visualização é obrigatório");
         }
     }
