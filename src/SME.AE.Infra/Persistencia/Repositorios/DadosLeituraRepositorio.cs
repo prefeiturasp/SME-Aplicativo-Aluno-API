@@ -21,6 +21,36 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
+        public async Task<IEnumerable<DataLeituraAluno>> ObterDadosLeituraAlunos(long notificacaoId, string codigosAlunos)
+        {
+            var sql =
+                @$"
+                select 
+	                codigo_eol_aluno CodigoAluno,
+	                greatest(criadoem, alteradoem) DataLeitura
+                from 
+	                usuario_notificacao_leitura unl
+                where 
+	                notificacao_id = {notificacaoId} and 
+	                codigo_eol_aluno in ({codigosAlunos})
+                ";
+            try
+            {
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var dadosLeituraComunicados =
+                    await conexao.QueryAsync<DataLeituraAluno>(sql);
+                conexao.Close();
+
+                return dadosLeituraComunicados;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long[] codigosTurmas, bool porResponsavel)
         {
 

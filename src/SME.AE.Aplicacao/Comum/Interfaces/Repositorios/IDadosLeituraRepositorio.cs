@@ -6,6 +6,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IDadosLeituraRepositorio
     {
+        Task<IEnumerable<DataLeituraAluno>> ObterDadosLeituraAlunos(long notificacaoId, string codigosAlunos);
         Task<IEnumerable<DadosConsolidacaoNotificacaoResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificacaoId);
 
         Task<IEnumerable<DadosConsolidacaoNotificacaoResultado>> ObterDadosLeituraComunicadosPorDre(long notificacaoId);
