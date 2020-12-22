@@ -67,5 +67,12 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await obterDadosDeLeituraTurma.Executar(codigoDre, codigoUe, notificacaoId, modalidades, codigosTurmas, modoVisualizacao));
         }
+        [HttpGet("leitura/alunos")]
+        [AllowAnonymous]
+        //[ChaveIntegracaoFiltro]]
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicadosAlunos([FromQuery] long notificacaoId, [FromQuery] long codigoTurma, [FromServices] IObterDadosDeLeituraAlunosUseCase obterDadosDeLeituraAlunos)
+        {
+            return Ok(await obterDadosDeLeituraAlunos.Executar(notificacaoId, codigoTurma));
+        }
     }
 }
