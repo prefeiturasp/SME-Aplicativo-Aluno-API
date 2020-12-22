@@ -46,9 +46,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
-	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = ANY(@modalidades)
+	                cn.notificacao_id = @notificacaoId 
                 ");
+
+            if (modalidades != null && modalidades.Any())
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo = ANY(@modalidades) ");
+            }
+            else
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo <> 0");
+            }
 
             if (codigosTurmas != null && codigosTurmas.Any())
             {
@@ -81,9 +89,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
-	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = ANY(@modalidades) 
+	                cn.notificacao_id = @notificacaoId 
                 ");
+
+            if (modalidades != null && modalidades.Any())
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo = ANY(@modalidades) ");
+            }
+            else
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo <> 0");
+            }
 
             if (codigosTurmas != null && codigosTurmas.Any())
             {
