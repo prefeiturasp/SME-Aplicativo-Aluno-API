@@ -54,7 +54,9 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                         NomeResponsavel = $"{aluno.NomeResponsavel.Trim()} ({TipoFiliacao(aluno.TipoResponsavel)})",
                         NumeroChamada = short.Parse(aluno.NumeroChamada ?? "0"),
                         PossueApp = possueApp,
-                        TelefoneResponsavel = telefone
+                        TelefoneResponsavel = telefone,
+                        SituacaoAluno = aluno.SituacaoAluno,
+                        DataSituacaoAluno = aluno.DataSituacaoAluno
                     };
                 });
 

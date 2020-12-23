@@ -1,4 +1,6 @@
-﻿namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
+﻿using System;
+
+namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
     public class AlunoTurmaEol
     {
@@ -12,5 +14,7 @@
         public string Celular { get; set; }
         public string DDDFixo { get; set; }
         public string TelefoneFixo { get; set; }
+        public short SituacaoAluno { get; set; }
+        public DateTime? DataSituacaoAluno { get; set; }
     }
 }
