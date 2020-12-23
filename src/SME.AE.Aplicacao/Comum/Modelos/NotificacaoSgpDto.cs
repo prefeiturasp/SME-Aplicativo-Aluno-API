@@ -30,26 +30,20 @@ namespace SME.AE.Aplicacao.Comum.Modelos
 
         public void InserirCategoria()
         {
-            switch (TipoComunicado)
+            if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
             {
-                case TipoComunicado.SME:
-                case TipoComunicado.SME_ANO:
-                    CategoriaNotificacao = "SME";
-                    break;
-                case TipoComunicado.DRE:
-                case TipoComunicado.DRE_ANO:
+                CategoriaNotificacao = "SME";
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+                {
+                    CategoriaNotificacao = "DRE";
+                }
+                else
+                {
                     CategoriaNotificacao = "UE";
-                    break;
-                case TipoComunicado.UE:
-                case TipoComunicado.UEMOD:
-                    CategoriaNotificacao = SeriesResumidas.ToStringEnumerable().Any() ? "TURMA" : "UE";
-                    break;
-                case TipoComunicado.TURMA:
-                case TipoComunicado.ALUNO:
-                    CategoriaNotificacao = "TURMA";
-                    break;
-                default:
-                    throw new NegocioException("Categoria não identificada");
+                }
             }
         }
 
