@@ -102,25 +102,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var sql =
                 @"
-                select 
-		            mte.nr_chamada_aluno NumeroChamada,
-		            a.nm_aluno NomeAluno,
-		            a.cd_aluno CodigoEOLAluno,
-		            coalesce(ra.cd_cpf_responsavel, 0) Cpf,
-		            ra.nm_responsavel NomeResponsavel,
-		            ra.tp_pessoa_responsavel TipoResponsavel,
-		            ra.cd_ddd_celular_responsavel DDDCelular, 
-		            ra.nr_celular_responsavel Celular,
-		            ra.cd_ddd_telefone_fixo_responsavel DDDFixo,
-		            ra.nr_telefone_fixo_responsavel TelefoneFixo
-	            from v_aluno_cotic(nolock) a
-	            inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
-	            inner join v_matricula_cotic(nolock) m on m.cd_aluno = a.cd_aluno 
-	            inner join matricula_turma_escola(nolock) mte on mte.cd_matricula = m.cd_matricula 
-	            inner join turma_escola(nolock) te on te.cd_turma_escola = mte.cd_turma_escola
-	            where 
+				select 
+					mte.nr_chamada_aluno NumeroChamada,
+					a.nm_aluno NomeAluno,
+					a.cd_aluno CodigoEOLAluno,
+					coalesce(ra.cd_cpf_responsavel, 0) Cpf,
+					ra.nm_responsavel NomeResponsavel,
+					ra.tp_pessoa_responsavel TipoResponsavel,
+					ra.cd_ddd_celular_responsavel DDDCelular, 
+					ra.nr_celular_responsavel Celular,
+					ra.cd_ddd_telefone_fixo_responsavel DDDFixo,
+					ra.nr_telefone_fixo_responsavel TelefoneFixo,
+					mte.cd_situacao_aluno SituacaoAluno,
+					mte.dt_situacao_aluno DataSituacaoAluno
+				from v_aluno_cotic(nolock) a
+				inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
+				inner join v_matricula_cotic(nolock) m on m.cd_aluno = a.cd_aluno 
+				inner join matricula_turma_escola(nolock) mte on mte.cd_matricula = m.cd_matricula 
+				inner join turma_escola(nolock) te on te.cd_turma_escola = mte.cd_turma_escola
+				where 
 		            te.cd_tipo_turma = 1 and
-		            mte.cd_situacao_aluno IN ( 1, 6, 10, 13 ) and
 		            ra.dt_fim IS NULL and
 		            te.cd_turma_escola = @codigoTurma
                 ";
