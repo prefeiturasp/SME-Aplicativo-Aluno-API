@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
@@ -32,11 +31,12 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                 .Select(at => at.CodigoEOLAluno)
                 .ToArray());
 
-            var dadosLeituraComunicados =  await dadosLeituraRepositorio
+            var dadosLeituraComunicados = await dadosLeituraRepositorio
                     .ObterDadosLeituraAlunos(request.NotificaoId, codigosAlunos);
 
             var dadosLeituraAlunos = alunosTurma
-                .Select(aluno => {
+                .Select(aluno =>
+                {
                     var dataleitura = dadosLeituraComunicados
                         .Where(dados => dados.CodigoAluno == aluno.CodigoEOLAluno)
                         .Select(dados => dados.DataLeitura)
@@ -47,7 +47,9 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                     var telefone = possueApp ? usuario.Celular : "";
                     if (string.IsNullOrWhiteSpace(telefone))
                         telefone = $"{aluno.DDDCelular.Trim()}{aluno.Celular.Trim()}";
-                    return new DadosLeituraAlunosComunicado { 
+                    return new DadosLeituraAlunosComunicado
+                    {
+                        CodigoAluno = aluno.CodigoEOLAluno,
                         LeuComunicado = dataleitura.HasValue,
                         DataLeitura = dataleitura,
                         NomeAluno = $"{aluno.NomeAluno.Trim()} ({aluno.CodigoEOLAluno})",
@@ -65,7 +67,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         string TipoFiliacao(int tipoResponsavel)
         {
-            switch(tipoResponsavel)
+            switch (tipoResponsavel)
             {
                 case 1: return "Filiação 1";
                 case 2: return "Filiação 2";
