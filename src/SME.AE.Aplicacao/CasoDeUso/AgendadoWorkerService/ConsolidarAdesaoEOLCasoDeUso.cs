@@ -32,10 +32,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task ExecutarAsync()
         {
-            await ObterUsuariosEscolaAqui();
+           // await ObterUsuariosEscolaAqui();
             var adesaoConsolidada = await ObterAdesaoConsolidada();
-            await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(adesaoConsolidada);
-            await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarAdesaoEOL");
+            //await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(adesaoConsolidada);
+            //await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarAdesaoEOL");
         }
 
         private async Task ObterUsuariosEscolaAqui()
@@ -54,135 +54,173 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         private async Task<IEnumerable<DashboardAdesaoDto>> ObterAdesaoConsolidada()
         {
+            //TODO: Loop por Dre
             var responsaveisEOL =
-                (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma())
-                .AsParallel();
+                (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(108300))
+                .ToList();
 
-            var porSME =
+            var respValidos = responsaveisEOL.Where(r => r.CpfResponsavel > 0).ToList();
+
+            var respSemCpf = responsaveisEOL.Where(r => r.CpfResponsavel == 0).ToList();
+
+            var porSme = responsaveisEOL.GroupBy(
+                        responsavelChave => responsavelChave.CpfResponsavel,
+                        responsavelValor => responsavelValor);
+
+
+            var listaFinal = new List<DashboardAdesaoDto>();
+
+
+            var respValidosAgrupados =
                 responsaveisEOL
                 .GroupBy(
                         responsavelChave => responsavelChave.CpfResponsavel,
                         responsavelValor => responsavelValor,
                         (chave, valor) => ProcessaResponsavel(valor.First())
-                    )
-                .GroupBy(
-                        todosChave => 0,
-                        todosValor => todosValor,
-                        (chave, valor) => new DashboardAdesaoDto
-                        {
-                            dre_codigo = "",
-                            dre_nome = "",
-                            ue_codigo = "",
-                            ue_nome = "",
-                            codigo_turma = 0,
-                            usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-                            usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-                            usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-                            usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-                        }
                     );
 
-            var porDRE =
-                responsaveisEOL
-                .GroupBy(
-                        responsavelChave => responsavelChave.CodigoDre,
-                        responsavelValor => responsavelValor,
-                        (chave, valor) => 
-                            valor
-                            .GroupBy(
-                                    responsavelChave => responsavelChave.CpfResponsavel,
-                                    responsavelValor => responsavelValor,
-                                    (chave, valor) => ProcessaResponsavel(valor.First())
-                                )
-                    )
-                .SelectMany(resp => resp)
-                .GroupBy(
-                        todosChave => todosChave.dre_codigo,
-                        todosValor => todosValor,
-                        (chave, valor) => new DashboardAdesaoDto
-                        {
-                            dre_codigo = valor.First().dre_codigo,
-                            dre_nome = valor.First().dre_nome,
-                            ue_codigo = "",
-                            ue_nome = "",
-                            codigo_turma = 0,
-                            usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-                            usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-                            usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-                            usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-                        }
-                    );
 
-            var porUE =
-                responsaveisEOL
-                .GroupBy(
-                        responsavelChave => responsavelChave.CodigoUe,
-                        responsavelValor => responsavelValor,
-                        (chave, valor) =>
-                            valor
-                            .GroupBy(
-                                    responsavelChave => responsavelChave.CpfResponsavel,
-                                    responsavelValor => responsavelValor,
-                                    (chave, valor) => ProcessaResponsavel(valor.First())
-                                )
-                    )
-                .SelectMany(resp => resp)
-                .GroupBy(
-                        todosChave => todosChave.ue_codigo,
-                        todosValor => todosValor,
-                        (chave, valor) => new DashboardAdesaoDto
-                        {
-                            dre_codigo = valor.First().dre_codigo,
-                            dre_nome = valor.First().dre_nome,
-                            ue_codigo = valor.First().ue_codigo,
-                            ue_nome = valor.First().ue_nome,
-                            codigo_turma = 0,
-                            usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-                            usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-                            usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-                            usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-                        }
-                    );
 
-            var porTurma =
-                responsaveisEOL
-                .GroupBy(
-                        responsavelChave => responsavelChave.CodigoTurma,
-                        responsavelValor => responsavelValor,
-                        (chave, valor) =>
-                            valor
-                            .GroupBy(
-                                    responsavelChave => responsavelChave.CpfResponsavel,
-                                    responsavelValor => responsavelValor,
-                                    (chave, valor) => ProcessaResponsavel(valor.First())
-                                )
-                    )
-                .SelectMany(resp => resp)
-                .GroupBy(
-                        todosChave => todosChave.codigo_turma,
-                        todosValor => todosValor,
-                        (chave, valor) => new DashboardAdesaoDto
-                        {
-                            dre_codigo = valor.First().dre_codigo,
-                            dre_nome = valor.First().dre_nome,
-                            ue_codigo = valor.First().ue_codigo,
-                            ue_nome = valor.First().ue_nome,
-                            codigo_turma = valor.First().codigo_turma,
-                            usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-                            usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-                            usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-                            usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-                        }
-                    );
+            ////Tratar os CPFS INVALIDOS
+            //foreach (var responsavelSemCPF in respSemCpf)
+            //{
+            //    listaFinal.Add(new DashboardAdesaoDto() { 
 
-            var adesaoConsolidada =
-                porSME
-                .Union(porDRE)
-                .Union(porUE)
-                .Union(porTurma)
-                ;
-                
-            return adesaoConsolidada;
+            //    });
+            //}
+
+            //foreach (var responsavelParaTratarCPF in respValidos)
+            //{
+
+            //}
+
+
+            return default;
+            //var porSME =
+            //    responsaveisEOL
+            //    .GroupBy(
+            //            responsavelChave => responsavelChave.CpfResponsavel,
+            //            responsavelValor => responsavelValor,
+            //            (chave, valor) => ProcessaResponsavel(valor.First())
+            //        )
+            //    .GroupBy(
+            //            todosChave => 0,
+            //            todosValor => todosValor,
+            //            (chave, valor) => new DashboardAdesaoDto
+            //            {
+            //                dre_codigo = "",
+            //                dre_nome = "",
+            //                ue_codigo = "",
+            //                ue_nome = "",
+            //                codigo_turma = 0,
+            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
+            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
+            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
+            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
+            //            }
+            //        );
+
+            //var porDRE =
+            //    respValidos
+            //    .GroupBy(
+            //            responsavelChave => responsavelChave.CodigoDre,
+            //            responsavelValor => responsavelValor,
+            //            (chave, valor) => 
+            //                valor
+            //                .GroupBy(
+            //                        responsavelChave => responsavelChave.CpfResponsavel,
+            //                        responsavelValor => responsavelValor,
+            //                        (chave, valor) => ProcessaResponsavel(valor.First())
+            //                    )
+            //        )
+            //    .SelectMany(resp => resp)
+            //    .GroupBy(
+            //            todosChave => todosChave.dre_codigo,
+            //            todosValor => todosValor,
+            //            (chave, valor) => new DashboardAdesaoDto
+            //            {
+            //                dre_codigo = valor.First().dre_codigo,
+            //                dre_nome = valor.First().dre_nome,
+            //                ue_codigo = "",
+            //                ue_nome = "",
+            //                codigo_turma = 0,
+            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
+            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
+            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
+            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
+            //            }
+            //        );
+
+            //var porUE =
+            //    respValidos
+            //    .GroupBy(
+            //            responsavelChave => responsavelChave.CodigoUe,
+            //            responsavelValor => responsavelValor,
+            //            (chave, valor) =>
+            //                valor
+            //                .GroupBy(
+            //                        responsavelChave => responsavelChave.CpfResponsavel,
+            //                        responsavelValor => responsavelValor,
+            //                        (chave, valor) => ProcessaResponsavel(valor.First())
+            //                    )
+            //        )
+            //    .SelectMany(resp => resp)
+            //    .GroupBy(
+            //            todosChave => todosChave.ue_codigo,
+            //            todosValor => todosValor,
+            //            (chave, valor) => new DashboardAdesaoDto
+            //            {
+            //                dre_codigo = valor.First().dre_codigo,
+            //                dre_nome = valor.First().dre_nome,
+            //                ue_codigo = valor.First().ue_codigo,
+            //                ue_nome = valor.First().ue_nome,
+            //                codigo_turma = 0,
+            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
+            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
+            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
+            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
+            //            }
+            //        );
+
+            //var porTurma =
+            //    respValidos
+            //    .GroupBy(
+            //            responsavelChave => responsavelChave.CodigoTurma,
+            //            responsavelValor => responsavelValor,
+            //            (chave, valor) =>
+            //                valor
+            //                .GroupBy(
+            //                        responsavelChave => responsavelChave.CpfResponsavel,
+            //                        responsavelValor => responsavelValor,
+            //                        (chave, valor) => ProcessaResponsavel(valor.First())
+            //                    )
+            //        )
+            //    .SelectMany(resp => resp)
+            //    .GroupBy(
+            //            todosChave => todosChave.codigo_turma,
+            //            todosValor => todosValor,
+            //            (chave, valor) => new DashboardAdesaoDto
+            //            {
+            //                dre_codigo = valor.First().dre_codigo,
+            //                dre_nome = valor.First().dre_nome,
+            //                ue_codigo = valor.First().ue_codigo,
+            //                ue_nome = valor.First().ue_nome,
+            //                codigo_turma = valor.First().codigo_turma,
+            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
+            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
+            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
+            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
+            //            }
+            //        );
+
+            //var adesaoConsolidada =
+            //    porSME
+            //    .Union(porDRE)
+            //    .Union(porUE)
+            //    .Union(porTurma)
+            //    ;
+
+            //return adesaoConsolidada;
         }
 
         private DashboardAdesaoDto ProcessaResponsavel(ResponsavelEOLDto responsavel)
