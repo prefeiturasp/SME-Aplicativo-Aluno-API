@@ -46,7 +46,10 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                     var possueApp = usuario != null;
                     var telefone = possueApp ? usuario.Celular : "";
                     if (string.IsNullOrWhiteSpace(telefone))
-                        telefone = $"{aluno.DDDCelular.Trim()}{aluno.Celular.Trim()}";
+                        if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
+                        {
+                            telefone = $"{aluno.DDDCelular.Trim()}{aluno.Celular.Trim()}";
+                        }
                     return new DadosLeituraAlunosComunicado
                     {
                         CodigoAluno = aluno.CodigoEOLAluno,
