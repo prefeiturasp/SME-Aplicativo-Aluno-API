@@ -148,7 +148,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf, long dreCodigoEol, string ueCodigoEol)
         {
             var query = @"select
-	                        *
+	                        usuario_Id as UsuarioId,
+                            codigo_eol_aluno as CodigoEolAluno,
+                            notificacao_id as NotificacaoId,
+                            dre_codigoeol as DreCodigoEol,
+                            ue_codigoeol as UeCodigoEol,
+                            usuario_cpf as UsuarioCpf
                         from
 	                        public.usuario_notificacao_leitura
                         where
@@ -171,6 +176,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<bool> Atualizar(UsuarioNotificacao usuarioNotificacao)
         {
+
+
             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
             conn.Open();
             var dataAtual = DateTime.Now;
