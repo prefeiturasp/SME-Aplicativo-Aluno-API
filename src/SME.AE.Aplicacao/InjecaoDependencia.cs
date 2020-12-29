@@ -101,6 +101,7 @@ namespace SME.AE.Aplicacao
             services.AddTransient<IObterDadosUnidadeEscolarUseCase, ObterDadosUnidadeEscolarUseCase>();
             services.AddTransient<IObterDadosDeLeituraModalidadeUseCase, ObterDadosDeLeituraModalidadeUseCase>();
             services.AddTransient<IObterDadosDeLeituraTurmaUseCase, ObterDadosDeLeituraTurmaUseCase>();
+            services.AddTransient<IObterDadosDeLeituraAlunosUseCase, ObterDadosDeLeituraAlunosUseCase>();
         }
     }
 }
