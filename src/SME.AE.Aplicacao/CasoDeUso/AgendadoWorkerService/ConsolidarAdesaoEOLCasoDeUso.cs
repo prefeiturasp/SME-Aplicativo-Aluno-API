@@ -1,11 +1,10 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
+﻿
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -14,216 +13,171 @@ namespace SME.AE.Aplicacao.CasoDeUso
     {
         private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly IDashboardAdesaoRepositorio dashboardAdesaoRepositorio;
-        private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
-
-        private Dictionary<string, Dominio.Entidades.Usuario> UsuariosEscolaAquiDict = new Dictionary<string, Dominio.Entidades.Usuario>();
+        private readonly IDreSgpRepositorio dreSgpRepositorio;
+        private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
 
         public ConsolidarAdesaoEOLCasoDeUso(IResponsavelEOLRepositorio responsavelEOLRepositorio,
                                             IDashboardAdesaoRepositorio dashboardAdesaoRepositorio,
-                                            IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio,
-                                            IUsuarioRepository usuarioRepository)
+                                            IUsuarioRepository usuarioRepository,
+                                            IDreSgpRepositorio dreSgpRepositorio,
+                                            IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio)
         {
             this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new System.ArgumentNullException(nameof(responsavelEOLRepositorio));
             this.dashboardAdesaoRepositorio = dashboardAdesaoRepositorio ?? throw new ArgumentNullException(nameof(dashboardAdesaoRepositorio));
-            this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
+            this.dreSgpRepositorio = dreSgpRepositorio ?? throw new ArgumentNullException(nameof(dreSgpRepositorio));
+            this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
         }
 
         public async Task ExecutarAsync()
         {
-           // await ObterUsuariosEscolaAqui();
-            var adesaoConsolidada = await ObterAdesaoConsolidada();
-            //await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(adesaoConsolidada);
-            //await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarAdesaoEOL");
+            var usuariosDoSistemaEA = await ObterUsuariosEscolaAqui();
+            var adesaoConsolidada = await ObterAdesaoConsolidada(usuariosDoSistemaEA);
+            await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(adesaoConsolidada);
+            await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarAdesaoEOL");
         }
 
-        private async Task ObterUsuariosEscolaAqui()
+        private async Task<IEnumerable<Dominio.Entidades.Usuario>> ObterUsuariosEscolaAqui()
         {
-            UsuariosEscolaAquiDict.Clear();
-            var usuariosEscolaAqui = await usuarioRepository.ListarAsync();
-            usuariosEscolaAqui.ForEach(usuario => 
+            return await usuarioRepository.ObterTodosUsuariosAtivos();
+        }
+
+        private async Task<IEnumerable<DashboardAdesaoDto>> ObterAdesaoConsolidada(IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema)
+        {
+            var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();
+
+            var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
+
+            foreach (var dreCodigo in dresDoSistema)
             {
-                if (!usuario.Excluido)
-                {
-                    if(!UsuariosEscolaAquiDict.ContainsKey(usuario.Cpf))
-                        UsuariosEscolaAquiDict.Add(usuario.Cpf, usuario);
-                }
-            });
+                var responsaveisDreEOL =
+                    (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo))
+                    .ToList();
+
+                listaDashBoardsParaIncluir = TrataTurmas(usuariosDoSistema, responsaveisDreEOL, listaDashBoardsParaIncluir);
+
+                listaDashBoardsParaIncluir = TrataUes(responsaveisDreEOL, listaDashBoardsParaIncluir);
+
+                listaDashBoardsParaIncluir = TrataDre(listaDashBoardsParaIncluir, dreCodigo);
+            }
+
+            var registrosDRES = listaDashBoardsParaIncluir.Where(a => a.codigo_turma == 0 && string.IsNullOrEmpty(a.ue_codigo)).ToList();
+
+
+            var registroSMEParaIncluir = new DashboardAdesaoDto()
+            {
+                codigo_turma = 0,
+                dre_codigo = string.Empty,
+                dre_nome = string.Empty,
+                ue_codigo = string.Empty,
+                ue_nome = string.Empty,
+                usuarios_cpf_invalidos = registrosDRES.Sum(a => a.usuarios_cpf_invalidos),
+                usuarios_primeiro_acesso_incompleto = registrosDRES.Sum(a => a.usuarios_primeiro_acesso_incompleto),
+                usuarios_sem_app_instalado = registrosDRES.Sum(a => a.usuarios_sem_app_instalado),
+                usuarios_validos = registrosDRES.Sum(a => a.usuarios_validos)
+            };
+
+            listaDashBoardsParaIncluir.Add(registroSMEParaIncluir);
+
+            return listaDashBoardsParaIncluir;
+
         }
 
-        private async Task<IEnumerable<DashboardAdesaoDto>> ObterAdesaoConsolidada()
+        private List<DashboardAdesaoDto> TrataDre(List<DashboardAdesaoDto> listaDashBoardDresParaIncluir, long dreCodigo)
         {
-            //TODO: Loop por Dre
-            var responsaveisEOL =
-                (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(108300))
-                .ToList();
-
-            var respValidos = responsaveisEOL.Where(r => r.CpfResponsavel > 0).ToList();
-
-            var respSemCpf = responsaveisEOL.Where(r => r.CpfResponsavel == 0).ToList();
-
-            var porSme = responsaveisEOL.GroupBy(
-                        responsavelChave => responsavelChave.CpfResponsavel,
-                        responsavelValor => responsavelValor);
+            var registroParaTratarDre = listaDashBoardDresParaIncluir.FirstOrDefault();
 
 
-            var listaFinal = new List<DashboardAdesaoDto>();
+            var registrosUes = listaDashBoardDresParaIncluir.Where(a => a.codigo_turma == 0 && a.dre_codigo == dreCodigo.ToString());
 
+            var registroDreParaIncluir = new DashboardAdesaoDto()
+            {
+                codigo_turma = 0,
+                ue_codigo = string.Empty,
+                ue_nome = string.Empty,
+                dre_codigo = registroParaTratarDre.dre_codigo,
+                dre_nome = registroParaTratarDre.dre_nome,
+                usuarios_cpf_invalidos = registrosUes.Sum(a => a.usuarios_cpf_invalidos),
+                usuarios_primeiro_acesso_incompleto = registrosUes.Sum(a => a.usuarios_primeiro_acesso_incompleto),
+                usuarios_sem_app_instalado = registrosUes.Sum(a => a.usuarios_sem_app_instalado),
+                usuarios_validos = registrosUes.Sum(a => a.usuarios_validos)
+            };
 
-            var respValidosAgrupados =
-                responsaveisEOL
-                .GroupBy(
-                        responsavelChave => responsavelChave.CpfResponsavel,
-                        responsavelValor => responsavelValor,
-                        (chave, valor) => ProcessaResponsavel(valor.First())
-                    );
+            listaDashBoardDresParaIncluir.Add(registroDreParaIncluir);
 
-
-
-            ////Tratar os CPFS INVALIDOS
-            //foreach (var responsavelSemCPF in respSemCpf)
-            //{
-            //    listaFinal.Add(new DashboardAdesaoDto() { 
-
-            //    });
-            //}
-
-            //foreach (var responsavelParaTratarCPF in respValidos)
-            //{
-
-            //}
-
-
-            return default;
-            //var porSME =
-            //    responsaveisEOL
-            //    .GroupBy(
-            //            responsavelChave => responsavelChave.CpfResponsavel,
-            //            responsavelValor => responsavelValor,
-            //            (chave, valor) => ProcessaResponsavel(valor.First())
-            //        )
-            //    .GroupBy(
-            //            todosChave => 0,
-            //            todosValor => todosValor,
-            //            (chave, valor) => new DashboardAdesaoDto
-            //            {
-            //                dre_codigo = "",
-            //                dre_nome = "",
-            //                ue_codigo = "",
-            //                ue_nome = "",
-            //                codigo_turma = 0,
-            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-            //            }
-            //        );
-
-            //var porDRE =
-            //    respValidos
-            //    .GroupBy(
-            //            responsavelChave => responsavelChave.CodigoDre,
-            //            responsavelValor => responsavelValor,
-            //            (chave, valor) => 
-            //                valor
-            //                .GroupBy(
-            //                        responsavelChave => responsavelChave.CpfResponsavel,
-            //                        responsavelValor => responsavelValor,
-            //                        (chave, valor) => ProcessaResponsavel(valor.First())
-            //                    )
-            //        )
-            //    .SelectMany(resp => resp)
-            //    .GroupBy(
-            //            todosChave => todosChave.dre_codigo,
-            //            todosValor => todosValor,
-            //            (chave, valor) => new DashboardAdesaoDto
-            //            {
-            //                dre_codigo = valor.First().dre_codigo,
-            //                dre_nome = valor.First().dre_nome,
-            //                ue_codigo = "",
-            //                ue_nome = "",
-            //                codigo_turma = 0,
-            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-            //            }
-            //        );
-
-            //var porUE =
-            //    respValidos
-            //    .GroupBy(
-            //            responsavelChave => responsavelChave.CodigoUe,
-            //            responsavelValor => responsavelValor,
-            //            (chave, valor) =>
-            //                valor
-            //                .GroupBy(
-            //                        responsavelChave => responsavelChave.CpfResponsavel,
-            //                        responsavelValor => responsavelValor,
-            //                        (chave, valor) => ProcessaResponsavel(valor.First())
-            //                    )
-            //        )
-            //    .SelectMany(resp => resp)
-            //    .GroupBy(
-            //            todosChave => todosChave.ue_codigo,
-            //            todosValor => todosValor,
-            //            (chave, valor) => new DashboardAdesaoDto
-            //            {
-            //                dre_codigo = valor.First().dre_codigo,
-            //                dre_nome = valor.First().dre_nome,
-            //                ue_codigo = valor.First().ue_codigo,
-            //                ue_nome = valor.First().ue_nome,
-            //                codigo_turma = 0,
-            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-            //            }
-            //        );
-
-            //var porTurma =
-            //    respValidos
-            //    .GroupBy(
-            //            responsavelChave => responsavelChave.CodigoTurma,
-            //            responsavelValor => responsavelValor,
-            //            (chave, valor) =>
-            //                valor
-            //                .GroupBy(
-            //                        responsavelChave => responsavelChave.CpfResponsavel,
-            //                        responsavelValor => responsavelValor,
-            //                        (chave, valor) => ProcessaResponsavel(valor.First())
-            //                    )
-            //        )
-            //    .SelectMany(resp => resp)
-            //    .GroupBy(
-            //            todosChave => todosChave.codigo_turma,
-            //            todosValor => todosValor,
-            //            (chave, valor) => new DashboardAdesaoDto
-            //            {
-            //                dre_codigo = valor.First().dre_codigo,
-            //                dre_nome = valor.First().dre_nome,
-            //                ue_codigo = valor.First().ue_codigo,
-            //                ue_nome = valor.First().ue_nome,
-            //                codigo_turma = valor.First().codigo_turma,
-            //                usuarios_validos = valor.Sum(adesao => adesao.usuarios_validos),
-            //                usuarios_cpf_invalidos = valor.Sum(adesao => adesao.usuarios_cpf_invalidos),
-            //                usuarios_primeiro_acesso_incompleto = valor.Sum(adesao => adesao.usuarios_primeiro_acesso_incompleto),
-            //                usuarios_sem_app_instalado = valor.Sum(adesao => adesao.usuarios_sem_app_instalado),
-            //            }
-            //        );
-
-            //var adesaoConsolidada =
-            //    porSME
-            //    .Union(porDRE)
-            //    .Union(porUE)
-            //    .Union(porTurma)
-            //    ;
-
-            //return adesaoConsolidada;
+            return listaDashBoardDresParaIncluir;
         }
 
-        private DashboardAdesaoDto ProcessaResponsavel(ResponsavelEOLDto responsavel)
+        private List<DashboardAdesaoDto> TrataUes(List<ResponsavelEOLDto> responsaveisDreEOL, List<DashboardAdesaoDto> listaDashBoardsParaIncluir)
+        {
+            var listaUesParaTratar = responsaveisDreEOL.Select(a => a.CodigoUe).Distinct();
+
+            foreach (var ueParaTratar in listaUesParaTratar)
+            {
+                var registrosDaUe = listaDashBoardsParaIncluir.Where(a => a.ue_codigo == ueParaTratar);
+
+                var registroParaTratarUe = registrosDaUe.FirstOrDefault();
+
+                var registroDashboardDaUe = new DashboardAdesaoDto()
+                {
+                    codigo_turma = 0,
+                    dre_codigo = registroParaTratarUe.dre_codigo,
+                    dre_nome = registroParaTratarUe.dre_nome,
+                    ue_codigo = registroParaTratarUe.ue_codigo,
+                    ue_nome = registroParaTratarUe.ue_nome,
+                    usuarios_cpf_invalidos = registrosDaUe.Sum(a => a.usuarios_cpf_invalidos),
+                    usuarios_primeiro_acesso_incompleto = registrosDaUe.Sum(a => a.usuarios_primeiro_acesso_incompleto),
+                    usuarios_sem_app_instalado = registrosDaUe.Sum(a => a.usuarios_sem_app_instalado),
+                    usuarios_validos = registrosDaUe.Sum(a => a.usuarios_validos)
+                };
+
+                listaDashBoardsParaIncluir.Add(registroDashboardDaUe);
+            }
+
+            return listaDashBoardsParaIncluir;
+        }
+
+        private List<DashboardAdesaoDto> TrataTurmas(IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<ResponsavelEOLDto> responsaveisDreEOL, List<DashboardAdesaoDto> listaDashBoardsParaIncluir)
+        {
+            var listaTurmasParaTratar = responsaveisDreEOL.Select(a => a.CodigoTurma).Distinct();
+
+            //Turmas da Dre
+            foreach (var turmaParaTratar in listaTurmasParaTratar)
+            {
+                var usuariosDaTurma = responsaveisDreEOL.Where(a => a.CodigoTurma == turmaParaTratar).ToList();
+
+                var listaTodosDaTurmaParaTratar = new List<DashboardAdesaoDto>();
+
+                foreach (var usuarioDaTurma in usuariosDaTurma)
+                {
+                    var dashBoardParaAdicionar = ProcessaResponsavel(usuarioDaTurma, usuariosDoSistema);
+                    listaTodosDaTurmaParaTratar.Add(dashBoardParaAdicionar);
+                }
+
+                var registroParaObterDados = usuariosDaTurma.FirstOrDefault();
+
+
+                var registroDashBoardTurmaAgrupado = new DashboardAdesaoDto()
+                {
+                    codigo_turma = turmaParaTratar,
+                    dre_codigo = registroParaObterDados.CodigoDre,
+                    dre_nome = registroParaObterDados.Dre,
+                    ue_codigo = registroParaObterDados.CodigoUe,
+                    ue_nome = registroParaObterDados.Ue,
+                    usuarios_cpf_invalidos = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_cpf_invalidos),
+                    usuarios_primeiro_acesso_incompleto = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_primeiro_acesso_incompleto),
+                    usuarios_sem_app_instalado = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_sem_app_instalado),
+                    usuarios_validos = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_validos)
+                };
+
+                listaDashBoardsParaIncluir.Add(registroDashBoardTurmaAgrupado);
+            }
+
+            return listaDashBoardsParaIncluir;
+        }
+
+        private DashboardAdesaoDto ProcessaResponsavel(ResponsavelEOLDto responsavel, IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema)
         {
             var cpf = responsavel.CpfResponsavel.ToString("00000000000");
             var cpfValido = ValidacaoCpf.Valida(cpf);
@@ -233,34 +187,37 @@ namespace SME.AE.Aplicacao.CasoDeUso
             var usuarios_cpf_invalidos = 0;
             var usuarios_sem_app_instalado = 0;
 
-            if(cpfValido)
+            if (cpfValido)
             {
-                UsuariosEscolaAquiDict.TryGetValue(cpf, out var usuarioEscolaAqui);
-                if(usuarioEscolaAqui == null || usuarioEscolaAqui.Excluido)
+                var usuarioDoSistema = usuariosDoSistema.FirstOrDefault(a => a.Cpf == cpf);
+
+                if (usuarioDoSistema == null)
                 {
                     usuarios_sem_app_instalado = 1;
-                } else
-                {
-                    usuarios_primeiro_acesso_incompleto = usuarioEscolaAqui.PrimeiroAcesso ? 1 : 0;
-                    usuarios_validos = !usuarioEscolaAqui.PrimeiroAcesso ? 1 : 0;
                 }
-            } else
+                else
+                {
+                    usuarios_primeiro_acesso_incompleto = usuarioDoSistema.PrimeiroAcesso ? 1 : 0;
+                    usuarios_validos = !usuarioDoSistema.PrimeiroAcesso ? 1 : 0;
+                }
+            }
+            else
             {
                 usuarios_cpf_invalidos = 1;
             }
 
             var dashboard_adesao = new DashboardAdesaoDto
-                {
-                    dre_codigo = responsavel.CodigoDre,
-                    dre_nome = responsavel.Dre,
-                    ue_codigo = responsavel.CodigoUe,
-                    ue_nome = responsavel.Ue,
-                    codigo_turma = responsavel.CodigoTurma,
-                    usuarios_primeiro_acesso_incompleto = usuarios_primeiro_acesso_incompleto,
-                    usuarios_validos = usuarios_validos,
-                    usuarios_cpf_invalidos = usuarios_cpf_invalidos,
-                    usuarios_sem_app_instalado = usuarios_sem_app_instalado
-                };
+            {
+                dre_codigo = responsavel.CodigoDre,
+                dre_nome = responsavel.Dre,
+                ue_codigo = responsavel.CodigoUe,
+                ue_nome = responsavel.Ue,
+                codigo_turma = responsavel.CodigoTurma,
+                usuarios_primeiro_acesso_incompleto = usuarios_primeiro_acesso_incompleto,
+                usuarios_validos = usuarios_validos,
+                usuarios_cpf_invalidos = usuarios_cpf_invalidos,
+                usuarios_sem_app_instalado = usuarios_sem_app_instalado
+            };
             return dashboard_adesao;
         }
     }

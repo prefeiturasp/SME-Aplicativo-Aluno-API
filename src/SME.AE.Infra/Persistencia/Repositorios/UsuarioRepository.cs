@@ -48,6 +48,28 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+
+        public async Task<IEnumerable<Usuario>> ObterTodosUsuariosAtivos()
+        {
+            var query = "select * from usuario where excluido = false";
+
+            try
+            {
+                using var conexao = InstanciarConexao();
+                await conexao.OpenAsync();
+                
+                var usuarios = await conexao.QueryAsync<Usuario>(query);
+                await conexao.CloseAsync();
+
+                return usuarios;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
         public async Task<Usuario> ObterUsuarioNaoExcluidoPorCpf(string cpf)
         {
             try
