@@ -21,6 +21,36 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.cacheRepositorio = cacheRepositorio;
         }
 
+        public async Task<IEnumerable<DataLeituraAluno>> ObterDadosLeituraAlunos(long notificacaoId, string codigosAlunos)
+        {
+            var sql =
+                @$"
+                select 
+	                codigo_eol_aluno CodigoAluno,
+	                greatest(criadoem, alteradoem) DataLeitura
+                from 
+	                usuario_notificacao_leitura unl
+                where 
+	                notificacao_id = {notificacaoId} and 
+	                codigo_eol_aluno in ({codigosAlunos})
+                ";
+            try
+            {
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var dadosLeituraComunicados =
+                    await conexao.QueryAsync<DataLeituraAluno>(sql);
+                conexao.Close();
+
+                return dadosLeituraComunicados;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long[] codigosTurmas, bool porResponsavel)
         {
 
@@ -46,9 +76,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
-	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = ANY(@modalidades)
+	                cn.notificacao_id = @notificacaoId 
                 ");
+
+            if (modalidades != null && modalidades.Any())
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo = ANY(@modalidades) ");
+            }
+            else
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo <> 0");
+            }
 
             if (codigosTurmas != null && codigosTurmas.Any())
             {
@@ -81,9 +119,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
-	                cn.notificacao_id = @notificacaoId and 
-	                cn.modalidade_codigo = ANY(@modalidades) 
+	                cn.notificacao_id = @notificacaoId 
                 ");
+
+            if (modalidades != null && modalidades.Any())
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo = ANY(@modalidades) ");
+            }
+            else
+            {
+                sqlResponsavel.Append(" and cn.modalidade_codigo <> 0");
+            }
 
             if (codigosTurmas != null && codigosTurmas.Any())
             {

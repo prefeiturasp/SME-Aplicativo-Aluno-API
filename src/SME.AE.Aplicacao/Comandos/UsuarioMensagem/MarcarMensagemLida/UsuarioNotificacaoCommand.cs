@@ -32,7 +32,8 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
                 var usuarioNotificacao = await _repository.ObterPorNotificacaoIdEhUsuarioCpf(usuarioNotificacaoRequest.NotificacaoId,
                                                                                              usuarioNotificacaoRequest.UsuarioCpf,
                                                                                              usuarioNotificacaoRequest.DreCodigoEol,
-                                                                                             usuarioNotificacaoRequest.UeCodigoEol);
+                                                                                             usuarioNotificacaoRequest.UeCodigoEol,
+                                                                                             usuarioNotificacaoRequest.CodigoEolAluno);
 
                 if (usuarioNotificacao == null)
                     return await _repository.Criar(request.UsuarioNotificacao);
