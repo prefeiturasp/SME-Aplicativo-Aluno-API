@@ -6,7 +6,7 @@ using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre;
 using System;
-using System.Data.SqlClient;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -47,6 +47,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
+        }
+
+        public async Task<IEnumerable<long>> ObterTodosCodigoDresAtivasAsync()
+        {
+            using var conexao = CriaConexao();
+
+            conexao.Open();
+
+            var query = @"SELECT dre_id FROM dre";
+
+            var ids = await conexao.QueryAsync<long>(query);
+
+            conexao.Close();
+
+            return ids;
         }
     }
 }
