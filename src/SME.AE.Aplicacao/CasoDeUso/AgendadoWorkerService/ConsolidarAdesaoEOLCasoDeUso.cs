@@ -49,7 +49,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             try
             {
 
-                var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();               
+                var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();
 
                 foreach (var dreCodigo in dresDoSistema)
                 {
@@ -57,12 +57,12 @@ namespace SME.AE.Aplicacao.CasoDeUso
                         (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo))
                         .ToList();
 
-                    await TrataTurmas(usuariosDoSistema, responsaveisDreEOL);                    
+                    await TrataTurmas(usuariosDoSistema, responsaveisDreEOL);
 
                     await TrataUes(dreCodigo.ToString(), responsaveisDreEOL);
 
                     await TrataDre(dreCodigo.ToString(), responsaveisDreEOL);
-                    
+
                 }
 
                 await TrataSME();
@@ -87,14 +87,15 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
-
-            foreach (var cpf in cpfsUnicosDaDre)
-            {
-                var registroParaSomar = registrosParaTratar.FirstOrDefault(a => a.CPF == cpf);
-                primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
-                semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
-                validos += registroParaSomar.UsuarioValido;
-            }
+            cpfsUnicosDaDre.AsParallel()
+                .WithDegreeOfParallelism(6)
+                .ForAll(cpf =>
+                {
+                    var registroParaSomar = registrosParaTratar.FirstOrDefault(a => a.CPF == cpf);
+                    primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
+                    semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
+                    validos += registroParaSomar.UsuarioValido;
+                });
 
             cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count();
 
@@ -107,7 +108,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 dre_codigo = registroParaTratarDre.CodigoDre,
                 dre_nome = registroParaTratarDre.Dre,
                 ue_codigo = string.Empty,
-                ue_nome =string.Empty,
+                ue_nome = string.Empty,
                 usuarios_cpf_invalidos = cpfsInvalidos,
                 usuarios_primeiro_acesso_incompleto = primeirosAcessos,
                 usuarios_sem_app_instalado = semAppInstalado,
@@ -123,21 +124,23 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         private async Task TrataSME()
         {
-            
+
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
             var cpfsUnicosDaSME = listaDeCpfsUtilizados.Where(a => a.CPF != 0).Select(a => a.CPF).ToList().Distinct();
 
             int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
+            cpfsUnicosDaSME.AsParallel()
+                .WithDegreeOfParallelism(6)
+                .ForAll(cpf =>
+                {
+                    var registroParaSomar = listaDeCpfsUtilizados.FirstOrDefault(a => a.CPF == cpf);
+                    primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
+                    semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
+                    validos += registroParaSomar.UsuarioValido;
+                });
 
-            foreach (var cpf in cpfsUnicosDaSME)
-            {
-                var registroParaSomar = listaDeCpfsUtilizados.FirstOrDefault(a => a.CPF == cpf);
-                primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
-                semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
-                validos += registroParaSomar.UsuarioValido;
-            }
 
             cpfsInvalidos = listaDeCpfsUtilizados.Where(a => a.TurmaCodigo == 0 && string.IsNullOrEmpty(a.UeCodigo) && a.CPF == 0).ToList().Count();
 
@@ -166,7 +169,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
             var registrosParaTratar = listaDeCpfsUtilizados.Where(a => a.DreCodigo == dreCodigo).ToList();
-           
+
             var uesCodigosParaTratar = registrosParaTratar.Select(a => a.UeCodigo).Distinct().ToList();
 
             foreach (var ueParaTratar in uesCodigosParaTratar)
@@ -180,13 +183,17 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
 
-                    foreach (var cpf in cpfsUnicosDaUe)
-                    {
-                        var registroParaSomar = cpfValidosDaUe.FirstOrDefault(a => a.CPF == cpf);
-                        primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
-                        semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
-                        validos += registroParaSomar.UsuarioValido;
-                    }
+                    cpfsUnicosDaUe.AsParallel()
+                        .WithDegreeOfParallelism(6)
+                        .ForAll(cpf =>
+                        {
+
+                            var registroParaSomar = cpfValidosDaUe.FirstOrDefault(a => a.CPF == cpf);
+                            primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
+                            semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
+                            validos += registroParaSomar.UsuarioValido;
+                        });
+
 
                     cpfsInvalidos = registrosParaTratar.Where(a => a.UeCodigo == ueParaTratar && a.CPF == 0).Count();
 
@@ -224,8 +231,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
 
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
-            
+
             var listaTurmasParaTratar = responsaveisDreEOL.Select(a => a.CodigoTurma).Distinct();
+
 
             //Turmas da Dre
             foreach (var turmaParaTratar in listaTurmasParaTratar)
@@ -238,7 +246,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
                 foreach (var usuarioDaTurma in usuariosDaTurma)
                 {
-                    
+
                     var dashBoardParaAdicionar = ProcessaResponsavel(usuarioDaTurma, usuariosDoSistema, cpfsParaTratar);
                     if (dashBoardParaAdicionar != null)
                         listaTodosDaTurmaParaTratar.Add(dashBoardParaAdicionar);
@@ -264,7 +272,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
 
             await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
-            
+
         }
 
         private DashboardAdesaoDto ProcessaResponsavel(ResponsavelEOLDto responsavel, IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<DashboardAdesaoUnificacaoDto> listaCpfsUnificados)
