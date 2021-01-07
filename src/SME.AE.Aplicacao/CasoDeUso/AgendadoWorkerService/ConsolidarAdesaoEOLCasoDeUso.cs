@@ -17,6 +17,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private readonly IDreSgpRepositorio dreSgpRepositorio;
         private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private List<DashboardAdesaoUnificacaoDto> listaDeCpfsUtilizados { get; set; }
+        private int cpfsInvalidosSME { get; set; }
 
         public ConsolidarAdesaoEOLCasoDeUso(IResponsavelEOLRepositorio responsavelEOLRepositorio,
                                             IDashboardAdesaoRepositorio dashboardAdesaoRepositorio,
@@ -30,6 +31,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.dreSgpRepositorio = dreSgpRepositorio ?? throw new ArgumentNullException(nameof(dreSgpRepositorio));
             this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
             listaDeCpfsUtilizados = new List<DashboardAdesaoUnificacaoDto>();
+            cpfsInvalidosSME = 0;
         }
 
         public async Task ExecutarAsync()
@@ -98,6 +100,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 });
 
             cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count();
+            
+            cpfsInvalidosSME += cpfsInvalidos;
 
             var registroParaTratarDre = responsaveis.FirstOrDefault(a => a.CodigoDre == dreCodigo);
 
@@ -129,10 +133,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var cpfsUnicosDaSME = listaDeCpfsUtilizados.Where(a => a.CPF != 0).Select(a => a.CPF).ToList().Distinct();
 
-            int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
+            int primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
             cpfsUnicosDaSME.AsParallel()
-                .WithDegreeOfParallelism(6)
+                .WithDegreeOfParallelism(8)
                 .ForAll(cpf =>
                 {
                     var registroParaSomar = listaDeCpfsUtilizados.FirstOrDefault(a => a.CPF == cpf);
@@ -141,10 +145,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     validos += registroParaSomar.UsuarioValido;
                 });
 
-
-            cpfsInvalidos = listaDeCpfsUtilizados.Where(a => a.TurmaCodigo == 0 && string.IsNullOrEmpty(a.UeCodigo) && a.CPF == 0).ToList().Count();
-
-
             var registroDashboardDaDre = new DashboardAdesaoDto()
             {
                 codigo_turma = 0,
@@ -152,7 +152,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 dre_nome = string.Empty,
                 ue_codigo = string.Empty,
                 ue_nome = string.Empty,
-                usuarios_cpf_invalidos = cpfsInvalidos,
+                usuarios_cpf_invalidos = cpfsInvalidosSME,
                 usuarios_primeiro_acesso_incompleto = primeirosAcessos,
                 usuarios_sem_app_instalado = semAppInstalado,
                 usuarios_validos = validos
