@@ -12,7 +12,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
 	public class ResponsavelEOLRepositorio : IResponsavelEOLRepositorio {
 		private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
-		public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo)
+		public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo)
 		{
 			var sql =
                 @"
@@ -34,11 +34,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					where 
 						mte.cd_situacao_aluno IN ( 1, 6, 10, 13 ) and
 						ra.dt_fim IS NULL and dre.cd_unidade_educacao = @dreCodigo
+                        and m.an_letivo = @anoLetivo;
 				";
 
 			using var conn = CriaConexao();
 			await conn.OpenAsync();
-			var responsaveisEOL = await conn.QueryAsync<ResponsavelEOLDto>(sql, new { dreCodigo });
+			var responsaveisEOL = await conn.QueryAsync<ResponsavelEOLDto>(sql, new { dreCodigo, anoLetivo });
 			await conn.CloseAsync();
 			return responsaveisEOL;
 		}
