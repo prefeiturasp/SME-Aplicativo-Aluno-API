@@ -50,13 +50,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             try
             {
-
+                var anoLetivoAtual = DateTime.Now.Year;
                 var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();
 
                 foreach (var dreCodigo in dresDoSistema)
                 {
                     var responsaveisDreEOL =
-                        (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo))
+                        (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo, anoLetivoAtual))
                         .ToList();
 
                     await TrataTurmas(usuariosDoSistema, responsaveisDreEOL);
