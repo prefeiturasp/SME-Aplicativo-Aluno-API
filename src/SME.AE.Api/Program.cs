@@ -16,6 +16,6 @@ namespace SME.AE.Api
             WebHost.CreateDefaultBuilder(args)
             .UseStartup<Startup>()
             .UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; })
-            .UseUrls("http://0.0.0.0:5000;https://0.0.0.0:5001;");
+            .UseUrls("http://0.0.0.0:5000;");
     }
 }

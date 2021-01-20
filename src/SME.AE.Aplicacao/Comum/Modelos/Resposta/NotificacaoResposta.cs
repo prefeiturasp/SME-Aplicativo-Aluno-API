@@ -22,8 +22,31 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public IEnumerable<NotificacaoTurma> Turmas { get; set; }
         public bool MensagemVisualizada { get; internal set; }
         public TipoComunicado TipoComunicado { get; set; }
-        public string CategoriaNotificacao { get; set; }
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
+        public string SeriesResumidas { get; set; }
+        public string CategoriaNotificacao { 
+            get {
+                if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+                {
+                    return "SME";
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+                    {
+                        return "DRE";
+                    }
+                    else
+                    {
+                        return "UE";
+                    }
+                }
+            }
+            set { }
+        }
     }
+
+
+
 }

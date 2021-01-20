@@ -1,19 +1,19 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
-using SME.AE.Infra.Persistencia.Repositorios;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
-using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
-using SME.AE.Infra.Persistencia.Repositorios.Externos;
 using SME.AE.Infra.Persistencia.Cache;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using SME.AE.Infra.Persistencia.Repositorios;
+using SME.AE.Infra.Persistencia.Repositorios.Externos;
+using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
+using System.Runtime.CompilerServices;
 
 namespace SME.AE.Infra
 {
@@ -39,10 +39,22 @@ namespace SME.AE.Infra
             services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddTransient(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddTransient(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
+            services.AddTransient(typeof(ITermosDeUsoRepositorio), typeof(TermosDeUsoRepositorio));
+            services.AddTransient(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
-
+            services.AddTransient(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
+            services.AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>();
+            services.AddTransient<IEventoRepositorio, EventoRepositorio>();
+            services.AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>();
+            services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
+            services.AddTransient(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
+            services.AddTransient(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
+            services.AddTransient(typeof(ITurmaRepositorio), typeof(TurmaRepositorio));
+            services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
+            services.AddTransient(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
+            services.AddTransient(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
+            services.AddTransient(typeof(IDreSgpRepositorio), typeof(DreSgpRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
-
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.AddTransient<IAutenticacaoService, AutenticacaoService>();
             services.AddAuthentication().AddIdentityServerJwt();

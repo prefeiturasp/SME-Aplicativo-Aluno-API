@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using Npgsql;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -27,7 +29,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                        ue_codigoeol, 
                         usuario_cpf,
                           criadopor,
-                     mensagemvisualizada)
+                     mensagemvisualizada,
+                     mensagemexcluida
+                        )
                     VALUES(@UsuarioId,
                            @NotificacaoId,
                            @dataAtual,
@@ -36,7 +40,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                            @UeCodigoEol,
                            @UsuarioCpf,
                            @CriadoPor,
-                           @MensagemVisualizada);",
+                           @MensagemVisualizada,
+                           @MensagemExcluida
+                        );",
                     new
                     {
                         usuarioNotificacao.UsuarioId,
@@ -47,7 +53,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuarioNotificacao.UeCodigoEol,
                         usuarioNotificacao.UsuarioCpf,
                         usuarioNotificacao.CriadoPor,
-                        usuarioNotificacao.MensagemVisualizada
+                        usuarioNotificacao.MensagemVisualizada,
+                        usuarioNotificacao.MensagemExcluida
                     });
                 conn.Close();
                 return true;
@@ -57,7 +64,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 throw ex;
             }
-          
+
         }
 
         public Task<UsuarioNotificacao> ObterPorId(long id)
@@ -76,6 +83,41 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Close();
 
             return true;
+        }
+
+
+        public async Task<UsuarioNotificacao> ObterPorUsuarioAlunoNotificacao(long usuarioId, long codigoAluno, long notificacaoId)
+        {
+            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+
+            await conn.OpenAsync();
+
+            var usuarioNotificacao = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
+                @"
+                    SELECT 
+                    	id, 
+                    	usuario_id usuarioid, 
+                    	codigo_eol_aluno codigoeolaluno, 
+                    	notificacao_id notificacaoid, 
+                    	criadoem, 
+                    	dre_codigoeol drecodigoeol, 
+                    	ue_codigoeol uecodigoeol, 
+                    	usuario_cpf usuariocpf, 
+                    	alteradoem, 
+                    	criadopor, 
+                    	alteradopor, 
+                    	mensagemvisualizada, 
+                    	mensagemexcluida
+                    FROM usuario_notificacao_leitura
+                    where
+                        usuario_id = @usuario_id and
+                        codigo_eol_aluno = @codigo_eol_aluno and
+                        notificacao_id = @notificacaoId
+                ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId });
+
+            await conn.CloseAsync();
+
+            return usuarioNotificacao;
         }
 
         public async Task<bool> Remover(long notificacaoId)
@@ -103,14 +145,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
 
-        public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf, long dreCodigoEol, string ueCodigoEol)
+        public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf, long dreCodigoEol, string ueCodigoEol, long codigoEolAluno)
         {
             var query = @"select
-	                        *
+                            id as Id,
+	                        usuario_Id as UsuarioId,
+                            codigo_eol_aluno as CodigoEolAluno,
+                            notificacao_id as NotificacaoId,
+                            dre_codigoeol as DreCodigoEol,
+                            ue_codigoeol as UeCodigoEol,
+                            usuario_cpf as UsuarioCpf
                         from
 	                        public.usuario_notificacao_leitura
                         where
 	                        usuario_cpf = @usuarioCpf
+                            and codigo_eol_aluno = @codigoEolAluno
 	                        and notificacao_id = @notificacaoId
 	                        and dre_codigoeol = @dreCodigoEol
 	                        and ue_codigoeol = @ueCodigoEol";
@@ -121,7 +170,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 conn.Open();
                 retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
-                    query, new { usuarioCpf, notificacaoId, dreCodigoEol, ueCodigoEol });
+                    query, new { usuarioCpf, notificacaoId, dreCodigoEol, ueCodigoEol, codigoEolAluno });
                 conn.Close();
             }
             return retorno;
@@ -129,6 +178,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<bool> Atualizar(UsuarioNotificacao usuarioNotificacao)
         {
+
+
             await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
             conn.Open();
             var dataAtual = DateTime.Now;
@@ -137,18 +188,65 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                          SET 
                              alteradoem= @dataAtual, 
                              alteradopor= @UsuarioId, 
-                             mensagemVisualizada= @MensagemVisualizada 
+                             mensagemVisualizada= @MensagemVisualizada,
+                             mensagemExcluida= @MensagemExcluida
                          WHERE id = @Id ;",
                 new
                 {
                     dataAtual,
                     usuarioNotificacao.UsuarioId,
                     usuarioNotificacao.MensagemVisualizada,
+                    usuarioNotificacao.MensagemExcluida,
                     usuarioNotificacao.Id
 
                 });
             conn.Close();
             return true;
+        }
+
+        public async Task<long> ObterTotalNotificacoesLeituraPorResponsavel(long notificacaoId, long codigoDre)
+        {
+            try
+            {
+                var query = new StringBuilder();
+                query.AppendLine(@"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+                if (codigoDre > 0)
+                    query.AppendLine(" and dre_codigoeol = @codigoDre ");
+
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre });
+                conn.Close();
+                return totalNotificacoesLeituraPorReponsavel;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        public async Task<long> ObterTotalNotificacoesLeituraPorAluno(long notificacaoId, long codigoDre)
+        {
+            try
+            {
+                var query = new StringBuilder();
+                query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+
+                if (codigoDre > 0) 
+                    query.AppendLine(" and dre_codigoeol = @codigoDre ");
+
+                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre});
+                conn.Close();
+                return totalNotificacoesLeituraPorAluno;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
         }
     }
 }

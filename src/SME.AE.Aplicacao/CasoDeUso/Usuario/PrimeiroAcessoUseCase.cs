@@ -88,7 +88,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
                 PrimeiroAcesso = false
             };
         }
-        
+
         private CriarUsuarioCoreSSOCommand MapearCriarUsuarioCoreSSOCommand(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)
         {
             return new CriarUsuarioCoreSSOCommand()
@@ -101,5 +101,6 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
                 }
             };
         }
+
     }
 }

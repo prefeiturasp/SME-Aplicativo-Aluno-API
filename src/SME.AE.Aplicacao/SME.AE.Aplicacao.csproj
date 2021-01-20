@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,12 +22,38 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
+    <Compile Include="Comum\Modelos\Resposta\AlunoTurmaEol.cs" />
+    <Compile Include="Comum\Modelos\Resposta\DadosConsolidacaoNotificacaoResultado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\DataLeituraAluno.cs" />
+    <Compile Include="Comum\Modelos\Resposta\DadosLeituraAlunosComunicado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\DadosLeituraComunicadosPorModalidadeTurmaResultado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\DadosLeituraComunicadosResultado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\ComponenteCurricularDoAluno.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoFaixa.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorBimestreAusencia.cs" />
+    <Compile Include="Comum\Modelos\Resposta\TurmaModalidadeDeEnsinoDto.cs" />
+    <Compile Include="Comum\Modelos\Resposta\AtualizacaiNotificacaoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\CpfResponsavelAlunoEol.cs" />
+    <Compile Include="Comum\Modelos\Resposta\EventoRespostaDto.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorBimestre.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoCor.cs" />
+    <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorComponenteCurricularResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\Grupo.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotasDoAluno\NotaAlunoCor.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotasDoAluno\NotaAlunoComponenteCurricular.cs" />
+    <Compile Include="Comum\Modelos\Resposta\NotasDoAluno\NotaAlunoPorBimestreResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\AlunoRespostaEol.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoPorUsuario.cs" />
     <Compile Include="Comum\Modelos\Resposta\ListaAlunos.cs" />
+    <Compile Include="Comum\Modelos\Resposta\TotaisAdesaoResultado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\RetornoTermosDeUsoDto.cs" />
+    <Compile Include="Comum\Modelos\Resposta\RetornoToken.cs" />
+    <Compile Include="Comum\Modelos\Resposta\UltimaAtualizaoWorkerPorProcessoResultado.cs" />
+    <Compile Include="Comum\Modelos\Resposta\Dre\DreResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\UnidadeEscolar\UnidadeEscolarResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,7 +111,6 @@
     <Folder Include="Comandos\Usuario\AdicionarCoreSSO\" />
     <Folder Include="Comum\Interfaces\UseCase\TesteArquitetura\" />
     <Folder Include="Comum\Modelos\Validadores\" />
-    <Folder Include="Consultas\UsuarioNotificacao\" />
   </ItemGroup>
 
 </Project>
