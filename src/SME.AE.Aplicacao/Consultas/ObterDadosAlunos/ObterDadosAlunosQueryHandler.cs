@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
         {
             var alunos = await _alunoRepositorio.ObterDadosAlunos(request.Cpf);
             if (alunos == null || !alunos.Any())
-                throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
+                throw new NegocioException("Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");
 
             return alunos;
         }

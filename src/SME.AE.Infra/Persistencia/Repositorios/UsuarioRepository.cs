@@ -2,12 +2,10 @@
 using Dapper;
 using Dapper.Dommel;
 using Dommel;
-using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -20,6 +18,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
+        private const string USUARIOPORCPF = "UsuarioCpf";
+        private const string USUARIOPORID = "UsuarioId";
+        private const string USUARIOPORTOKEN = "UsuarioToken";
+
         private readonly ICacheRepositorio cacheRepositorio;
         public UsuarioRepository(ICacheRepositorio cacheRepositorio) : base(ConnectionStrings.Conexao)
         {
@@ -28,18 +30,57 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
-            SentrySdk.CaptureEvent(new SentryEvent(new Exception("Teste 1234")));
+            try
+            {
+                var usuarioCache = ObterUsuarioCachePorCpf(cpf);
+                if (usuarioCache != null) return usuarioCache;
+
+                using var conexao = InstanciarConexao();
+                conexao.Open();
+                var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
+                await SalvarUsuarioCache(usuario);
+                return usuario;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
+
+        public async Task<IEnumerable<Usuario>> ObterTodosUsuariosAtivos()
+        {
+            var query = "select * from usuario where excluido = false";
 
             try
             {
-                var chaveCache = $"Usuario-{cpf}";
-                var usuarioCache = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(usuarioCache))
-                    return JsonConvert.DeserializeObject<Usuario>(usuarioCache);
+                using var conexao = InstanciarConexao();
+                await conexao.OpenAsync();
+                
+                var usuarios = await conexao.QueryAsync<Usuario>(query);
+                await conexao.CloseAsync();
+
+                return usuarios;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
+        public async Task<Usuario> ObterUsuarioNaoExcluidoPorCpf(string cpf)
+        {
+            try
+            {
+                var usuarioCache = ObterUsuarioCachePorCpf(cpf);
+                if (usuarioCache != null) return usuarioCache;
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Cpf == cpf);
+                await SalvarUsuarioCache(usuario);
                 return usuario;
             }
             catch (Exception ex)
@@ -66,6 +107,54 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
+        public async Task<long> ObterTotalUsuariosComAcessoIncompleto(List<string> cpfs)
+        {
+            try
+            {
+                var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+                var query = new StringBuilder();
+                query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosComAcessoIncompleto}");
+
+                if (cpfs != null && cpfs.Any())
+                    query.AppendLine($" and cpf IN ({cpfsIN})");
+
+                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(query.ToString());
+                conn.Close();
+                return (long)totalUsuariosComAcessoIncompleto;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return 0;
+            }
+        }
+
+        public async Task<long> ObterTotalUsuariosValidos(List<string> cpfs)
+        {
+            try
+            {
+                var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+                var query = new StringBuilder();
+                query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosValidos}");
+
+                if (cpfs != null && cpfs.Any())
+                    query.AppendLine($" and cpf IN ({cpfsIN})");
+
+                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                conn.Open();
+                var totalUsuariosValidos = await conn.ExecuteScalarAsync(query.ToString());
+                conn.Close();
+                return (long)totalUsuariosValidos;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return 0;
+            }
+        }
+
         public async Task AtualizaUltimoLoginUsuario(string cpf)
         {
             try
@@ -76,9 +165,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conn.ExecuteAsync(
                     "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
                 conn.Close();
-
-                var chaveCache = $"Usuario-{cpf}";
-                await cacheRepositorio.RemoverAsync(chaveCache);
+                await LimparUsuarioCachePorCpf(cpf);
             }
             catch (Exception ex)
             {
@@ -99,9 +186,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
                 await conexao.ExecuteAsync(sql, usuario);
                 conexao.Close();
-
-                var chaveCache = $"Usuario-{usuario.Cpf}";
-                await cacheRepositorio.RemoverAsync(chaveCache);
+                await LimparUsuarioCache(usuario);
             }
             catch (Exception ex)
             {
@@ -127,6 +212,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = InstanciarConexao();
                 await conexao.ExecuteAsync(builder.ToString(), new { id, email, celular, alteradoem = DateTime.Now });
                 conexao.Close();
+                await LimparUsuarioCachePorId(id);
             }
             catch (Exception ex)
             {
@@ -143,6 +229,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             SET primeiroacesso=@primeiroAcesso,alteradopor='Sistema', alteradoem=@alteradoem
                             where id = @id;", new { id, primeiroAcesso, alteradoem = DateTime.Now });
                 conexao.Close();
+                await LimparUsuarioCachePorId(id);
             }
             catch (Exception ex)
             {
@@ -154,15 +241,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = $"UsuarioToken-{token}";
-                var usuarioToken = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(usuarioToken))
-                    return JsonConvert.DeserializeObject<Usuario>(usuarioToken);
+                var usuarioCache = ObterUsuarioCachePorToken(token);
+                if (usuarioCache != null)
+                    return usuarioCache;
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Token == token && x.RedefinirSenha);
                 conexao.Close();
+                await SalvarUsuarioCache(usuario);
                 return usuario;
             }
             catch (Exception ex)
@@ -182,9 +269,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conn.ExecuteAsync(
                     "update usuario set excluido = true , ultimoLogin = @dataHoraAtual, token_redefinicao = '', redefinicao = false, validade_token = null  where cpf = @cpf", new { cpf, dataHoraAtual });
                 conn.Close();
-
-                var chaveCache = $"Usuario-{cpf}";
-                await cacheRepositorio.RemoverAsync(chaveCache);
+                await LimparUsuarioCachePorCpf(cpf);
             }
             catch (Exception ex)
             {
@@ -206,7 +291,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conn.Close();
 
                 var chaveCache = $"UsuarioDispositivo-{usuarioId}-{dispositivoId}";
-                await cacheRepositorio.SalvarAsync(chaveCache, JsonConvert.SerializeObject(new UsuarioDispositivoDto(usuarioId, dispositivoId)), 1080, false);
+                await cacheRepositorio.SalvarAsync(chaveCache, "true", 1080, false);
             }
             catch (Exception ex)
             {
@@ -256,6 +341,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var retorno = await conn.QueryAsync(query, new { usuarioId, dispositivoId });
                 if (!retorno.Any())
                     return false;
+
+                await cacheRepositorio.SalvarAsync(chaveCache, "true", 1080, false);
                 return true;
             }
             catch (Exception ex)
@@ -263,6 +350,90 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 return false;
             }
+        }
+
+        private Usuario ObterUsuarioCachePorId(long id)
+            => cacheRepositorio.Obter<Usuario>($"{USUARIOPORID}-{id}");
+        private Usuario ObterUsuarioCachePorCpf(string cpf)
+            => cacheRepositorio.Obter<Usuario>($"{USUARIOPORCPF}-{cpf}");
+        private Usuario ObterUsuarioCachePorToken(string token)
+            => cacheRepositorio.Obter<Usuario>($"{USUARIOPORTOKEN}-{token}");
+        private async Task LimparUsuarioCachePorId(long id)
+            => await LimparUsuarioCache(ObterUsuarioCachePorId(id));
+        private async Task LimparUsuarioCachePorCpf(string cpf)
+            => await LimparUsuarioCache(ObterUsuarioCachePorCpf(cpf));
+        private async Task LimparUsuarioCachePorToken(string token)
+            => await LimparUsuarioCache(ObterUsuarioCachePorToken(token));
+        private async Task LimparUsuarioCache(Usuario usuario)
+        {
+            if (usuario != null)
+            {
+                try
+                {
+                    var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuario.Id}";
+                    var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuario.Cpf}";
+                    var chaveUsuarioTokenCache = $"{USUARIOPORTOKEN}-{usuario.Token}";
+
+                    await Task.WhenAll(
+                        cacheRepositorio.RemoverAsync(chaveUsuarioIdCache),
+                        cacheRepositorio.RemoverAsync(chaveUsuarioCpfCache),
+                        cacheRepositorio.RemoverAsync(chaveUsuarioTokenCache)
+                        );
+                }
+                catch (Exception ex)
+                {
+                    SentrySdk.CaptureException(ex);
+                    throw ex;
+                }
+            }
+        }
+        private async Task SalvarUsuarioCache(Usuario usuario)
+        {
+            if (usuario != null)
+            {
+                try
+                {
+                    var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuario.Id}";
+                    var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuario.Cpf}";
+                    var chaveUsuarioTokenCache = $"{USUARIOPORTOKEN}-{usuario.Token}";
+
+                    await Task.WhenAll(
+                        cacheRepositorio.SalvarAsync(chaveUsuarioIdCache, usuario),
+                        cacheRepositorio.SalvarAsync(chaveUsuarioCpfCache, usuario),
+                        cacheRepositorio.SalvarAsync(chaveUsuarioTokenCache, usuario)
+                        );
+                }
+                catch (Exception ex)
+                {
+                    SentrySdk.CaptureException(ex);
+                    throw ex;
+                }
+            }
+        }
+        public override async Task<Usuario> ObterPorIdAsync(long id)
+        {
+            var usuario = ObterUsuarioCachePorId(id);
+            if (usuario == null)
+            {
+                usuario = await base.ObterPorIdAsync(id);
+            }
+            return usuario;
+        }
+        public override async Task RemoverAsync(long id)
+        {
+            await LimparUsuarioCachePorId(id);
+            await base.RemoverAsync(id);
+        }
+        public override async Task RemoverAsync(Usuario usuario)
+        {
+            await LimparUsuarioCache(usuario);
+            await base.RemoverAsync(usuario);
+        }
+        public override async Task<long> SalvarAsync(Usuario usuario)
+        {
+            if (usuario.Id != 0)
+                await LimparUsuarioCache(usuario);
+            return await base.SalvarAsync(usuario);
         }
     }
 }

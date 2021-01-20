@@ -10,6 +10,5 @@
             Cpf = cpf;
             Nome = nome;
         }
-
     }
 }

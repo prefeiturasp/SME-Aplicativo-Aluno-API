@@ -31,9 +31,9 @@ pipeline {
             }
          steps {
              sh 'echo Analise SonarQube API'
-             sh 'dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno" /d:sonar.host.url="http://sonar.sme.prefeitura.sp.gov.br/" /d:sonar.login="82daa76df5080b75b89b6e1db6cbdde71794405f"'
+             sh 'dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno" /d:sonar.host.url="http://sonar.sme.prefeitura.sp.gov.br/" /d:sonar.login="5a0e9b0ae743ade93c77190a95b79505b3e6bae5"'
              sh 'dotnet build'
-             sh 'dotnet-sonarscanner end /d:sonar.login="82daa76df5080b75b89b6e1db6cbdde71794405f"'
+             sh 'dotnet-sonarscanner end /d:sonar.login="5a0e9b0ae743ade93c77190a95b79505b3e6bae5"'
            
          }
        }

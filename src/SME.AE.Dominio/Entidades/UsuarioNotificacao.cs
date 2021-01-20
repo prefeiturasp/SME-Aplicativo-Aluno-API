@@ -13,5 +13,6 @@ namespace SME.AE.Dominio.Entidades
         public string UeCodigoEol { get; set; }
         public string UsuarioCpf { get; set; }
         public bool MensagemVisualizada { get; set; }
+        public bool MensagemExcluida { get; set; }
     }
 }

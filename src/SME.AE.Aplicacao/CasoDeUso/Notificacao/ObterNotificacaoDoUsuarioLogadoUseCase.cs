@@ -49,7 +49,8 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 CodigoTurma = aluno.CodigoTurma.ToString(),
                 CodigoUE = aluno.CodigoEscola,
                 CodigoUsuario  = usuario.Id,
-                GruposId = string.Join(',', grupos)
+                GruposId = string.Join(',', grupos),
+                SerieResumida = aluno.SerieResumida
             });
         }
     }

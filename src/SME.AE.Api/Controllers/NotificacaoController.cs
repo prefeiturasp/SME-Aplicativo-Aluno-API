@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
 using SME.AE.Api.Filtros;
-using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
@@ -46,7 +43,7 @@ namespace SME.AE.Api.Controllers
 
         [HttpGet("{codigoAluno}")]
         [Authorize]
-        public async Task<ObjectResult> ObterDoUsuarioLogado(long codigoAluno, [FromServices]IObterNotificacaoDoUsuarioLogadoUseCase obterDoUsuarioLogadoUseCase)
+        public async Task<ObjectResult> ObterDoUsuarioLogado(long codigoAluno, [FromServices] IObterNotificacaoDoUsuarioLogadoUseCase obterDoUsuarioLogadoUseCase)
         {
             return Ok(await obterDoUsuarioLogadoUseCase.Executar(User.Identity.Name, codigoAluno));
         }

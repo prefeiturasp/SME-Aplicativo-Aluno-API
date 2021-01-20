@@ -4,11 +4,11 @@ namespace SME.AE.Aplicacao.Comum.Config
 {
     public static class VariaveisAmbiente
     {
-        public static string JwtTokenSecret = Environment.GetEnvironmentVariable("SME_AE_JWT_TOKEN_SECRET");
-        public static string ChaveIntegracao = Environment.GetEnvironmentVariable("ChaveIntegracao");
-        public static string SentryDsn = Environment.GetEnvironmentVariable("SentryDsn");
-        public static string FirebaseToken = Environment.GetEnvironmentVariable("FirebaseToken");
-        public static string FirebaseProjectId = Environment.GetEnvironmentVariable("FirebaseProjectId");
-        public static string UrlArquivosEstaticos = Environment.GetEnvironmentVariable("UrlFrontEnd");
+        public static string JwtTokenSecret { get => Environment.GetEnvironmentVariable("SME_AE_JWT_TOKEN_SECRET"); }
+        public static string ChaveIntegracao { get => Environment.GetEnvironmentVariable("ChaveIntegracao"); }
+        public static string SentryDsn { get => Environment.GetEnvironmentVariable("Sentry__DSN"); }
+        public static string FirebaseToken { get => Environment.GetEnvironmentVariable("FirebaseToken"); }
+        public static string FirebaseProjectId { get => Environment.GetEnvironmentVariable("FirebaseProjectId"); }
+        public static string UrlArquivosEstaticos { get => Environment.GetEnvironmentVariable("UrlFrontEnd"); }
     }
 }
