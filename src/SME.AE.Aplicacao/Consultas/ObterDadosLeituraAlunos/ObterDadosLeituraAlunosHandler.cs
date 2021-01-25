@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,9 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         public async Task<IEnumerable<DadosLeituraAlunosComunicado>> Handle(ObterDadosLeituraAlunosQuery request, CancellationToken cancellationToken)
         {
             var alunosTurma = await alunoRepositorio.ObterAlunosTurma(request.CodigoTurma);
+
+            if (!alunosTurma.Any())
+                throw new NegocioException("Não foi possível localizar alunos para a turma informada");
 
             var codigosAlunos = string.Join(',',
                 alunosTurma
