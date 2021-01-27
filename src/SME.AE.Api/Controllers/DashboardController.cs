@@ -40,9 +40,9 @@ namespace SME.AE.Api.Controllers
         [HttpGet("leitura")]
         [AllowAnonymous]
         //[ChaveIntegracaoFiltro]]
-        public async Task<ObjectResult> ObterDadosDeLeituraComunicados([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraComunicadosUseCase obterDadosDeLeituraComunicados)
+        public async Task<ObjectResult> ObterDadosDeLeituraComunicados([FromQuery] string codigoDre, [FromQuery] string codigoUe, [FromQuery] long notificacaoId, [FromQuery] short modalidade, ModoVisualizacao modoVisualizacao, [FromServices] IObterDadosDeLeituraComunicadosUseCase obterDadosDeLeituraComunicados)
         {
-            return Ok(await obterDadosDeLeituraComunicados.Executar(codigoDre, codigoUe, notificacaoId, modoVisualizacao));
+            return Ok(await obterDadosDeLeituraComunicados.Executar(codigoDre, codigoUe, notificacaoId, modalidade, modoVisualizacao));
         }
 
         [HttpGet("leitura/agrupados")]
