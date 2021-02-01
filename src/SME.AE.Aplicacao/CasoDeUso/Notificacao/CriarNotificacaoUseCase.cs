@@ -66,7 +66,7 @@ namespace SME.AE.Aplicacao
             return new Dictionary<String, String>
             {
                 ["Titulo"] = notificacao.Titulo,
-                ["Mensagem"] = notificacao.Mensagem,
+                ["Mensagem"] = notificacao.Mensagem.Length > 1024 ? notificacao.Mensagem.Substring(0, 1024) : notificacao.Mensagem,
                 ["categoriaNotificacao"] = notificacao.CategoriaNotificacao,
                 ["Id"] = notificacao.Id.ToString(),
                 ["CriadoEm"] = notificacao.CriadoEm.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
