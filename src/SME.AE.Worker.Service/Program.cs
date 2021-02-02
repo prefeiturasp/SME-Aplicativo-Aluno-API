@@ -3,9 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra.Persistencia.Mapeamentos;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace SME.AE.Worker.Service
@@ -43,11 +43,10 @@ namespace SME.AE.Worker.Service
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso();
-                });
-        //}).ConfigureLogging((context, logging) =>
-        //{
-        //    logging.AddConfiguration(context.Configuration);
-        //    logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
-        //});
+                }).ConfigureLogging((context, logging) =>
+                    {
+                        logging.AddConfiguration(context.Configuration);
+                        logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
+                    });
     }
 }
