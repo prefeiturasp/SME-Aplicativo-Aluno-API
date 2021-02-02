@@ -59,8 +59,7 @@ namespace SME.AE.Worker.Service
 
         private async Task ExecutaCasoDeUso()
         {
-            //SentrySdk.CaptureException(new Exception($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}"));
-            //SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
+            SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
             logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
 
             var servico = serviceProvider.GetService<T>() ?? throw new Exception($"Injeção de dependencia para o tipo {typeof(T).Name} não registrado.");
