@@ -140,7 +140,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					mte.dt_situacao_aluno DataSituacaoAluno
 				from v_aluno_cotic(nolock) a
 				inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
-				inner join v_matricula_cotic(nolock) m on m.cd_aluno = a.cd_aluno 
+				inner join v_historico_matricula_cotic(nolock) m on m.cd_aluno = a.cd_aluno 
 				inner join historico_matricula_turma_escola(nolock) mte on mte.cd_matricula = m.cd_matricula 
 				inner join turma_escola(nolock) te on te.cd_turma_escola = mte.cd_turma_escola
 				where 

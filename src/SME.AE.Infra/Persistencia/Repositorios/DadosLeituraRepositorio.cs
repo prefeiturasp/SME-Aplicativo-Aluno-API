@@ -234,7 +234,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<IEnumerable<DadosConsolidacaoNotificacaoResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificacaoId)
+        public async Task<IEnumerable<DadosConsolidacaoNotificacaoResultado>> ObterDadosLeituraComunicados(string codigoDre, string codigoUe, long notificacaoId, short modalidade)
         {
             try
             {
@@ -279,7 +279,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
 
-                if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe))
+                if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe) && modalidade == 0)
                     sql = @"SELECT 
                                 ano_letivo as AnoLetivo,
                                 notificacao_id as NotificacaoId,
@@ -295,13 +295,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             FROM consolidacao_notificacao 
                             where dre_codigo = @codigoDre 
                             and ue_codigo = @codigoUe 
-                            and modalidade_codigo = 0 
+                            and modalidade_codigo = 0
+                            and turma_codigo = 0 
+                            and notificacao_id = @notificacaoId ";
+
+                if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe) && modalidade > 0)
+                    sql = @"SELECT 
+                                ano_letivo as AnoLetivo,
+                                notificacao_id as NotificacaoId,
+                                dre_codigo as DreCodigo,
+                                ue_codigo as UeCodigo,
+	                            quantidade_alunos_com_app as QuantidadeAlunosComApp,
+	                            quantidade_alunos_sem_app as QuantidadeAlunosSemApp,
+	                            quantidade_responsaveis_com_app as QuantidadeResponsaveisComApp,
+	                            quantidade_responsaveis_sem_app as QuantidadeResponsaveisSemApp,
+                                turma as Turma,
+                                turma_codigo as TurmaCodigo,
+                                modalidade_codigo as ModalidadeCodigo
+                            FROM consolidacao_notificacao 
+                            where dre_codigo = @codigoDre 
+                            and ue_codigo = @codigoUe 
+                            and modalidade_codigo <> 0
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId, codigoDre, codigoUe });
+                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId, codigoDre, codigoUe, modalidade });
                 conexao.Close();
 
                 return dadosLeituraComunicados;

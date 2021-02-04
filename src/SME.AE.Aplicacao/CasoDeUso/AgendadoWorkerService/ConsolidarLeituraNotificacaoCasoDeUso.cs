@@ -1,12 +1,10 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+﻿using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -42,7 +40,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         private async Task<IEnumerable<UsuarioAlunoNotificacaoApp>> ObterUsuariosAlunosNotificacoesApp()
         {
-            var usuariosAlunosNotificacoesApp = 
+            var usuariosAlunosNotificacoesApp =
                 (await consolidarLeituraNotificacaoRepositorio.ObterUsuariosAlunosNotificacoesApp())
                 .ToArray();
             return usuariosAlunosNotificacoesApp;
@@ -72,7 +70,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                         return new { id, umComunicado.AnoLetivo, alunosComunidado, TemUe = !String.IsNullOrWhiteSpace(umComunicado.CodigoUe) };
                     }
                 )
-                .ForAll(comunicado => {
+                .ForAll(comunicado =>
+                {
                     var consolidacaoNotificacoes = ConsolidarComunicado(comunicado.id, comunicado.AnoLetivo, comunicado.alunosComunidado, comunicado.TemUe);
 
                     while (listasParaGravar.Count > 0) Task.Delay(100).Wait();
@@ -102,7 +101,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 usuariosAlunos
                 .AsParallel();
 
-            var smeConsolidado = new ConsolidacaoNotificacaoDto[] { 
+            var smeConsolidado = new ConsolidacaoNotificacaoDto[] {
                 ConsolidaNotificacoes(
                     new ConsolidacaoNotificacaoDto {
                         NotificacaoId = comunicadoId,
@@ -212,7 +211,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
 
 
-            return 
+            return
                 tudoConsolidado
                 .ToArray();
         }
@@ -280,12 +279,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
             {
                 alunosComunicado = alunosComunicado.Where(aluno => tipoEscolaId.Contains(aluno.CodigoTipoEscola));
 
-                return 
+                return
                     alunosComunicado
                     .Distinct()
                     .ToArray();
 
-            } else if(tipoCicloId.Any() && etapaEnsinoId.Any())
+            }
+            else if (tipoCicloId.Any() && etapaEnsinoId.Any())
             {
                 alunosComunicado = alunosComunicado.Where(aluno => tipoCicloId.Contains(aluno.CodigoCicloEnsino) && etapaEnsinoId.Contains(aluno.CodigoEtapaEnsino));
 
