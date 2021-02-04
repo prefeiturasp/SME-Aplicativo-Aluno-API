@@ -138,7 +138,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Close();
             }
 
-            return retorno == null || !retorno.Any() ? default : retorno;  
+            return retorno == null || !retorno.Any() ? default : retorno;
         }
 
         public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida)
@@ -239,7 +239,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or n.SeriesResumidas = '' or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
 
-            return 
+            return
                 $@"
                     select {CamposConsultaNotificacao("notificacao", true)}
                       notificacao.ano_letivo AnoLetivo,
@@ -377,6 +377,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {abreviacao}.enviadopushnotification,
                     {abreviacao}.dre_codigoeol {(camposGeral ? "as CodigoDre" : "")},
                     {abreviacao}.ue_codigoeol {(camposGeral ? "as CodigoUe," : "")}";
+        }
+
+        public async Task<IEnumerable<NotificacaoAlunoResposta>> ObterNotificacoesAlunoPorId(long notificacaoId)
+        {
+            try
+            {
+                using (var conexao = InstanciarConexao())
+                {
+                    var consulta = $@"select 
+                                  codigo_eol_aluno as codigoAluno,
+                                  n.id as notificacaoId
+                                  from notificacao n
+                                  inner join notificacao_aluno na 
+                                  on na.notificacao_id = n.id
+                                  where n.tipocomunicado = {(int)TipoComunicado.ALUNO}
+                                    and n.id = @notificacaoId";
+
+                    var retorno = await conexao.QueryAsync<NotificacaoAlunoResposta>(consulta, new { notificacaoId });
+                    conexao.Close();
+                    return retorno;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
