@@ -40,7 +40,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join comunidado_grupo cg on cg.comunicado_id = c.id
                 left join grupo_comunicado gc on cg.grupo_comunicado_id = gc.id 
                 where 
-	                c.ano_letivo >= extract(year from current_date)
+	               c.ano_letivo >= extract(year from current_date)
                 --and	date_trunc('day', c.data_envio) <= current_date 
                 --and date_trunc('day', c.data_expiracao) >= current_date
                 and not c.excluido 
