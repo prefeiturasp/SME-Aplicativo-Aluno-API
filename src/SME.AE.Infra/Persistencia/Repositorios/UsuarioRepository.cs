@@ -32,14 +32,36 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var usuarioCache = ObterUsuarioCachePorCpf(cpf);
-                if (usuarioCache != null) return usuarioCache;
+                //var usuarioCache = ObterUsuarioCachePorCpf(cpf);
+                //if (usuarioCache != null) return usuarioCache;
 
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
-                await SalvarUsuarioCache(usuario);
+                //await SalvarUsuarioCache(usuario);
                 return usuario;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return null;
+            }
+        }
+
+
+        public async Task<IEnumerable<Usuario>> ObterTodosUsuariosAtivos()
+        {
+            var query = "select * from usuario where excluido = false";
+
+            try
+            {
+                using var conexao = InstanciarConexao();
+                await conexao.OpenAsync();
+                
+                var usuarios = await conexao.QueryAsync<Usuario>(query);
+                await conexao.CloseAsync();
+
+                return usuarios;
             }
             catch (Exception ex)
             {
@@ -390,12 +412,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
         public override async Task<Usuario> ObterPorIdAsync(long id)
         {
-            var usuario = ObterUsuarioCachePorId(id);
-            if (usuario == null)
-            {
-                usuario = await base.ObterPorIdAsync(id);
-            }
-            return usuario;
+            //var usuario = ObterUsuarioCachePorId(id);
+            //if (usuario == null)
+            //{
+            //    usuario = await base.ObterPorIdAsync(id);
+            //}
+            return await base.ObterPorIdAsync(id);
         }
         public override async Task RemoverAsync(long id)
         {

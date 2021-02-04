@@ -63,6 +63,8 @@ namespace SME.AE.Aplicacao
 
         private static Dictionary<string, string> montarNotificacao(NotificacaoSgpDto notificacao)
         {
+
+
             return new Dictionary<String, String>
             {
                 ["Titulo"] = notificacao.Titulo,
