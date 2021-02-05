@@ -1,4 +1,4 @@
-﻿
+﻿using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Utilitarios;
@@ -64,15 +64,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     await TrataUes(dreCodigo.ToString(), responsaveisDreEOL);
 
                     await TrataDre(dreCodigo.ToString(), responsaveisDreEOL);
-
                 }
 
                 await TrataSME();
-
             }
             catch (Exception ex)
             {
-
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
 
@@ -100,7 +98,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 });
 
             cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count();
-            
+
             cpfsInvalidosSME += cpfsInvalidos;
 
             var registroParaTratarDre = responsaveis.FirstOrDefault(a => a.CodigoDre == dreCodigo);
@@ -121,9 +119,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             listaDashBoardsParaIncluir.Add(registroDashboardDaDre);
 
-
             await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
-
         }
 
         private async Task TrataSME()
@@ -214,12 +210,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     };
 
                     listaDashBoardsParaIncluir.Add(registroDashboardDaUe);
-
-
                 }
                 catch (Exception ex)
                 {
-
+                    SentrySdk.CaptureException(ex);
                     throw ex;
                 }
             }
