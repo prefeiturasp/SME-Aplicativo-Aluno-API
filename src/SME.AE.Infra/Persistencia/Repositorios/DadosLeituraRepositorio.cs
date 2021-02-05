@@ -61,7 +61,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_responsaveis_sem_app NaoReceberamComunicado,
-	                cn.quantidade_responsaveis_com_app - coalesce(leram, 0) ReceberamENaoVisualizaram,
+                    CASE 
+	                when cn.quantidade_alunos_com_app = 0 THEN
+	                cn.quantidade_alunos_com_app
+	                when cn.quantidade_alunos_com_app > 0 THEN
+	                cn.quantidade_alunos_com_app - coalesce(leram, 0)
+	                end ReceberamENaoVisualizaram,
 	                coalesce(leram, 0) VisualizaramComunicado 
                 from consolidacao_notificacao cn
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
@@ -104,7 +109,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.turma_codigo CodigoTurma,
 	                cn.turma,
 	                cn.quantidade_alunos_sem_app NaoReceberamComunicado,
-	                cn.quantidade_alunos_com_app - coalesce(leram, 0) ReceberamENaoVisualizaram,
+                    CASE 
+	                when cn.quantidade_alunos_com_app = 0 THEN
+	                cn.quantidade_alunos_com_app
+	                when cn.quantidade_alunos_com_app > 0 THEN
+	                cn.quantidade_alunos_com_app - coalesce(leram, 0)
+	                end ReceberamENaoVisualizaram,
 	                coalesce(leram, 0) VisualizaramComunicado 
                 from consolidacao_notificacao cn
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
