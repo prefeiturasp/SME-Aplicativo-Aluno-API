@@ -59,7 +59,6 @@ namespace SME.AE.Worker.Service
 
         private async Task ExecutaCasoDeUso()
         {
-            //SentrySdk.CaptureException(new Exception($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}"));
             SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
             logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
 
@@ -115,8 +114,8 @@ namespace SME.AE.Worker.Service
                     catch (OperationCanceledException) { }
                     catch (Exception ex)
                     {
-                        //SentrySdk.CaptureMessage("*** Worker error: " + ex.Message);
-                        //SentrySdk.CaptureException(ex);
+                        SentrySdk.CaptureMessage("*** Worker error: " + ex.Message);
+                        SentrySdk.CaptureException(ex);
                         logger?.LogError(ex, "*** Worker error:");
                         throw ex;
                     }
