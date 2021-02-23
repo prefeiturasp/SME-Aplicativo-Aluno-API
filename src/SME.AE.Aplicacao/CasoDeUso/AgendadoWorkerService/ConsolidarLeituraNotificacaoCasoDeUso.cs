@@ -33,7 +33,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             var comunicadosAtivos = await ObterComunicadosAtivos();
             var usuariosAlunos = await ObterUsuariosAlunos();
-
             await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos);
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarLeituraNotificacao");
         }
