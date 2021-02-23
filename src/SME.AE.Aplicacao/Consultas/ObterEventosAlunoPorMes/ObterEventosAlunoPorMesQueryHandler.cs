@@ -53,7 +53,8 @@ namespace SME.AE.Aplicacao.Consultas
 
             if (DateTime.Today < dataInicial)
             {
-                eventos = eventos.Where(e => e.tipo_evento == (int)TipoEvento.ReuniaoResponsaveis);
+                var tiposEventosPermitidos = new int[] { (int)TipoEvento.ReuniaoResponsaveis, (int)TipoEvento.Feriado, (int)TipoEvento.Avaliacao };
+                eventos = eventos.Where(e => tiposEventosPermitidos.Contains(e.tipo_evento));
             }
 
             var eventosResposta = eventos
