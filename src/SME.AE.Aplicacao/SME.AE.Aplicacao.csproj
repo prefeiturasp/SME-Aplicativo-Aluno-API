@@ -55,6 +55,7 @@
     <Compile Include="Comum\Modelos\Resposta\Dre\DreResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\UnidadeEscolar\UnidadeEscolarResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
+    <Compile Include="Comum\Modelos\Resposta\StatusNotificacaoUsuario.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -110,8 +111,10 @@
 
   <ItemGroup>
     <Folder Include="Comandos\Usuario\AdicionarCoreSSO\" />
+    <Folder Include="Comum\Interfaces\UseCase\StatusNotificacaoLeitura\" />
     <Folder Include="Comum\Interfaces\UseCase\TesteArquitetura\" />
     <Folder Include="Comum\Modelos\Validadores\" />
+    <Folder Include="Consultas\NewFolder\" />
   </ItemGroup>
 
 </Project>
