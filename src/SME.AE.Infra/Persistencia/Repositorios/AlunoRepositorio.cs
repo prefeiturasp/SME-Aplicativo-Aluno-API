@@ -28,6 +28,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
                                                            AND aluno.cd_tipo_sigilo is null";
 
+        private readonly string whereAlunoCodigo = @" WHERE aluno.cd_aluno = @codigoAluno
+                                                           AND responsavel.dt_fim IS NULL  
+                                                           AND responsavel.cd_cpf_responsavel IS NOT NULL
+                                                           AND aluno.cd_tipo_sigilo is null";
+
         private readonly string whereDreUeReponsavelAluno = @" WHERE responsavel.cd_cpf_responsavel = @cpf 
                                                            AND responsavel.dt_fim IS NULL  
                                                            AND dre.cd_unidade_educacao = @codigoDre
@@ -168,6 +173,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     )
                     .ToArray();
                 return alunosRetorno;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw ex;
+            }
+        }
+
+        public async Task<AlunoRespostaEol> ObterDadosAlunoPorCodigo(long codigoAluno) 
+        {
+            try
+            {
+                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                return await conexao.QueryFirstOrDefaultAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereAlunoCodigo}", new { codigoAluno });
             }
             catch (Exception ex)
             {
