@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao.Consultas
 
                 if (dadosLeituraComunicados.Any())
                 {
-                    statusNotificacaoUsuario.Add(new StatusNotificacaoUsuario(notificacaoId, dadosLeituraComunicados.First().DataLeitura.Value, $"Lida - em {dadosLeituraComunicados.First().DataLeitura.Value.ToString("MM/dd/yyyy HH:mm")}"));
+                    statusNotificacaoUsuario.Add(new StatusNotificacaoUsuario(notificacaoId, dadosLeituraComunicados.First().DataLeitura.Value, $"Lida - em {dadosLeituraComunicados.First().DataLeitura.Value.ToString("dd/MM/yyyy HH:mm")}"));
                 }
 
                 if (!dadosLeituraComunicados.Any() && usuario != null)
