@@ -18,21 +18,21 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("frequencia/componente-curricular")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] ObterFrequenciaAlunoPorComponenteCurricularDto frequenciaAlunoDto, [FromServices] IObterFrequenciaAlunoPorComponenteCurricularUseCase obterFrequenciaAlunoPorComponenteCurricularUseCase)
         {
             return Ok(await obterFrequenciaAlunoPorComponenteCurricularUseCase.Executar(frequenciaAlunoDto));
         }
 
         [HttpGet("frequencia")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] ObterFrequenciaAlunoDto frequenciaAlunoDto, [FromServices] IObterFrequenciaAlunoUseCase obterFrequenciaGlobalAlunoUseCase)
         {
             return Ok(await obterFrequenciaGlobalAlunoUseCase.Executar(frequenciaAlunoDto));
         }
 
         [HttpGet("notas")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ObjectResult> ObterNotasAluno([FromQuery] NotaAlunoDto notaAlunoDto,[FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
         {
             return Ok(await obterNotasAlunoUseCase.Executar(notaAlunoDto));

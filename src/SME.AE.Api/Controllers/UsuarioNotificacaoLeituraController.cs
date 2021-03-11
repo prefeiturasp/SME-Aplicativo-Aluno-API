@@ -20,6 +20,7 @@ namespace SME.AE.Api.Controllers
 
         [HttpGet("status-leitura")]
         [AllowAnonymous]
+        
         public async Task<ObjectResult> ObterStatusDeLeituraNotificacao([FromQuery] List<long> notificacaoId, long codigoAluno, [FromServices] IObterStatusDeLeituraNotificacaoUseCase useCase)
         {
             return Ok(await useCase.Executar(notificacaoId, codigoAluno));

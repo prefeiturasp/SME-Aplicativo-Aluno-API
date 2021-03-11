@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -26,6 +27,7 @@ namespace SME.AE.Api.Controllers
 
         [HttpPost("registrar-aceite")]
         [AllowAnonymous]
+        [ChaveIntegracaoFiltro]
         public async Task<ActionResult<bool>> RegistrarAceite(RegistrarAceiteDosTermosDeUsoDto aceite, [FromServices] IRegistrarAceiteDosTermosDeUsoUseCase registrarAceiteDosTermosDeUsoUseCase)
         {
             return Ok(await registrarAceiteDosTermosDeUsoUseCase.Executar(aceite));
