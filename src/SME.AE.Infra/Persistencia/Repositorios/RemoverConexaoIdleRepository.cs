@@ -12,7 +12,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 NpgsqlConnection.ClearAllPools();
-                SentrySdk.AddBreadcrumb("Limpando pool de conexões idle do banco.");
+                SentrySdk.CaptureMessage("Limpando pool de conexões idle do banco.");
             }
             catch (Exception ex)
             {
