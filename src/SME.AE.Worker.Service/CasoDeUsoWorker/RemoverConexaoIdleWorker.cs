@@ -3,7 +3,7 @@ using System;
 
 namespace SME.AE.Worker.Service.CasoDeUsoWorker
 {
-    [UseCaseWorker(CronParametroDB = "RemoverConexaoIdle", CronPadrao = "*/30 * * * *")]
+    [UseCaseWorker(CronParametroDB = "RemoverConexaoIdle", CronPadrao = "*/10 * * * *")]
     public class RemoverConexaoIdleWorker : UseCaseWorker<RemoverConexaoIdleCasoDeUso>
     {
         public RemoverConexaoIdleWorker(IServiceProvider serviceProvider)
