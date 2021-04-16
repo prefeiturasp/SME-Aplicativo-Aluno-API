@@ -33,7 +33,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             var comunicadosAtivos = await ObterComunicadosAtivos();
             var usuariosAlunos = await ObterUsuariosAlunos();
-
             await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos);
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarLeituraNotificacao");
         }
@@ -209,11 +208,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     .Union(turmaConsolidado);
             }
 
-
-
             return
-                tudoConsolidado
-                .ToArray();
+                tudoConsolidado.ToArray();
         }
 
         private ConsolidacaoNotificacaoDto ConsolidaNotificacoes(ConsolidacaoNotificacaoDto consolidacao, IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado)
