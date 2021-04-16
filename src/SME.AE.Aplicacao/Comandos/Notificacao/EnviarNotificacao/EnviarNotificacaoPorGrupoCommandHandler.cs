@@ -3,7 +3,6 @@ using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using MediatR;
 using SME.AE.Aplicacao.Comum.Config;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System.Threading;
 using System.Threading.Tasks;
 

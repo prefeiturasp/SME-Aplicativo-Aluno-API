@@ -1,19 +1,17 @@
 ﻿using Dapper;
 using Npgsql;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class ConsolidarLeituraNotificacaoSgpRepositorio : IConsolidarLeituraNotificacaoSgpRepositorio
-	{
+    {
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
 
         public async Task<IEnumerable<ComunicadoSgpDto>> ObterComunicadosSgp()
@@ -60,7 +58,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                //SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
         }
