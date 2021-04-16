@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace SME.AE.Aplicacao
 {
@@ -63,12 +64,11 @@ namespace SME.AE.Aplicacao
 
         private static Dictionary<string, string> montarNotificacao(NotificacaoSgpDto notificacao)
         {
-
-
+            var mensagem = Regex.Replace(notificacao.Mensagem, @"<(.|\n)*?>", string.Empty);
             return new Dictionary<String, String>
             {
                 ["Titulo"] = notificacao.Titulo,
-                ["Mensagem"] = notificacao.Mensagem.Length > 1024 ? notificacao.Mensagem.Substring(0, 1024) : notificacao.Mensagem,
+                ["Mensagem"] = mensagem.Length > 256 ? mensagem.Substring(0, 256) : mensagem,
                 ["categoriaNotificacao"] = notificacao.CategoriaNotificacao,
                 ["Id"] = notificacao.Id.ToString(),
                 ["CriadoEm"] = notificacao.CriadoEm.ToString("yyyy-MM-dd HH:mm:ss.ffffff"),
