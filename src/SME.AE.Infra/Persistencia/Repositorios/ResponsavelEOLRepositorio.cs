@@ -5,16 +5,17 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-	public class ResponsavelEOLRepositorio : IResponsavelEOLRepositorio {
-		private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
-		public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo)
-		{
-			var sql =
+    public class ResponsavelEOLRepositorio : IResponsavelEOLRepositorio
+    {
+        private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
+        public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo)
+        {
+            var sql =
                 @"
 					select 
 						distinct
@@ -37,15 +38,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         and m.an_letivo = @anoLetivo;
 				";
 
-			using var conn = CriaConexao();
-			await conn.OpenAsync();
-			var responsaveisEOL = await conn.QueryAsync<ResponsavelEOLDto>(sql, new { dreCodigo, anoLetivo });
-			await conn.CloseAsync();
-			return responsaveisEOL;
-		}
-		public async Task<IEnumerable<ResponsavelAlunoEOLDto>> ListarCpfResponsavelAlunoDaDreUeTurma()
-		{
-			var sql =
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var timer = Stopwatch.StartNew();
+            try
+            {
+                var responsaveisEOL = await conn.QueryAsync<ResponsavelEOLDto>(sql, new { dreCodigo, anoLetivo });
+                timer.Stop();
+                await conn.CloseAsync();
+                return responsaveisEOL;
+            }
+            catch (Exception)
+            {
+                timer.Stop();
+                Sentry.SentrySdk.CaptureMessage($"Erro ao listar Responsaveis: {sql} - DreCodigo: {dreCodigo} - AnoLetivo: {anoLetivo} - Tempo de execução: {timer.Elapsed}");
+                return null;
+            }
+        }
+        public async Task<IEnumerable<ResponsavelAlunoEOLDto>> ListarCpfResponsavelAlunoDaDreUeTurma()
+        {
+            var sql =
                 @"
 	            SELECT DISTINCT
                        aluno.cd_aluno                        CodigoAluno, 
@@ -112,12 +124,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where responsavel.dt_fim is null
                				";
 
-			using var conn = CriaConexao();
-			await conn.OpenAsync();
-			var responsaveisEOL = await conn.QueryAsync<ResponsavelAlunoEOLDto>(sql);
-			await conn.CloseAsync();
-			return responsaveisEOL;
-		}
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var responsaveisEOL = await conn.QueryAsync<ResponsavelAlunoEOLDto>(sql);
+            await conn.CloseAsync();
+            return responsaveisEOL;
+        }
 
-	}
+    }
 }
