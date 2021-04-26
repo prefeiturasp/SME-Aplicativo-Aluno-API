@@ -1,4 +1,4 @@
-﻿using Sentry;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Utilitarios;
