@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.CasoDeUso.AgendadoWorkerService;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Infra.Persistencia.Cache;
@@ -24,6 +25,7 @@ namespace SME.AE.Worker.Service
                 .AddTransient<TransferirNotaSgpCasoDeUso>()
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
+                .AddTransient<RemoverConexaoIdleCasoDeUso>()
                 .AddTransient<ICriarNotificacaoUseCase, CriarNotificacaoUseCase>()
                 ;
         }
@@ -34,10 +36,11 @@ namespace SME.AE.Worker.Service
             return services
                 //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                //.AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
-                //.AddSingleton<IHostedService, TransferirNotaSgpWorker>()
-                //.AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
-                //.AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
+                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
+                .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
+                .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
+                .AddSingleton<IHostedService, RemoverConexaoIdleWorker>()
                 ;
         }
         #endregion
@@ -71,6 +74,8 @@ namespace SME.AE.Worker.Service
                 .AddTransient<INotificacaoRepository, NotificacaoRepository>()
 
                 .AddTransient<IDreSgpRepositorio, DreSgpRepositorio>()
+                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>()
+
             ;
         }
         #endregion
