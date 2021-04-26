@@ -32,12 +32,12 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddSingleton<IHostedService, TransferirEventoSgpWorker>()
+                //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
-                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
-                .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
-                .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
+                //.AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
+                //.AddSingleton<IHostedService, TransferirNotaSgpWorker>()
+                //.AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
+                //.AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
                 ;
         }
         #endregion
