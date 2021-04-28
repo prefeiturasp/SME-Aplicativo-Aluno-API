@@ -1,4 +1,4 @@
-﻿using Sentry;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Utilitarios;
@@ -64,104 +64,117 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     await TrataUes(dreCodigo.ToString(), responsaveisDreEOL);
 
                     await TrataDre(dreCodigo.ToString(), responsaveisDreEOL);
+
                 }
 
                 await TrataSME();
+
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
             }
-
         }
 
         private async Task TrataDre(string dreCodigo, List<ResponsavelEOLDto> responsaveis)
         {
-
-            var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
-
-            var registrosParaTratar = listaDeCpfsUtilizados.Where(a => a.DreCodigo == dreCodigo).ToList();
-
-            var cpfsUnicosDaDre = registrosParaTratar.Where(a => a.CPF != 0).ToList().Select(a => a.CPF).Distinct();
-
-            int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
-
-            cpfsUnicosDaDre.AsParallel()
-                .WithDegreeOfParallelism(6)
-                .ForAll(cpf =>
-                {
-                    var registroParaSomar = registrosParaTratar.FirstOrDefault(a => a.CPF == cpf);
-                    primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
-                    semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
-                    validos += registroParaSomar.UsuarioValido;
-                });
-
-            cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count();
-
-            cpfsInvalidosSME += cpfsInvalidos;
-
-            var registroParaTratarDre = responsaveis.FirstOrDefault(a => a.CodigoDre == dreCodigo);
-
-
-            var registroDashboardDaDre = new DashboardAdesaoDto()
+            try
             {
-                codigo_turma = 0,
-                dre_codigo = registroParaTratarDre.CodigoDre,
-                dre_nome = registroParaTratarDre.Dre,
-                ue_codigo = string.Empty,
-                ue_nome = string.Empty,
-                usuarios_cpf_invalidos = cpfsInvalidos,
-                usuarios_primeiro_acesso_incompleto = primeirosAcessos,
-                usuarios_sem_app_instalado = semAppInstalado,
-                usuarios_validos = validos
-            };
+                var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
-            listaDashBoardsParaIncluir.Add(registroDashboardDaDre);
+                var registrosParaTratar = listaDeCpfsUtilizados.Where(a => a.DreCodigo == dreCodigo).ToList();
 
-            await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
+                var cpfsUnicosDaDre = registrosParaTratar.Where(a => a.CPF != 0).ToList().Select(a => a.CPF).Distinct();
+
+                int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
+
+                cpfsUnicosDaDre.AsParallel()
+                    .WithDegreeOfParallelism(6)
+                    .ForAll(cpf =>
+                    {
+                        var registroParaSomar = registrosParaTratar.FirstOrDefault(a => a.CPF == cpf);
+                        primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
+                        semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
+                        validos += registroParaSomar.UsuarioValido;
+                    });
+
+                cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count();
+
+                cpfsInvalidosSME += cpfsInvalidos;
+
+                var registroParaTratarDre = responsaveis.FirstOrDefault(a => a.CodigoDre == dreCodigo);
+
+
+                var registroDashboardDaDre = new DashboardAdesaoDto()
+                {
+                    codigo_turma = 0,
+                    dre_codigo = registroParaTratarDre.CodigoDre,
+                    dre_nome = registroParaTratarDre.Dre,
+                    ue_codigo = string.Empty,
+                    ue_nome = string.Empty,
+                    usuarios_cpf_invalidos = cpfsInvalidos,
+                    usuarios_primeiro_acesso_incompleto = primeirosAcessos,
+                    usuarios_sem_app_instalado = semAppInstalado,
+                    usuarios_validos = validos
+                };
+
+                listaDashBoardsParaIncluir.Add(registroDashboardDaDre);
+
+                await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
         }
 
         private async Task TrataSME()
         {
-
-            var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
-
-            var cpfsUnicosDaSME = listaDeCpfsUtilizados.Where(a => a.CPF != 0).Select(a => a.CPF).ToList().Distinct();
-
-            int primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
-
-            cpfsUnicosDaSME.AsParallel()
-                .WithDegreeOfParallelism(8)
-                .ForAll(cpf =>
-                {
-                    var registroParaSomar = listaDeCpfsUtilizados.FirstOrDefault(a => a.CPF == cpf);
-                    primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
-                    semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
-                    validos += registroParaSomar.UsuarioValido;
-                });
-
-            var registroDashboardDaDre = new DashboardAdesaoDto()
+            try
             {
-                codigo_turma = 0,
-                dre_codigo = string.Empty,
-                dre_nome = string.Empty,
-                ue_codigo = string.Empty,
-                ue_nome = string.Empty,
-                usuarios_cpf_invalidos = cpfsInvalidosSME,
-                usuarios_primeiro_acesso_incompleto = primeirosAcessos,
-                usuarios_sem_app_instalado = semAppInstalado,
-                usuarios_validos = validos
-            };
+                var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
-            listaDashBoardsParaIncluir.Add(registroDashboardDaDre);
+                var cpfsUnicosDaSME = listaDeCpfsUtilizados.Where(a => a.CPF != 0).Select(a => a.CPF).ToList().Distinct();
 
-            await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
+                int primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
+                cpfsUnicosDaSME.AsParallel()
+                    .WithDegreeOfParallelism(8)
+                    .ForAll(cpf =>
+                    {
+                        var registroParaSomar = listaDeCpfsUtilizados.FirstOrDefault(a => a.CPF == cpf);
+                        primeirosAcessos += registroParaSomar.PrimeiroAcessoIncompleto;
+                        semAppInstalado += registroParaSomar.UsuarioSemAppInstalado;
+                        validos += registroParaSomar.UsuarioValido;
+                    });
+
+                var registroDashboardDaDre = new DashboardAdesaoDto()
+                {
+                    codigo_turma = 0,
+                    dre_codigo = string.Empty,
+                    dre_nome = string.Empty,
+                    ue_codigo = string.Empty,
+                    ue_nome = string.Empty,
+                    usuarios_cpf_invalidos = cpfsInvalidosSME,
+                    usuarios_primeiro_acesso_incompleto = primeirosAcessos,
+                    usuarios_sem_app_instalado = semAppInstalado,
+                    usuarios_validos = validos
+                };
+
+                listaDashBoardsParaIncluir.Add(registroDashboardDaDre);
+
+                await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
+
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
         }
 
         private async Task TrataUes(string dreCodigo, List<ResponsavelEOLDto> responsaveis)
         {
+
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
             var registrosParaTratar = listaDeCpfsUtilizados.Where(a => a.DreCodigo == dreCodigo).ToList();
@@ -177,7 +190,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     var cpfsUnicosDaUe = cpfValidosDaUe.Select(a => a.CPF).Distinct().ToList();
 
                     int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
-
 
                     cpfsUnicosDaUe.AsParallel()
                         .WithDegreeOfParallelism(6)
@@ -210,11 +222,11 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     };
 
                     listaDashBoardsParaIncluir.Add(registroDashboardDaUe);
+
                 }
                 catch (Exception ex)
                 {
                     SentrySdk.CaptureException(ex);
-                    throw ex;
                 }
             }
 
@@ -227,46 +239,50 @@ namespace SME.AE.Aplicacao.CasoDeUso
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
             var listaTurmasParaTratar = responsaveisDreEOL.Select(a => a.CodigoTurma).Distinct();
-
-
-            //Turmas da Dre
-            foreach (var turmaParaTratar in listaTurmasParaTratar)
+            try
             {
-                var usuariosDaTurma = responsaveisDreEOL.Where(a => a.CodigoTurma == turmaParaTratar).ToList();
-
-                var listaTodosDaTurmaParaTratar = new List<DashboardAdesaoDto>();
-
-                var cpfsParaTratar = listaDeCpfsUtilizados.Where(a => a.TurmaCodigo == turmaParaTratar).ToList();
-
-                foreach (var usuarioDaTurma in usuariosDaTurma)
+                //Turmas da Dre
+                foreach (var turmaParaTratar in listaTurmasParaTratar)
                 {
+                    var usuariosDaTurma = responsaveisDreEOL.Where(a => a.CodigoTurma == turmaParaTratar).ToList();
 
-                    var dashBoardParaAdicionar = ProcessaResponsavel(usuarioDaTurma, usuariosDoSistema, cpfsParaTratar);
-                    if (dashBoardParaAdicionar != null)
-                        listaTodosDaTurmaParaTratar.Add(dashBoardParaAdicionar);
+                    var listaTodosDaTurmaParaTratar = new List<DashboardAdesaoDto>();
+
+                    var cpfsParaTratar = listaDeCpfsUtilizados.Where(a => a.TurmaCodigo == turmaParaTratar).ToList();
+
+                    foreach (var usuarioDaTurma in usuariosDaTurma)
+                    {
+
+                        var dashBoardParaAdicionar = ProcessaResponsavel(usuarioDaTurma, usuariosDoSistema, cpfsParaTratar);
+                        if (dashBoardParaAdicionar != null)
+                            listaTodosDaTurmaParaTratar.Add(dashBoardParaAdicionar);
+                    }
+
+                    var registroParaObterDados = usuariosDaTurma.FirstOrDefault();
+
+                    var registroDashBoardTurmaAgrupado = new DashboardAdesaoDto()
+                    {
+                        codigo_turma = turmaParaTratar,
+                        dre_codigo = registroParaObterDados.CodigoDre,
+                        dre_nome = registroParaObterDados.Dre,
+                        ue_codigo = registroParaObterDados.CodigoUe,
+                        ue_nome = registroParaObterDados.Ue,
+                        usuarios_cpf_invalidos = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_cpf_invalidos),
+                        usuarios_primeiro_acesso_incompleto = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_primeiro_acesso_incompleto),
+                        usuarios_sem_app_instalado = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_sem_app_instalado),
+                        usuarios_validos = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_validos)
+                    };
+
+                    listaDashBoardsParaIncluir.Add(registroDashBoardTurmaAgrupado);
                 }
 
-                var registroParaObterDados = usuariosDaTurma.FirstOrDefault();
+                await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
 
-
-                var registroDashBoardTurmaAgrupado = new DashboardAdesaoDto()
-                {
-                    codigo_turma = turmaParaTratar,
-                    dre_codigo = registroParaObterDados.CodigoDre,
-                    dre_nome = registroParaObterDados.Dre,
-                    ue_codigo = registroParaObterDados.CodigoUe,
-                    ue_nome = registroParaObterDados.Ue,
-                    usuarios_cpf_invalidos = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_cpf_invalidos),
-                    usuarios_primeiro_acesso_incompleto = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_primeiro_acesso_incompleto),
-                    usuarios_sem_app_instalado = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_sem_app_instalado),
-                    usuarios_validos = listaTodosDaTurmaParaTratar.Sum(a => a.usuarios_validos)
-                };
-
-                listaDashBoardsParaIncluir.Add(registroDashBoardTurmaAgrupado);
             }
-
-            await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
-
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+            }
         }
 
         private DashboardAdesaoDto ProcessaResponsavel(ResponsavelEOLDto responsavel, IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<DashboardAdesaoUnificacaoDto> listaCpfsUnificados)
