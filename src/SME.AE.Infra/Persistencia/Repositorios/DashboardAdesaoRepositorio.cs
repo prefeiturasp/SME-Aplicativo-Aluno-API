@@ -38,25 +38,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					(@dre_codigo, @dre_nome, @ue_codigo, @ue_nome, @codigo_turma, @usuarios_primeiro_acesso_incompleto, @usuarios_validos, @usuarios_cpf_invalidos, @usuarios_sem_app_instalado) 
             ";
 
-            listaAdesao
-                .AsParallel()
-                .WithDegreeOfParallelism(4)
-                .ForAll(adesao =>
+            foreach (var adesao in listaAdesao)
+            {
+                var conn = CriaConexao();
+                try
                 {
-                    var conn = CriaConexao();
-                    try
-                    {
-                        conn.Open();
-                        var alterado = (conn.Execute(sqlUpdate, adesao)) > 0;
-                        if (!alterado)
-                            conn.Execute(sqlInsert, adesao);
-                        conn.Close();
-                    }                    
-                    finally
-                    {
-                        conn.Dispose();
-                    }
-                });
+                    conn.Open();
+                    var alterado = (conn.Execute(sqlUpdate, adesao)) > 0;
+                    if (!alterado)
+                        conn.Execute(sqlInsert, adesao);
+                    conn.Close();
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
             await Task.CompletedTask;
         }
     }

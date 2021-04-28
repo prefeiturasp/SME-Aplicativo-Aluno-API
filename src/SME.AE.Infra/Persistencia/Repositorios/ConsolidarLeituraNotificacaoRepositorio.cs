@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Npgsql;
+using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -49,7 +50,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                //SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
 
@@ -66,8 +67,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                //SentrySdk.CaptureException(ex);
-                throw ex;
+                SentrySdk.CaptureException(ex);
             }
             await Task.CompletedTask;
         }
@@ -152,8 +152,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                //SentrySdk.CaptureException(ex);
-                throw ex;
+                SentrySdk.CaptureException(ex);
             }
         }
         public async Task ExcluirConsolidacaoNotificacao(ConsolidacaoNotificacaoDto consolidacaoNotificacao)
@@ -181,8 +180,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                //SentrySdk.CaptureException(ex);
-                throw ex;
+                SentrySdk.CaptureException(ex);
             }
         }
     }
