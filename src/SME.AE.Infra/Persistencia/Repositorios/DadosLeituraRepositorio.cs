@@ -77,7 +77,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                left join notificacao n on n.id = unl.notificacao_id
 	                left join notificacao_turma nt on nt.notificacao_id = unl.notificacao_id 
 	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), unl.codigo_eol_turma 
-                ) ul on ul.notificacao_id = cn.notificacao_id and ul.dre_codigoeol::varchar = cn.dre_codigo and ul.ue_codigoeol = cn.ue_codigo and ul.modalidade = cn.modalidade_codigo::text and ul.codigo_eol_turma = cn.turma_codigo 
+                ) ul on ul.notificacao_id = cn.notificacao_id and 
+                  ul.dre_codigoeol::varchar = cn.dre_codigo and 
+                  ul.ue_codigoeol = cn.ue_codigo and 
+                  --ul.modalidade = cn.modalidade_codigo::text and 
+                  ul.codigo_eol_turma = cn.turma_codigo 
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
@@ -125,7 +129,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                left join notificacao n on n.id = unl.notificacao_id
 	                left join notificacao_turma nt on nt.notificacao_id = unl.notificacao_id 
 	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), unl.codigo_eol_turma 
-                ) ul on ul.notificacao_id = cn.notificacao_id and ul.dre_codigoeol::varchar = cn.dre_codigo and ul.ue_codigoeol = cn.ue_codigo and ul.modalidade = cn.modalidade_codigo::text and ul.codigo_eol_turma = cn.turma_codigo 
+                ) ul on ul.notificacao_id = cn.notificacao_id and 
+                  ul.dre_codigoeol::varchar = cn.dre_codigo and 
+                  ul.ue_codigoeol = cn.ue_codigo and 
+                  --ul.modalidade = cn.modalidade_codigo::text and 
+                  ul.codigo_eol_turma = cn.turma_codigo 
                 where
 	                cn.dre_codigo = @codigoDre and
 	                cn.ue_codigo = @codigoUe and
