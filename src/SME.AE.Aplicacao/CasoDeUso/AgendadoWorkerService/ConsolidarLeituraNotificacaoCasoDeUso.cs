@@ -208,11 +208,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     .Union(turmaConsolidado);
             }
 
-
-
             return
-                tudoConsolidado
-                .ToArray();
+                tudoConsolidado.ToArray();
         }
 
         private ConsolidacaoNotificacaoDto ConsolidaNotificacoes(ConsolidacaoNotificacaoDto consolidacao, IEnumerable<ResponsavelAlunoEOLDto> alunosComunicado)
