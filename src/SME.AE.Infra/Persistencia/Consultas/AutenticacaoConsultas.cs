@@ -21,7 +21,6 @@
 		    INNER JOIN (select cd_aluno , cd_matricula
 			              from v_matricula_cotic  
 						  where st_matricula = 1
-						    and cd_serie_ensino is not null -- turma regular 
 							and an_letivo = year(getdate())
 							) as   matricula
 			on matricula.cd_aluno = aluno.cd_aluno
