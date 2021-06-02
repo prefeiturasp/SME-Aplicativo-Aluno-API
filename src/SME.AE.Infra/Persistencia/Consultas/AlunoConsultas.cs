@@ -29,7 +29,7 @@
                        ON aluno.cd_aluno = responsavel.cd_aluno 
                INNER JOIN(SELECT cd_aluno, 
                                  cd_matricula, 
-                                 cd_escola, 
+                                 vmc.cd_escola, 
                                  cd_serie_ensino 
                           FROM   v_matricula_cotic vmc
                           inner join escola esc on esc.cd_escola = vmc.cd_escola
