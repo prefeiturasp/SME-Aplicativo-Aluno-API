@@ -19,11 +19,11 @@
             INNER JOIN responsavel_aluno responsavel
 			ON aluno.cd_aluno = responsavel.cd_aluno
 		    INNER JOIN (select cd_aluno , cd_matricula
-			              from v_matricula_cotic  
-						  where st_matricula = 1
-						    and cd_serie_ensino is not null -- turma regular 
-							and an_letivo = year(getdate())
-							) as   matricula
+			              from v_matricula_cotic vmc
+                            inner join escola esc on esc.cd_escola = vmc.cd_escola
+                              where st_matricula = 1
+                                and ((cd_serie_ensino is not null) or (esc.tp_escola in (22, 23)))
+                                and an_letivo = year(getdate())) as matricula
 			on matricula.cd_aluno = aluno.cd_aluno
 			   inner join (
                            select cd_matricula,
