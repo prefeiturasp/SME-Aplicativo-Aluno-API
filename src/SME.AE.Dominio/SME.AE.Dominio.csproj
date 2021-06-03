@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Remove="Class1.cs" />
+    <Compile Remove="Streams\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SME.AE.COMUM\SME.AE.Comum.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Streams\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Streams\**" />
   </ItemGroup>
 
 </Project>

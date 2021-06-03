@@ -51,24 +51,23 @@ namespace SME.AE.Aplicacao.CasoDeUso
             try
             {
                 var anoLetivoAtual = DateTime.Now.Year;
-                var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();
+                // var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();
+                var dresEnumerator = dreSgpRepositorio.ObterTodosCodigosDresAtivasStream();
 
-                foreach (var dreCodigo in dresDoSistema)
+                while (await dresEnumerator.MoveNextAsync())
                 {
-                    var responsaveisDreEOL =
-                        (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo, anoLetivoAtual))
-                        .ToList();
+                    long dreCodigo = dresEnumerator.Current;
 
-                    await TrataTurmas(usuariosDoSistema, responsaveisDreEOL);
+                    IEnumerable<ResponsavelEOLDto> responsaveis = 
+                        await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo, anoLetivoAtual);
+                    var responsaveisDreEol = responsaveis.ToList();
 
-                    await TrataUes(dreCodigo.ToString(), responsaveisDreEOL);
-
-                    await TrataDre(dreCodigo.ToString(), responsaveisDreEOL);
-
+                    await TrataTurmas(usuariosDoSistema, responsaveisDreEol);
+                    await TrataUes(dreCodigo.ToString(), responsaveisDreEol);
+                    await TrataDre(dreCodigo.ToString(), responsaveisDreEol);
                 }
 
                 await TrataSME();
-
             }
             catch (Exception ex)
             {

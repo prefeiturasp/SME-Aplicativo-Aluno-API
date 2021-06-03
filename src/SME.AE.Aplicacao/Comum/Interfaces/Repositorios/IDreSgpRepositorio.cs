@@ -8,5 +8,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task<DreResposta> ObterNomeAbreviadoDrePorCodigo(string codigoDre);
         Task<IEnumerable<long>> ObterTodosCodigoDresAtivasAsync();
+        IAsyncEnumerator<long> ObterTodosCodigosDresAtivasStream();
     }
 }

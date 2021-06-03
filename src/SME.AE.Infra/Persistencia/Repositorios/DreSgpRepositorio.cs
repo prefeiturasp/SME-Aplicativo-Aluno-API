@@ -63,5 +63,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             return ids;
         }
+
+        public async IAsyncEnumerator<long> ObterTodosCodigosDresAtivasStream()
+        {
+            using var conexao = CriaConexao();
+            await conexao.OpenAsync();
+            
+            var query = @"SELECT dre_id FROM dre";
+            var ids = await conexao.QueryAsync<long>(query);
+            var enumerador = ids.GetEnumerator();
+
+            while (enumerador.MoveNext())
+            {
+                yield return enumerador.Current;
+            }
+
+            await conexao.CloseAsync();
+        }
     }
 }
