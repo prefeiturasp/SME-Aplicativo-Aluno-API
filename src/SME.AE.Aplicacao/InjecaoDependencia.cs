@@ -66,7 +66,6 @@ namespace SME.AE.Aplicacao
             //Usuario
             services.TryAddScoped(typeof(IMarcarMensagemLidaUseCase), typeof(MarcarMensagemLidaUseCase));
             services.TryAddScoped(typeof(IPrimeiroAcessoUseCase), typeof(PrimeiroAcessoUseCase));
-            services.TryAddScoped(typeof(IAlterarEmailCelularUseCase), typeof(AlterarEmailCelularUseCase));
             services.TryAddScoped(typeof(ICriarNotificacaoUseCase), typeof(CriarNotificacaoUseCase));
             services.TryAddScoped(typeof(IAtualizarNotificacaoUseCase), typeof(AtualizarNotificacaoUseCase));
             services.TryAddScoped(typeof(IRemoverNotificacaoEmLoteUseCase), typeof(RemoverNotificacaoEmLoteUseCase));

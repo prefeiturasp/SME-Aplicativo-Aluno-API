@@ -32,13 +32,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                //var usuarioCache = ObterUsuarioCachePorCpf(cpf);
-                //if (usuarioCache != null) return usuarioCache;
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
-                //await SalvarUsuarioCache(usuario);
                 return usuario;
             }
             catch (Exception ex)

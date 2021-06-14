@@ -15,17 +15,20 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         private readonly IDadosLeituraRepositorio dadosLeituraRepositorio;
         private readonly IAlunoRepositorio alunoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
+        private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly INotificacaoRepository notificacaoRepository;
 
         public ObterDadosLeituraAlunosQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
                                                     IAlunoRepositorio alunoRepositorio,
                                                     IUsuarioRepository usuarioRepository,
-                                                    INotificacaoRepository notificacaoRepository)
+                                                    INotificacaoRepository notificacaoRepository,
+                                                    IResponsavelEOLRepositorio responsavelEOLRepositorio)
         {
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new System.ArgumentNullException(nameof(dadosLeituraRepositorio));
             this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
+            this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new ArgumentNullException(nameof(responsavelEOLRepositorio));
         }
 
         public async Task<IEnumerable<DadosLeituraAlunosComunicado>> Handle(ObterDadosLeituraAlunosQuery request, CancellationToken cancellationToken)
@@ -47,8 +50,6 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
             if (notificacaoAlunos != null && notificacaoAlunos.Any())
             {
-
-                
                 List<long> IDS = notificacaoAlunos.Select(aluno => aluno.CodigoAluno).ToList();
                 var dadosLeituraAlunos = alunosTurma.Where(a => IDS.Contains(a.CodigoEOLAluno)).Select(aluno =>
                 {
@@ -57,9 +58,12 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                     .Select(dados => dados.DataLeitura)
                     .FirstOrDefault();
 
-                    var usuario = usuarioRepository.ObterPorCpf(aluno.Cpf.ToString("00000000000")).Result;
+                    var cpf = aluno.Cpf.ToString("00000000000");
+
+                    var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                     var possueApp = usuario != null;
-                    var telefone = possueApp ? usuario.Celular : "";
+                    var usuarioEol = responsavelEOLRepositorio.ObterDadosResumidosReponsavelPorCpf(cpf).Result;
+                    var telefone = possueApp ? usuarioEol.Celular : "";
                     if (string.IsNullOrWhiteSpace(telefone))
                         if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
                         {
@@ -92,9 +96,12 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                             .Select(dados => dados.DataLeitura)
                             .FirstOrDefault();
 
-                        var usuario = usuarioRepository.ObterPorCpf(aluno.Cpf.ToString("00000000000")).Result;
+                        var cpf = aluno.Cpf.ToString("00000000000");
+
+                        var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                         var possueApp = usuario != null;
-                        var telefone = possueApp ? usuario.Celular : "";
+                        var usuarioEol = responsavelEOLRepositorio.ObterDadosResumidosReponsavelPorCpf(cpf).Result;
+                        var telefone = possueApp ? usuarioEol.Celular : "";
                         if (string.IsNullOrWhiteSpace(telefone))
                             if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
                             {
