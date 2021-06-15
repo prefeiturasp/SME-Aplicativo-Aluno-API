@@ -48,7 +48,7 @@ namespace SME.AE.Aplicacao.Comandos.Token.Criar
             };
             
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return await Task.FromResult(tokenHandler.WriteToken(token));
         }
     }
 }

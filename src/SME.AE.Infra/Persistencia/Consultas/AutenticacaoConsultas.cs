@@ -12,6 +12,8 @@
                     RTRIM(LTRIM(responsavel.email_responsavel)) AS Email,
                     RTRIM(LTRIM(cd_ddd_celular_responsavel)) AS DDD,
                     RTRIM(LTRIM(nr_celular_responsavel)) AS Celular,
+                    RTRIM(LTRIM(responsavel.nm_mae_responsavel)) AS NomeMae,
+                    responsavel.dt_nascimento_mae_responsavel AS DataNascimentoResponsavel,
                     aluno.dt_nascimento_aluno AS DataNascimento,
                     aluno.cd_tipo_sigilo as TipoSigilo,
 	                aluno.nm_aluno 

@@ -18,27 +18,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
-        private const string USUARIOPORCPF = "UsuarioCpf";
-        private const string USUARIOPORID = "UsuarioId";
-        private const string USUARIOPORTOKEN = "UsuarioToken";
-
-        private readonly ICacheRepositorio cacheRepositorio;
-        public UsuarioRepository(ICacheRepositorio cacheRepositorio) : base(ConnectionStrings.Conexao)
+        public UsuarioRepository() : base(ConnectionStrings.Conexao)
         {
-            this.cacheRepositorio = cacheRepositorio;
         }
 
         public async Task<Usuario> ObterPorCpf(string cpf)
         {
             try
             {
-                //var usuarioCache = ObterUsuarioCachePorCpf(cpf);
-                //if (usuarioCache != null) return usuarioCache;
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
-                //await SalvarUsuarioCache(usuario);
                 return usuario;
             }
             catch (Exception ex)
@@ -74,13 +64,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var usuarioCache = ObterUsuarioCachePorCpf(cpf);
-                if (usuarioCache != null) return usuarioCache;
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Cpf == cpf);
-                await SalvarUsuarioCache(usuario);
                 return usuario;
             }
             catch (Exception ex)
@@ -165,7 +151,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conn.ExecuteAsync(
                     "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
                 conn.Close();
-                await LimparUsuarioCachePorCpf(cpf);
             }
             catch (Exception ex)
             {
@@ -186,7 +171,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 conexao.Open();
                 await conexao.ExecuteAsync(sql, usuario);
                 conexao.Close();
-                await LimparUsuarioCache(usuario);
             }
             catch (Exception ex)
             {
@@ -212,7 +196,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = InstanciarConexao();
                 await conexao.ExecuteAsync(builder.ToString(), new { id, email, celular, alteradoem = DateTime.Now });
                 conexao.Close();
-                await LimparUsuarioCachePorId(id);
             }
             catch (Exception ex)
             {
@@ -229,7 +212,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             SET primeiroacesso=@primeiroAcesso,alteradopor='Sistema', alteradoem=@alteradoem
                             where id = @id;", new { id, primeiroAcesso, alteradoem = DateTime.Now });
                 conexao.Close();
-                await LimparUsuarioCachePorId(id);
             }
             catch (Exception ex)
             {
@@ -241,15 +223,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var usuarioCache = ObterUsuarioCachePorToken(token);
-                if (usuarioCache != null)
-                    return usuarioCache;
-
                 using var conexao = InstanciarConexao();
                 conexao.Open();
                 var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => !x.Excluido && x.Token == token && x.RedefinirSenha);
                 conexao.Close();
-                await SalvarUsuarioCache(usuario);
                 return usuario;
             }
             catch (Exception ex)
@@ -269,7 +246,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conn.ExecuteAsync(
                     "update usuario set excluido = true , ultimoLogin = @dataHoraAtual, token_redefinicao = '', redefinicao = false, validade_token = null  where cpf = @cpf", new { cpf, dataHoraAtual });
                 conn.Close();
-                await LimparUsuarioCachePorCpf(cpf);
             }
             catch (Exception ex)
             {
@@ -289,9 +265,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                           (usuario_id, codigo_dispositivo, criadoem)
                            VALUES(@usuarioId, @dispositivoId , @dataHoraAtual ); ", new { usuarioId, dispositivoId, dataHoraAtual });
                 conn.Close();
-
-                var chaveCache = $"UsuarioDispositivo-{usuarioId}-{dispositivoId}";
-                await cacheRepositorio.SalvarAsync(chaveCache, "true", 1080, false);
             }
             catch (Exception ex)
             {
@@ -310,9 +283,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             WHERE usuario_id = @usuarioId  AND codigo_dispositivo = @dispositivoId ;", new { usuarioId, dispositivoId });
                 conn.Close();
 
-                var chaveCache = $"UsuarioDispositivo-{usuarioId}-{dispositivoId}";
-                await cacheRepositorio.RemoverAsync(chaveCache);
-
                 return true;
             }
             catch (Exception ex)
@@ -326,11 +296,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = $"UsuarioDispositivo-{usuarioId}-{dispositivoId}";
-                var usuarioDispositivo = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(usuarioDispositivo))
-                    return true;
-
                 using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
                 conn.Open();
                 string query =
@@ -342,7 +307,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (!retorno.Any())
                     return false;
 
-                await cacheRepositorio.SalvarAsync(chaveCache, "true", 1080, false);
                 return true;
             }
             catch (Exception ex)
@@ -352,87 +316,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        private Usuario ObterUsuarioCachePorId(long id)
-            => cacheRepositorio.Obter<Usuario>($"{USUARIOPORID}-{id}");
-        private Usuario ObterUsuarioCachePorCpf(string cpf)
-            => cacheRepositorio.Obter<Usuario>($"{USUARIOPORCPF}-{cpf}");
-        private Usuario ObterUsuarioCachePorToken(string token)
-            => cacheRepositorio.Obter<Usuario>($"{USUARIOPORTOKEN}-{token}");
-        private async Task LimparUsuarioCachePorId(long id)
-            => await LimparUsuarioCache(ObterUsuarioCachePorId(id));
-        private async Task LimparUsuarioCachePorCpf(string cpf)
-            => await LimparUsuarioCache(ObterUsuarioCachePorCpf(cpf));
-        private async Task LimparUsuarioCachePorToken(string token)
-            => await LimparUsuarioCache(ObterUsuarioCachePorToken(token));
-        private async Task LimparUsuarioCache(Usuario usuario)
-        {
-            if (usuario != null)
-            {
-                try
-                {
-                    var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuario.Id}";
-                    var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuario.Cpf}";
-                    var chaveUsuarioTokenCache = $"{USUARIOPORTOKEN}-{usuario.Token}";
-
-                    await Task.WhenAll(
-                        cacheRepositorio.RemoverAsync(chaveUsuarioIdCache),
-                        cacheRepositorio.RemoverAsync(chaveUsuarioCpfCache),
-                        cacheRepositorio.RemoverAsync(chaveUsuarioTokenCache)
-                        );
-                }
-                catch (Exception ex)
-                {
-                    SentrySdk.CaptureException(ex);
-                    throw ex;
-                }
-            }
-        }
-        private async Task SalvarUsuarioCache(Usuario usuario)
-        {
-            if (usuario != null)
-            {
-                try
-                {
-                    var chaveUsuarioIdCache = $"{USUARIOPORID}-{usuario.Id}";
-                    var chaveUsuarioCpfCache = $"{USUARIOPORCPF}-{usuario.Cpf}";
-                    var chaveUsuarioTokenCache = $"{USUARIOPORTOKEN}-{usuario.Token}";
-
-                    await Task.WhenAll(
-                        cacheRepositorio.SalvarAsync(chaveUsuarioIdCache, usuario),
-                        cacheRepositorio.SalvarAsync(chaveUsuarioCpfCache, usuario),
-                        cacheRepositorio.SalvarAsync(chaveUsuarioTokenCache, usuario)
-                        );
-                }
-                catch (Exception ex)
-                {
-                    SentrySdk.CaptureException(ex);
-                    throw ex;
-                }
-            }
-        }
         public override async Task<Usuario> ObterPorIdAsync(long id)
         {
-            //var usuario = ObterUsuarioCachePorId(id);
-            //if (usuario == null)
-            //{
-            //    usuario = await base.ObterPorIdAsync(id);
-            //}
             return await base.ObterPorIdAsync(id);
         }
         public override async Task RemoverAsync(long id)
         {
-            await LimparUsuarioCachePorId(id);
             await base.RemoverAsync(id);
         }
         public override async Task RemoverAsync(Usuario usuario)
         {
-            await LimparUsuarioCache(usuario);
             await base.RemoverAsync(usuario);
         }
         public override async Task<long> SalvarAsync(Usuario usuario)
         {
-            if (usuario.Id != 0)
-                await LimparUsuarioCache(usuario);
             return await base.SalvarAsync(usuario);
         }
     }

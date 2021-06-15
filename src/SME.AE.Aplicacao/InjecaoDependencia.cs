@@ -7,7 +7,6 @@ using SME.AE.Aplicacao.CasoDeUso.Aluno;
 using SME.AE.Aplicacao.CasoDeUso.Frequencia;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
-using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
@@ -61,12 +60,9 @@ namespace SME.AE.Aplicacao
 
         private static void AddCasosDeUso(this IServiceCollection services)
         {
-            services.TryAddScoped<ITesteArquiteturaUseCase, TesteArquiteturaUseCase>();
-
             //Usuario
             services.TryAddScoped(typeof(IMarcarMensagemLidaUseCase), typeof(MarcarMensagemLidaUseCase));
             services.TryAddScoped(typeof(IPrimeiroAcessoUseCase), typeof(PrimeiroAcessoUseCase));
-            services.TryAddScoped(typeof(IAlterarEmailCelularUseCase), typeof(AlterarEmailCelularUseCase));
             services.TryAddScoped(typeof(ICriarNotificacaoUseCase), typeof(CriarNotificacaoUseCase));
             services.TryAddScoped(typeof(IAtualizarNotificacaoUseCase), typeof(AtualizarNotificacaoUseCase));
             services.TryAddScoped(typeof(IRemoverNotificacaoEmLoteUseCase), typeof(RemoverNotificacaoEmLoteUseCase));

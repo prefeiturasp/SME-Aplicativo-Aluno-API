@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,11 +34,10 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo
                     var usuario = await _repository.ObterUsuarioNaoExcluidoPorCpf(request.CpfUsuario);
                     if (usuario == null)
                         return false;
-                 bool existeUsuarioDisposivo =  await _repository.ExisteUsuarioDispositivo(usuario.Id, request.DispositivoId);
+                    bool existeUsuarioDisposivo = await _repository.ExisteUsuarioDispositivo(usuario.Id, request.DispositivoId);
                     if (!existeUsuarioDisposivo)
                     {
-                        _ = _repository.CriaUsuarioDispositivo(usuario.Id, request.DispositivoId);
-
+                        await _repository.CriaUsuarioDispositivo(usuario.Id, request.DispositivoId);
                     }
 
                     return true;

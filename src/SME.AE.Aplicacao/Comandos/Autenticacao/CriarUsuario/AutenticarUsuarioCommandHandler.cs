@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using System;
 using System.Globalization;
@@ -69,7 +70,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             //buscar o usuario 
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
-            
+
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
             {
@@ -83,7 +84,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
-                else {
+                else
+                {
                     var senha = Regex.Replace(request.Senha, @"\-\/", "");
 
                     try
@@ -139,7 +141,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             //necessário implementar unit of work para transacionar essas operações
-            senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
             var grupos = await _repositoryCoreSSO.SelecionarGrupos();
             var usuario = usuarioAlunos.FirstOrDefault();
 
@@ -150,17 +151,26 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.UsuId, StatusUsuarioCoreSSO.Ativo);
 
             if (usuarioCoreSSO != null && usuarioCoreSSO.TipoCriptografia != TipoCriptografia.TripleDES)
-                await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.UsuId, request.Senha);
+            {
+                senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
+                await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.UsuId, senhaCriptografada);
+            }
 
             usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
 
-            var informarCelularEmail = string.IsNullOrWhiteSpace(usuarioRetorno.Email) && string.IsNullOrWhiteSpace(usuarioRetorno.Celular);
-
-            usuarioRetorno.Email = usuarioRetorno.Email ?? email;
-            usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
+            usuario.Email ??= email;
+            usuario.Celular ??= celular;
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, informarCelularEmail || primeiroAcesso);
+            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuario);
+
+            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
+        }
+
+        private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
+        {
+            return usuario.DataNascimentoResponsavel == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
+                   string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.Celular);
         }
 
         private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
@@ -193,7 +203,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             var usuario = new Dominio.Entidades.Usuario
             {
                 Cpf = usuarioEol.Cpf,
-                Nome = usuarioEol.Nome,
                 Excluido = false,
                 UltimoLogin = DateTime.Now,
                 PrimeiroAcesso = primeiroAcesso
@@ -202,17 +211,19 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             return usuario;
         }
 
-        private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool informarCelularEmail)
+        private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool atualizarDadosCadastrais)
         {
             RespostaAutenticar usuario = new RespostaAutenticar
             {
                 Cpf = usuarioEol.Cpf,
-                Email = usuarioApp.Email,
+                Email = usuarioEol.Email,
                 Id = usuarioApp.Id,
                 Nome = usuarioEol.Nome,
+                DataNascimento = usuarioEol.DataNascimentoResponsavel,
+                NomeMae = usuarioEol.NomeMae,
                 PrimeiroAcesso = primeiroAcesso,
-                InformarCelularEmail = informarCelularEmail,
-                Celular = usuarioApp.Celular,
+                AtualizarDadosCadastrais = atualizarDadosCadastrais,
+                Celular = usuarioEol.Celular,
                 Token = ""
             };
 

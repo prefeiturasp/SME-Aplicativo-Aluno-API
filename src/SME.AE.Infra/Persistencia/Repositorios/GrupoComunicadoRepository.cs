@@ -35,7 +35,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     resultado = await conexao.QueryAsync<GrupoComunicado>(GrupoComunicadoConsulta.Select);
                     conexao.Close();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     conexao.Close();
                 }

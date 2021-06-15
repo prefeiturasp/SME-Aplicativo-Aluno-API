@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sentry;
 using SME.AE.Api.Filtros;
-using SME.AE.Aplicacao.CasoDeUso.TesteArquitetura;
 using SME.AE.Aplicacao.Comum.Config;
 
 namespace SME.AE.Api.Controllers
@@ -14,7 +12,7 @@ namespace SME.AE.Api.Controllers
     {
         [HttpGet]
         [ChaveIntegracaoFiltro]
-        public async Task<Object> check()
+        public async Task<Object> Check()
         {
             bool isEolConnOk = false;
 
@@ -31,17 +29,10 @@ namespace SME.AE.Api.Controllers
                 throw ex;
             }
 
-            return new
+            return await Task.FromResult(new
             {
                 IsEolConnOk = isEolConnOk
-            };
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> TesteArquitetura([FromServices] ITesteArquiteturaUseCase testeArquiteturaUseCase)
-        {
-            return Ok(await testeArquiteturaUseCase.Executar(Mediator));
+            });
         }
     }
 }
