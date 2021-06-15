@@ -1,11 +1,9 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
@@ -17,16 +15,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class NotaAlunoRepositorio : INotaAlunoRepositorio
     {
-        private readonly ICacheRepositorio cacheRepositorio;
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
-
-        public NotaAlunoRepositorio(ICacheRepositorio cacheRepositorio)
-        {
-            this.cacheRepositorio = cacheRepositorio;
-        }
-
-        private static string chaveCacheAnoBimestreUeTurmaAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurmna, string codigoAluno)
-            => $"notasAluno-AnoBimestreUeTurmaAluno-{anoLetivo}-{bimestre}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
 
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
@@ -201,11 +190,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                //var chaveCache = chaveCacheAnoBimestreUeTurmaAluno(anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno);
-                //var notasAluno = await cacheRepositorio.ObterAsync(chaveCache);
-                //if (!string.IsNullOrWhiteSpace(notasAluno))
-                //    return JsonConvert.DeserializeObject<NotaAlunoPorBimestreResposta>(notasAluno);
-
                 using var conexao = CriaConexao();
                 conexao.Open();
 
@@ -237,7 +221,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     parametros, splitOn: "splitOn");
                 conexao.Close();
 
-                //await cacheRepositorio.SalvarAsync(chaveCache, dadosNotasAluno, 720, false);
                 return dadosNotasAluno;
             }
             catch (Exception ex)

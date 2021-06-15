@@ -1,12 +1,9 @@
 ﻿using Dapper;
 using Npgsql;
-using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -50,9 +47,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 				conexao.Close();
 				return ultimaAtualizacao;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				//SentrySdk.CaptureException(ex);
 				return null;
 			}
 		}

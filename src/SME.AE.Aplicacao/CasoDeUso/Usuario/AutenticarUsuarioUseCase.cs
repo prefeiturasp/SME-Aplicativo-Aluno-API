@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Internal;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo;
@@ -26,7 +25,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
 
             if (!resposta.Ok)
-                throw new NegocioException(resposta.Erros.Join());
+                throw new NegocioException(string.Join("", resposta.Erros));
             
             var token = await mediator.Send(new CriarTokenCommand(cpf));
             await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));

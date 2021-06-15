@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
@@ -16,13 +15,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AlunoRepositorio : IAlunoRepositorio
     {
-        private readonly ICacheRepositorio cacheRepositorio;
-
-        public AlunoRepositorio(ICacheRepositorio cacheRepositorio)
-        {
-            this.cacheRepositorio = cacheRepositorio;
-        }
-
         private readonly string whereReponsavelAluno = @" WHERE responsavel.cd_cpf_responsavel = @cpf 
                                                            AND responsavel.dt_fim IS NULL  
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
@@ -43,11 +35,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = $"dadosAlunos-{cpf}";
-                var dadosAlunos = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(dadosAlunos))
-                    return JsonConvert.DeserializeObject<List<AlunoRespostaEol>>(dadosAlunos);
-
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
                 var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
                 return listaAlunos.ToList();
@@ -63,11 +50,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var chaveCache = $"dadosAlunosPorDreUeCpfResponsavel-{codigoDre}-{codigoUe}{cpf}";
-                var dadosAlunos = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(dadosAlunos))
-                    return JsonConvert.DeserializeObject<List<AlunoRespostaEol>>(dadosAlunos);
-
                 using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
                 var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereDreUeReponsavelAluno}", new { codigoDre, codigoUe, cpf });
                 return listaAlunos.ToList();

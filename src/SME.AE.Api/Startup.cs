@@ -14,7 +14,6 @@ using SME.AE.Infra;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System.Linq;
 using System.Text;
-using SME.AE.Infra.Persistencia.Cache;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace SME.AE.Api
@@ -36,8 +35,6 @@ namespace SME.AE.Api
             {
                 options.AllowSynchronousIO = true;
             });
-
-            services.AdicionarRedis();
 
             services.AddResponseCompression(options =>
             {

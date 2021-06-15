@@ -162,10 +162,15 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             usuario.Celular ??= celular;
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-            var atualizarDadosCadastrais = usuario.DataNascimentoResponsavel == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
-                                          string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.Celular);
+            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuario);
 
             return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
+        }
+
+        private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
+        {
+            return usuario.DataNascimentoResponsavel == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
+                   string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.Celular);
         }
 
         private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
