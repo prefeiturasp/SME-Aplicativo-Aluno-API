@@ -27,8 +27,8 @@ namespace SME.AE.Aplicacao
         {
             var request = new MensagemRabbit(command.Filtros,
                                              command.CodigoCorrelacao,
-                                             command.UsuarioLogadoNomeCompleto,
-                                             command.UsuarioLogadoCpf);
+                                             command.UsuarioCpf,
+                                             command.UsuarioNome);
 
             var mensagem = JsonConvert.SerializeObject(request, new JsonSerializerSettings
             {

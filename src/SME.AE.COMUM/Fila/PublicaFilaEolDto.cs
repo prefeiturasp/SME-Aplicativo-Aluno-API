@@ -1,9 +1,8 @@
-﻿using SME.AE.Dominio.Entidades;
-using System;
+﻿using System;
 
-namespace SME.AE.Infra
+namespace SME.AE.Comum
 {
-   public class PublicaFilaEolDto
+    public class PublicaFilaEolDto
     {
         public PublicaFilaEolDto(string nomeFila, object filtros, Guid codigoCorrelacao, string cpf, string nome)
         {
