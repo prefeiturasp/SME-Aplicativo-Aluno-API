@@ -2,6 +2,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao.Comum.Config;
+using System;
 
 namespace SME.AE.Api
 {
@@ -15,7 +16,7 @@ namespace SME.AE.Api
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
             .UseStartup<Startup>()
-            .UseSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; })
+            .UseSentry()
             .UseUrls("http://0.0.0.0:5000;");
     }
 }

@@ -29,8 +29,7 @@ namespace SME.AE.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            AddAuthentication(services);
-
+            AddAuthentication(services);            
             services.Configure<KestrelServerOptions>(options =>
             {
                 options.AllowSynchronousIO = true;
