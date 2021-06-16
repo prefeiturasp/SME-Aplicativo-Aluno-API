@@ -5,22 +5,19 @@ using System.Text;
 
 namespace SME.AE.Comum
 {
-   public class MensagemRabbit
+    public class MensagemRabbit
     {
-        public MensagemRabbit(string action, object mensagem, Guid codigoCorrelacao, string usuarioLogadoCpf)
+        public MensagemRabbit(string action, object mensagem, Guid codigoCorrelacao)
         {
             Action = action;
             Mensagem = mensagem;
             CodigoCorrelacao = codigoCorrelacao;
-            UsuarioLogadoCpf = usuarioLogadoCpf;
         }
 
-        public MensagemRabbit(object mensagem, Guid codigoCorrelacao, string usuarioLogadoCpf, string usuarioLogadoNome)
+        public MensagemRabbit(object mensagem, Guid codigoCorrelacao)
         {
             Mensagem = mensagem;
             CodigoCorrelacao = codigoCorrelacao;
-            UsuarioLogadoNomeCompleto = usuarioLogadoNome;
-            UsuarioLogadoCpf = usuarioLogadoCpf;
         }
 
         public MensagemRabbit(object mensagem)
@@ -35,8 +32,6 @@ namespace SME.AE.Comum
         public string Action { get; set; }
         public object Mensagem { get; set; }
         public Guid CodigoCorrelacao { get; set; }
-        public string UsuarioLogadoNomeCompleto { get; set; }
-        public string UsuarioLogadoCpf { get; set; }
 
         public T ObterObjetoMensagem<T>() where T : class
         {

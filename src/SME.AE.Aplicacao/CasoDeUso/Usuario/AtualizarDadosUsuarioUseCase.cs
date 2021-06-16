@@ -29,8 +29,8 @@ namespace SME.AE.Aplicacao
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
-            await mediator.Send(new PublicarFilaEolCommand(RotasRabbitEol.AtualizarDadosUsuarioEolSync, usuarioDto, Guid.NewGuid(), usuarioApp.Cpf, usuarioEol.Nome));
-            await mediator.Send(new PublicarFilaEolCommand(RotasRabbitEol.AtualizarDadosUsuarioProdamSync, usuarioDto, Guid.NewGuid(), usuarioApp.Cpf, usuarioEol.Nome));
+            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
+            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
 
             return RespostaApi.Sucesso();
         }
