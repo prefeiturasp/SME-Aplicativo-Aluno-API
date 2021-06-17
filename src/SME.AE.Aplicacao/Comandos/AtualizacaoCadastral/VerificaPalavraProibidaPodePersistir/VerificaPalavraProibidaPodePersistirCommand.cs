@@ -6,20 +6,20 @@ namespace SME.AE.Aplicacao
     public class VerificaPalavraProibidaPodePersistirCommand : IRequest<bool>
     {
 
-        public VerificaPalavraProibidaPodePersistirCommand(string nome)
+        public VerificaPalavraProibidaPodePersistirCommand(string texto)
         {
-            Nome = nome;
+            Texto = texto;
         }
-        public string Nome { get; set; }
+        public string Texto { get; set; }
     }
 
     public class VerificaPalavraProibidaPodePersistirCommandValidator : AbstractValidator<VerificaPalavraProibidaPodePersistirCommand>
     {
         public VerificaPalavraProibidaPodePersistirCommandValidator()
         {
-            RuleFor(x => x.Nome)
+            RuleFor(x => x.Texto)
                    .NotEmpty()
-                   .WithMessage("O nome deve ser informado!");
+                   .WithMessage("O texto deve ser informado!");
         }
     }
 }

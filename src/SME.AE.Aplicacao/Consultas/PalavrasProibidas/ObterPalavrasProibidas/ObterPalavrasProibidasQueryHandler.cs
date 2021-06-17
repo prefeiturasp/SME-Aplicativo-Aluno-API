@@ -19,10 +19,9 @@ namespace SME.AE.Aplicacao
 
         public async Task<string[]> Handle(ObterPalavrasProibidasQuery request, CancellationToken cancellationToken)
         {
-            var url = Environment.GetEnvironmentVariable("UrlApiPalavrasBloqueadas");
             var palavrasBloqueadas = new string[] { };
             var httpClient = httpClientFactory.CreateClient("servicoAtualizacaoCadastral");            
-            var resposta = await httpClient.GetAsync(url);
+            var resposta = await httpClient.GetAsync("palavras-bloqueadas");
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();

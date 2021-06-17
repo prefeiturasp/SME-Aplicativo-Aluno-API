@@ -38,7 +38,7 @@ namespace SME.AE.Aplicacao
             else
                 palavrasBloqueadas = JsonConvert.DeserializeObject<string[]>(cachePalavrasBloqueadas);
 
-            var palavrasTratadas = request.Nome.ToLower();
+            var palavrasTratadas = request.Texto.ToLower();
 
             var palavrasSeparadas = palavrasTratadas.Split(new char[] { '.', '@', ' ' }, StringSplitOptions.None);            
 
