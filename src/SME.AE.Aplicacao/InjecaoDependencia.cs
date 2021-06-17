@@ -2,6 +2,8 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Polly;
+using Polly.Registry;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
 using SME.AE.Aplicacao.CasoDeUso.Frequencia;
@@ -17,6 +19,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Middlewares;
 using SME.AE.Aplicacao.Servicos;
+using SME.AE.Comum;
 using System;
 
 namespace SME.AE.Aplicacao
@@ -36,6 +39,7 @@ namespace SME.AE.Aplicacao
             services.AddFiltros();
             services.AddServices();
             services.AddCasosDeUso();
+            services.AddPolicies();
         }
 
         private static void AdicionarAutoMapper(this IServiceCollection services)
@@ -57,22 +61,34 @@ namespace SME.AE.Aplicacao
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidacaoRequisicaoMiddleware<,>));
         }
+        public static void AddPolicies(this IServiceCollection services)
+        {
+            IPolicyRegistry<string> registry = services.AddPolicyRegistry();
+
+            Random jitterer = new Random();
+            var policyFila = Policy.Handle<Exception>()
+              .WaitAndRetryAsync(3,
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                      + TimeSpan.FromMilliseconds(jitterer.Next(0, 30)));
+
+            registry.Add(PoliticaPolly.PublicaFila, policyFila);
+        }
 
         private static void AddCasosDeUso(this IServiceCollection services)
         {
             //Usuario
-            services.TryAddScoped(typeof(IMarcarMensagemLidaUseCase), typeof(MarcarMensagemLidaUseCase));
-            services.TryAddScoped(typeof(IPrimeiroAcessoUseCase), typeof(PrimeiroAcessoUseCase));
-            services.TryAddScoped(typeof(ICriarNotificacaoUseCase), typeof(CriarNotificacaoUseCase));
-            services.TryAddScoped(typeof(IAtualizarNotificacaoUseCase), typeof(AtualizarNotificacaoUseCase));
-            services.TryAddScoped(typeof(IRemoverNotificacaoEmLoteUseCase), typeof(RemoverNotificacaoEmLoteUseCase));
-            services.TryAddScoped(typeof(IRemoveNotificacaoPorIdUseCase), typeof(RemoveNotificacaoPorIdUseCase));
-            services.TryAddScoped(typeof(IObterNotificacaoDoUsuarioLogadoUseCase), typeof(ObterNotificacaoDoUsuarioLogadoUseCase));
-            services.TryAddScoped(typeof(IAutenticarUsuarioUseCase), typeof(AutenticarUsuarioUseCase));
-            services.TryAddScoped(typeof(IDadosDoAlunoUseCase), typeof(DadosDoAlunoUseCase));
-            services.TryAddScoped(typeof(IAlterarSenhaUseCase), typeof(AlterarSenhaUseCase));
-            services.TryAddScoped(typeof(ISolicitarRedifinicaoSenhaUseCase), typeof(SolicitarRedifinicaoSenhaUseCase));
-            services.TryAddScoped(typeof(IValidarTokenUseCase), typeof(ValidarTokenUseCase));
+            services.TryAddScoped<IMarcarMensagemLidaUseCase, MarcarMensagemLidaUseCase>();
+            services.TryAddScoped<IPrimeiroAcessoUseCase, PrimeiroAcessoUseCase>();
+            services.TryAddScoped<ICriarNotificacaoUseCase, CriarNotificacaoUseCase>();
+            services.TryAddScoped<IAtualizarNotificacaoUseCase, AtualizarNotificacaoUseCase>();
+            services.TryAddScoped<IRemoverNotificacaoEmLoteUseCase, RemoverNotificacaoEmLoteUseCase>();
+            services.TryAddScoped<IRemoveNotificacaoPorIdUseCase, RemoveNotificacaoPorIdUseCase>();
+            services.TryAddScoped<IObterNotificacaoDoUsuarioLogadoUseCase, ObterNotificacaoDoUsuarioLogadoUseCase>();
+            services.TryAddScoped<IAutenticarUsuarioUseCase, AutenticarUsuarioUseCase>();
+            services.TryAddScoped<IDadosDoAlunoUseCase, DadosDoAlunoUseCase>();
+            services.TryAddScoped<IAlterarSenhaUseCase, AlterarSenhaUseCase>();
+            services.TryAddScoped<ISolicitarRedifinicaoSenhaUseCase, SolicitarRedifinicaoSenhaUseCase>();
+            services.TryAddScoped<IValidarTokenUseCase, ValidarTokenUseCase>();
             services.TryAddScoped<IRedefinirSenhaUseCase, RedefinirSenhaUseCase>();
             services.TryAddScoped<IMensagensUsuarioLogadoAlunoUseCase, MensagensUsuarioLogadoAlunoUseCase>();
             services.TryAddScoped<IMensagenUsuarioLogadoAlunoIdUseCase, MensagenUsuarioLogadoAlunoIdUseCase>();
@@ -88,18 +104,18 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterTotaisAdesaoUseCase, ObterTotaisAdesaoUseCase>();
             services.TryAddScoped<IObterTotaisAdesaoAgrupadosPorDreUseCase, ObterTotaisAdesaoAgrupadosPorDreUseCase>();
             services.TryAddScoped<IObterUltimaAtualizacaoPorProcessoUseCase, ObterUltimaAtualizacaoPorProcessoUseCase>();
-            services.AddTransient<IObterFrequenciaAlunoPorComponenteCurricularUseCase, ObterFrequenciaAlunoPorComponenteCurricularUseCase>();
-            services.AddTransient<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
-            services.AddTransient<IObterNotasAlunoUseCase, ObterNotasAlunoUseCase>();
-            services.AddTransient<IValidarUsuarioEhResponsavelDeAlunoUseCase, ValidarUsuarioEhResponsavelDeAlunoUseCase>();
-            services.AddTransient<IObterDadosDeLeituraComunicadosUseCase, ObterDadosDeLeituraComunicadosUseCase>();
-            services.AddTransient<IObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase, ObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase>();
-            services.AddTransient<IObterDadosUnidadeEscolarUseCase, ObterDadosUnidadeEscolarUseCase>();
-            services.AddTransient<IObterDadosDeLeituraModalidadeUseCase, ObterDadosDeLeituraModalidadeUseCase>();
-            services.AddTransient<IObterDadosDeLeituraTurmaUseCase, ObterDadosDeLeituraTurmaUseCase>();
-            services.AddTransient<IObterDadosDeLeituraAlunosUseCase, ObterDadosDeLeituraAlunosUseCase>();
-
-            services.AddTransient<IObterStatusDeLeituraNotificacaoUseCase, ObterStatusDeLeituraNotificacaoUseCase>();
+            services.TryAddScoped<IAtualizarDadosUsuarioUseCase, AtualizarDadosUsuarioUseCase>();
+            services.TryAddScoped<IObterFrequenciaAlunoPorComponenteCurricularUseCase, ObterFrequenciaAlunoPorComponenteCurricularUseCase>();
+            services.TryAddScoped<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
+            services.TryAddScoped<IObterNotasAlunoUseCase, ObterNotasAlunoUseCase>();
+            services.TryAddScoped<IValidarUsuarioEhResponsavelDeAlunoUseCase, ValidarUsuarioEhResponsavelDeAlunoUseCase>();
+            services.TryAddScoped<IObterDadosDeLeituraComunicadosUseCase, ObterDadosDeLeituraComunicadosUseCase>();
+            services.TryAddScoped<IObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase, ObterDadosDeLeituraComunicadosAgrupadosPorDreUseCase>();
+            services.TryAddScoped<IObterDadosUnidadeEscolarUseCase, ObterDadosUnidadeEscolarUseCase>();
+            services.TryAddScoped<IObterDadosDeLeituraModalidadeUseCase, ObterDadosDeLeituraModalidadeUseCase>();
+            services.TryAddScoped<IObterDadosDeLeituraTurmaUseCase, ObterDadosDeLeituraTurmaUseCase>();
+            services.TryAddScoped<IObterDadosDeLeituraAlunosUseCase, ObterDadosDeLeituraAlunosUseCase>();
+            services.TryAddScoped<IObterStatusDeLeituraNotificacaoUseCase, ObterStatusDeLeituraNotificacaoUseCase>();
         }
     }
 }

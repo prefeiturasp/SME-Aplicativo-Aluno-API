@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Comum;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
 using SME.AE.Infra.Persistencia.Repositorios;
@@ -17,11 +17,11 @@ namespace SME.AE.Infra
 {
     public static class InjecaoDependencia
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, VariaveisGlobaisOptions variaveisGlobais)
         {
             services.AddDbContext<AplicacaoContext>(options =>
                 options.UseNpgsql(
-                    ConnectionStrings.Conexao,
+                    variaveisGlobais.AEConnection,
                     b => b.MigrationsAssembly(typeof(AplicacaoContext).Assembly.FullName)));
 
             services.AddScoped(typeof(IAplicacaoContext), typeof(AplicacaoContext));
@@ -31,8 +31,7 @@ namespace SME.AE.Infra
             services.AddScoped(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.AddScoped(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepository));
             services.AddScoped(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
-            services.AddScoped(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
-            services.AddScoped(typeof(ITesteRepositorio), typeof(TesteRepositorio));
+            services.AddScoped(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));            
             services.AddScoped(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddScoped(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddScoped(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));

@@ -1,11 +1,11 @@
 ﻿using Dapper;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno.PorComponenteCurricular;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class FrequenciaAlunoRepositorio : IFrequenciaAlunoRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task<FrequenciaAlunoPorComponenteCurricularResposta> ObterFrequenciaAlunoPorComponenteCurricularAsync(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno, short codigoComponenteCurricular)
         {
@@ -202,7 +208,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     x => x.AlunoCodigo, x => x.ComponentesCurricularesDoAluno, parametros, splitOn: "splitOn");
 
                 conexao.Close();
-              
+
                 return dadosFrequenciaAluno;
             }
             catch (Exception ex)
@@ -291,7 +297,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (alterado == 0)
                 {
                     await conn.ExecuteAsync(sqlInsert, frequenciaAluno);
-                } else if (alterado > 1)
+                }
+                else if (alterado > 1)
                 {
                     await conn.ExecuteAsync(sqlDelete, frequenciaAluno);
                     await conn.ExecuteAsync(sqlInsert, frequenciaAluno);

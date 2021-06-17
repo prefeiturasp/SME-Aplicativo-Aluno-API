@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -11,7 +11,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class TermosDeUsoRepositorio : BaseRepositorio<TermosDeUso>, ITermosDeUsoRepositorio
     {
-        public TermosDeUsoRepositorio() : base(ConnectionStrings.Conexao)
+        public TermosDeUsoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
         {
         }
 

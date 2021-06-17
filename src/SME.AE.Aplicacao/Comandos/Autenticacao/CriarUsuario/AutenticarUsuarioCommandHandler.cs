@@ -1,6 +1,5 @@
 ﻿using FluentValidation.Results;
 using MediatR;
-using Sentry;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Extensoes;
@@ -8,7 +7,6 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using System;
 using System.Globalization;
@@ -185,7 +183,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
             else
             {
-                //
                 await _repository.SalvarAsync(MapearDominioUsuario(usuario, primeiroAcesso));
             }
 
@@ -223,7 +220,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 NomeMae = usuarioEol.NomeMae,
                 PrimeiroAcesso = primeiroAcesso,
                 AtualizarDadosCadastrais = atualizarDadosCadastrais,
-                Celular = usuarioEol.Celular,
+                Celular = usuarioEol.ObterCelularComDDD(),
                 Token = ""
             };
 

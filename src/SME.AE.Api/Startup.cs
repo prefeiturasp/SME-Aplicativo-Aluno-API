@@ -9,12 +9,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SME.AE.Api.Configuracoes;
 using SME.AE.Aplicacao;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Infra;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using SME.AE.Comum;
+using RabbitMQ.Client;
 
 namespace SME.AE.Api
 {
@@ -29,8 +30,6 @@ namespace SME.AE.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            AddAuthentication(services);
-
             services.Configure<KestrelServerOptions>(options =>
             {
                 options.AllowSynchronousIO = true;
@@ -41,10 +40,19 @@ namespace SME.AE.Api
                 options.Providers.Add<GzipCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
-            RegistrarMapeamentos.Registrar();
-            RegistrarMvc.Registrar(services, Configuration);
 
-            services.AddInfrastructure();
+            var variaveisGlobais = new VariaveisGlobaisOptions();
+            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
+            services.AddSingleton(variaveisGlobais);
+
+            AddAuthentication(services, variaveisGlobais);
+
+            RegistrarMapeamentos.Registrar();
+            RegistrarMvc.Registrar(services, variaveisGlobais);
+            ConfiguraVariaveisAmbiente(services);
+
+            services.AddInfrastructure(variaveisGlobais);
             services.AddApplication();
             services.AdicionarValidadoresFluentValidation();
             services.AddCors(options => options.AddDefaultPolicy(
@@ -58,11 +66,27 @@ namespace SME.AE.Api
                 .AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
-            registrarSwagger(services);
+            RegistrarSwagger(services);
             services.AddApplicationInsightsTelemetry();
         }
 
-        private static void registrarSwagger(IServiceCollection services)
+        private void ConfiguraVariaveisAmbiente(IServiceCollection services)
+        {
+            var configuracaoRabbitOptions = new ConfiguracaoRabbitOptions();
+            Configuration.GetSection(nameof(ConfiguracaoRabbitOptions)).Bind(configuracaoRabbitOptions, c => c.BindNonPublicProperties = true);
+
+            var rabbitConn = new ConnectionFactory
+            {
+                HostName = configuracaoRabbitOptions.HostName,
+                UserName = configuracaoRabbitOptions.UserName,
+                Password = configuracaoRabbitOptions.Password,
+                VirtualHost = configuracaoRabbitOptions.VirtualHost
+            };
+
+            services.AddSingleton(rabbitConn);
+        }
+
+        private static void RegistrarSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
             {
@@ -94,9 +118,9 @@ namespace SME.AE.Api
             });
         }
 
-        private void AddAuthentication(IServiceCollection services)
+        private void AddAuthentication(IServiceCollection services, VariaveisGlobaisOptions variaveisGlobais)
         {
-            byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
+            byte[] key = Encoding.ASCII.GetBytes(variaveisGlobais.SME_AE_JWT_TOKEN_SECRET);
             services
                     .AddAuthentication(x =>
                 {
