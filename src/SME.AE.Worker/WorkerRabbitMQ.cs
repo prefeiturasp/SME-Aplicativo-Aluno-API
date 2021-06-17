@@ -6,6 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sentry;
 using Sentry.Protocol;
+using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Fila;
 using SME.AE.Comum.Utilitarios;
