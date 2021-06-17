@@ -27,7 +27,7 @@ namespace SME.AE.Aplicacao
             bool podePersistirTexto = await PodePersistirTexto(usuarioDto);
 
             if (!podePersistirTexto)
-                return RespostaApi.Falha("Foram detectadas palavras proibidas!");
+                return RespostaApi.Falha("Conteúdo inadequado nos campos de cadastro, por favor revise e tente novamente.");
 
             var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuarioApp.Cpf));
 
