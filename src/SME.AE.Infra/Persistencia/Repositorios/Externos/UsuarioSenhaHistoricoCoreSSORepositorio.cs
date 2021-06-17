@@ -1,7 +1,6 @@
 ﻿using Dapper;
-using Dommel;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades.Externas;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -13,7 +12,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos
 {
     public class UsuarioSenhaHistoricoCoreSSORepositorio : ExternoRepositorio<UsuarioSenhaHistoricoCoreSSO, SqlConnection>, IUsuarioSenhaHistoricoCoreSSORepositorio
     {
-        public UsuarioSenhaHistoricoCoreSSORepositorio() : base(new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+        public UsuarioSenhaHistoricoCoreSSORepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection))
         {
         }
 

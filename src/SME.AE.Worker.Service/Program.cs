@@ -45,7 +45,7 @@ namespace SME.AE.Worker.Service
                 }).ConfigureLogging((context, logging) =>
                 {
                     logging.AddConfiguration(context.Configuration);
-                    logging.AddSentry(option => { option.Dsn = VariaveisAmbiente.SentryDsn; });
+                    logging.AddSentry();
                 });
     }
 }

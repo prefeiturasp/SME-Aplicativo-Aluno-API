@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.UnidadeEscolar;
+using SME.AE.Comum;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -11,7 +11,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UnidadeEscolarRepositorio : IUnidadeEscolarRepositorio
     {
-        private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public UnidadeEscolarRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private SqlConnection CriaConexao() => new SqlConnection(variaveisGlobaisOptions.EolConnection);
 
         public async Task<UnidadeEscolarResposta> ObterDadosUnidadeEscolarPorCodigoUe(string codigoUe)
         {

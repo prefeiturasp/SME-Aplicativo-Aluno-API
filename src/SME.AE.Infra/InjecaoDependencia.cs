@@ -31,8 +31,7 @@ namespace SME.AE.Infra
             services.AddScoped(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.AddScoped(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepository));
             services.AddScoped(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
-            services.AddScoped(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
-            services.AddScoped(typeof(ITesteRepositorio), typeof(TesteRepositorio));
+            services.AddScoped(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));            
             services.AddScoped(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddScoped(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddScoped(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
