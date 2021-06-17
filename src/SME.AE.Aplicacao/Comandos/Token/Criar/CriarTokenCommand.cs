@@ -6,8 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
-using SME.AE.Aplicacao.Comum.Config;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum;
 
 namespace SME.AE.Aplicacao.Comandos.Token.Criar
 {
@@ -23,17 +22,17 @@ namespace SME.AE.Aplicacao.Comandos.Token.Criar
     
     public class CriarTokenCommandHandler : IRequestHandler<CriarTokenCommand, string>
     {
-        private readonly IUsuarioRepository _repository;
+        private readonly string JwtTokenSecret;
         
-        public CriarTokenCommandHandler(IUsuarioRepository repository)
+        public CriarTokenCommandHandler(VariaveisGlobaisOptions variaveisGlobais)
         {
-            _repository = repository;
+            JwtTokenSecret = variaveisGlobais.SME_AE_JWT_TOKEN_SECRET;
         }
 
         public async Task<string> Handle(CriarTokenCommand request, CancellationToken cancellationToken)
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(VariaveisAmbiente.JwtTokenSecret);
+            byte[] key = Encoding.ASCII.GetBytes(JwtTokenSecret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -48,7 +47,7 @@ namespace SME.AE.Aplicacao.Comandos.Token.Criar
             };
             
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return await Task.FromResult(tokenHandler.WriteToken(token));
         }
     }
 }

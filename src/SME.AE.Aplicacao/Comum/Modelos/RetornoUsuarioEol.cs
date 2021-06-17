@@ -1,7 +1,5 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
@@ -24,8 +22,14 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public TipoResponsavelEnum TipoResponsavel { get; set; }
         public string NomeSocial { get; set; }
         public DateTime DataNascimento { get; set; }
+        public DateTime DataNascimentoResponsavel { get; set; }
+        public string NomeMae { get; set; }
         public int TipoSigilo { get; set; }
         public string DDD { get; set; }
         public string Celular { get; set; }
+        public string ObterCelularComDDD()
+        {
+            return $"{DDD}{Celular}";
+        }
     }
 }

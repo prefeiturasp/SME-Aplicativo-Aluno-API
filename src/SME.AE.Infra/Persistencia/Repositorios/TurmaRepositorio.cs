@@ -1,33 +1,28 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
+using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Infra.Persistencia.Repositorios.Base.SGP;
+using SME.AE.Comum;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class TurmaRepositorio : RepositorioSgpComCacheBase, ITurmaRepositorio
+    public class TurmaRepositorio : ITurmaRepositorio
     {
-        public TurmaRepositorio(ICacheRepositorio cacheRepositorio) 
-            : base(cacheRepositorio)
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public TurmaRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<TurmaModalidadeDeEnsinoDto> ObterModalidadeDeEnsino(string codigoTurma)
         {
             try
             {
-                var chaveCache = ChaveCacheTurma(codigoTurma);
-
-                var frequenciaAluno = await _cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(frequenciaAluno))
-                    return JsonConvert.DeserializeObject<TurmaModalidadeDeEnsinoDto>(frequenciaAluno);
-
                 using var conexao = CriaConexao();
                 conexao.Open();
 
@@ -43,7 +38,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var turmaModalidadeDeEnsino = await conexao.QuerySingleAsync<TurmaModalidadeDeEnsinoDto>(query, parametros);
                 conexao.Close();
 
-                await _cacheRepositorio.SalvarAsync(chaveCache, turmaModalidadeDeEnsino, 720, false);
                 return turmaModalidadeDeEnsino;
             }
             catch (Exception ex)
@@ -52,8 +46,5 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
-
-        private static string ChaveCacheTurma(string codigoTurma)
-            => $"modalidade-ensino-turma-{codigoTurma}";
     }
 }
