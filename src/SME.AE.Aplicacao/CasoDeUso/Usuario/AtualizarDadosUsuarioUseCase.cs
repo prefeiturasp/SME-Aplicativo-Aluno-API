@@ -24,15 +24,26 @@ namespace SME.AE.Aplicacao
             if (usuarioApp == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
+            bool podePersistirTexto = await PodePersistirTexto(usuarioDto);
+
+            if (!podePersistirTexto)
+                return RespostaApi.Falha("Foram detectadas palavras proibidas!");
+
             var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuarioApp.Cpf));
 
             if (usuarioEol == null)
-                return RespostaApi.Falha("Usuário não encontrado!");
+                return RespostaApi.Falha("Usuário não encontrado!");            
 
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
 
             return RespostaApi.Sucesso();
+        }
+
+        private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)
+        {
+            var podePersistir = await mediator.Send(new VerificaPalavraProibidaPodePersistirCommand(usuarioDto.TextoParaVerificarPersistencia()));
+            return podePersistir;
         }
     }
 }

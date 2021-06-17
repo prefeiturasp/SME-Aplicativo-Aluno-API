@@ -10,6 +10,12 @@ namespace SME.AE.Aplicacao
         public DateTime DataNascimentoResponsavel { get; set; }
         public string NomeMae { get; set; }
         public string Celular { get; set; }
+
+        public string TextoParaVerificarPersistencia()
+        {
+            return $"{NomeMae} {Email}";
+        }       
+
     }
 
     public class AtualizarDadosUsuarioValidator : AbstractValidator<AtualizarDadosUsuarioDto>
