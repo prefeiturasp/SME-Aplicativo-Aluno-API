@@ -87,7 +87,8 @@
     <PackageReference Include="Polly" Version="7.2.2" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
-    <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />    
+    <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />    
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.5.0" />    
     <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
