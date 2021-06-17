@@ -1,6 +1,6 @@
-﻿namespace SME.AE.Comum.Fila
+﻿namespace SME.AE.Comum
 {
-    public static class RotasRabbitAe
+    public class RotasRabbitAe
     {
         public const string RotaAtualizacaoCadastralEol = "ae.usuario.cadastro.eol.atualizar";
         public const string RotaAtualizacaoCadastralProdam = "ae.usuario.cadastro.prodam.atualizar";

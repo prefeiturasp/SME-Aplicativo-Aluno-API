@@ -1,13 +1,10 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.AgendadoWorkerService;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Infra.Persistencia.Cache;
 using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Worker.Service.CasoDeUsoWorker;
 
@@ -49,9 +46,6 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarRepositorios(this IServiceCollection services)
         {
             return services
-                .AddTransient<ICacheRepositorio, CacheRepositorio>()
-                .AddTransient<IConnectionMultiplexerAe, ConnectionMultiplexerAe>()
-
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
 
                 .AddTransient<IEventoRepositorio, EventoRepositorio>()

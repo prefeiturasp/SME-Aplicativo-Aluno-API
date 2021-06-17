@@ -77,11 +77,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
         private Dominio.Entidades.Usuario usuario { get; set; } = new Dominio.Entidades.Usuario
         {
-            Celular = "00000000000",
-            Cpf = "00000000000",
-            Email = "a@a.com",
+            Cpf = "00000000000",         
             Id = 1,
-            Nome = "Teste",
             PrimeiroAcesso = true,
             UltimoLogin = DateTime.Now
         };

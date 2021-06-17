@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SME.AE.Comum.Fila
+namespace SME.AE.Comum
 {
     public class MensagemRabbit
     {
