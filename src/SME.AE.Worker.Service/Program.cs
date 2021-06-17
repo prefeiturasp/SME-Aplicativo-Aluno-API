@@ -1,11 +1,14 @@
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
+using System.Reflection;
 
 namespace SME.AE.Worker.Service
 {
@@ -34,14 +37,23 @@ namespace SME.AE.Worker.Service
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration( a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
                 .ConfigureServices((hostContext, services) =>
                 {
+                    
                     AdicionarAutoMapper(services);
                     AdicionarMediatr(services);
                     services
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso();
+
+                    var variaveisGlobais = new VariaveisGlobaisOptions();
+                    hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
+                    services.AddSingleton(variaveisGlobais);
+
+
                 }).ConfigureLogging((context, logging) =>
                 {
                     logging.AddConfiguration(context.Configuration);
