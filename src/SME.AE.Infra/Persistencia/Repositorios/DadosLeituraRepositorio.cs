@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class DadosLeituraRepositorio : BaseRepositorio<Adesao>, IDadosLeituraRepositorio
     {
-        public DadosLeituraRepositorio() : base(ConnectionStrings.Conexao)
+        public DadosLeituraRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
         {
         }
 

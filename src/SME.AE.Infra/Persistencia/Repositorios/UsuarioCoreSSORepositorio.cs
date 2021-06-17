@@ -1,10 +1,10 @@
 ﻿using Dapper;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Comandos;
 using System;
 using System.Collections.Generic;
@@ -16,11 +16,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioCoreSSORepositorio : IUsuarioCoreSSORepositorio
     {
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public UsuarioCoreSSORepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
         public async Task AlterarStatusUsuario(Guid usuId, StatusUsuarioCoreSSO novoStatus)
         {
             try
             {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
                 conn.Open();
                 using var transaction = conn.BeginTransaction();
 
@@ -43,7 +49,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conexao = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conexao = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
                 conexao.Open();
                 var sql = @"update SYS_Usuario 
                                set usu_senha = @senhaCriptografada, usu_dataAlteracaoSenha = @dataAtual, usu_dataAlteracao = @dataAtual
@@ -64,7 +70,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
                 conn.Open();
                 await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
                 conn.Close();
@@ -81,7 +87,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
                 conn.Open();
                 using var transaction = conn.BeginTransaction();
 
@@ -115,7 +121,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
 
                 conn.Open();
                 using var transaction = conn.BeginTransaction();
@@ -137,7 +143,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
                 conn.Open();
 
                 var consulta = @"
@@ -160,16 +166,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 RetornoUsuarioCoreSSO usuarioCoreSSO;
 
-                using (var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
-                {
-                    conn.Open();
-                    usuarioCoreSSO = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
+
+                conn.Open();
+                usuarioCoreSSO = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
                             SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, u.usu_login as Cpf
                             FROM sys_usuario u
                             WHERE u.usu_login = @cpf "
-                        , new { cpf });
-                    conn.Close();
-                }
+                    , new { cpf });
+                conn.Close();
+
 
                 return usuarioCoreSSO;
             }
@@ -185,7 +191,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new SqlConnection(ConnectionStrings.ConexaoCoreSSO);
+                using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
                 conn.Open();
                 var listaIdGrupoQry = await conn.QueryAsync<Guid>(@"
                     SELECT gru_id

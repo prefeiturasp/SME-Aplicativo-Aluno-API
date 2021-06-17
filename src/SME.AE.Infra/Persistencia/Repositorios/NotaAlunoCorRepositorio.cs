@@ -1,10 +1,9 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +12,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class NotaAlunoCorRepositorio : INotaAlunoCorRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public NotaAlunoCorRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task<IEnumerable<NotaAlunoCor>> ObterAsync()
         {

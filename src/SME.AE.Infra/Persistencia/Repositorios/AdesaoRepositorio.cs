@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -13,8 +13,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AdesaoRepositorio : BaseRepositorio<Adesao>, IAdesaoRepositorio
     {
-        public AdesaoRepositorio() : base(ConnectionStrings.Conexao)
+        
+        public AdesaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
         {
+            
         }
 
         public async Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoAgrupadosPorDre()

@@ -27,5 +27,9 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int TipoSigilo { get; set; }
         public string DDD { get; set; }
         public string Celular { get; set; }
+        public string ObterCelularComDDD()
+        {
+            return $"{DDD}{Celular}";
+        }
     }
 }

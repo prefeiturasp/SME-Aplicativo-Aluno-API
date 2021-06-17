@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using SME.AE.Aplicacao;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -13,7 +13,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class ResponsavelEOLRepositorio : IResponsavelEOLRepositorio
     {
-        private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public ResponsavelEOLRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private SqlConnection CriaConexao() => new SqlConnection(variaveisGlobaisOptions.EolConnection);
         public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo)
         {
             var sql =

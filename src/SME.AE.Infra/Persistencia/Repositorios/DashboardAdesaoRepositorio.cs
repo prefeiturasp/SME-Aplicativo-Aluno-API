@@ -1,17 +1,22 @@
 ﻿using Dapper;
 using Npgsql;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class DashboardAdesaoRepositorio : IDashboardAdesaoRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public DashboardAdesaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new System.ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task IncluiOuAtualizaPorDreUeTurmaEmBatch(IEnumerable<DashboardAdesaoDto> listaAdesao)
         {

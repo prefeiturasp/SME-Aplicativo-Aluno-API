@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AlunoRepositorio : IAlunoRepositorio
     {
+        public AlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
         private readonly string whereReponsavelAluno = @" WHERE responsavel.cd_cpf_responsavel = @cpf 
                                                            AND responsavel.dt_fim IS NULL  
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
@@ -31,11 +35,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                            AND vue.cd_unidade_educacao = @codigoUe
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
                                                            AND aluno.cd_tipo_sigilo is null";
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
         public async Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf)
         {
             try
             {
-                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                using var conexao = new SqlConnection(variaveisGlobaisOptions.EolConnection);
                 var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereReponsavelAluno}", new { cpf });
                 return listaAlunos.ToList();
             }
@@ -50,7 +56,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                using var conexao = new SqlConnection(variaveisGlobaisOptions.EolConnection);
                 var listaAlunos = await conexao.QueryAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereDreUeReponsavelAluno}", new { codigoDre, codigoUe, cpf });
                 return listaAlunos.ToList();
             }
@@ -74,7 +80,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (!string.IsNullOrWhiteSpace(codigoUe))
                     query.AppendLine(" AND vue.cd_unidade_educacao = @codigoUe");
 
-                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                using var conexao = new SqlConnection(variaveisGlobaisOptions.EolConnection);
                 var cpfsResponsaveis = await conexao.QueryAsync<CpfResponsavelAlunoEol>($"{query}", new { codigoDre, codigoUe });
                 return cpfsResponsaveis.ToList();
             }
@@ -137,7 +143,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 ";
             try
             {
-                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                using var conexao = new SqlConnection(variaveisGlobaisOptions.EolConnection);
                 var listaAlunos = await conexao.QueryAsync<AlunoTurmaEol>(sql, new { codigoTurma });
 
                 var alunosRetorno = listaAlunos
@@ -163,11 +169,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<AlunoRespostaEol> ObterDadosAlunoPorCodigo(long codigoAluno) 
+        public async Task<AlunoRespostaEol> ObterDadosAlunoPorCodigo(long codigoAluno)
         {
             try
             {
-                using var conexao = new SqlConnection(ConnectionStrings.ConexaoEol);
+                using var conexao = new SqlConnection(variaveisGlobaisOptions.EolConnection);
                 return await conexao.QueryFirstOrDefaultAsync<AlunoRespostaEol>($"{AlunoConsultas.ObterDadosAlunos} {whereAlunoCodigo}", new { codigoAluno });
             }
             catch (Exception ex)

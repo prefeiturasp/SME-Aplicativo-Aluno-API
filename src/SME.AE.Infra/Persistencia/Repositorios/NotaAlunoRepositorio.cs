@@ -1,10 +1,10 @@
 ﻿using Dapper;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class NotaAlunoRepositorio : INotaAlunoRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public NotaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
         {
@@ -89,7 +95,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (alterado == 0)
                 {
                     await conn.ExecuteAsync(sqlInsert, notaAluno);
-                } else if (alterado > 1)
+                }
+                else if (alterado > 1)
                 {
                     await conn.ExecuteAsync(sqlDelete, notaAluno);
                     await conn.ExecuteAsync(sqlInsert, notaAluno);
@@ -185,7 +192,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        
+
         public async Task<NotaAlunoPorBimestreResposta> ObterNotasAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurma, string codigoAluno)
         {
             try
@@ -216,8 +223,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var parametros = new { anoLetivo, bimestre, codigoUe, codigoTurma, codigoAluno };
                 var dadosNotasAluno = await conexao.QueryParentChildSingleAsync<NotaAlunoPorBimestreResposta, NotaAlunoComponenteCurricular, int>(query,
-                    notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.Bimestre, 
-                    notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.NotasPorComponenteCurricular, 
+                    notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.Bimestre,
+                    notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.NotasPorComponenteCurricular,
                     parametros, splitOn: "splitOn");
                 conexao.Close();
 

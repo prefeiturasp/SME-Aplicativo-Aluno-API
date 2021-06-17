@@ -4,8 +4,8 @@ using Dapper.Dommel;
 using Dommel;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -18,8 +18,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
-        public UsuarioRepository() : base(ConnectionStrings.Conexao)
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public UsuarioRepository(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
         {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
 
         public async Task<Usuario> ObterPorCpf(string cpf)
@@ -28,7 +31,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var usuario = await conexao.FirstOrDefaultAsync<Usuario>(x => x.Cpf == cpf);
+                var usuario = await conexao.QueryFirstOrDefaultAsync<Usuario>("select * from usuario where cpf = @cpf", new { cpf });
                 return usuario;
             }
             catch (Exception ex)
@@ -47,7 +50,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 using var conexao = InstanciarConexao();
                 await conexao.OpenAsync();
-                
+
                 var usuarios = await conexao.QueryAsync<Usuario>(query);
                 await conexao.CloseAsync();
 
@@ -80,7 +83,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var cpfsUsuarios = await conn.QueryAsync<string>(UsuarioConsultas.ObterTodos);
                 conn.Close();
@@ -104,7 +107,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (cpfs != null && cpfs.Any())
                     query.AppendLine($" and cpf IN ({cpfsIN})");
 
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(query.ToString());
                 conn.Close();
@@ -128,7 +131,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (cpfs != null && cpfs.Any())
                     query.AppendLine($" and cpf IN ({cpfsIN})");
 
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var totalUsuariosValidos = await conn.ExecuteScalarAsync(query.ToString());
                 conn.Close();
@@ -146,7 +149,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var dataHoraAtual = DateTime.Now;
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 await conn.ExecuteAsync(
                     "update usuario set ultimologin = @dataHoraAtual, excluido = false  where cpf = @cpf", new { cpf, dataHoraAtual });
@@ -240,7 +243,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var dataHoraAtual = DateTime.Now;
                 await conn.ExecuteAsync(
@@ -257,7 +260,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var dataHoraAtual = DateTime.Now;
                 await conn.ExecuteAsync(
@@ -276,7 +279,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 await conn.ExecuteAsync(
                     @"DELETE FROM public.usuario_dispositivo
@@ -296,7 +299,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 string query =
                      @"SELECT usuario_id 

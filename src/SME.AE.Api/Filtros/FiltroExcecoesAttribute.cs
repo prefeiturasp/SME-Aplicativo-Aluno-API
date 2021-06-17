@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.Linq;
@@ -16,12 +14,9 @@ namespace SME.AE.Api.Filtros
     {
         public readonly string sentryDSN;
 
-        public FiltroExcecoesAttribute(IConfiguration configuration)
+        public FiltroExcecoesAttribute(VariaveisGlobaisOptions variaveisGlobais)
         {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-
-            sentryDSN = VariaveisAmbiente.SentryDsn;
+            sentryDSN = variaveisGlobais.SentryDsn;
         }
 
         public override void OnException(ExceptionContext context)
