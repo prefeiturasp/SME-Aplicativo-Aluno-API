@@ -34,9 +34,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
         {
-            bool primeiroAcesso = false;
-            string email = "";
-            string celular = "";
+            bool primeiroAcesso = false;            
 
             var validator = new AutenticarUsuarioUseCaseValidatior();
             var validacao = validator.Validate(request);
