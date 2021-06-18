@@ -142,7 +142,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var sql =
                  @"
-	            SELECT 
+               SELECT 
                     RTRIM(LTRIM(responsavel.nm_responsavel)) AS Nome,
                     RTRIM(LTRIM(responsavel.email_responsavel)) AS Email,
                     RTRIM(LTRIM(cd_ddd_celular_responsavel)) AS DDD,
@@ -155,6 +155,45 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             using var conn = CriaConexao();
             await conn.OpenAsync();
             var responsavelEol = await conn.QueryFirstOrDefaultAsync<ResponsavelAlunoEolResumidoDto>(sql, new { cpfResponsavel });
+            await conn.CloseAsync();
+            return responsavelEol;
+        }
+
+        public async Task<IEnumerable<ResponsavelAlunoDetalhadoEolDto>> ObterDadosReponsavelPorCpf(string cpfResponsavel)
+        {
+            var sql =
+                 @"
+                select 
+                        a.cd_aluno CodigoAluno,
+                        ra.tp_pessoa_responsavel TipoPessoa,
+                        ra.nm_responsavel Nome,
+                        ra.nr_rg_responsavel NumeroRG,
+                        ra.cd_digito_rg_responsavel DigitoRG,
+                        ra.sg_uf_rg_responsavel UfRG,
+                        ra.cd_cpf_responsavel UfRG,
+                        ra.in_cpf_responsavel_confere CPFConfere,
+                        ra.cd_ddd_celular_responsavel DDDCelular,
+                        ra.nr_celular_responsavel NumeroCelular,
+                        ra.cd_tipo_turno_celular TipoTurnoCelular,
+                        ra.cd_ddd_telefone_fixo_responsavel DDDTelefoneFixo,
+                        ra.nr_telefone_fixo_responsavel NumeroTelefoneFixo,
+                        ra.cd_tipo_turno_fixo TipoTurnoTelefoneFixo,
+                        ra.cd_ddd_telefone_comercial_responsavel DDDTelefoneComercial,
+                        ra.nr_telefone_comercial_responsavel NumeroTelefoneComercial,
+                        ra.cd_tipo_turno_comercial TipoTurnoTelefoneComercial,
+                        ra.in_autoriza_envio_sms AutorizaEnvioSMS,
+                        ra.email_responsavel Email,
+                        ra.nm_mae_responsavel NomeMae,
+                        ra.dt_nascimento_mae_responsavel DataNascimentoMae
+					from v_aluno_cotic(nolock) a
+					inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
+                WHERE responsavel.cd_cpf_responsavel = @cpfResponsavel 
+                  AND responsavel.dt_fim IS NULL  
+                  AND responsavel.cd_cpf_responsavel IS NOT NULL";
+
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var responsavelEol = await conn.QueryAsync<ResponsavelAlunoDetalhadoEolDto>(sql, new { cpfResponsavel });
             await conn.CloseAsync();
             return responsavelEol;
         }

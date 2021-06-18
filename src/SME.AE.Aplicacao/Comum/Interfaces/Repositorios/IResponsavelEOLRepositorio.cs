@@ -9,5 +9,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task<IEnumerable<ResponsavelAlunoEOLDto>> ListarCpfResponsavelAlunoDaDreUeTurma();
         Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo);
         Task<ResponsavelAlunoEolResumidoDto> ObterDadosResumidosReponsavelPorCpf(string cpfResponsavel);
+        Task<IEnumerable<ResponsavelAlunoDetalhadoEolDto>> ObterDadosReponsavelPorCpf(string cpfResponsavel);
     }
 }

@@ -1,0 +1,55 @@
+﻿using MediatR;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
+using SME.AE.Comum;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace SME.AE.Aplicacao
+{
+    public class AtualizarDadosUsuarioProdamUseCase : IAtualizarDadosUsuarioProdamUseCase
+    {
+        private readonly IMediator mediator;
+
+        public AtualizarDadosUsuarioProdamUseCase(IMediator mediator)
+        {
+            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+        }
+
+        public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
+        {
+            var dto = mensagemRabbit.ObterObjetoMensagem<AtualizarDadosUsuarioDto>();
+
+            var usuarioApp = await mediator.Send(new ObterUsuarioQuery(dto.Id));
+
+            if (usuarioApp == null)
+                return false;
+
+            var usuariosEol = await mediator.Send(new ObterDadosReponsavelPorCpfQuery(usuarioApp.Cpf));
+
+            if (usuariosEol == null || !usuariosEol.Any())
+                return false;
+
+            MapearAlteracoes(usuariosEol, dto);
+
+            foreach (var usuarioEol in usuariosEol)
+            {
+                await mediator.Send(new EnviarAtualizacaoCadastralProdamCommand(usuarioEol));
+            }
+
+            return true;
+        }
+
+        private void MapearAlteracoes(IEnumerable<ResponsavelAlunoDetalhadoEolDto> usuarioEol, AtualizarDadosUsuarioDto dto)
+        {
+            usuarioEol.Select(usuarioEol =>
+            {
+                usuarioEol.DataNascimentoMae = dto.DataNascimentoResponsavel.ToString("yyyyMMdd");
+                usuarioEol.NomeMae = dto.NomeMae;
+                usuarioEol.Email = dto.Email;
+                usuarioEol.NumeroCelular = dto.Celular;
+                return usuarioEol;
+            });
+        }
+    }
+}

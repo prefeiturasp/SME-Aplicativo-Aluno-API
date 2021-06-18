@@ -44,12 +44,17 @@ namespace SME.AE.Api
             var variaveisGlobais = new VariaveisGlobaisOptions();
             Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
 
+            var servicoProdam = new ServicoProdamOptions();
+            Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
+
             services.AddSingleton(variaveisGlobais);
+            services.AddSingleton(servicoProdam);
 
             AddAuthentication(services, variaveisGlobais);
 
             RegistrarMapeamentos.Registrar();
             RegistrarMvc.Registrar(services, variaveisGlobais);
+            RegistrarClientesHttp.Registrar(services, servicoProdam);
             ConfiguraVariaveisAmbiente(services);
 
             services.AddInfrastructure(variaveisGlobais);
