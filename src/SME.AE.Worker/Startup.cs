@@ -1,9 +1,13 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
+using SME.AE.Comum;
+using System;
 
 namespace SME.AE.Worker
 {
@@ -19,6 +23,14 @@ namespace SME.AE.Worker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            AdicionarMediatr(services);
+            ConfiguraVariaveisAmbiente(services);
+
+            services
+                .AdicionarRepositorios()
+                .AdicionarCasosDeUso();
+
+            services.AddHostedService<WorkerRabbitMQ>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -27,12 +39,33 @@ namespace SME.AE.Worker
             });
         }
 
+        private void ConfiguraVariaveisAmbiente(IServiceCollection services)
+        {
+            var variaveisGlobais = new VariaveisGlobaisOptions();
+            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
+            services.AddSingleton(variaveisGlobais);
+
+            var configuracaoRabbitOptions = new ConfiguracaoRabbitOptions();
+            Configuration.GetSection(nameof(ConfiguracaoRabbitOptions)).Bind(configuracaoRabbitOptions, c => c.BindNonPublicProperties = true);
+
+            var rabbitConn = new ConnectionFactory
+            {
+                HostName = configuracaoRabbitOptions.HostName,
+                UserName = configuracaoRabbitOptions.UserName,
+                Password = configuracaoRabbitOptions.Password,
+                VirtualHost = configuracaoRabbitOptions.VirtualHost
+            };
+
+            services.AddSingleton(rabbitConn);
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();                
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseSwagger();
@@ -48,6 +81,12 @@ namespace SME.AE.Worker
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private static void AdicionarMediatr(IServiceCollection services)
+        {
+            var assembly = AppDomain.CurrentDomain.Load("SME.AE.Aplicacao");
+            services.AddMediatR(assembly);
         }
     }
 }

@@ -33,13 +33,14 @@ namespace SME.AE.Worker
         /// </summary>
         private readonly Dictionary<string, ComandoRabbit> comandos;
 
-        public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
+        public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, VariaveisGlobaisOptions variaveisGlobais, ConnectionFactory connRabbitFactory)
         {
-            sentryDSN = configuration.GetValue<string>("Sentry:DSN");
+            sentryDSN = variaveisGlobais.SentryDsn;
+
+            this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
             //Fazer a conexão rabbit
-            //this.conexaoRabbit = conexaoRabbit ?? throw new ArgumentNullException(nameof(conexaoRabbit));
-            this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+            conexaoRabbit = connRabbitFactory.CreateConnection();
             canalRabbit = conexaoRabbit.CreateModel();
 
             canalRabbit.BasicQos(0, 10, false);
@@ -47,13 +48,13 @@ namespace SME.AE.Worker
             canalRabbit.ExchangeDeclare(ExchangeRabbit.Ae, ExchangeType.Direct, true, false);
             canalRabbit.ExchangeDeclare(ExchangeRabbit.AeDeadLetter, ExchangeType.Direct, true, false);
 
-            DeclararFilasSgp();
+            DeclararFilasAe();
 
             comandos = new Dictionary<string, ComandoRabbit>();
             RegistrarUseCases();
         }
 
-        private void DeclararFilasSgp()
+        private void DeclararFilasAe()
         {
             foreach (var fila in typeof(RotasRabbitAe).ObterConstantesPublicas<string>())
             {
