@@ -6,6 +6,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
@@ -51,6 +52,8 @@ namespace SME.AE.Infra
             services.AddScoped(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
             services.AddScoped(typeof(IDreSgpRepositorio), typeof(DreSgpRepositorio));
             services.AddScoped(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
+            services.AddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
+            services.AddScoped(typeof(IServicoLog), typeof(ServicoLog));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.AddScoped<IAutenticacaoService, AutenticacaoService>();

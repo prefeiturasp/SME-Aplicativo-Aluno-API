@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
@@ -24,15 +25,35 @@ namespace SME.AE.Aplicacao
             if (usuarioApp == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
+            bool podePersistirTexto = await PodePersistirTexto(usuarioDto);
+
+            if (!podePersistirTexto)
+                return RespostaApi.Falha("Conteúdo inadequado nos campos de cadastro, por favor revise e tente novamente.");
+
             var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuarioApp.Cpf));
 
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
+            await AtualizaUsuario(usuarioApp, usuarioDto);            
 
             return RespostaApi.Sucesso();
+        }
+
+        private async Task AtualizaUsuario(Dominio.Entidades.Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
+        {
+            usuarioApp.AtualizarAuditoria();
+            await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
+
+            //Descomentar ao criar o salvar
+            //await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
+            //await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
+        }
+
+        private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)
+        {
+            var podePersistir = await mediator.Send(new VerificaPalavraProibidaPodePersistirCommand(usuarioDto.TextoParaVerificarPersistencia()));
+            return podePersistir;
         }
     }
 }
