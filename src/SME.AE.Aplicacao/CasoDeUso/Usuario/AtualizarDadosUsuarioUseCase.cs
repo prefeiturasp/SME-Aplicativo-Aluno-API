@@ -4,6 +4,7 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
+using SME.AE.Dominio.Entidades;
 using System;
 using System.Threading.Tasks;
 
@@ -40,14 +41,13 @@ namespace SME.AE.Aplicacao
             return RespostaApi.Sucesso();
         }
 
-        private async Task AtualizaUsuario(Dominio.Entidades.Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
+        private async Task AtualizaUsuario(Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
         {
             usuarioApp.AtualizarAuditoria();
             await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
 
-            //Descomentar ao criar o salvar
-            //await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
-            //await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
+            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
+            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
         }
 
         private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)

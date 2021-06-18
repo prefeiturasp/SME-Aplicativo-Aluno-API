@@ -142,7 +142,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var sql =
                  @"
-               SELECT 
+	            SELECT 
                     RTRIM(LTRIM(responsavel.nm_responsavel)) AS Nome,
                     RTRIM(LTRIM(responsavel.email_responsavel)) AS Email,
                     RTRIM(LTRIM(cd_ddd_celular_responsavel)) AS DDD,
