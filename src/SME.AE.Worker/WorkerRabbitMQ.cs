@@ -23,7 +23,6 @@ namespace SME.AE.Worker
     public class WorkerRabbitMQ : IHostedService
     {
         private readonly IModel canalRabbit;
-        private readonly string sentryDSN;
         private readonly IConnection conexaoRabbit;
         private readonly IServiceScopeFactory serviceScopeFactory;
 
@@ -33,10 +32,8 @@ namespace SME.AE.Worker
         /// </summary>
         private readonly Dictionary<string, ComandoRabbit> comandos;
 
-        public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, VariaveisGlobaisOptions variaveisGlobais, ConnectionFactory connRabbitFactory)
+        public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, ConnectionFactory connRabbitFactory)
         {
-            sentryDSN = variaveisGlobais.SentryDsn;
-
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
             //Fazer a conexão rabbit
@@ -83,7 +80,7 @@ namespace SME.AE.Worker
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
             {
-                using (SentrySdk.Init(sentryDSN))
+                using (SentrySdk.Init())
                 {
                     var mensagemRabbit = JsonConvert.DeserializeObject<MensagemRabbit>(mensagem);
                     //SentrySdk.AddBreadcrumb($"Dados: {mensagemRabbit.Mensagem}");

@@ -26,11 +26,21 @@ namespace SME.AE.Worker
             AdicionarMediatr(services);
             ConfiguraVariaveisAmbiente(services);
 
+            var servicoProdam = new ServicoProdamOptions();
+            Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
+
+            services.AddSingleton(servicoProdam);
+
             services
                 .AdicionarRepositorios()
-                .AdicionarCasosDeUso();
-
-            services.AddHostedService<WorkerRabbitMQ>();
+                .AdicionarIdentity()
+                .AdicionarServicos()
+                .AdicionarCasosDeUso()
+                .AdicionarPoliticas()
+                .AdicionarClientesHttp(servicoProdam)
+                .AddMemoryCache()
+                .AddApplicationInsightsTelemetry()
+                .AddHostedService<WorkerRabbitMQ>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
