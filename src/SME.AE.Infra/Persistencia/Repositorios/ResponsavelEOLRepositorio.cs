@@ -187,9 +187,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         ra.dt_nascimento_mae_responsavel DataNascimentoMae
 					from v_aluno_cotic(nolock) a
 					inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
-                WHERE responsavel.cd_cpf_responsavel = @cpfResponsavel 
-                  AND responsavel.dt_fim IS NULL  
-                  AND responsavel.cd_cpf_responsavel IS NOT NULL";
+                WHERE ra.cd_cpf_responsavel = @cpfResponsavel 
+                  AND ra.dt_fim IS NULL  
+                  AND ra.cd_cpf_responsavel IS NOT NULL";
 
             using var conn = CriaConexao();
             await conn.OpenAsync();
