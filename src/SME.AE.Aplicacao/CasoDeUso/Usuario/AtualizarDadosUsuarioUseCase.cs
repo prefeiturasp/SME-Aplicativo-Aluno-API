@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
@@ -32,12 +33,20 @@ namespace SME.AE.Aplicacao
             var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuarioApp.Cpf));
 
             if (usuarioEol == null)
-                return RespostaApi.Falha("Usuário não encontrado!");            
+                return RespostaApi.Falha("Usuário não encontrado!");
+            
+            await AtualizaUsuario(usuarioApp, usuarioDto);            
+
+            return RespostaApi.Sucesso();
+        }
+
+        private async Task AtualizaUsuario(Dominio.Entidades.Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
+        {
+            usuarioApp.AtualizarAuditoria();
+            await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
 
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
-
-            return RespostaApi.Sucesso();
         }
 
         private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)

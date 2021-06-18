@@ -14,5 +14,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public bool PrimeiroAcesso { get; internal set; }
         public bool AtualizarDadosCadastrais { get; set; }
         public object Celular { get; internal set; }
+        public DateTime? UltimaAtualizacao { get; set; }
     }
 }

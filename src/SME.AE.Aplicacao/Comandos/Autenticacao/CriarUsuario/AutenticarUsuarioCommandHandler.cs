@@ -221,7 +221,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 PrimeiroAcesso = primeiroAcesso,
                 AtualizarDadosCadastrais = atualizarDadosCadastrais,
                 Celular = usuarioEol.ObterCelularComDDD(),
-                Token = ""
+                Token = "",
+                UltimaAtualizacao = usuarioApp.AlteradoEm
             };
 
             return RespostaApi.Sucesso(usuario);
