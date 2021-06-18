@@ -19,7 +19,11 @@ namespace SME.AE.Api.Controllers
         [Authorize]
         public async Task<ObjectResult> AtualizarDadosUsuario([FromBody] AtualizarDadosUsuarioDto usuarioDto, [FromServices] IAtualizarDadosUsuarioUseCase atualizarDadosUsuarioUseCase)
         {
-            return Ok(await atualizarDadosUsuarioUseCase.Executar(usuarioDto));
+            var retorno = await atualizarDadosUsuarioUseCase.Executar(usuarioDto);
+            if (retorno.Ok)
+                return Ok(retorno);
+            else
+                return StatusCode(601, retorno);
         }
 
     }

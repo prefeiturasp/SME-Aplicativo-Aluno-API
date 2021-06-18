@@ -34,7 +34,7 @@ namespace SME.AE.Aplicacao
 
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
-            
+
             await AtualizaUsuario(usuarioApp, usuarioDto);            
 
             return RespostaApi.Sucesso();
@@ -45,8 +45,9 @@ namespace SME.AE.Aplicacao
             usuarioApp.AtualizarAuditoria();
             await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
 
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
+            //Descomentar ao criar o salvar
+            //await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
+            //await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
         }
 
         private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)

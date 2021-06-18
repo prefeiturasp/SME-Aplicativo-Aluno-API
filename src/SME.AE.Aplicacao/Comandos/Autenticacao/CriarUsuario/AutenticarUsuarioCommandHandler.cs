@@ -96,6 +96,20 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
+            } else
+            {
+                primeiroAcesso = true;
+                var senha = Regex.Replace(request.Senha, @"\-\/", "");
+
+                try
+                {
+                    request.DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                    return RespostaApi.Falha(validacao.Errors);
+                }
             }
 
             //selecionar alunos do responsável buscando apenas pelo cpf
