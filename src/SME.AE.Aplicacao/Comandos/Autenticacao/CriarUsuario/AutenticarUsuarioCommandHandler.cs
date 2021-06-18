@@ -141,21 +141,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 return RespostaApi.Falha(validacao.Errors);
             }
 
-            //verificar se o usuário tem e-mail e celular cadastrado
-            if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Email)))
-                email = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Email)).Email;
-
-            if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Celular)))
-            {
-                celular = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Celular)).Celular;
-                if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.DDD)))
-                    celular = $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
-            }
-
             //necessário implementar unit of work para transacionar essas operações
             var grupos = await _repositoryCoreSSO.SelecionarGrupos();
-            var usuario = usuarioAlunos.FirstOrDefault();
 
+            var usuarioParaSeBasear = usuarioAlunos
+                .OrderByDescending(a => a.DataAtualizacao)
+                .FirstOrDefault();
+         
             primeiroAcesso = primeiroAcesso || !grupos.Any(x => usuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
             //verificar se o usuário está incluído em todos os grupos            
@@ -168,15 +160,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.UsuId, senhaCriptografada);
             }
 
-            usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
-
-            usuario.Email ??= email;
-            usuario.Celular ??= celular;
+            usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuarioParaSeBasear, primeiroAcesso);
+            
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuario);
+            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
 
-            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
+            return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
         }
 
         private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
