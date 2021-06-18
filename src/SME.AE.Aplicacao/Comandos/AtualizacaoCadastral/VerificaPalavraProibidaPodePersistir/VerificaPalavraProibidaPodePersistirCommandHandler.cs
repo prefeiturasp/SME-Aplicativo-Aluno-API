@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,15 +39,19 @@ namespace SME.AE.Aplicacao
             else
                 palavrasBloqueadas = JsonConvert.DeserializeObject<string[]>(cachePalavrasBloqueadas);
 
-            var palavrasTratadas = request.Texto.ToLower();
+            var palavrasTratadas = request.Texto.ToLower();                        
 
-            var palavrasSeparadas = palavrasTratadas.Split(new char[] { '.', '@', ' ' }, StringSplitOptions.None);            
+            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).ToList();
 
-            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).ToList();            
+            var palavrasProibidas = string.Join("|", listaPalavrasBloqueadas);
 
-            var resultado = palavrasSeparadas.FirstOrDefault(t => listaPalavrasBloqueadas.Contains(t));
+            string pattern = $@"\b(\w*({palavrasProibidas})\w*)\b";
+            var m = Regex.Matches(palavrasTratadas, pattern, RegexOptions.IgnoreCase);
 
-            return string.IsNullOrEmpty(resultado);
+            if (m.Count() > 0)
+                return false;            
+
+            return true;
         }
     }
 }
