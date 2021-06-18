@@ -40,16 +40,15 @@ namespace SME.AE.Aplicacao
             return true;
         }
 
-        private void MapearAlteracoes(IEnumerable<ResponsavelAlunoDetalhadoEolDto> usuarioEol, AtualizarDadosUsuarioDto dto)
+        private void MapearAlteracoes(IEnumerable<ResponsavelAlunoDetalhadoEolDto> lstUsuarioEol, AtualizarDadosUsuarioDto dto)
         {
-            usuarioEol.Select(usuarioEol =>
+            foreach (var usuarioEol in lstUsuarioEol)
             {
                 usuarioEol.DataNascimentoMae = dto.DataNascimentoResponsavel.ToString("yyyyMMdd");
                 usuarioEol.NomeMae = dto.NomeMae;
                 usuarioEol.Email = dto.Email;
                 usuarioEol.NumeroCelular = dto.Celular;
-                return usuarioEol;
-            });
+            }
         }
     }
 }

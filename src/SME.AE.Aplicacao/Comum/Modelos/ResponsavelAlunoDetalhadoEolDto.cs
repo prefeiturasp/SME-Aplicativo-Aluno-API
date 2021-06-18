@@ -29,7 +29,7 @@ namespace SME.AE.Aplicacao
         [JsonProperty("sg_uf_rg_responsavel")]
         public string UfRG { get; set; }
 
-        [JsonProperty("sg_uf_rg_responsavel")]
+        [JsonProperty("cd_cpf_responsavel")]
         public string CPF { get; set; }
 
         [JsonProperty("in_cpf_responsavel_confere")]

@@ -22,8 +22,8 @@ namespace SME.AE.Aplicacao
         {
             var httpClient = httpClientFactory.CreateClient("servicoAtualizacaoCadastralProdam");
 
-            var filtro = JsonConvert.SerializeObject(request.ResponsavelDto);
-            var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(filtro, Encoding.UTF8, "application/json-patch+json"));
+            var body = JsonConvert.SerializeObject(request.ResponsavelDto);
+            var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(body, Encoding.UTF8, "application/json-patch+json"));
 
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
                 return true;
