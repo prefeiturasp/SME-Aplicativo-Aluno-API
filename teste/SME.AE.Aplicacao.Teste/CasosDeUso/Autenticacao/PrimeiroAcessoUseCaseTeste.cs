@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
+using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
@@ -70,6 +71,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(retornoUsuarioCoreSSO);
 
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResumidosReponsavelPorCpfQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
+
             mediator.Setup(a => a.Send(It.IsAny<AssociarGrupoUsuarioCommand>(), It.IsAny<CancellationToken>()));
 
             mediator.Setup(a => a.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()));
@@ -90,6 +93,14 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             Senha = "Ab#12345",
             TipoCriptografia = Comum.Enumeradores.TipoCriptografia.SHA512,
             UsuId = Guid.NewGuid()
+        };
+
+        private ResponsavelAlunoEolResumidoDto responsavelAlunoEolResumido { get; set; } = new ResponsavelAlunoEolResumidoDto
+        {
+            Celular = "999999999",
+            DDD = "99",
+            Email = "Teste@teste.com",
+            Nome = "Teste"
         };
 
         private NovaSenhaDto novaSenhaDtoCerta { get; set; } = new NovaSenhaDto
