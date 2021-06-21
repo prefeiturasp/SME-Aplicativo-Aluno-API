@@ -22,7 +22,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public TipoResponsavelEnum TipoResponsavel { get; set; }
         public string NomeSocial { get; set; }
         public DateTime DataNascimento { get; set; }
-        public DateTime DataNascimentoResponsavel { get; set; }
+        public DateTime? DataNascimentoResponsavel { get; set; }
+        public DateTime DataAtualizacao { get; set; }
         public string NomeMae { get; set; }
         public int TipoSigilo { get; set; }
         public string DDD { get; set; }

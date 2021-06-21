@@ -34,9 +34,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
         {
-            bool primeiroAcesso = false;
-            string email = "";
-            string celular = "";
+            bool primeiroAcesso = false;            
 
             var validator = new AutenticarUsuarioUseCaseValidatior();
             var validacao = validator.Validate(request);
@@ -96,6 +94,20 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
+            } else
+            {
+                primeiroAcesso = true;
+                var senha = Regex.Replace(request.Senha, @"\-\/", "");
+
+                try
+                {
+                    request.DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                    return RespostaApi.Falha(validacao.Errors);
+                }
             }
 
             //selecionar alunos do responsável buscando apenas pelo cpf
@@ -127,21 +139,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 return RespostaApi.Falha(validacao.Errors);
             }
 
-            //verificar se o usuário tem e-mail e celular cadastrado
-            if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Email)))
-                email = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Email)).Email;
-
-            if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Celular)))
-            {
-                celular = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Celular)).Celular;
-                if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.DDD)))
-                    celular = $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
-            }
-
             //necessário implementar unit of work para transacionar essas operações
             var grupos = await _repositoryCoreSSO.SelecionarGrupos();
-            var usuario = usuarioAlunos.FirstOrDefault();
 
+            var usuarioParaSeBasear = usuarioAlunos
+                .OrderByDescending(a => a.DataAtualizacao)
+                .FirstOrDefault();
+         
             primeiroAcesso = primeiroAcesso || !grupos.Any(x => usuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
             //verificar se o usuário está incluído em todos os grupos            
@@ -154,15 +158,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.UsuId, senhaCriptografada);
             }
 
-            usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
-
-            usuario.Email ??= email;
-            usuario.Celular ??= celular;
+            usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuarioParaSeBasear, primeiroAcesso);
+            
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuario);
+            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
 
-            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
+            return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
         }
 
         private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
@@ -221,7 +223,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 PrimeiroAcesso = primeiroAcesso,
                 AtualizarDadosCadastrais = atualizarDadosCadastrais,
                 Celular = usuarioEol.ObterCelularComDDD(),
-                Token = ""
+                Token = "",
+                UltimaAtualizacao = usuarioApp.AlteradoEm
             };
 
             return RespostaApi.Sucesso(usuario);

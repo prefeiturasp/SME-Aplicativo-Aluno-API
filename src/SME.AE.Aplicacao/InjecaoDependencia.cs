@@ -117,6 +117,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterDadosDeLeituraTurmaUseCase, ObterDadosDeLeituraTurmaUseCase>();
             services.TryAddScoped<IObterDadosDeLeituraAlunosUseCase, ObterDadosDeLeituraAlunosUseCase>();
             services.TryAddScoped<IObterStatusDeLeituraNotificacaoUseCase, ObterStatusDeLeituraNotificacaoUseCase>();
+            services.TryAddScoped<IAtualizarDadosUsuarioProdamUseCase, AtualizarDadosUsuarioProdamUseCase>();
             services.TryAddScoped<IAtualizarDadosUsuarioEolUseCase, AtualizarDadosUsuarioEolUseCase>();
         }
     }
