@@ -18,9 +18,9 @@ namespace SME.AE.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var atualizarDadosUsuario = mensagemRabbit.ObterObjetoMensagem<AtualizarDadosUsuarioDto>();
+            var filtroDadosUsuario = mensagemRabbit.ObterObjetoMensagem<AtualizarDadosUsuarioDto>();
 
-            var usuarioApp = await mediator.Send(new ObterUsuarioQuery(atualizarDadosUsuario.Id));
+            var usuarioApp = await mediator.Send(new ObterUsuarioQuery(filtroDadosUsuario.Id));
 
             if (usuarioApp == null)
                 return false;
@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao
             if (usuariosEol == null || !usuariosEol.Any())
                 return false;
 
-            MapearAlteracoes(usuariosEol, atualizarDadosUsuario);
+            MapearAlteracoes(usuariosEol, filtroDadosUsuario);
 
             foreach (var usuarioEol in usuariosEol)
             {
