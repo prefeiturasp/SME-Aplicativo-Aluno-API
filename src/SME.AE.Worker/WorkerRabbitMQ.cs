@@ -36,8 +36,7 @@ namespace SME.AE.Worker
         public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, ConnectionFactory connRabbitFactory)
         {
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-
-            //Fazer a conexão rabbit
+            
             conexaoRabbit = connRabbitFactory.CreateConnection();
             canalRabbit = conexaoRabbit.CreateModel();
 
@@ -84,8 +83,7 @@ namespace SME.AE.Worker
             {
                 using (SentrySdk.Init())
                 {
-                    var mensagemRabbit = JsonConvert.DeserializeObject<MensagemRabbit>(mensagem);
-                    //SentrySdk.AddBreadcrumb($"Dados: {mensagemRabbit.Mensagem}");
+                    var mensagemRabbit = JsonConvert.DeserializeObject<MensagemRabbit>(mensagem);                    
                     var comandoRabbit = comandos[rota];
                     try
                     {
