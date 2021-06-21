@@ -43,8 +43,10 @@ namespace SME.AE.Aplicacao
             usuarioApp.AtualizarAuditoria();
             await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
 
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, Guid.NewGuid()));
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, Guid.NewGuid()));
+            var correlacaoCodigo = Guid.NewGuid();
+
+            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, correlacaoCodigo));
+            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, correlacaoCodigo));
         }
 
         private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)

@@ -7,6 +7,7 @@ using RabbitMQ.Client.Events;
 using Sentry;
 using Sentry.Protocol;
 using SME.AE.Aplicacao;
+using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Fila;
@@ -72,6 +73,7 @@ namespace SME.AE.Worker
         private void RegistrarUseCases()
         {
             comandos.Add(RotasRabbitAe.RotaAtualizacaoCadastralProdam, new ComandoRabbit("Atualizar Cadastro de Usuário na Prodam", typeof(IAtualizarDadosUsuarioProdamUseCase)));
+            comandos.Add(RotasRabbitAe.RotaAtualizacaoCadastralEol, new ComandoRabbit("Atualizar Cadastro de Usuário no Eol", typeof(IAtualizarDadosUsuarioEolUseCase)));
         }
 
         private async Task TratarMensagem(BasicDeliverEventArgs ea)

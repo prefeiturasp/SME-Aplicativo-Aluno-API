@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using SME.AE.Comum;
+using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
 
 namespace SME.AE.Worker
@@ -30,6 +31,8 @@ namespace SME.AE.Worker
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
             services.AddSingleton(servicoProdam);
+            
+            RegistrarMapeamentos.Registrar();
 
             services
                 .AdicionarRepositorios()
@@ -41,6 +44,8 @@ namespace SME.AE.Worker
                 .AddMemoryCache()
                 .AddApplicationInsightsTelemetry()
                 .AddHostedService<WorkerRabbitMQ>();
+
+           
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

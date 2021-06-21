@@ -29,7 +29,8 @@ namespace SME.AE.Worker
         public static IServiceCollection AdicionarCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddTransient<IAtualizarDadosUsuarioProdamUseCase, AtualizarDadosUsuarioProdamUseCase>();
+                .AddTransient<IAtualizarDadosUsuarioProdamUseCase, AtualizarDadosUsuarioProdamUseCase>()
+                .AddTransient<IAtualizarDadosUsuarioEolUseCase, AtualizarDadosUsuarioEolUseCase>();
         }
         #endregion
 
