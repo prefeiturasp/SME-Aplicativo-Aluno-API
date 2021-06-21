@@ -42,12 +42,16 @@ namespace SME.AE.Aplicacao
 
         private void MapearAlteracoes(IEnumerable<ResponsavelAlunoDetalhadoEolDto> lstUsuarioEol, AtualizarDadosUsuarioDto dto)
         {
+            var ddd = dto.Celular.Substring(0, 2);
+            var celular = dto.Celular[2..];
+
             foreach (var usuarioEol in lstUsuarioEol)
             {
                 usuarioEol.DataNascimentoMae = dto.DataNascimentoResponsavel.ToString("yyyyMMdd");
                 usuarioEol.NomeMae = dto.NomeMae;
                 usuarioEol.Email = dto.Email;
-                usuarioEol.NumeroCelular = dto.Celular;
+                usuarioEol.NumeroCelular = celular;
+                usuarioEol.DDDCelular = ddd;
             }
         }
     }
