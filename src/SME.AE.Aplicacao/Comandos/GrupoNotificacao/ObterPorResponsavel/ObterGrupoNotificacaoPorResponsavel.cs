@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Practices.ObjectBuilder2;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
 {
@@ -43,15 +37,15 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
         {
             var grupos = await _grupoComunicadoRepository.ObterTodos();
 
-            var query = (from g in grupos 
+            var query = string.Join("", (from g in grupos 
                 where g.TipoCicloId != null
-                select $"case when (se.cd_ciclo_ensino in ({g.TipoCicloId}) and se.cd_etapa_ensino IN ({g.EtapaEnsinoId})) then 1 else 0 end as \"{g.Nome}\",").Join("");
+                select $"case when (se.cd_ciclo_ensino in ({g.TipoCicloId}) and se.cd_etapa_ensino IN ({g.EtapaEnsinoId})) then 1 else 0 end as \"{g.Nome}\","));
 
             query = query.Substring(0, query.Count() - 1);
 
-            var nomeGrupos = (from n in grupos
+            var nomeGrupos = string.Join("", (from n in grupos
                               where n.TipoCicloId != null
-                              select $"max({n.Nome}){n.Nome},").Join("");
+                              select $"max({n.Nome}){n.Nome},"));
 
             nomeGrupos = nomeGrupos.Substring(0, nomeGrupos.Count() - 1);
 

@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
+using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
@@ -36,7 +37,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
 
-            await CriarUsuarioOuAssociarGrupo(mediator, novaSenhaDto, usuario, usuarioCoreSSO);
+            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuario.Cpf));
+
+            await CriarUsuarioOuAssociarGrupo(novaSenhaDto, usuario, usuarioCoreSSO, usuarioEol.Nome);
 
             var atualizarPrimeiroAcesso = MapearAtualizarPrimeiroAcessoCommand(usuario);
 
@@ -56,15 +59,15 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             await mediator.Send(incluirSenhaHistorico);
         }
 
-        private async Task CriarUsuarioOuAssociarGrupo(IMediator mediator, NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario, RetornoUsuarioCoreSSO usuarioCoreSSO)
+        private async Task CriarUsuarioOuAssociarGrupo(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario, RetornoUsuarioCoreSSO usuarioCoreSSO, string nomeUsuario)
         {
             if (usuarioCoreSSO != null)
-                await AssociarGrupoEAlterarSenha(mediator, novaSenhaDto, usuarioCoreSSO);
+                await AssociarGrupoEAlterarSenha(novaSenhaDto, usuarioCoreSSO);
             else
-                await CriarUsuario(mediator, novaSenhaDto, usuario);
+                await CriarUsuario(novaSenhaDto, usuario, nomeUsuario);
         }
 
-        private async Task AssociarGrupoEAlterarSenha(IMediator mediator, NovaSenhaDto novaSenhaDto, RetornoUsuarioCoreSSO usuarioCoreSSO)
+        private async Task AssociarGrupoEAlterarSenha(NovaSenhaDto novaSenhaDto, RetornoUsuarioCoreSSO usuarioCoreSSO)
         {
             usuarioCoreSSO.AlterarSenha(novaSenhaDto.NovaSenha);
 
@@ -73,9 +76,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             await mediator.Send(new AlterarSenhaUsuarioCoreSSOCommand(usuarioCoreSSO.UsuId, usuarioCoreSSO.Senha));
         }
 
-        private async Task CriarUsuario(IMediator mediator, NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)
+        private async Task CriarUsuario(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario, string nomeUsuario)
         {
-            var comandoCriaUsuario = MapearCriarUsuarioCoreSSOCommand(novaSenhaDto, usuario);
+            var comandoCriaUsuario = MapearCriarUsuarioCoreSSOCommand(novaSenhaDto, usuario, nomeUsuario);
 
             await mediator.Send(comandoCriaUsuario);
         }
@@ -89,14 +92,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             };
         }
 
-        private CriarUsuarioCoreSSOCommand MapearCriarUsuarioCoreSSOCommand(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario)
+        private CriarUsuarioCoreSSOCommand MapearCriarUsuarioCoreSSOCommand(NovaSenhaDto novaSenhaDto, Dominio.Entidades.Usuario usuario, string nomeUsuario)
         {
             return new CriarUsuarioCoreSSOCommand()
             {
                 Usuario = new UsuarioCoreSSODto
                 {
                     Cpf = usuario.Cpf,
-                    Nome = usuario.Nome,
+                    Nome = nomeUsuario,
                     Senha = novaSenhaDto.NovaSenha,
                 }
             };

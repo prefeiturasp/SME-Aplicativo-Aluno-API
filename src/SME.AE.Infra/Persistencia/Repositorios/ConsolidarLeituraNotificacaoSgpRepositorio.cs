@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,7 +12,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class ConsolidarLeituraNotificacaoSgpRepositorio : IConsolidarLeituraNotificacaoSgpRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public ConsolidarLeituraNotificacaoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<IEnumerable<ComunicadoSgpDto>> ObterComunicadosSgp()
         {

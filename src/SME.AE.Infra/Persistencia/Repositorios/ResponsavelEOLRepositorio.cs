@@ -1,7 +1,8 @@
 ﻿using Dapper;
-using SME.AE.Aplicacao.Comum.Config;
+using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -12,7 +13,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class ResponsavelEOLRepositorio : IResponsavelEOLRepositorio
     {
-        private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public ResponsavelEOLRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private SqlConnection CriaConexao() => new SqlConnection(variaveisGlobaisOptions.EolConnection);
         public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo)
         {
             var sql =
@@ -131,5 +138,25 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return responsaveisEOL;
         }
 
+        public async Task<ResponsavelAlunoEolResumidoDto> ObterDadosResumidosReponsavelPorCpf(string cpfResponsavel)
+        {
+            var sql =
+                 @"
+	            SELECT 
+                    RTRIM(LTRIM(responsavel.nm_responsavel)) AS Nome,
+                    RTRIM(LTRIM(responsavel.email_responsavel)) AS Email,
+                    RTRIM(LTRIM(cd_ddd_celular_responsavel)) AS DDD,
+                    RTRIM(LTRIM(nr_celular_responsavel)) AS Celular
+                FROM responsavel_aluno responsavel
+                WHERE responsavel.cd_cpf_responsavel = @cpfResponsavel 
+                  AND responsavel.dt_fim IS NULL  
+                  AND responsavel.cd_cpf_responsavel IS NOT NULL";
+
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var responsavelEol = await conn.QueryFirstOrDefaultAsync<ResponsavelAlunoEolResumidoDto>(sql, new { cpfResponsavel });
+            await conn.CloseAsync();
+            return responsavelEol;
+        }
     }
 }

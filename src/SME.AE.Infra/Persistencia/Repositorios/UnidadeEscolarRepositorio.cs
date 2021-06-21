@@ -1,9 +1,8 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.UnidadeEscolar;
+using SME.AE.Comum;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -12,26 +11,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UnidadeEscolarRepositorio : IUnidadeEscolarRepositorio
     {
-        private readonly ICacheRepositorio cacheRepositorio;
-        private SqlConnection CriaConexao() => new SqlConnection(ConnectionStrings.ConexaoEol);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
-        public UnidadeEscolarRepositorio(ICacheRepositorio cacheRepositorio)
+        public UnidadeEscolarRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
-            this.cacheRepositorio = cacheRepositorio;
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
-
-        private static string chaveCacheUnidadeEscolar(string codigoUe)
-            => $"unidadeEscolar-Ue-{codigoUe}";
+        private SqlConnection CriaConexao() => new SqlConnection(variaveisGlobaisOptions.EolConnection);
 
         public async Task<UnidadeEscolarResposta> ObterDadosUnidadeEscolarPorCodigoUe(string codigoUe)
         {
             try
             {
-                var chaveCache = chaveCacheUnidadeEscolar(codigoUe);
-                var unidadeEscolar = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(unidadeEscolar))
-                    return JsonConvert.DeserializeObject<UnidadeEscolarResposta>(unidadeEscolar);
-
                 using var conexao = CriaConexao();
                 conexao.Open();
 
@@ -91,7 +82,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var dadosUnidadeEscolar = await conexao.QuerySingleAsync<UnidadeEscolarResposta>(query, parametros);
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosUnidadeEscolar, 720, false);
                 return dadosUnidadeEscolar;
             }
             catch (Exception ex)
