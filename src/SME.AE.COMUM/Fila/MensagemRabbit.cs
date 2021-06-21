@@ -14,24 +14,34 @@ namespace SME.AE.Comum
             CodigoCorrelacao = codigoCorrelacao;
         }
 
+
+
         public MensagemRabbit(object mensagem, Guid codigoCorrelacao)
         {
             Mensagem = mensagem;
             CodigoCorrelacao = codigoCorrelacao;
         }
 
+
+
         public MensagemRabbit(object mensagem)
         {
             Mensagem = mensagem;
         }
 
+
+
         protected MensagemRabbit()
         {
+
+
 
         }
         public string Action { get; set; }
         public object Mensagem { get; set; }
         public Guid CodigoCorrelacao { get; set; }
+
+
 
         public T ObterObjetoMensagem<T>() where T : class
         {

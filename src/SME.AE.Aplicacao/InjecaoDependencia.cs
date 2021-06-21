@@ -11,6 +11,7 @@ using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
+using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
@@ -116,6 +117,8 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterDadosDeLeituraTurmaUseCase, ObterDadosDeLeituraTurmaUseCase>();
             services.TryAddScoped<IObterDadosDeLeituraAlunosUseCase, ObterDadosDeLeituraAlunosUseCase>();
             services.TryAddScoped<IObterStatusDeLeituraNotificacaoUseCase, ObterStatusDeLeituraNotificacaoUseCase>();
+            services.TryAddScoped<IAtualizarDadosUsuarioProdamUseCase, AtualizarDadosUsuarioProdamUseCase>();
+            services.TryAddScoped<IAtualizarDadosUsuarioEolUseCase, AtualizarDadosUsuarioEolUseCase>();
         }
     }
 }

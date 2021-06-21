@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace SME.AE.Comum.Utilitarios
 {
@@ -30,6 +30,14 @@ namespace SME.AE.Comum.Utilitarios
             foreach (var stringId in stringLista.ToStringEnumerable())
                 if (Int16.TryParse(stringId, out var numero))
                     yield return numero;
+        }
+
+        public static string EncodeTo64(this string toEncode)
+        {
+            byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(toEncode);
+            string returnValue = Convert.ToBase64String(toEncodeAsBytes);
+
+            return returnValue;
         }
     }
 }

@@ -10,6 +10,14 @@ namespace SME.AE.Aplicacao
         public DateTime DataNascimentoResponsavel { get; set; }
         public string NomeMae { get; set; }
         public string Celular { get; set; }
+        public string DDD
+        { 
+            get => string.IsNullOrEmpty(Celular) ? "" : Celular.Substring(0, 2);
+        }
+        public string CelularResponsavel
+        {
+            get => string.IsNullOrEmpty(Celular) ? "" : Celular[2..];
+        }
 
         public string TextoParaVerificarPersistencia()
         {
