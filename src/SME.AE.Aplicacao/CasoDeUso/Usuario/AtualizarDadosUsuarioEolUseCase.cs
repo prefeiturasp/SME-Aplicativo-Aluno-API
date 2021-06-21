@@ -26,6 +26,7 @@ namespace SME.AE.Aplicacao
             if (dto == null)
             {
                 SentrySdk.CaptureMessage($"Não foi possível realizar a atualização dos dados do responsável do aluno no eol", Sentry.Protocol.SentryLevel.Error);
+                return false;
             }
 
             var usuarioApp = await mediator.Send(new ObterUsuarioQuery(dto.Id));
