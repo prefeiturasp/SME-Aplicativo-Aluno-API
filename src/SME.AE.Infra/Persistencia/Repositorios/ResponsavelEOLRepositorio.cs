@@ -184,7 +184,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         ra.in_autoriza_envio_sms AutorizaEnvioSMS,
                         ra.email_responsavel Email,
                         ra.nm_mae_responsavel NomeMae,
-                        ra.dt_nascimento_mae_responsavel DataNascimentoMae
+                        ra.dt_nascimento_mae_responsavel DataNascimentoMae,
+                        ra.cd_cpf_responsavel as Cpf
 					from v_aluno_cotic(nolock) a
 					inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
                 WHERE ra.cd_cpf_responsavel = @cpfResponsavel 
@@ -197,7 +198,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
             return responsavelEol;
         }
-        public async Task<int> AtualizarDadosResponsavel(long id, string email, DateTime dataNascimentoResponsavel, string nomeMae, string dddCelular, string celular)
+        public async Task<int> AtualizarDadosResponsavel(long cpfResponsavel, string email, DateTime dataNascimentoResponsavel, string nomeMae, string dddCelular, string celular)
         {
             var query = @"update responsavel_aluno 
                              set email_responsavel = @email,
@@ -205,15 +206,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                  nm_mae_responsavel = @NomeMae,
                                  cd_ddd_celular_responsavel = @dddCelular,
                                  nr_celular_responsavel = @celular,
-                                 in_cpf_responsavel_confere = 'S'
+                                 in_cpf_responsavel_confere = 'S',
                                  in_autoriza_envio_sms = 'S',
                                  cd_tipo_turno_celular = 1,
-                                 dt_atualizacao_tabela = @dataAtualizacao,
-                           where id = @id";
+                                 dt_atualizacao_tabela = @dataAtualizacao
+                           where cd_cpf_responsavel = @cpfResponsavel";
 
             var parametros = new
             {
-                id,
+                cpfResponsavel,
                 email,
                 dataNascimentoResponsavel,
                 nomeMae,

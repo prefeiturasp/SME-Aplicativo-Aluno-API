@@ -73,7 +73,7 @@ namespace SME.AE.Worker
         private void RegistrarUseCases()
         {
             comandos.Add(RotasRabbitAe.RotaAtualizacaoCadastralProdam, new ComandoRabbit("Atualizar Cadastro de Usuário na Prodam", typeof(IAtualizarDadosUsuarioProdamUseCase)));
-            comandos.Add(RotasRabbitAe.RotaAtualizacaoCadastralEol, new ComandoRabbit("Realiza Atualização cadastral no Eol", typeof(IAtualizarDadosUsuarioEolUseCase)));
+            comandos.Add(RotasRabbitAe.RotaAtualizacaoCadastralEol, new ComandoRabbit("Atualizar Cadastro de Usuário no Eol", typeof(IAtualizarDadosUsuarioEolUseCase)));
         }
 
         private async Task TratarMensagem(BasicDeliverEventArgs ea)
