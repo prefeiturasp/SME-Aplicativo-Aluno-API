@@ -16,7 +16,8 @@
                     responsavel.dt_nascimento_mae_responsavel AS DataNascimentoResponsavel,
                     aluno.dt_nascimento_aluno AS DataNascimento,
                     aluno.cd_tipo_sigilo as TipoSigilo,
-	                aluno.nm_aluno 
+	                aluno.nm_aluno,
+                    responsavel.dt_atualizacao_tabela as DataAtualizacao
                 FROM v_aluno_cotic aluno
                 INNER JOIN responsavel_aluno responsavel
                 ON aluno.cd_aluno = responsavel.cd_aluno

@@ -1,7 +1,11 @@
-﻿namespace SME.AE.Comum
+﻿using System.Runtime.Serialization;
+
+namespace SME.AE.Comum
 {
     public class VariaveisGlobaisOptions
     {
+        public string ApiPalavrasBloqueadas { get; set; }
+
         public string SME_AE_JWT_TOKEN_SECRET { get; set; }
 
         public string AEConnection { get; set; }
