@@ -158,5 +158,37 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
             return responsavelEol;
         }
+        public async Task<int> AtualizarDadosResponsavel(long id, string email, DateTime dataNascimentoResponsavel, string nomeMae, string dddCelular, string celular)
+        {
+            var query = @"update responsavel_aluno 
+                             set email_responsavel = @email,
+                                 dt_nascimento_mae_responsavel = @dataNascimentoResponsavel,
+                                 nm_mae_responsavel = @NomeMae,
+                                 cd_ddd_celular_responsavel = @dddCelular,
+                                 nr_celular_responsavel = @celular,
+                                 in_cpf_responsavel_confere = 'S'
+                                 in_autoriza_envio_sms = 'S',
+                                 cd_tipo_turno_celular = 1,
+                                 dt_atualizacao_tabela = @dataAtualizacao,
+                           where id = @id";
+
+            var parametros = new
+            {
+                id,
+                email,
+                dataNascimentoResponsavel,
+                nomeMae,
+                dddCelular,
+                celular,
+                dataAtualizacao = DateTime.Now
+            };
+
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var resultado = await conn.ExecuteAsync(query, parametros);
+            await conn.CloseAsync();
+
+            return resultado;
+        }
     }
 }
