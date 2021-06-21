@@ -6,6 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sentry;
 using Sentry.Protocol;
+using SME.AE.Aplicacao;
 using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Fila;
@@ -22,7 +23,6 @@ namespace SME.AE.Worker
     public class WorkerRabbitMQ : IHostedService
     {
         private readonly IModel canalRabbit;
-        private readonly string sentryDSN;
         private readonly IConnection conexaoRabbit;
         private readonly IServiceScopeFactory serviceScopeFactory;
 
@@ -32,13 +32,12 @@ namespace SME.AE.Worker
         /// </summary>
         private readonly Dictionary<string, ComandoRabbit> comandos;
 
-        public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
+        public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, ConnectionFactory connRabbitFactory)
         {
-            sentryDSN = configuration.GetValue<string>("Sentry:DSN");
-            
-            //Fazer a conexão rabbit
-            //this.conexaoRabbit = conexaoRabbit ?? throw new ArgumentNullException(nameof(conexaoRabbit));
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+
+            //Fazer a conexão rabbit
+            conexaoRabbit = connRabbitFactory.CreateConnection();
             canalRabbit = conexaoRabbit.CreateModel();
 
             canalRabbit.BasicQos(0, 10, false);
@@ -46,13 +45,13 @@ namespace SME.AE.Worker
             canalRabbit.ExchangeDeclare(ExchangeRabbit.Ae, ExchangeType.Direct, true, false);
             canalRabbit.ExchangeDeclare(ExchangeRabbit.AeDeadLetter, ExchangeType.Direct, true, false);
 
-            DeclararFilasSgp();
+            DeclararFilasAe();
 
             comandos = new Dictionary<string, ComandoRabbit>();
             RegistrarUseCases();
         }
 
-        private void DeclararFilasSgp()
+        private void DeclararFilasAe()
         {
             foreach (var fila in typeof(RotasRabbitAe).ObterConstantesPublicas<string>())
             {
@@ -72,7 +71,7 @@ namespace SME.AE.Worker
 
         private void RegistrarUseCases()
         {
-         
+            comandos.Add(RotasRabbitAe.RotaAtualizacaoCadastralProdam, new ComandoRabbit("Atualizar Cadastro de Usuário na Prodam", typeof(IAtualizarDadosUsuarioProdamUseCase)));
         }
 
         private async Task TratarMensagem(BasicDeliverEventArgs ea)
@@ -81,7 +80,7 @@ namespace SME.AE.Worker
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
             {
-                using (SentrySdk.Init(sentryDSN))
+                using (SentrySdk.Init())
                 {
                     var mensagemRabbit = JsonConvert.DeserializeObject<MensagemRabbit>(mensagem);
                     //SentrySdk.AddBreadcrumb($"Dados: {mensagemRabbit.Mensagem}");
@@ -89,31 +88,31 @@ namespace SME.AE.Worker
                     try
                     {
                         using var scope = serviceScopeFactory.CreateScope();
-                        
-                            var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
 
-                            await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, new object[] { mensagemRabbit });
-                            canalRabbit.BasicAck(ea.DeliveryTag, false);                        
+                        var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
+
+                        await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, new object[] { mensagemRabbit });
+                        canalRabbit.BasicAck(ea.DeliveryTag, false);
                     }
                     catch (NegocioException nex)
                     {
                         canalRabbit.BasicAck(ea.DeliveryTag, false);
                         SentrySdk.AddBreadcrumb($"Erros: {nex.Message}", null, null, null, BreadcrumbLevel.Error);
                         SentrySdk.CaptureException(nex);
-                        RegistrarSentry(ea, mensagemRabbit, nex);                        
+                        RegistrarSentry(ea, mensagemRabbit, nex);
                     }
                     catch (ValidacaoException vex)
                     {
-                        canalRabbit.BasicAck(ea.DeliveryTag, false);                        
+                        canalRabbit.BasicAck(ea.DeliveryTag, false);
                         SentrySdk.CaptureException(vex);
-                        RegistrarSentry(ea, mensagemRabbit, vex);                        
+                        RegistrarSentry(ea, mensagemRabbit, vex);
                     }
                     catch (Exception ex)
                     {
                         canalRabbit.BasicReject(ea.DeliveryTag, false);
                         SentrySdk.AddBreadcrumb($"Erros: {ex.Message}", null, null, null, BreadcrumbLevel.Error);
                         SentrySdk.CaptureException(ex);
-                        RegistrarSentry(ea, mensagemRabbit, ex);                        
+                        RegistrarSentry(ea, mensagemRabbit, ex);
                     }
                 }
             }
