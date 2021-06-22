@@ -56,7 +56,7 @@ namespace SME.AE.Api
 
             RegistrarMapeamentos.Registrar();
             RegistrarMvc.Registrar(services, variaveisGlobais);
-            RegistrarClientesHttp.Registrar(services, servicoProdam);
+            RegistrarClientesHttp.Registrar(services, servicoProdam, variaveisGlobais);
             ConfiguraVariaveisAmbiente(services);
 
             services.AddInfrastructure(variaveisGlobais);
