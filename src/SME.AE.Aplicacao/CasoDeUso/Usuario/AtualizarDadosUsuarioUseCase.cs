@@ -33,6 +33,10 @@ namespace SME.AE.Aplicacao
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
+            usuarioDto.Celular = usuarioDto.Celular.Replace("(", "");
+            usuarioDto.Celular = usuarioDto.Celular.Replace(")", "");
+            usuarioDto.Celular = usuarioDto.Celular.Replace("-", "");
+            usuarioDto.Celular = usuarioDto.Celular.Replace(" ", "");
             await AtualizaUsuario(usuarioApp, usuarioDto);            
 
             return RespostaApi.Sucesso();
@@ -44,6 +48,8 @@ namespace SME.AE.Aplicacao
             await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
 
             var correlacaoCodigo = Guid.NewGuid();
+
+            
 
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, correlacaoCodigo));
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, correlacaoCodigo));
