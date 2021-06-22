@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
+using Sentry;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -25,6 +26,8 @@ namespace SME.AE.Aplicacao
             var body = JsonConvert.SerializeObject(request.ResponsavelDto);
             var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(body, Encoding.UTF8, "application/json"));
 
+
+            SentrySdk.CaptureMessage(resposta.Content.ToString());
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
                 return true;
 
