@@ -18,6 +18,11 @@ RUN dotnet build "SME.AE.Api.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "SME.AE.Api.csproj" -c Release -o /app/publish
 
+RUN apk add tzdata \ 
+    && cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime \
+    && echo "America/Sao_Paulo" >  /etc/timezone \
+    && apk del tzdata
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
