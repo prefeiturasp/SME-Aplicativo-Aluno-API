@@ -33,10 +33,6 @@ namespace SME.AE.Aplicacao
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
-            usuarioDto.Celular = usuarioDto.Celular.Replace("(", "");
-            usuarioDto.Celular = usuarioDto.Celular.Replace(")", "");
-            usuarioDto.Celular = usuarioDto.Celular.Replace("-", "");
-            usuarioDto.Celular = usuarioDto.Celular.Replace(" ", "");
             await AtualizaUsuario(usuarioApp, usuarioDto);            
 
             return RespostaApi.Sucesso();

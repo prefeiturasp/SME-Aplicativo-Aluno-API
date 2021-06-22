@@ -26,8 +26,9 @@ namespace SME.AE.Aplicacao
             var body = JsonConvert.SerializeObject(request.ResponsavelDto);
             var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(body, Encoding.UTF8, "application/json"));
 
-
-            SentrySdk.CaptureMessage(resposta.Content.ToString());
+            var json = await resposta.Content.ReadAsStringAsync();
+            Console.WriteLine(json);
+            SentrySdk.CaptureMessage(json);
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
                 return true;
 
