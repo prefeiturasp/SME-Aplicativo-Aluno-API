@@ -49,6 +49,7 @@ namespace SME.AE.Aplicacao
                 usuarioEol.Email = dto.Email;
                 usuarioEol.NumeroCelular = dto.CelularResponsavel;
                 usuarioEol.DDDCelular = dto.DDD;
+                usuarioEol.UfRG = usuarioEol.UfRG.Length > 2 ? "" : usuarioEol.UfRG;
             }
         }
     }
