@@ -11,18 +11,20 @@ namespace SME.AE.Aplicacao
         public string NomeMae { get; set; }
         public string Celular { get; set; }
         public string DDD
-        { 
-            get => string.IsNullOrEmpty(Celular) ? "" : Celular.Substring(0, 2);
+        {
+            get => string.IsNullOrEmpty(CelularNormalizado) ? "" : CelularNormalizado.Substring(0, 2);
         }
         public string CelularResponsavel
         {
-            get => string.IsNullOrEmpty(Celular) ? "" : Celular[2..];
+            get => string.IsNullOrEmpty(CelularNormalizado) ? "" : CelularNormalizado[2..];
         }
+
+        private string CelularNormalizado { get => string.IsNullOrEmpty(Celular) ? "" : Celular.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", ""); }
 
         public string TextoParaVerificarPersistencia()
         {
             return $"{NomeMae} {Email}";
-        }       
+        }
 
     }
 
