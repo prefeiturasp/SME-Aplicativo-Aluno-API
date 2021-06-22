@@ -45,8 +45,6 @@ namespace SME.AE.Aplicacao
 
             var correlacaoCodigo = Guid.NewGuid();
 
-            
-
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, correlacaoCodigo));
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, correlacaoCodigo));
         }
