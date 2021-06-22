@@ -11,7 +11,7 @@ namespace SME.AE.Api.Configuracoes
 {
     public class RegistrarClientesHttp
     {
-        public static void Registrar(IServiceCollection services, ServicoProdamOptions servicoProdamOptions)
+        public static void Registrar(IServiceCollection services, ServicoProdamOptions servicoProdamOptions, VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             var policy = ObterPolicyBaseHttp();
 
@@ -22,6 +22,12 @@ namespace SME.AE.Api.Configuracoes
                 c.BaseAddress = new Uri(servicoProdamOptions.Url);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoAtualizacaoCadastral", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiPalavrasBloqueadas);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddPolicyHandler(policy);
         }
 
