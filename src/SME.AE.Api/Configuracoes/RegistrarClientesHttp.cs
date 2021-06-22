@@ -20,7 +20,6 @@ namespace SME.AE.Api.Configuracoes
             services.AddHttpClient(name: "servicoAtualizacaoCadastralProdam", c =>
             {
                 c.BaseAddress = new Uri(servicoProdamOptions.Url);
-                c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
             }).AddPolicyHandler(policy);
 
