@@ -31,12 +31,6 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDto));
         }
-
-        [HttpPost("AlterarEmailCelular")]
-        public async Task<ActionResult<RespostaApi>> AlterarEmailCelular([FromBody] AlterarEmailCelularDto alterarEmailCelularDto, [FromServices]IAlterarEmailCelularUseCase alterarEmailCelularUseCase)
-        {
-            return Ok(await alterarEmailCelularUseCase.Executar(Mediator, alterarEmailCelularDto));
-        }
         
         [HttpPut("Senha/Alterar")]
         public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody]SenhaDto senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)

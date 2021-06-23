@@ -18,11 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ADD . /src
 WORKDIR /src 
 
-RUN apt-get update -y \
-    && apt-get install -yq tzdata locales -y \
-    && dpkg-reconfigure --frontend noninteractive tzdata \ 
-	&& locale-gen en_US.UTF-8 \
-    && dotnet restore \
+RUN dotnet restore \
     && dotnet build \ 
     && dotnet publish -c Release \   
     && ls -la  /src/src/SME.AE.Api/bin/Release/ \ 
@@ -32,6 +28,10 @@ RUN apt-get update -y \
 FROM mcr.microsoft.com/dotnet/aspnet:3.1-bionic as final
 COPY --from=build /app /app
 WORKDIR /app
+
+RUN apt-get update -y \
+    && apt-get install -y tzdata \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 EXPOSE 5000-5001
 CMD ["/app/SME.AE.Api"]

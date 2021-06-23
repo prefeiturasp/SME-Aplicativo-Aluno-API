@@ -1,13 +1,10 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.AgendadoWorkerService;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Infra.Persistencia.Cache;
 using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Worker.Service.CasoDeUsoWorker;
 
@@ -26,8 +23,7 @@ namespace SME.AE.Worker.Service
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
                 .AddTransient<RemoverConexaoIdleCasoDeUso>()
-                .AddTransient<ICriarNotificacaoUseCase, CriarNotificacaoUseCase>()
-                ;
+                .AddTransient<ICriarNotificacaoUseCase, CriarNotificacaoUseCase>();
         }
         #endregion
         #region Workers
@@ -49,34 +45,22 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarRepositorios(this IServiceCollection services)
         {
             return services
-                .AddTransient<ICacheRepositorio, CacheRepositorio>()
-                .AddTransient<IConnectionMultiplexerAe, ConnectionMultiplexerAe>()
-
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
-
                 .AddTransient<IEventoRepositorio, EventoRepositorio>()
                 .AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>()
-
                 .AddTransient<IResponsavelEOLRepositorio, ResponsavelEOLRepositorio>()
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
-
                 .AddTransient<IFrequenciaAlunoRepositorio, FrequenciaAlunoRepositorio>()
                 .AddTransient<IFrequenciaAlunoSgpRepositorio, FrequenciaAlunoSgpRepositorio>()
-
                 .AddTransient<INotaAlunoRepositorio, NotaAlunoRepositorio>()
                 .AddTransient<INotaAlunoSgpRepositorio, NotaAlunoSgpRepositorio>()
-
                 .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
                 .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
-
                 .AddTransient<INotificacaoRepository, NotificacaoRepository>()
-
                 .AddTransient<IDreSgpRepositorio, DreSgpRepositorio>()
-                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>()
-
-            ;
+                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>();
         }
         #endregion
     }

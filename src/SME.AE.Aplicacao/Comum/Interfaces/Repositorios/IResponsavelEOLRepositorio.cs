@@ -1,4 +1,5 @@
 ﻿using SME.AE.Aplicacao.Comum.Modelos;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,5 +9,8 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task<IEnumerable<ResponsavelAlunoEOLDto>> ListarCpfResponsavelAlunoDaDreUeTurma();
         Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo);
+        Task<ResponsavelAlunoEolResumidoDto> ObterDadosResumidosReponsavelPorCpf(string cpfResponsavel);
+        Task<IEnumerable<ResponsavelAlunoDetalhadoEolDto>> ObterDadosReponsavelPorCpf(string cpfResponsavel);
+        Task<int> AtualizarDadosResponsavel(long cpfResponsavel, string email, DateTime dataNascimentoResponsavel, string nomeMae, string dddCelular, string celular);
     }
 }

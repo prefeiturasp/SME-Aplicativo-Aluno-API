@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Threading.Tasks;
@@ -11,15 +11,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AceiteTermosDeUsoRepositorio : BaseRepositorio<AceiteTermosDeUso>, IAceiteTermosDeUsoRepositorio
     {
-        public AceiteTermosDeUsoRepositorio() : base(ConnectionStrings.Conexao)
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public AceiteTermosDeUsoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
         {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
 
         public async Task<bool> RegistrarAceite(AceiteTermosDeUso aceiteTermosDeUso)
         {
-         try
+            try
             {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var dataAtual = DateTime.Now;
                 aceiteTermosDeUso.InserirAuditoria();

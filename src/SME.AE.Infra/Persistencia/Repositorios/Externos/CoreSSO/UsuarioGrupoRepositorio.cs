@@ -1,7 +1,7 @@
 ﻿
 using Dapper;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades.Externas;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO
 {
     public class UsuarioGrupoRepositorio : ExternoRepositorio<UsuarioGrupoCoreSSO, SqlConnection>, IUsuarioGrupoRepositorio
     {
-        public UsuarioGrupoRepositorio() : base(new SqlConnection(ConnectionStrings.ConexaoCoreSSO))
+        public UsuarioGrupoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection))
         {
         }
 
