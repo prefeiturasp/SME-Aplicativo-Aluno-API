@@ -24,9 +24,10 @@ namespace SME.AE.Worker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
             AdicionarMediatr(services);
             ConfiguraVariaveisAmbiente(services);
-
+            ConfiguraSentry();
             var servicoProdam = new ServicoProdamOptions();
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
@@ -54,6 +55,11 @@ namespace SME.AE.Worker
             });
         }
 
+        private void ConfiguraSentry()
+        {
+            Sentry.SentrySdk.Init(Configuration.GetSection("Sentry:DSN").Value);            
+        }
+        
         private void ConfiguraVariaveisAmbiente(IServiceCollection services)
         {
             var variaveisGlobais = new VariaveisGlobaisOptions();
