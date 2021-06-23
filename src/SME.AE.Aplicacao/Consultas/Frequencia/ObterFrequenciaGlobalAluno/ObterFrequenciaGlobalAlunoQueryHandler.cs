@@ -2,9 +2,7 @@
 using Newtonsoft.Json;
 using Sentry;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,8 +20,8 @@ namespace SME.AE.Aplicacao
         public async Task<double?> Handle(ObterFrequenciaGlobalAlunoQuery request, CancellationToken cancellationToken)
         {
             double frequenciaGlobal;
-            var httpClient = httpClientFactory.CreateClient("servicoAtualizacaoCadastral");
-            var resposta = await httpClient.GetAsync("palavras-bloqueadas");
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
+            var resposta = await httpClient.GetAsync($"v1/calendarios/frequencias/alunos/{request.AlunoCodigo}/turmas/{request.TurmaCodigo}/geral");
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();

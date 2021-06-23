@@ -4,6 +4,6 @@ namespace SME.AE.Aplicacao
 {
     public interface IObterFrequenciaGlobalAlunoUseCase
     {
-        Task<bool> Executar(FiltroFrequenciaGlobalAlunoDto filtro);
+        Task<double?> Executar(FiltroFrequenciaGlobalAlunoDto filtro);
     }
 }

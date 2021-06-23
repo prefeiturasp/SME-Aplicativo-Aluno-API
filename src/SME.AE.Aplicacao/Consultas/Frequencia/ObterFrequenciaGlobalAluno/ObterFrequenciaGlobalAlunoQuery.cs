@@ -5,6 +5,12 @@ namespace SME.AE.Aplicacao
 {
     public class ObterFrequenciaGlobalAlunoQuery : IRequest<double?>
     {
+        public ObterFrequenciaGlobalAlunoQuery(string turmaCodigo, string alunoCodigo)
+        {
+            TurmaCodigo = turmaCodigo;
+            AlunoCodigo = alunoCodigo;
+        }
+
         public string TurmaCodigo { get; set; }
         public string AlunoCodigo { get; set; }
     }

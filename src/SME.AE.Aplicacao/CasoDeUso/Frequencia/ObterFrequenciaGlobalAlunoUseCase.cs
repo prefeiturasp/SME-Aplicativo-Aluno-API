@@ -13,9 +13,11 @@ namespace SME.AE.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<bool> Executar(FiltroFrequenciaGlobalAlunoDto filtro)
+        public async Task<double?> Executar(FiltroFrequenciaGlobalAlunoDto filtro)
         {
-            throw new NotImplementedException();
+            var frequenciaGlobal = await mediator.Send(new ObterFrequenciaGlobalAlunoQuery(filtro.TurmaCodigo, filtro.AlunoCodigo));
+
+            return frequenciaGlobal;
         }
     }
 }
