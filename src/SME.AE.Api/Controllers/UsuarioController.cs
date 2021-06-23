@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
 {
-    public class UsuarioController : ApiController
+    [Route("api/v1/[controller]")]
+    [ApiController]
+    public class UsuarioController :  ControllerBase
     {
         [HttpGet("dre/{codigoDre}/ue/{codigoUe}/cpf/{cpf}")]
         [AllowAnonymous]
@@ -24,6 +26,12 @@ namespace SME.AE.Api.Controllers
                 return Ok(retorno);
             else
                 return StatusCode(601, retorno);
+        }
+        [HttpGet("{cpf}")]
+        [Authorize]
+        public async Task<ObjectResult> ObterDadosUsuario(string cpf, [FromServices] IObterDadosUsuarioPorCpfUseCase obterDadosUsuarioPorCpfUseCase)
+        {
+            return Ok(await obterDadosUsuarioPorCpfUseCase.Executar(cpf));
         }
 
     }

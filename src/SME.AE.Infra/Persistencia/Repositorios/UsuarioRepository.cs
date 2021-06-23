@@ -4,6 +4,7 @@ using Dapper.Dommel;
 using Dommel;
 using Npgsql;
 using Sentry;
+using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
