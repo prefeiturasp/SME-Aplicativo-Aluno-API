@@ -24,5 +24,8 @@ namespace SME.AE.Comum
 
         public string SentryDsn { get; set; }
         public string UrlArquivosEstaticos { get; set; }
+
+        public string ApiSgp { get; set; }
+
     }
 }

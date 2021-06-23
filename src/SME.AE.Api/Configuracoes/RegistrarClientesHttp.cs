@@ -29,6 +29,12 @@ namespace SME.AE.Api.Configuracoes
                 c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiPalavrasBloqueadas);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddPolicyHandler(policy);
+           
+            services.AddHttpClient(name: "servicoApiSgp", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+            }).AddPolicyHandler(policy);
         }
 
         static IAsyncPolicy<HttpResponseMessage> ObterPolicyBaseHttp()
