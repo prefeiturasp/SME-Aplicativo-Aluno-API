@@ -49,7 +49,7 @@ namespace SME.AE.Aplicacao
                 usuarioEol.Email = dto.Email;
                 usuarioEol.NumeroCelular = dto.CelularResponsavel;
                 usuarioEol.DDDCelular = dto.DDD;
-                usuarioEol.UfRG = usuarioEol.UfRG.Length > 2 ? "" : usuarioEol.UfRG;
+                usuarioEol.UfRG = usuarioEol.UfRG == null ? "" : usuarioEol.UfRG;
                 usuarioEol.TipoTurnoCelular = usuarioEol.TipoTurnoCelular == null ? "" : usuarioEol.TipoTurnoCelular;
                 usuarioEol.TipoTurnoTelefoneComercial = usuarioEol.TipoTurnoTelefoneComercial == null ? "" : usuarioEol.TipoTurnoTelefoneComercial;
                 usuarioEol.TipoTurnoTelefoneFixo = usuarioEol.TipoTurnoTelefoneFixo == null ? "" : usuarioEol.TipoTurnoTelefoneFixo;

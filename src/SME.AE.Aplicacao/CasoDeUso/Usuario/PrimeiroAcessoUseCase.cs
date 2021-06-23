@@ -35,15 +35,12 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             if (!usuario.PrimeiroAcesso)
                 throw new NegocioException("Somente é possivel utilizar essa função quando for o primeiro acesso do usuário");
 
-            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
-
-            if (usuarioCoreSSO == null)
-                throw new NegocioException("Usuário não encontrado no coreSSO");
-
             var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuario.Cpf));
 
             if (usuarioEol == null)
                 throw new NegocioException("Responsável não encontrado");
+
+            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
 
             await CriarUsuarioOuAssociarGrupo(novaSenhaDto, usuario, usuarioCoreSSO, usuarioEol.Nome);
 

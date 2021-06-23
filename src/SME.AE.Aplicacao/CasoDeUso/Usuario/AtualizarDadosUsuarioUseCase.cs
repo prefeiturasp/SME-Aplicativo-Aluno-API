@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
@@ -35,7 +36,7 @@ namespace SME.AE.Aplicacao
 
             await AtualizaUsuario(usuarioApp, usuarioDto);            
 
-            return RespostaApi.Sucesso();
+            return MapearResposta(usuarioApp);
         }
 
         private async Task AtualizaUsuario(Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
@@ -53,6 +54,18 @@ namespace SME.AE.Aplicacao
         {
             var podePersistir = await mediator.Send(new VerificaPalavraProibidaPodePersistirCommand(usuarioDto.TextoParaVerificarPersistencia()));
             return podePersistir;
+        }
+
+        private RespostaApi MapearResposta(Usuario usuarioApp)
+        {
+            RespostaAutenticar usuario = new RespostaAutenticar
+            {
+                Cpf = usuarioApp.Cpf,
+                Id = usuarioApp.Id,
+                UltimaAtualizacao = usuarioApp.AlteradoEm
+            };
+
+            return RespostaApi.Sucesso(usuario);
         }
     }
 }
