@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
+using SME.AE.Aplicacao.HandlerExtensions;
 using SME.AE.Comum;
 using SME.AE.Comum.Utilitarios;
 using System;
@@ -17,6 +18,8 @@ namespace SME.AE.Api.Configuracoes
 
             var basicAuth = $"{servicoProdamOptions.Usuario}:{servicoProdamOptions.Senha}".EncodeTo64();
 
+            services.AddTransient<AutenticacaoSgpDelegatingHandler>();
+
             services.AddHttpClient(name: "servicoAtualizacaoCadastralProdam", c =>
             {
                 c.BaseAddress = new Uri(servicoProdamOptions.Url);
@@ -29,12 +32,13 @@ namespace SME.AE.Api.Configuracoes
                 c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiPalavrasBloqueadas);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddPolicyHandler(policy);
-           
+
             services.AddHttpClient(name: "servicoApiSgp", c =>
             {
-                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSGP);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
-            }).AddPolicyHandler(policy);
+            }).AddPolicyHandler(policy)
+            .AddHttpMessageHandler<AutenticacaoSgpDelegatingHandler>();
         }
 
         static IAsyncPolicy<HttpResponseMessage> ObterPolicyBaseHttp()
