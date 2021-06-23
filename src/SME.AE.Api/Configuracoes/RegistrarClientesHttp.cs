@@ -33,7 +33,7 @@ namespace SME.AE.Api.Configuracoes
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddPolicyHandler(policy);
 
-            services.AddHttpClient(name: "servicoApiSGP", c =>
+            services.AddHttpClient(name: "servicoApiSgp", c =>
             {
                 c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSGP);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
