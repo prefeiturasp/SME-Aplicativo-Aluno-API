@@ -17,7 +17,8 @@ namespace SME.AE.Aplicacao
 
         public async Task<bool> Handle(AtualizarDadosResponsavelEolCommand request, CancellationToken cancellationToken)
         {
-            var retorno = await responsavelEOLRepositorio.AtualizarDadosResponsavel(request.Cpf,
+            var retorno = await responsavelEOLRepositorio.AtualizarDadosResponsavel(request.CodigoAluno,
+                                                                                    request.Cpf,
                                                                                     request.Email,
                                                                                     request.DataNascimentoResponsavel,
                                                                                     request.NomeMae,
