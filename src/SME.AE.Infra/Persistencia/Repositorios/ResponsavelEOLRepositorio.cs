@@ -248,5 +248,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             return resultado;
         }
+
+        public async Task<UsuarioDadosDetalhesDto> ObterPorCpfParaDetalhes(string cpf)
+        {
+
+            var query = @"select ra.nm_responsavel as Nome, ra.cd_cpf_responsavel as Cpf, ra.dt_nascimento_mae_responsavel as DataNascimento, ra.nm_mae_responsavel as NomeMae, ra.email_responsavel as Email, 
+				                ra.cd_ddd_celular_responsavel + ra.nr_celular_responsavel as Celular, ra.dt_atualizacao_tabela as UltimaAtualizacao
+                                from responsavel_aluno  ra
+				 where ra.cd_cpf_responsavel = @cpf";
+
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var responsavelEol = await conn.QueryFirstOrDefaultAsync<UsuarioDadosDetalhesDto>(query, new { cpf });
+            await conn.CloseAsync();
+          
+            return responsavelEol;
+
+        }
     }
 }

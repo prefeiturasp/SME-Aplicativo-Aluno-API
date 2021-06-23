@@ -24,6 +24,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         new Task<long> SalvarAsync(Usuario usuario);
         Task<long> ObterTotalUsuariosComAcessoIncompleto(List<string> cpfs);
         Task<long> ObterTotalUsuariosValidos(List<string> cpfs);
-        Task<IEnumerable<Usuario>> ObterTodosUsuariosAtivos();
+        Task<IEnumerable<Usuario>> ObterTodosUsuariosAtivos();        
     }
 }
