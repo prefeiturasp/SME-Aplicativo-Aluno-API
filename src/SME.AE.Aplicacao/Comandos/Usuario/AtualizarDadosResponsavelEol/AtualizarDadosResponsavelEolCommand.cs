@@ -5,8 +5,9 @@ namespace SME.AE.Aplicacao
 {
     public class AtualizarDadosResponsavelEolCommand : IRequest<bool>
     {
-        public AtualizarDadosResponsavelEolCommand(long cpf, string email, DateTime dataNascimentoResponsavel, string nomeMae, string celular, string ddd)
+        public AtualizarDadosResponsavelEolCommand(string codigoAluno, long cpf, string email, DateTime dataNascimentoResponsavel, string nomeMae, string celular, string ddd)
         {
+            CodigoAluno = codigoAluno;
             Cpf = cpf;
             Email = email;
             DataNascimentoResponsavel = dataNascimentoResponsavel;
@@ -15,6 +16,7 @@ namespace SME.AE.Aplicacao
             DDD = ddd;
         }
 
+        public string CodigoAluno { get; set; }
         public long Cpf { get; set; }
         public string Email { get; set; }
         public DateTime DataNascimentoResponsavel { get; set; }
