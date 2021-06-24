@@ -50,7 +50,7 @@ namespace SME.AE.Aplicacao
         public string NumeroTelefoneFixo { get; set; }
 
         [JsonProperty("cd_tipo_turno_fixo")]
-        public string TipoTurnoTelefoneFixo { get; set; };
+        public string TipoTurnoTelefoneFixo { get; set; }
 
         [JsonProperty("cd_ddd_telefone_comercial_responsavel")]
         public string DDDTelefoneComercial { get; set; }
