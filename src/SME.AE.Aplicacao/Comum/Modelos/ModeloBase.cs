@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
@@ -10,6 +8,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public DateTime CriadoEm { get; set; }
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
-        public string? AlteradoPor { get; set; }
+        public string AlteradoPor { get; set; }
     }
 }

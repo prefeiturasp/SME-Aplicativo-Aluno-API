@@ -1,12 +1,11 @@
 ﻿using Dapper;
-using Newtonsoft.Json;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno.PorComponenteCurricular;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
@@ -17,31 +16,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class FrequenciaAlunoRepositorio : IFrequenciaAlunoRepositorio
     {
-        private readonly ICacheRepositorio cacheRepositorio;
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
-
-        private static string chaveCacheAnoUeTurmaAlunoComponenteCurricular(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno, short codigoComponenteCurricular)
-            => $"frequenciaAluno-AnoUeTurmaAlunoComponenteCurricular-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}-{codigoComponenteCurricular}";
-
-        private static string chaveCacheAnoUeTurmaAluno(int anoLetivo, string codigoUe, string codigoTurmna, string codigoAluno)
-            => $"frequenciaAluno-AnoUeTurmaAluno-{anoLetivo}-{codigoUe}-{codigoTurmna}-{codigoAluno}";
-
-        public FrequenciaAlunoRepositorio(ICacheRepositorio cacheRepositorio)
+        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
-            this.cacheRepositorio = cacheRepositorio;
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task<FrequenciaAlunoPorComponenteCurricularResposta> ObterFrequenciaAlunoPorComponenteCurricularAsync(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno, short codigoComponenteCurricular)
         {
             try
             {
-                var chaveCache = chaveCacheAnoUeTurmaAlunoComponenteCurricular(anoLetivo, codigoUe, codigoTurma, codigoAluno, codigoComponenteCurricular);
-
-                var frequenciaAluno = await cacheRepositorio.ObterAsync(chaveCache);
-                if (!string.IsNullOrWhiteSpace(frequenciaAluno))
-                    return JsonConvert.DeserializeObject<FrequenciaAlunoPorComponenteCurricularResposta>(frequenciaAluno);
-
                 using var conexao = CriaConexao();
                 conexao.Open();
 
@@ -103,7 +89,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     query, x => x.CodigoComponenteCurricular, x => x.FrequenciasPorBimestre, parametros, splitOn: "splitOn");
                 conexao.Close();
 
-                await cacheRepositorio.SalvarAsync(chaveCache, dadosFrequenciaAlunos, 720, false);
                 return dadosFrequenciaAlunos;
             }
             catch (Exception ex)
@@ -117,14 +102,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-
-                // TODO: Retirar o comentário após validação da PO 
-                //var chaveCache = chaveCacheAnoUeTurmaAluno(anoLetivo, codigoUe, codigoTurma, codigoAluno);
-
-                //var frequenciaAluno = await cacheRepositorio.ObterAsync(chaveCache);
-                //if (!string.IsNullOrWhiteSpace(frequenciaAluno))
-                //    return JsonConvert.DeserializeObject<FrequenciaAlunoResposta>(frequenciaAluno);
-
                 using var conexao = CriaConexao();
                 conexao.Open();
 
@@ -231,8 +208,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     x => x.AlunoCodigo, x => x.ComponentesCurricularesDoAluno, parametros, splitOn: "splitOn");
 
                 conexao.Close();
-                // TODO: Retirar o comentário após validação da PO 
-                //await cacheRepositorio.SalvarAsync(chaveCache, dadosFrequenciaAluno, 720, false);
+
                 return dadosFrequenciaAluno;
             }
             catch (Exception ex)
@@ -321,7 +297,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (alterado == 0)
                 {
                     await conn.ExecuteAsync(sqlInsert, frequenciaAluno);
-                } else if (alterado > 1)
+                }
+                else if (alterado > 1)
                 {
                     await conn.ExecuteAsync(sqlDelete, frequenciaAluno);
                     await conn.ExecuteAsync(sqlInsert, frequenciaAluno);

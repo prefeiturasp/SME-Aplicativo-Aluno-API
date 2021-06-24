@@ -7,8 +7,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         string Obter(string nomeChave, bool utilizarGZip = false);
 
-        T Obter<T>(string nomeChave, bool utilizarGZip = false);
-
         Task<T> Obter<T>(string nomeChave, Func<Task<T>> buscarDados, int minutosParaExpirar = 720, bool utilizarGZip = false);
 
         Task<string> ObterAsync(string nomeChave, bool utilizarGZip = false);

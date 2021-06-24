@@ -1,8 +1,5 @@
 ﻿using SME.AE.Dominio.Comum.Enumeradores;
-using SME.AE.Dominio.Entidades;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario
 {
@@ -17,7 +14,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario
         public DateTime? CriadoEm { get; set; }
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
-        public string? AlteradoPor { get; set; }
+        public string AlteradoPor { get; set; }
         public bool MensagemVisualizada { get; set; }
         public TipoComunicado TipoComunicado { get; set; }
         public string CategoriaNotificacao { get; set; }

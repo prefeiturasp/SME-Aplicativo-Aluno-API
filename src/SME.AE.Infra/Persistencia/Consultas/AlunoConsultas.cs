@@ -32,10 +32,11 @@
                                  vmc.cd_escola, 
                                  cd_serie_ensino 
                           FROM   v_matricula_cotic vmc
-                            inner join escola esc on esc.cd_escola = vmc.cd_escola
-                              where st_matricula = 1
-                                and ((cd_serie_ensino is not null) or (esc.tp_escola in (22, 23)))
-                                and an_letivo = year(getdate())) as matricula
+                          inner join escola esc on esc.cd_escola = vmc.cd_escola
+			                  where st_matricula = 1
+			                    and (cd_serie_ensino is not null -- turma regular 
+			                    or esc.tp_escola in (22, 23))
+				                and an_letivo = year(getdate())) AS matricula 
                        ON matricula.cd_aluno = aluno.cd_aluno 
                INNER JOIN(SELECT cd_matricula, 
                                  cd_turma_escola, 
