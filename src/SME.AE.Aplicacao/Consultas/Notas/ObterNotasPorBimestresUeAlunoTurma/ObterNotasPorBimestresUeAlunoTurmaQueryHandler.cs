@@ -32,7 +32,7 @@ namespace SME.AE.Aplicacao
             else
             {
                 SentrySdk.CaptureMessage(resposta.ReasonPhrase);
-                return null;
+                throw new Exception();
             }
 
             return notasConceitos;
