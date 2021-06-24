@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
+using Sentry;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -28,6 +29,9 @@ namespace SME.AE.Aplicacao
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
             {
                 var json = await resposta.Content.ReadAsStringAsync();
+                Console.WriteLine(body);
+                Console.WriteLine(json);
+                SentrySdk.CaptureMessage(json);
 
                 if (json.ToLower().Contains("false"))
                     throw new Exception($"Não foi possível atualizar os dados cadastrais do cpf {request.ResponsavelDto.CPF}. Retorno: {json}");
