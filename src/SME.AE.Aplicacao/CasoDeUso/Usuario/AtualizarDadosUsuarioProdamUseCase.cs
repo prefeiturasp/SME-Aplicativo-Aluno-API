@@ -49,11 +49,16 @@ namespace SME.AE.Aplicacao
                 usuarioEol.Email = dto.Email;
                 usuarioEol.NumeroCelular = dto.CelularResponsavel;
                 usuarioEol.DDDCelular = dto.DDD;
-                usuarioEol.UfRG ??= "";
-                usuarioEol.TipoTurnoCelular ??= "";
-                usuarioEol.TipoTurnoTelefoneComercial ??= "";
-                usuarioEol.TipoTurnoTelefoneFixo ??= "";
                 usuarioEol.Nome = usuarioEol.Nome.Trim();
+
+                if (string.IsNullOrEmpty(usuarioEol.TipoTurnoTelefoneFixo))
+                {
+                    if (!string.IsNullOrEmpty(usuarioEol.NumeroTelefoneFixo) &&
+                        !string.IsNullOrEmpty(usuarioEol.DDDTelefoneFixo))
+                        usuarioEol.TipoTurnoTelefoneFixo = "1";
+                    else
+                        usuarioEol.TipoTurnoTelefoneFixo = "";
+                }
             }
         }
     }
