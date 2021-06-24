@@ -49,10 +49,7 @@ namespace SME.AE.Aplicacao
                 usuarioEol.Email = dto.Email;
                 usuarioEol.NumeroCelular = dto.CelularResponsavel;
                 usuarioEol.DDDCelular = dto.DDD;
-                usuarioEol.UfRG ??= "";
-                usuarioEol.TipoTurnoCelular ??= "";
-                usuarioEol.TipoTurnoTelefoneComercial ??= "";
-                usuarioEol.TipoTurnoTelefoneFixo ??= "";
+                usuarioEol.TipoTurnoTelefoneFixo = string.IsNullOrEmpty(usuarioEol.TipoTurnoTelefoneFixo) ? "1" : usuarioEol.TipoTurnoTelefoneFixo;
                 usuarioEol.Nome = usuarioEol.Nome.Trim();
             }
         }
