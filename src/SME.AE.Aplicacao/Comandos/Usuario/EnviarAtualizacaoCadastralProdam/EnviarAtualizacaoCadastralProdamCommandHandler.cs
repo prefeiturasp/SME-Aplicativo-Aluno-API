@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using Sentry;
+using SME.AE.Comum;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -23,7 +24,7 @@ namespace SME.AE.Aplicacao
         {
             var httpClient = httpClientFactory.CreateClient("servicoAtualizacaoCadastralProdam");
 
-            var body = JsonConvert.SerializeObject(request.ResponsavelDto);
+            var body = JsonConvert.SerializeObject(request.ResponsavelDto, UtilJson.ObterConfigConverterNulosEmVazio());
             var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(body, Encoding.UTF8, "application/json"));
 
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
