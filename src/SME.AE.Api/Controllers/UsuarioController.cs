@@ -18,7 +18,8 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        //[Authorize]
+        [AllowAnonymous]
         public async Task<ObjectResult> AtualizarDadosUsuario([FromBody] AtualizarDadosUsuarioDto usuarioDto, [FromServices] IAtualizarDadosUsuarioUseCase atualizarDadosUsuarioUseCase)
         {
             var retorno = await atualizarDadosUsuarioUseCase.Executar(usuarioDto);
