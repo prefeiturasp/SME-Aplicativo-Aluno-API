@@ -30,9 +30,8 @@ namespace SME.AE.Aplicacao
                 notasConceitos = JsonConvert.DeserializeObject<IEnumerable<NotaConceitoBimestreComponenteDto>>(json);
             }
             else
-            {
-                SentrySdk.CaptureMessage(resposta.ReasonPhrase);
-                throw new Exception();
+            {                
+                throw new Exception($"Não foi possível localizar as notas do aluno : {request.AlunoCodigo} da turma {request.TurmaId}.");
             }
 
             return notasConceitos;
