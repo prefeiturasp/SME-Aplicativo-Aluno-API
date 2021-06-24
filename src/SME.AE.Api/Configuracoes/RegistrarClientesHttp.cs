@@ -35,7 +35,7 @@ namespace SME.AE.Api.Configuracoes
 
             services.AddHttpClient(name: "servicoApiSgp", c =>
             {
-                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSGP);
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddPolicyHandler(policy)
             .AddHttpMessageHandler<AutenticacaoSgpDelegatingHandler>();
