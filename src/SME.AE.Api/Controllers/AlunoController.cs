@@ -48,10 +48,10 @@ namespace SME.AE.Api.Controllers
             return Ok(await useCase.Executar(new NotaConceitoPorBimestresAlunoTurmaDto(ueId, turmaId, alunoCodigo, bimestres)));
         }
 
-        [HttpGet("aluno/turmas/{codigoTurma}/boletins/liberacoes/bimestres")]
-        public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string codigoTurma, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
+        [HttpGet("aluno/turmas/{turmaCodigo}/boletins/liberacoes/bimestres")]
+        public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
         {
-            return Ok(await useCase.Executar(codigoTurma));
+            return Ok(await useCase.Executar(turmaCodigo));
         }
     }
 }
