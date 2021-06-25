@@ -45,5 +45,12 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await useCase.Executar(filtro));
         }
+
+        [HttpGet("{turmaCodigo}/liberacao-boletim/bimestres")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterNotasPorBimestresUeAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
+        {
+            return Ok(await useCase.Executar(turmaCodigo));
+        }
     }
 }

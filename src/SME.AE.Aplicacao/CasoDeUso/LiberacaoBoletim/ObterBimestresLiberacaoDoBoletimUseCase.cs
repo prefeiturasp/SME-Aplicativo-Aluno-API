@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.CasoDeUso
+namespace SME.AE.Aplicacao
 {
     public class ObterBimestresLiberacaoDoBoletimUseCase : IObterBimestresLiberacaoBoletimAlunoUseCase
     {

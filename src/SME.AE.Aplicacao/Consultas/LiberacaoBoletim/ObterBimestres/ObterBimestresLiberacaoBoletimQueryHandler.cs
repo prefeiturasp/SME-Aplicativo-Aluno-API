@@ -32,8 +32,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterBimestres
             }
             else
             {
-                SentrySdk.CaptureMessage(resposta.ReasonPhrase);
-                return null;
+                throw new Exception($"Não foi possível localizar os bimetres da liberação de boletim da turma do aluno.");
             }
 
             return bimestres;
