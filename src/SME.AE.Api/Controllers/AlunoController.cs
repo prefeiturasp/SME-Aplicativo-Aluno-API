@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao;
+using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -46,9 +47,16 @@ namespace SME.AE.Api.Controllers
             return Ok(await useCase.Executar(filtro));
         }
 
+        [HttpGet("ues/{ueId}/turmas/{turmaId}/alunos/{alunoCodigo}/notas-conceitos")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterNotasPorBimestresUeAlunoTurma(long ueId, long turmaId, string alunoCodigo, [FromQuery] int[] bimestres, [FromServices] IObterNotasPorBimestresUeAlunoTurmaUseCase useCase)
+        {
+            return Ok(await useCase.Executar(new NotaConceitoPorBimestresAlunoTurmaDto(ueId, turmaId, alunoCodigo, bimestres)));
+        }
+
         [HttpGet("{turmaCodigo}/liberacao-boletim/bimestres")]
         [AllowAnonymous]
-        public async Task<ObjectResult> ObterNotasPorBimestresUeAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
+        public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
         {
             return Ok(await useCase.Executar(turmaCodigo));
         }

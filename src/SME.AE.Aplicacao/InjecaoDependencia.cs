@@ -120,6 +120,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IAtualizarDadosUsuarioProdamUseCase, AtualizarDadosUsuarioProdamUseCase>();
             services.TryAddScoped<IAtualizarDadosUsuarioEolUseCase, AtualizarDadosUsuarioEolUseCase>();
             services.TryAddScoped<IObterFrequenciaGlobalAlunoUseCase, ObterFrequenciaGlobalAlunoUseCase>();
+            services.TryAddScoped<IObterNotasPorBimestresUeAlunoTurmaUseCase, ObterNotasPorBimestresUeAlunoTurmaUseCase>();
         }
     }
 }

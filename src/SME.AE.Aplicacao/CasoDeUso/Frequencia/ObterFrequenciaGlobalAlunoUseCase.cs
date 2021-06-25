@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Interfaces;
 using System;
 using System.Threading.Tasks;
 
