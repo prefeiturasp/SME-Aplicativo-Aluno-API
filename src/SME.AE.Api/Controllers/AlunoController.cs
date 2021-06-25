@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
@@ -36,6 +37,13 @@ namespace SME.AE.Api.Controllers
         public async Task<ObjectResult> ObterNotasAluno([FromQuery] NotaAlunoDto notaAlunoDto,[FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
         {
             return Ok(await obterNotasAlunoUseCase.Executar(notaAlunoDto));
+        }
+
+        [HttpGet("frequencia-global")]
+        [AllowAnonymous]
+        public async Task<ObjectResult> ObterFrequenciaGlobalAluno([FromQuery] FiltroFrequenciaGlobalAlunoDto filtro, [FromServices] IObterFrequenciaGlobalAlunoUseCase useCase)
+        {
+            return Ok(await useCase.Executar(filtro));
         }
     }
 }
