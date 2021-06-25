@@ -14,45 +14,45 @@ namespace SME.AE.Api.Controllers
     public class AlunoController : ApiController
     {
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult> ObterDadosAlunos([FromQuery] string cpf, [FromServices] IDadosDoAlunoUseCase dadosDoAlunoUseCase)
         {
             return Ok(await dadosDoAlunoUseCase.Executar(cpf));
         }
 
         [HttpGet("frequencia/componente-curricular")]
-        [AllowAnonymous]
         public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] ObterFrequenciaAlunoPorComponenteCurricularDto frequenciaAlunoDto, [FromServices] IObterFrequenciaAlunoPorComponenteCurricularUseCase obterFrequenciaAlunoPorComponenteCurricularUseCase)
         {
             return Ok(await obterFrequenciaAlunoPorComponenteCurricularUseCase.Executar(frequenciaAlunoDto));
         }
 
         [HttpGet("frequencia")]
-        [AllowAnonymous]
         public async Task<ObjectResult> ObterFrequenciaAluno([FromQuery] ObterFrequenciaAlunoDto frequenciaAlunoDto, [FromServices] IObterFrequenciaAlunoUseCase obterFrequenciaGlobalAlunoUseCase)
         {
             return Ok(await obterFrequenciaGlobalAlunoUseCase.Executar(frequenciaAlunoDto));
         }
 
         [HttpGet("notas")]
-        [AllowAnonymous]
         public async Task<ObjectResult> ObterNotasAluno([FromQuery] NotaAlunoDto notaAlunoDto,[FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
         {
             return Ok(await obterNotasAlunoUseCase.Executar(notaAlunoDto));
         }
 
         [HttpGet("frequencia-global")]
-        [AllowAnonymous]
         public async Task<ObjectResult> ObterFrequenciaGlobalAluno([FromQuery] FiltroFrequenciaGlobalAlunoDto filtro, [FromServices] IObterFrequenciaGlobalAlunoUseCase useCase)
         {
             return Ok(await useCase.Executar(filtro));
         }
 
         [HttpGet("ues/{ueId}/turmas/{turmaId}/alunos/{alunoCodigo}/notas-conceitos")]
-        [AllowAnonymous]
         public async Task<ObjectResult> ObterNotasPorBimestresUeAlunoTurma(long ueId, long turmaId, string alunoCodigo, [FromQuery] int[] bimestres, [FromServices] IObterNotasPorBimestresUeAlunoTurmaUseCase useCase)
         {
             return Ok(await useCase.Executar(new NotaConceitoPorBimestresAlunoTurmaDto(ueId, turmaId, alunoCodigo, bimestres)));
+        }
+
+        [HttpGet("aluno/turmas/{turmaCodigo}/boletins/liberacoes/bimestres")]
+        public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
+        {
+            return Ok(await useCase.Executar(turmaCodigo));
         }
 
         [HttpGet("frequencia/turmas/{turmaCodigo}/alunos/{alunoCodigo}/componentes-curriculares/{componenteCurricularId}")]
