@@ -54,7 +54,7 @@ namespace SME.AE.Api.Controllers
             return Ok(await useCase.Executar(new NotaConceitoPorBimestresAlunoTurmaDto(ueId, turmaId, alunoCodigo, bimestres)));
         }
 
-        [HttpGet("boletim/liberacoes/bimestres")]
+        [HttpGet("boletins/liberacoes/bimestres")]
         [Authorize]
         public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
         {
