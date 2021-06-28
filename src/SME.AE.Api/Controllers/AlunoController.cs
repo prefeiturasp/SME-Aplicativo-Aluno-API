@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao;
+using SME.AE.Aplicacao.Comum;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
@@ -52,6 +53,13 @@ namespace SME.AE.Api.Controllers
         public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
         {
             return Ok(await useCase.Executar(turmaCodigo));
+        }
+
+        [HttpGet("frequencia/turmas/{turmaCodigo}/alunos/{alunoCodigo}/componentes-curriculares/{componenteCurricularId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricular(string turmaCodigo, string alunoCodigo, string componenteCurricularId, [FromQuery] int[] bimestres, [FromServices] IObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase useCase)
+        {
+            return Ok(await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto(turmaCodigo, alunoCodigo, bimestres, componenteCurricularId)));
         }
     }
 }
