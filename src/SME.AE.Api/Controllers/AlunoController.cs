@@ -50,7 +50,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("turmas/{turmaCodigo}/boletins/liberacoes/bimestres")]
-        public async Task<ObjectResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
+        public async Task<IActionResult> ObterBimestresLiberacaoDeBoletimAlunoTurma(string turmaCodigo, [FromServices] IObterBimestresLiberacaoBoletimAlunoUseCase useCase)
         {
             return Ok(await useCase.Executar(turmaCodigo));
         }
