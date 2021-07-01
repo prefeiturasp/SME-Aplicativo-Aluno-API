@@ -2,11 +2,11 @@
 
 namespace SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso
 {
-    public class ObterParametrosSistemaPorChavesQueryValidator : AbstractValidator<ObterParametrosSistemaPorChavesQuery>
+    public class ObterModalidadeDeEnsinoQueryValidator : AbstractValidator<ObterModalidadeDeEnsinoQuery>
     {
-        public ObterParametrosSistemaPorChavesQueryValidator()
+        public ObterModalidadeDeEnsinoQueryValidator()
         {
-            RuleFor(x => x.Chaves).NotEmpty().WithMessage("As chaves para busca devem ser informadas");
+            RuleFor(x => x.CodigoTurma).NotEmpty().WithMessage("O código da turma deve ser informado");
         }
     }
 }
