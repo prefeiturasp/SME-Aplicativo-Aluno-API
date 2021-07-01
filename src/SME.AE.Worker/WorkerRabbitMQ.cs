@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -36,7 +35,7 @@ namespace SME.AE.Worker
         public WorkerRabbitMQ(IServiceScopeFactory serviceScopeFactory, ConnectionFactory connRabbitFactory)
         {
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-            
+
             conexaoRabbit = connRabbitFactory.CreateConnection();
             canalRabbit = conexaoRabbit.CreateModel();
 
@@ -81,40 +80,38 @@ namespace SME.AE.Worker
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
             {
-                using (SentrySdk.Init())
+                var mensagemRabbit = JsonConvert.DeserializeObject<MensagemRabbit>(mensagem);
+                var comandoRabbit = comandos[rota];
+                try
                 {
-                    var mensagemRabbit = JsonConvert.DeserializeObject<MensagemRabbit>(mensagem);                    
-                    var comandoRabbit = comandos[rota];
-                    try
-                    {
-                        using var scope = serviceScopeFactory.CreateScope();
+                    using var scope = serviceScopeFactory.CreateScope();
 
-                        var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
+                    var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
 
-                        await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, new object[] { mensagemRabbit });
-                        canalRabbit.BasicAck(ea.DeliveryTag, false);
-                    }
-                    catch (NegocioException nex)
-                    {
-                        canalRabbit.BasicAck(ea.DeliveryTag, false);
-                        SentrySdk.AddBreadcrumb($"Erros: {nex.Message}", null, null, null, BreadcrumbLevel.Error);
-                        SentrySdk.CaptureException(nex);
-                        RegistrarSentry(ea, mensagemRabbit, nex);
-                    }
-                    catch (ValidacaoException vex)
-                    {
-                        canalRabbit.BasicAck(ea.DeliveryTag, false);
-                        SentrySdk.CaptureException(vex);
-                        RegistrarSentry(ea, mensagemRabbit, vex);
-                    }
-                    catch (Exception ex)
-                    {
-                        canalRabbit.BasicReject(ea.DeliveryTag, false);
-                        SentrySdk.AddBreadcrumb($"Erros: {ex.Message}", null, null, null, BreadcrumbLevel.Error);
-                        SentrySdk.CaptureException(ex);
-                        RegistrarSentry(ea, mensagemRabbit, ex);
-                    }
+                    await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, new object[] { mensagemRabbit });
+                    canalRabbit.BasicAck(ea.DeliveryTag, false);
                 }
+                catch (NegocioException nex)
+                {
+                    canalRabbit.BasicAck(ea.DeliveryTag, false);
+                    SentrySdk.AddBreadcrumb($"Erros: {nex.Message}", null, null, null, BreadcrumbLevel.Error);
+                    SentrySdk.CaptureException(nex);
+                    RegistrarSentry(ea, mensagemRabbit, nex);
+                }
+                catch (ValidacaoException vex)
+                {
+                    canalRabbit.BasicAck(ea.DeliveryTag, false);
+                    SentrySdk.CaptureException(vex);
+                    RegistrarSentry(ea, mensagemRabbit, vex);
+                }
+                catch (Exception ex)
+                {
+                    canalRabbit.BasicReject(ea.DeliveryTag, false);
+                    SentrySdk.AddBreadcrumb($"Erros: {ex.Message}", null, null, null, BreadcrumbLevel.Error);
+                    SentrySdk.CaptureException(ex);
+                    RegistrarSentry(ea, mensagemRabbit, ex);
+                }
+
             }
             else
                 canalRabbit.BasicReject(ea.DeliveryTag, false);

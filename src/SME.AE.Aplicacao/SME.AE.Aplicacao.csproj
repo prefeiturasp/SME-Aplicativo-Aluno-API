@@ -54,6 +54,7 @@
     <Compile Include="Comum\Modelos\Resposta\UltimaAtualizaoWorkerPorProcessoResultado.cs" />
     <Compile Include="Comum\Modelos\Resposta\Dre\DreResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\UnidadeEscolar\UnidadeEscolarResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\UsuarioDadosDetalhesDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\UsuarioDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\StatusNotificacaoUsuario.cs" />
   </ItemGroup>

@@ -187,6 +187,23 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         ra.cd_cpf_responsavel as Cpf
 					from v_aluno_cotic(nolock) a
 					inner join responsavel_aluno(nolock) ra on ra.cd_aluno = a.cd_aluno 
+                    INNER JOIN (select cd_aluno , cd_matricula
+                              from v_matricula_cotic vmc 
+                              inner join escola esc on esc.cd_escola = vmc.cd_escola
+			                  where st_matricula = 1
+			                    and (cd_serie_ensino is not null -- turma regular 
+			                    or esc.tp_escola in (22, 23))
+				                and an_letivo = year(getdate())
+				                ) as   matricula
+                     on matricula.cd_aluno = a.cd_aluno
+                   inner join (
+                               select cd_matricula,
+				                      cd_turma_escola,
+				                      cd_situacao_aluno
+                                      from matricula_turma_escola (nolock)
+                              ) mte 
+                  on mte.cd_matricula = matricula.cd_matricula
+                 and mte.cd_situacao_aluno in (1, 6, 10, 13)
                 WHERE ra.cd_cpf_responsavel = @cpfResponsavel 
                   AND ra.dt_fim IS NULL  
                   AND ra.cd_cpf_responsavel IS NOT NULL";
@@ -197,7 +214,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
             return responsavelEol;
         }
-        public async Task<int> AtualizarDadosResponsavel(long cpfResponsavel, string email, DateTime dataNascimentoResponsavel, string nomeMae, string dddCelular, string celular)
+        public async Task<int> AtualizarDadosResponsavel(string codigoAluno, long cpfResponsavel, string email, DateTime dataNascimentoResponsavel, string nomeMae, string dddCelular, string celular)
         {
             var query = @"update responsavel_aluno 
                              set email_responsavel = @email,
@@ -209,10 +226,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                  in_autoriza_envio_sms = 'S',
                                  cd_tipo_turno_celular = 1,
                                  dt_atualizacao_tabela = @dataAtualizacao
-                           where cd_cpf_responsavel = @cpfResponsavel";
+                           where cd_cpf_responsavel = @cpfResponsavel 
+                             and cd_aluno = @codigoAluno";
 
             var parametros = new
             {
+                codigoAluno,
                 cpfResponsavel,
                 email,
                 dataNascimentoResponsavel,
@@ -228,6 +247,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
 
             return resultado;
+        }
+
+        public async Task<UsuarioDadosDetalhesDto> ObterPorCpfParaDetalhes(string cpf)
+        {
+
+            var query = @"select ra.nm_responsavel as Nome, ra.cd_cpf_responsavel as Cpf, ra.dt_nascimento_mae_responsavel as DataNascimento, ra.nm_mae_responsavel as NomeMae, ra.email_responsavel as Email, 
+				                ra.cd_ddd_celular_responsavel + ra.nr_celular_responsavel as Celular, ra.dt_atualizacao_tabela as UltimaAtualizacao
+                                from responsavel_aluno  ra
+				 where ra.cd_cpf_responsavel = @cpf
+                    order by UltimaAtualizacao desc";
+
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var responsavelEol = await conn.QueryFirstOrDefaultAsync<UsuarioDadosDetalhesDto>(query, new { cpf });
+            await conn.CloseAsync();
+          
+            return responsavelEol;
+
         }
     }
 }

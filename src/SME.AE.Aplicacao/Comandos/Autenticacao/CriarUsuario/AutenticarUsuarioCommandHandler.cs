@@ -164,6 +164,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
 
+            
             return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
         }
 
@@ -224,7 +225,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 AtualizarDadosCadastrais = atualizarDadosCadastrais,
                 Celular = usuarioEol.ObterCelularComDDD(),
                 Token = "",
-                UltimaAtualizacao = usuarioApp.AlteradoEm
+                UltimaAtualizacao = usuarioEol.DataAtualizacao
             };
 
             return RespostaApi.Sucesso(usuario);

@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao
 
             foreach (var usuarioEol in usuariosEol)
             {
-                await mediator.Send(new AtualizarDadosResponsavelEolCommand(long.Parse(usuarioEol.CPF), usuarioEol.Email, filtroDadosUsuario.DataNascimentoResponsavel, usuarioEol.NomeMae, usuarioEol.NumeroCelular, usuarioEol.DDDCelular));
+                await mediator.Send(new AtualizarDadosResponsavelEolCommand(usuarioEol.CodigoAluno, long.Parse(usuarioEol.CPF), usuarioEol.Email, filtroDadosUsuario.DataNascimentoResponsavel, usuarioEol.NomeMae, usuarioEol.NumeroCelular, usuarioEol.DDDCelular));
             }
 
             return true;

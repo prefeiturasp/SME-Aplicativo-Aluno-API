@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using Sentry;
+using SME.AE.Comum;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -23,17 +24,22 @@ namespace SME.AE.Aplicacao
         {
             var httpClient = httpClientFactory.CreateClient("servicoAtualizacaoCadastralProdam");
 
-            var body = JsonConvert.SerializeObject(request.ResponsavelDto);
+            var body = JsonConvert.SerializeObject(request.ResponsavelDto, UtilJson.ObterConfigConverterNulosEmVazio());
             var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(body, Encoding.UTF8, "application/json"));
 
-            var json = await resposta.Content.ReadAsStringAsync();
-            Console.WriteLine(body);
-            Console.WriteLine(json);
-            SentrySdk.CaptureMessage(json);
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
-                return true;
+            {
+                var json = await resposta.Content.ReadAsStringAsync();
+                Console.WriteLine(body);
+                Console.WriteLine(json);
+                SentrySdk.CaptureMessage(json);
 
-            return false;
+                if (json.ToLower().Contains("false"))
+                    throw new Exception($"Não foi possível atualizar os dados cadastrais do cpf {request.ResponsavelDto.CPF}. Retorno: {json}");
+
+                return true;
+            }
+            else throw new Exception($"Não foi possível atualizar os dados cadastrais do cpf {request.ResponsavelDto.CPF}.");
         }
     }
 }
