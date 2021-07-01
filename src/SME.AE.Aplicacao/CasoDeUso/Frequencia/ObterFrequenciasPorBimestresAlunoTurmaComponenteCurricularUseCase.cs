@@ -2,6 +2,7 @@
 using SME.AE.Aplicacao.Comum;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
+using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,13 +20,30 @@ namespace SME.AE.Aplicacao
 
         public async Task<IEnumerable<FrequenciaAlunoDto>> Executar(FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto dto)
         {
-            var notasConceitosBimestreComponente = await mediator.Send(new ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularQuery(dto.Bimestres,
-                                                                                                                  dto.TurmaCodigo,
-                                                                                                                  dto.AlunoCodigo,
-                                                                                                                  dto.ComponenteCurricularId));
+            var notasConceitosBimestreComponente = await mediator.Send(new ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularQuery(dto.Bimestres, dto.TurmaCodigo, dto.AlunoCodigo, dto.ComponenteCurricularId));
+
+            if (notasConceitosBimestreComponente != null)
+            {
+                var turmaModalidadeDeEnsino = await mediator.Send(new ObterModalidadeDeEnsinoQuery(dto.TurmaCodigo));
+                var parametros = turmaModalidadeDeEnsino.ModalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+                ? await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametrosParaEnsinoInfantil()))
+                : await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametros()));
+
+                var obterFrequenciaAlunoCores = await mediator.Send(new ObterFrequenciaAlunoCorPorParametroQuery(parametros));
+                var obterFrequenciaAlunoFaixa = await mediator.Send(new ObterFrequenciaAlunoFaixaPorParametroQuery(parametros));
+
+                List<FrequenciaAlunoDto> frequenciasAtualizada = new List<FrequenciaAlunoDto>();
+                foreach (var frequencia in notasConceitosBimestreComponente)
+                {
+                    frequencia.CorDaFrequencia = await mediator.Send(new ObterCorQuery(parametros, frequencia.PercentualFrequencia,
+                    obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa,
+                    turmaModalidadeDeEnsino.ModalidadeDeEnsino));
+                    frequenciasAtualizada.Add(frequencia);
+                }
+                return frequenciasAtualizada;
+            }
 
             return notasConceitosBimestreComponente;
         }
-
     }
 }
