@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace SME.AE.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<double?> Executar(FiltroFrequenciaGlobalAlunoDto filtro)
+        public async Task<FrequenciaGlobalDto> Executar(FiltroFrequenciaGlobalAlunoDto filtro)
         {
             var frequenciaGlobal = await mediator.Send(new ObterFrequenciaGlobalAlunoQuery(filtro.TurmaCodigo, filtro.AlunoCodigo));
 

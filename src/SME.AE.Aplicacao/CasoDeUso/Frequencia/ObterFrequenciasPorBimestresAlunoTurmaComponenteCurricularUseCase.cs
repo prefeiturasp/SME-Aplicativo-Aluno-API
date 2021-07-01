@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum;
+using SME.AE.Aplicacao.Comum.Enumeradores;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,5 +26,6 @@ namespace SME.AE.Aplicacao
 
             return notasConceitosBimestreComponente;
         }
+
     }
 }

@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using MediatR;
+using SME.AE.Aplicacao.Comum.Modelos;
 
 namespace SME.AE.Aplicacao
 {
-    public class ObterFrequenciaGlobalAlunoQuery : IRequest<double?>
+    public class ObterFrequenciaGlobalAlunoQuery : IRequest<FrequenciaGlobalDto>
     {
         public ObterFrequenciaGlobalAlunoQuery(string turmaCodigo, string alunoCodigo)
         {

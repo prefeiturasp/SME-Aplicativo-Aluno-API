@@ -18,8 +18,8 @@ namespace SME.AE.Aplicacao
         public async Task<IEnumerable<NotaConceitoBimestreComponenteDto>> Executar(NotaConceitoPorBimestresAlunoTurmaDto notaAlunoDto)
         {
             var notasConceitosBimestreComponente = await mediator.Send(new ObterNotasPorBimestresUeAlunoTurmaQuery(notaAlunoDto.Bimestres,
-                                                                                                                   notaAlunoDto.TurmaId,
-                                                                                                                   notaAlunoDto.UeId,
+                                                                                                                   notaAlunoDto.TurmaCodigo,
+                                                                                                                   notaAlunoDto.UeCodigo,
                                                                                                                    notaAlunoDto.AlunoCodigo));
 
             return notasConceitosBimestreComponente;
