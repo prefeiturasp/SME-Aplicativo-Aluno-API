@@ -1,5 +1,4 @@
-﻿using FluentValidation.Results;
-using MediatR;
+﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -8,9 +7,7 @@ using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,71 +34,60 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             }
             public async Task<RespostaApi> Handle(DadosAlunoCommand request, CancellationToken cancellationToken)
             {
-                //var grupos = await _repositorioGrupoComunicado.ObterTodos();
                 var dadosDosAlunos = await alunoRepositorio.ObterDadosAlunos(request.Cpf);
 
                 if (dadosDosAlunos == null || !dadosDosAlunos.Any())
                     throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
 
-                var turmasCodigo = dadosDosAlunos.Select(a => a.CodigoTurma).Distinct();
+                var turmasCodigo = dadosDosAlunos.Select(a => a.CodigoTurma.ToString())
+                                                 .Distinct()
+                                                 .ToArray();
 
+                var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(turmasCodigo));
 
-                return default;
+                dadosDosAlunos.ForEach(dadoDoAluno =>
+                {
+                    var modalidadeDaTurma = turmasModalidade.FirstOrDefault(a => a.TurmaCodigo == dadoDoAluno.CodigoTurma);
+                    dadoDoAluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
+                    dadoDoAluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
+                });              
 
-                //var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigos)
+                var tipoEscola =
+                    dadosDosAlunos
+                    .GroupBy(g => new { g.ModalidadeCodigo, g.ModalidadeDescricao })
+                    .Select(s => new ListaEscola
+                    {
+                        Modalidade = s.Key.ModalidadeDescricao,
+                        ModalidadeCodigo = s.Key.ModalidadeCodigo,
+                        Alunos = dadosDosAlunos
+                                .Where(w => w.ModalidadeCodigo == s.Key.ModalidadeCodigo)
+                                .Select(a => new Dominio.Entidades.Aluno
+                                {
+                                    CodigoEol = a.CodigoEol,
+                                    Nome = a.Nome,
+                                    NomeResponsavel = a.TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno &&
+                                                        !string.IsNullOrWhiteSpace(a.NomeSocial) ?
+                                                        a.NomeSocial.Trim() :
+                                                        a.NomeResponsavel.Trim(),
+                                    CpfResponsavel = a.CpfResponsavel,
+                                    NomeSocial = a.NomeSocial,
+                                    DataNascimento = a.DataNascimento.Date,
+                                    CodigoTipoEscola = a.CodigoTipoEscola,
+                                    CodigoEscola = a.CodigoEscola,
+                                    DescricaoTipoEscola = a.DescricaoTipoEscola,
+                                    Escola = a.Escola,
+                                    CodigoDre = a.CodigoDre,
+                                    SiglaDre = a.SiglaDre,
+                                    CodigoTurma = a.CodigoTurma,
+                                    Turma = a.Turma,
+                                    SituacaoMatricula = a.SituacaoMatricula,
+                                    DataSituacaoMatricula = a.DataSituacaoMatricula,
+                                    SerieResumida = a.SerieResumida
+                                })
+                    });
 
-
-
-                //dadosDosAlunos.ForEach(x => { var g = SelecionarGrupos(x.CodigoTipoEscola, x.CodigoEtapaEnsino, x.CodigoCicloEnsino, grupos); x.Grupo = g.gupo; x.CodigoGrupo = g.codigo; });
-
-                //var tipoEscola =
-                //    dadosDosAlunos
-                //    .GroupBy(g => new { g.Grupo, g.CodigoGrupo })
-                //    .Select(s => new ListaEscola
-                //    {
-                //        Grupo = s.Key.Grupo,
-                //        CodigoGrupo = s.Key.CodigoGrupo,
-                //        Alunos = dadosDosAlunos
-                //                .Where(w => w.CodigoGrupo == s.Key.CodigoGrupo)
-                //                .Select(a => new Dominio.Entidades.Aluno
-                //                {
-                //                    CodigoEol = a.CodigoEol,
-                //                    Nome = a.Nome,
-                //                    NomeResponsavel = a.TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno &&
-                //                                        !string.IsNullOrWhiteSpace(a.NomeSocial) ?
-                //                                        a.NomeSocial :
-                //                                        a.NomeResponsavel,
-                //                    CpfResponsavel = a.CpfResponsavel,
-                //                    NomeSocial = a.NomeSocial,
-                //                    DataNascimento = a.DataNascimento.Date,
-                //                    CodigoTipoEscola = a.CodigoTipoEscola,
-                //                    CodigoEscola = a.CodigoEscola,
-                //                    DescricaoTipoEscola = a.DescricaoTipoEscola,
-                //                    Escola = a.Escola,
-                //                    CodigoDre = a.CodigoDre,
-                //                    SiglaDre = a.SiglaDre,
-                //                    CodigoTurma = a.CodigoTurma,
-                //                    Turma = a.Turma,
-                //                    SituacaoMatricula = a.SituacaoMatricula,
-                //                    DataSituacaoMatricula = a.DataSituacaoMatricula,
-                //                    SerieResumida = a.SerieResumida
-                //                })
-                //    });
-
-                //return RespostaApi.Sucesso(tipoEscola);
-            }
-
-            private (string gupo, long codigo) SelecionarGrupos(int? codigoTipoEscola, int codigoEtapaEnsino, int codigoCicloEnsino, IEnumerable<GrupoComunicado> grupos)
-            {
-                return grupos
-                .Where(x => (x.TipoEscolaId != null
-                    && x.TipoEscolaId.Split(',').Contains(codigoTipoEscola.Value.ToString()))
-                || (x.TipoEscolaId == null
-                    && x.TipoCicloId.Split(',').Contains(codigoCicloEnsino.ToString())
-                    && x.EtapaEnsinoId.Split(',').Contains(codigoEtapaEnsino.ToString())))
-                .Select(s => (s.Nome, s.Id))
-                    .FirstOrDefault();
-            }
+                return RespostaApi.Sucesso(tipoEscola);
+            }            
         }
     }
 }

@@ -2,7 +2,8 @@
 {
     public class TurmaModalidadeCodigoDto
     {
-        public long Codigo { get; set; }
-        public int Modalidade { get; set; }
+        public long TurmaCodigo { get; set; }
+        public int ModalidadeCodigo { get; set; }
+        public string ModalidadeDescricao { get; set; }
     }
 }

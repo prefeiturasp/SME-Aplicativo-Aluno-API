@@ -135,11 +135,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return retorno == null || !retorno.Any() ? default : retorno;
         }
 
-        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida)
+        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
         {
             using var conexao = InstanciarConexao();
             var consulta =
                 MontarQueryListagemCompleta(serieResumida);
+
+            //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
 
             var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
 

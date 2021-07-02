@@ -9,9 +9,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
     {
         public long Id { get; set; }
         public string Mensagem { get; set; }
-        public string Titulo { get; set; }
-        public IEnumerable<Grupo> Grupos { get; set; }
-        public string[] GruposId { get; set; }
+        public string Titulo { get; set; }        
+        public string[] ModalidadesId { get; set; }
         public DateTime DataEnvio { get; set; }
         public DateTime? DataExpiracao { get; set; }
         public DateTime? CriadoEm { get; set; }
