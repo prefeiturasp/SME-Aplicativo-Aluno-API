@@ -4,7 +4,8 @@
     {
         public long Id { get; set; }
         public long ConselhoClasseNotaId { get; set; }
-        public int? Bimestre { get; set; }
+        private int? _bimestre { get; set; }
+        public int? Bimestre { get => _bimestre.HasValue ? _bimestre : 0; set => _bimestre = value; }
         public long ComponenteCurricularCodigo { get; set; }
         public string ComponenteCurricularNome { get; set; }
 
