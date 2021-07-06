@@ -29,7 +29,7 @@ namespace SME.AE.Aplicacao.Consultas
 
             var modalidade = 0;
 
-            switch (aluno.CodigoModalidadeTurma)
+            switch (aluno.ModalidadeCodigo)
             {
                 case 1:
                     modalidade = 3;
@@ -42,7 +42,7 @@ namespace SME.AE.Aplicacao.Consultas
                     modalidade = 1;
                     break;
                 default:
-                    modalidade = aluno.CodigoModalidadeTurma;
+                    modalidade = aluno.ModalidadeCodigo;
                     break;
             }
             var eventos = await eventoRepositorio.ObterPorDreUeTurmaMes(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno);

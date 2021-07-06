@@ -1,9 +1,6 @@
-﻿using SME.AE.Comum.Utilitarios;
-using SME.AE.Dominio.Comum.Enumeradores;
+﻿using SME.AE.Dominio.Comum.Enumeradores;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace SME.AE.Dominio.Entidades
 {
@@ -12,7 +9,6 @@ namespace SME.AE.Dominio.Entidades
 
         public DateTime DataEnvio { get; set; }
         public DateTime? DataExpiracao { get; set; }
-        public string Grupo { get; set; }
         public IEnumerable<string> Alunos { get; set; }
         public string Mensagem { get; set; }
         public string Titulo { get; set; }

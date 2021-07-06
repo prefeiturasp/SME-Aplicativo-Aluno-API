@@ -8,7 +8,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
     public class MensagensUsuarioLogadoAlunoQuery : IRequest<IEnumerable<NotificacaoResposta>>
     {
-        public string GruposId { get; set; }
+        public string ModalidadesId { get; set; }
         public string CodigoUE { get; set; }
         public string CodigoDRE { get; set; }
         public string CodigoTurma { get; set; }
