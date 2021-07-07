@@ -14,7 +14,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 
             RuleFor(x => x.CodigoUE).NotEmpty().WithMessage("É necessário informar o codigo da UE");
 
-            RuleFor(x => x.GruposId).NotEmpty().WithMessage("É necessário informar os grupos do Aluno");
+            RuleFor(x => x.ModalidadesCodigo).NotEmpty().WithMessage("É necessário informar as modalidades do Aluno");
         }
     }
 }

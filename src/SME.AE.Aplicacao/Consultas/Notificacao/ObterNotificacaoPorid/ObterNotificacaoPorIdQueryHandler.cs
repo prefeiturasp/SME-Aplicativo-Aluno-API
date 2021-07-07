@@ -2,11 +2,8 @@
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Utilitarios;
-using SME.AE.Dominio.Entidades;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,17 +40,11 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
                 Titulo = notificacao.Titulo,
                 TipoComunicado = notificacao.TipoComunicado,
                 CategoriaNotificacao = notificacao.CategoriaNotificacao,
-                GruposId = notificacao.Grupo.ToStringEnumerable().ToArray(),
+                ModalidadesId = notificacao.Modalidades.ToStringEnumerable().ToArray(),
                 SeriesResumidas = notificacao.SeriesResumidas
             };
 
             return notificacaoResposta;
-        }
-
-        private IEnumerable<Grupo> SelecionarGrupos(string grupo, IEnumerable<GrupoComunicado> grupos)
-        {
-            var ids = grupo.Split(',').Select(x => Convert.ToInt64(x));
-            return grupos.Where(w => ids.Contains(w.Id)).Select(s => new Grupo { Codigo = s.Id, Nome = s.Nome });
         }
     }
 }
