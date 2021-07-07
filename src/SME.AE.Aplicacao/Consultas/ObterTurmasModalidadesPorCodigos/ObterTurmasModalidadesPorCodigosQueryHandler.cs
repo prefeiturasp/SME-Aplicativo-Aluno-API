@@ -21,7 +21,7 @@ namespace SME.AE.Aplicacao
 
             var turmasCodigos = string.Join("&turmasCodigo=", request.TurmaCodigo);
 
-            var resposta = await httpClient.GetAsync($"turmas/modalidades/?turmasCodigo={turmasCodigos}");
+            var resposta = await httpClient.GetAsync($"v1/turmas/modalidades?turmasCodigo={turmasCodigos}");
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();

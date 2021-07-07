@@ -191,7 +191,7 @@ namespace SME.AE.Aplicacao
             {
                 var data = dicionarioNotificacao;
 
-                var topico = $"Modalidade-{modalidade}";
+                var topico = $"MODALIDADE-{modalidade}";
 
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
 
