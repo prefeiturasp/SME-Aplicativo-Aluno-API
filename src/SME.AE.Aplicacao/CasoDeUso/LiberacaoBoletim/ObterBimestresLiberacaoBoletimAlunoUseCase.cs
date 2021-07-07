@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
 {
-    public class ObterBimestresLiberacaoDoBoletimUseCase : IObterBimestresLiberacaoBoletimAlunoUseCase
+    public class ObterBimestresLiberacaoBoletimAlunoUseCase : IObterBimestresLiberacaoBoletimAlunoUseCase
     {
         private readonly IMediator mediator;
 
-        public ObterBimestresLiberacaoDoBoletimUseCase(IMediator mediator)
+        public ObterBimestresLiberacaoBoletimAlunoUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }

@@ -38,6 +38,7 @@ namespace SME.AE.Aplicacao.Comum
 
         public int Bimestre { get; set; }
         public string CodigoAluno { get; set; }
+        public string CorDaFrequencia { get; set; }
         public string DisciplinaId { get; set; }
         public int NumeroFaltasNaoCompensadas { get => TotalAusencias - TotalCompensacoes; }
         public double PercentualFrequencia

@@ -24,7 +24,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterBimestres
         {
             int[] bimestres;
             var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
-            var resposta = await httpClient.GetAsync($"api/v1/calendarios/eventos/liberacao-boletim/turmas/{request.TurmaCodigo}/bimestres");
+            var resposta = await httpClient.GetAsync($"v1/calendarios/eventos/liberacao-boletim/turmas/{request.TurmaCodigo}/bimestres");
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();

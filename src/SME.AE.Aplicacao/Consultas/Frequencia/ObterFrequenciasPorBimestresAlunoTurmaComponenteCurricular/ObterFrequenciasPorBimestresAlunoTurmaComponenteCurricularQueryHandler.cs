@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
