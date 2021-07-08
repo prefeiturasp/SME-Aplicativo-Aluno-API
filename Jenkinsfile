@@ -40,7 +40,7 @@ pipeline {
      }
 
         stage('AnaliseCodigo') {
-	      //when { branch 'homolog' }
+	      when { branch 'homolog' }
           steps {
               withSonarQubeEnv('sonarqube-local'){
                 sh 'echo "[ INFO ] Iniciando analise Sonar..." && dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno"'
