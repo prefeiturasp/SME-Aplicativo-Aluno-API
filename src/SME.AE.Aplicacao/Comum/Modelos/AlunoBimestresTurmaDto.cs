@@ -1,8 +1,8 @@
 ﻿namespace SME.AE.Aplicacao
 {
-    public class NotaConceitoPorBimestresAlunoTurmaDto
+    public class AlunoBimestresTurmaDto
     {
-        public NotaConceitoPorBimestresAlunoTurmaDto(string ueCodigo, string turmaCodigo, string alunoCodigo, int[] bimestres)
+        public AlunoBimestresTurmaDto(string ueCodigo, string turmaCodigo, string alunoCodigo, int[] bimestres)
         {
             UeCodigo = ueCodigo;
             TurmaCodigo = turmaCodigo;

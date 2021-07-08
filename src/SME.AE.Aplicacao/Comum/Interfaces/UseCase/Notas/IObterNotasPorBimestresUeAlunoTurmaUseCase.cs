@@ -5,6 +5,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces
 {
     public interface IObterNotasPorBimestresUeAlunoTurmaUseCase
     {
-        Task<IEnumerable<NotaConceitoBimestreComponenteDto>> Executar(NotaConceitoPorBimestresAlunoTurmaDto notaAlunoDto);
+        Task<IEnumerable<NotaConceitoBimestreComponenteDto>> Executar(AlunoBimestresTurmaDto notaAlunoDto);
     }
 }

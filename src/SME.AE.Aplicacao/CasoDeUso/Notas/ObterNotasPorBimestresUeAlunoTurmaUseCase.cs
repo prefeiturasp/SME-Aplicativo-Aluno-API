@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<IEnumerable<NotaConceitoBimestreComponenteDto>> Executar(NotaConceitoPorBimestresAlunoTurmaDto notaAlunoDto)
+        public async Task<IEnumerable<NotaConceitoBimestreComponenteDto>> Executar(AlunoBimestresTurmaDto notaAlunoDto)
         {
             var notasConceitosBimestreComponente = await mediator.Send(new ObterNotasPorBimestresUeAlunoTurmaQuery(notaAlunoDto.Bimestres,
                                                                                                                    notaAlunoDto.TurmaCodigo,
