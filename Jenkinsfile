@@ -6,7 +6,7 @@ pipeline {
     }
   
     agent {
-      node { label 'dotnet5-appaluno-rc' }
+      node { label 'dotnet31-appaluno-rc' }
     }
 
     options {
