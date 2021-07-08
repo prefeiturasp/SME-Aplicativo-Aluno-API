@@ -45,7 +45,8 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Atualizar
                 Mensagem = request.Mensagem,
                 DataExpiracao = request.DataExpiracao,
                 AlteradoEm = DateTime.Now,
-                AlteradoPor = request.AlteradoPor
+                AlteradoPor = request.AlteradoPor,
+                EnviadoPushNotification = true
             };
             return notificacaoDTO;
         }
