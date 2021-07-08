@@ -135,12 +135,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return retorno == null || !retorno.Any() ? default : retorno;
         }
 
-        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida)
+        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
         {
             using var conexao = InstanciarConexao();
             var consulta =
                 MontarQueryListagemCompleta(serieResumida);
 
+            //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
+            conexao.Open();
             var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
 
             conexao.Close();
@@ -281,7 +283,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
                         where n.tipocomunicado = {(int)TipoComunicado.SME}
-                        and string_to_array(n.grupo,',') 
+                        and string_to_array(n.modalidades,',') 
                         && string_to_array(@gruposId,',')";
         }
         private string QueryComunicadosSME_ANO()
@@ -289,7 +291,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
                         where n.tipocomunicado = {(int)TipoComunicado.SME_ANO}
-                        and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                        and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
                 ";
         }
 
@@ -298,7 +300,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
                     where n.tipocomunicado = {(int)TipoComunicado.DRE}
-                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
         private string QueryComunicadosDRE_ANO()
@@ -306,7 +308,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
                     where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO}
-                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
 
@@ -324,7 +326,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     from notificacao n
                     where n.tipocomunicado = {(int)TipoComunicado.UEMOD}
                     and n.ue_codigoeol = @codigoUe 
-                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')";
+                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')";
         }
 
         private string QueryComunicadosTurmas()
@@ -351,7 +353,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"{abreviacao}.Id,
                     {abreviacao}.Mensagem,
                     {abreviacao}.Titulo,
-                    {(camposGeral ? $"string_to_array({abreviacao}.Grupo,',') as GruposId" : $"{abreviacao}.grupo")},
+                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as GruposId" : $"{abreviacao}.modalidades")},
                     {abreviacao}.DataEnvio,
                     {abreviacao}.DataExpiracao,
                     {abreviacao}.CriadoEm,

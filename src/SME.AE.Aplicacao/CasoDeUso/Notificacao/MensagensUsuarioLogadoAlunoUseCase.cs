@@ -42,7 +42,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
             if (aluno == null)
                 throw new NegocioException($"Não encontrado usuário com o codigo {codigoAluno}");
 
-            var grupos = listaEscolas.Where(x => x.Alunos.Any(z => z.CodigoEol == aluno.CodigoEol)).Select(x => x.CodigoGrupo);
+            var modalidades = listaEscolas.Where(x => x.Alunos.Any(z => z.CodigoEol == aluno.CodigoEol)).Select(x => x.ModalidadeCodigo);
 
             return await mediator.Send(new MensagensUsuarioLogadoAlunoQuery
             {
@@ -51,7 +51,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 CodigoTurma = aluno.CodigoTurma.ToString(),
                 CodigoUE = aluno.CodigoEscola,
                 CodigoUsuario  = usuario.Id,
-                GruposId = string.Join(',', grupos),
+                ModalidadesId = string.Join(',', modalidades),
                 DataUltimaConsulta = dataUltimaConsulta,
                 SerieResumida = aluno.SerieResumida
             });
