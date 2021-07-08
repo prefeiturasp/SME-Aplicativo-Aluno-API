@@ -46,7 +46,13 @@ namespace SME.AE.Api.Controllers
         [HttpGet("ues/{ueCodigo}/turmas/{turmaCodigo}/alunos/{alunoCodigo}/notas-conceitos")]
         public async Task<ObjectResult> ObterNotasPorBimestresUeAlunoTurma(string ueCodigo, string turmaCodigo, string alunoCodigo, [FromQuery] int[] bimestres, [FromServices] IObterNotasPorBimestresUeAlunoTurmaUseCase useCase)
         {
-            return Ok(await useCase.Executar(new NotaConceitoPorBimestresAlunoTurmaDto(ueCodigo, turmaCodigo, alunoCodigo, bimestres)));
+            return Ok(await useCase.Executar(new AlunoBimestresTurmaDto(ueCodigo, turmaCodigo, alunoCodigo, bimestres)));
+        }
+
+        [HttpGet("ues/{ueCodigo}/turmas/{turmaCodigo}/alunos/{alunoCodigo}/componentes-curriculares")]
+        public async Task<ObjectResult> ObterComponentesCurriculares(string ueCodigo, string turmaCodigo, string alunoCodigo, [FromQuery] int[] bimestres, [FromServices] IObterComponentesCurricularesIdsUseCase useCase)
+        {
+            return Ok(await useCase.Executar(new AlunoBimestresTurmaDto(ueCodigo, turmaCodigo, alunoCodigo, bimestres)));
         }
 
         [HttpGet("turmas/{turmaCodigo}/boletins/liberacoes/bimestres")]
