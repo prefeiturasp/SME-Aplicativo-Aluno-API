@@ -43,7 +43,7 @@ pipeline {
 	      //when { branch 'homolog' }
           steps {
               withSonarQubeEnv('sonarqube-local'){
-                sh 'echo "[ INFO ] Iniciando analise Sonar..." && dotnet-sonarscanner begin -Dsonar.projectKey=SME-Aplicativo-Aluno'
+                sh 'echo "[ INFO ] Iniciando analise Sonar..." && dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno"'
                 sh 'dotnet build'
                 sh 'dotnet-sonarscanner end'
 
