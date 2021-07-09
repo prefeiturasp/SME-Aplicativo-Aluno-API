@@ -1,6 +1,6 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 #alterado para bionic pois o alpine tem erro de tls
-FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as build
+FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as base
 
 WORKDIR /app
 
