@@ -3,6 +3,7 @@ pipeline {
       branchname =  env.BRANCH_NAME.toLowerCase()
       kubeconfig = getKubeconf(env.branchname)
       registryCredential = 'jenkins_registry'
+      namespace = "${env.branchname == 'release-r2' ? 'sme-appaluno-r2' : 'sme-appaluno' }"
     }
   
     agent {
@@ -49,12 +50,10 @@ pipeline {
 
             }
           }
-        }
-
-        
+        }        
 
         stage('Build') {
-          when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release'; branch 'homolog';  } } 
+          when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'homolog';  } } 
           steps {
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
@@ -75,35 +74,42 @@ pipeline {
         }
 	    
         stage('Deploy'){
-            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'homolog';  } }        
+            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }        
             steps {
                 script{
                     if ( env.branchname == 'main' ||  env.branchname == 'master' || env.branchname == 'homolog' || env.branchname == 'release' ) {
                         sendTelegram("🤩 [Deploy ${env.branchname}] Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nMe aprove! \nLog: \n${env.BUILD_URL}")
                         timeout(time: 24, unit: "HOURS") {
-                            input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato'
+                            input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato, luiz_araujo, marcos_lobo, rafael_losi'
                         }
                         withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
                             sh('cp $config '+"$home"+'/.kube/config')
-                            sh 'kubectl rollout restart deployment/sme-appaluno-api -n sme-appaluno'
-                            sh 'kubectl rollout restart deployment/appaluno-worker -n sme-appaluno'
-                            sh 'kubectl rollout restart deployment/sme-ea-worker -n sme-appaluno'
+                            sh "kubectl -n ${namespace} rollout restart deploy"
                             sh('rm -f '+"$home"+'/.kube/config')
                         }
                     }
                     else{
                         withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
                             sh('cp $config '+"$home"+'/.kube/config')
-                            sh 'kubectl rollout restart deployment/sme-appaluno-api -n sme-appaluno'
-                            sh 'kubectl rollout restart deployment/appaluno-worker -n sme-appaluno'
-                            sh 'kubectl rollout restart deployment/sme-ea-worker -n sme-appaluno'
+                            sh 'kubectl -n sme-appaluno rollout restart deploy'
                             sh('rm -f '+"$home"+'/.kube/config')
                         }
                     }
                 }
             }           
-        }    
-    }
+        }
+
+          stage('Flyway') { 
+            agent { label 'master' }
+            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }     
+            steps{ 
+              withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
+                 checkout scm 
+                 sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts boxfuse/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
+              } 
+            }
+          }    
+        }
 
   post {
     success { sendTelegram("🚀 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Success \nLog: \n${env.BUILD_URL}console") }
