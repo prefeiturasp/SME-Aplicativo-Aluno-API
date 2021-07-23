@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
+using Sentry;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -29,6 +30,7 @@ namespace SME.AE.Aplicacao
             }
             else
             {
+                SentrySdk.CaptureMessage($"ObterTurmasModalidadesPorCodigosQueryHandler: {resposta}");
                 throw new System.Exception($"Não foi possível obter as modalidades das turmas {turmasCodigos}");
             }            
         }
