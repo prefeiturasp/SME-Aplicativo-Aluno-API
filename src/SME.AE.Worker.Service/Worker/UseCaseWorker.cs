@@ -27,8 +27,8 @@ namespace SME.AE.Worker.Service
         public UseCaseWorker(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            this.parametrosEscolaAqui = serviceProvider.GetRequiredService<IParametrosEscolaAquiRepositorio>() ?? throw new Exception($"InjeÁ„o de dependencia para o tipo IParametrosEscolaAquiRepositorio n„o registrado.");
-            this.logger = serviceProvider.GetRequiredService<ILogger<UseCaseWorker<T>>>() ?? throw new Exception($"InjeÁ„o de dependencia para o tipo ILogger n„o registrado.");
+            this.parametrosEscolaAqui = serviceProvider.GetRequiredService<IParametrosEscolaAquiRepositorio>() ?? throw new Exception($"Inje√ß√£o de dependencia para o tipo IParametrosEscolaAquiRepositorio n√£o registrado.");
+            this.logger = serviceProvider.GetRequiredService<ILogger<UseCaseWorker<T>>>() ?? throw new Exception($"Inje√ß√£o de dependencia para o tipo ILogger n√£o registrado.");
         }
 
         private CrontabSchedule BuscaParametroCrontab()
@@ -62,11 +62,11 @@ namespace SME.AE.Worker.Service
             SentrySdk.CaptureMessage($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
             logger?.LogInformation($"Executando caso de uso {typeof(T).Name} => {DateTime.Now}");
 
-            var servico = serviceProvider.GetService<T>() ?? throw new Exception($"InjeÁ„o de dependencia para o tipo {typeof(T).Name} n„o registrado.");
+            var servico = serviceProvider.GetService<T>() ?? throw new Exception($"Inje√ß√£o de dependencia para o tipo {typeof(T).Name} n√£o registrado.");
             var metodo =
                 servico.GetType().GetMethod("ExecutarAsync")
                 ?? servico.GetType().GetMethod("Executar")
-                ?? throw new Exception($"Metodo Executar/ExecutarAsync n„o encontrado na classe {typeof(T).Name}.");
+                ?? throw new Exception($"Metodo Executar/ExecutarAsync n√£o encontrado na classe {typeof(T).Name}.");
 
             if (metodo.ReturnType == typeof(Task))
             {

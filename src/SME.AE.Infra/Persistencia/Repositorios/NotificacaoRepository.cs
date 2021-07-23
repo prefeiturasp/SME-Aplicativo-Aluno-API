@@ -1,14 +1,13 @@
 ﻿using Dapper;
 using Dommel;
-using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
 using System;
@@ -21,31 +20,31 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class NotificacaoRepository : BaseRepositorio<Notificacao>, INotificacaoRepository
     {
-        public NotificacaoRepository() : base(ConnectionStrings.Conexao)
-        {
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
+        public NotificacaoRepository(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
 
         public async Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf)
         {
-            IEnumerable<NotificacaoPorUsuario> list = null;
-
             var query = NotificacaoConsultas.ObterPorUsuarioLogado
                   //"WHERE UNL.usuario_cpf = @cpf" +
                   + " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual) ";
 
 
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = InstanciarConexao();
             conn.Open();
             var dataAtual = DateTime.Now.Date;
-            list = await conn.QueryAsync<NotificacaoPorUsuario>(
-                query, new
-                {
-                    grupo,
-                    cpf,
-                    dataAtual
-                });
+            IEnumerable<NotificacaoPorUsuario> list = await conn.QueryAsync<NotificacaoPorUsuario>(
+    query, new
+    {
+        grupo,
+        cpf,
+        dataAtual
+    });
             conn.Close();
             return list;
         }
@@ -57,17 +56,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             try
             {
-                await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
-                {
-                    conn.Open();
-                    var query = $"select {nomeGrupos} from(select {grupos + NotificacaoConsultas.GruposDoResponsavel}) grupos";
-                    var resultado = await conn.QueryAsync(query, new { cpf });
+                await using var conn = new SqlConnection(variaveisGlobaisOptions.EolConnection);
+                conn.Open();
+                var query = $"select {nomeGrupos} from(select {grupos + NotificacaoConsultas.GruposDoResponsavel}) grupos";
+                var resultado = await conn.QueryAsync(query, new { cpf });
 
-                    if (resultado.Any())
-                        list = resultado.First() as IDictionary<string, object>;
+                if (resultado.Any())
+                    list = resultado.First() as IDictionary<string, object>;
 
-                    conn.Close();
-                }
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -80,7 +77,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<IEnumerable<string>> ObterResponsaveisPorGrupo(string where)
         {
-            await using (var conn = new SqlConnection(ConnectionStrings.ConexaoEol))
+            await using var conn = new SqlConnection(variaveisGlobaisOptions.EolConnection);
             {
                 conn.Open();
                 var query = $"{NotificacaoConsultas.ResponsaveisPorGrupo}{where}";
@@ -95,7 +92,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task Criar(Notificacao notificacao)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = InstanciarConexao();
             conn.Open();
             notificacao.InserirAuditoria();
             notificacao.InserirCategoria();
@@ -106,7 +103,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = InstanciarConexao();
             conn.Open();
             notificacaoAluno.InserirAuditoria();
             await conn.InsertAsync(notificacaoAluno);
@@ -115,7 +112,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = InstanciarConexao();
             conn.Open();
             notificacaoTurma.InserirAuditoria();
             await conn.InsertAsync(notificacaoTurma);
@@ -127,65 +124,58 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var consulta = @"select nt.id, nt.notificacao_id, nt.codigo_eol_turma, nt.criadoem from notificacao_turma nt 
                             where notificacao_id = @id";
 
-            IEnumerable<NotificacaoTurma> retorno = default;
+            using var conexao = InstanciarConexao();
 
-            using (var conexao = InstanciarConexao())
-            {
-                conexao.Open();
+            conexao.Open();
 
-                retorno = await conexao.QueryAsync<NotificacaoTurma>(consulta, new { id });
+            IEnumerable<NotificacaoTurma> retorno = await conexao.QueryAsync<NotificacaoTurma>(consulta, new { id });
+            conexao.Close();
 
-                conexao.Close();
-            }
 
-            return retorno == null || !retorno.Any() ? default : retorno;  
+            return retorno == null || !retorno.Any() ? default : retorno;
         }
 
-        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida)
+        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
         {
-            using (var conexao = InstanciarConexao())
-            {
-                var consulta =
-                    MontarQueryListagemCompleta(serieResumida);
+            using var conexao = InstanciarConexao();
+            var consulta =
+                MontarQueryListagemCompleta(serieResumida);
 
-                var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
+            //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
+            conexao.Open();
+            var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
 
-                conexao.Close();
+            conexao.Close();
 
-                return retorno;
-            }
+            return retorno;
         }
 
         public async Task<IEnumerable<NotificacaoSgpDto>> ListarNotificacoesNaoEnviadas()
         {
-            using (var conexao = InstanciarConexao())
-            {
-                var consulta = MontarQueryListagemCompletaNaoEnviadoPushNotification();
+            using var conexao = InstanciarConexao();
+            var consulta = MontarQueryListagemCompletaNaoEnviadoPushNotification();
 
-                var retorno = await conexao.QueryAsync<NotificacaoSgpDto>(consulta);
+            var retorno = await conexao.QueryAsync<NotificacaoSgpDto>(consulta);
 
-                conexao.Close();
+            conexao.Close();
 
-                return retorno;
-            }
+            return retorno;
         }
 
         public async Task<NotificacaoResposta> NotificacaoPorId(long Id)
         {
-            using (var conexao = InstanciarConexao())
-            {
-                var consulta = QueryPorId();
-                var retorno = await conexao.QueryFirstOrDefaultAsync<NotificacaoResposta>(consulta, new { Id });
-                conexao.Close();
-                return retorno;
-            }
+            using var conexao = InstanciarConexao();
+            var consulta = QueryPorId();
+            var retorno = await conexao.QueryFirstOrDefaultAsync<NotificacaoResposta>(consulta, new { Id });
+            conexao.Close();
+            return retorno;
         }
 
         public async Task Atualizar(AtualizarNotificacaoDto notificacao)
         {
             try
             {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                await using var conn = InstanciarConexao();
                 conn.Open();
                 await conn.ExecuteAsync(
                     @"UPDATE notificacao set mensagem=@Mensagem, 
@@ -210,14 +200,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             try
             {
-                await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
-                {
-                    conn.Open();
+                await using var conn = InstanciarConexao();
 
-                    var retorno = await conn.ExecuteAsync(
-                        @"DELETE FROM notificacao where id = @ID", notificacao);
-                    conn.Close();
-                }
+                conn.Open();
+
+                var retorno = await conn.ExecuteAsync(
+                    @"DELETE FROM notificacao where id = @ID", notificacao);
+                conn.Close();
+
             }
             catch (Exception ex)
             {
@@ -239,7 +229,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or n.SeriesResumidas = '' or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
 
-            return 
+            return
                 $@"
                     select {CamposConsultaNotificacao("notificacao", true)}
                       notificacao.ano_letivo AnoLetivo,
@@ -293,7 +283,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
                         where n.tipocomunicado = {(int)TipoComunicado.SME}
-                        and string_to_array(n.grupo,',') 
+                        and string_to_array(n.modalidades,',') 
                         && string_to_array(@gruposId,',')";
         }
         private string QueryComunicadosSME_ANO()
@@ -301,7 +291,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
                         where n.tipocomunicado = {(int)TipoComunicado.SME_ANO}
-                        and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                        and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
                 ";
         }
 
@@ -310,7 +300,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
                     where n.tipocomunicado = {(int)TipoComunicado.DRE}
-                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
         private string QueryComunicadosDRE_ANO()
@@ -318,7 +308,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
                     where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO}
-                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')
+                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
                     and n.dre_codigoeol = @codigoDre";
         }
 
@@ -336,7 +326,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     from notificacao n
                     where n.tipocomunicado = {(int)TipoComunicado.UEMOD}
                     and n.ue_codigoeol = @codigoUe 
-                    and string_to_array(n.grupo,',') && string_to_array(@gruposId,',')";
+                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')";
         }
 
         private string QueryComunicadosTurmas()
@@ -363,7 +353,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"{abreviacao}.Id,
                     {abreviacao}.Mensagem,
                     {abreviacao}.Titulo,
-                    {(camposGeral ? $"string_to_array({abreviacao}.Grupo,',') as GruposId" : $"{abreviacao}.grupo")},
+                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as GruposId" : $"{abreviacao}.modalidades")},
                     {abreviacao}.DataEnvio,
                     {abreviacao}.DataExpiracao,
                     {abreviacao}.CriadoEm,
@@ -377,6 +367,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {abreviacao}.enviadopushnotification,
                     {abreviacao}.dre_codigoeol {(camposGeral ? "as CodigoDre" : "")},
                     {abreviacao}.ue_codigoeol {(camposGeral ? "as CodigoUe," : "")}";
+        }
+
+        public async Task<IEnumerable<NotificacaoAlunoResposta>> ObterNotificacoesAlunoPorId(long notificacaoId)
+        {
+            try
+            {
+                using (var conexao = InstanciarConexao())
+                {
+                    var consulta = $@"select 
+                                  codigo_eol_aluno as codigoAluno,
+                                  n.id as notificacaoId
+                                  from notificacao n
+                                  inner join notificacao_aluno na 
+                                  on na.notificacao_id = n.id
+                                  where n.tipocomunicado = {(int)TipoComunicado.ALUNO}
+                                    and n.id = @notificacaoId";
+
+                    var retorno = await conexao.QueryAsync<NotificacaoAlunoResposta>(consulta, new { notificacaoId });
+                    conexao.Close();
+                    return retorno;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

@@ -86,7 +86,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             TipoComunicado = TipoComunicado.SME,
             DataEnvio = DateTime.Now,
             Mensagem = "Teste Mensagem",
-            Grupo = "1,2,3,4,5,6",
+            Modalidades = "1,2,3,4,5,6",
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
@@ -122,7 +122,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             Mensagem = "Teste Mensagem",
             CodigoDre = "0000000",
             CodigoUe = "0000000",
-            Grupo = "1,2,3,4,5,6",
+            Modalidades = "1,2,3,4,5,6",
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
@@ -135,7 +135,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             Mensagem = "Teste Mensagem",
             CodigoDre = "0000000",
             CodigoUe = "0000000",
-            Grupo = "1,2,3,4,5,6",
+            Modalidades = "1,2,3,4,5,6",
             Turmas = new List<string> { "0000000" },
             DataExpiracao = DateTime.Now.AddDays(7)
         };
@@ -149,7 +149,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             Mensagem = "Teste Mensagem",
             CodigoDre = "0000000",
             CodigoUe = "0000000",
-            Grupo = "1,2,3,4,5,6",
+            Modalidades = "1,2,3,4,5,6",
             Turmas = new List<string> { "0000000" },
             Alunos = new List<string> { "0000000" },
             DataExpiracao = DateTime.Now.AddDays(7)

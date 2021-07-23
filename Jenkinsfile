@@ -59,17 +59,17 @@ pipeline {
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
               imagename2 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/appaluno-worker"
-              //imagename3 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-ea-worker"
+              imagename3 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-ea-worker"
               dockerImage1 = docker.build(imagename1, "-f src/SME.AE.Api/Dockerfile .")
               dockerImage2 = docker.build(imagename2, "-f src/SME.AE.Worker.Service/Dockerfile .")
-              //dockerImage3 = docker.build(imagename3, "-f src/SME.AE.Worker/Dockerfile .")
+              dockerImage3 = docker.build(imagename3, "-f src/SME.AE.Worker/Dockerfile .")
               docker.withRegistry( 'https://registry.sme.prefeitura.sp.gov.br', registryCredential ) {
               dockerImage1.push()
               dockerImage2.push()
-              //dockerImage3.push()
+              dockerImage3.push()
               }
-              sh "docker rmi $imagename1 $imagename2"
-              //sh "docker rmi $imagename1 $imagename2 $imagename3"
+              sh "docker rmi $imagename1 $imagename2 $imagename3"
+              //sh "docker rmi $imagename2"
             }
           }
         }
@@ -87,7 +87,7 @@ pipeline {
                             sh('cp $config '+"$home"+'/.kube/config')
                             sh 'kubectl rollout restart deployment/sme-appaluno-api -n sme-appaluno'
                             sh 'kubectl rollout restart deployment/appaluno-worker -n sme-appaluno'
-                            //sh 'kubectl rollout restart deployment/sme-ea-worker -n sme-appaluno'
+                            sh 'kubectl rollout restart deployment/sme-ea-worker -n sme-appaluno'
                             sh('rm -f '+"$home"+'/.kube/config')
                         }
                     }
@@ -96,7 +96,7 @@ pipeline {
                             sh('cp $config '+"$home"+'/.kube/config')
                             sh 'kubectl rollout restart deployment/sme-appaluno-api -n sme-appaluno'
                             sh 'kubectl rollout restart deployment/appaluno-worker -n sme-appaluno'
-                            //sh 'kubectl rollout restart deployment/sme-ea-worker -n sme-appaluno'
+                            sh 'kubectl rollout restart deployment/sme-ea-worker -n sme-appaluno'
                             sh('rm -f '+"$home"+'/.kube/config')
                         }
                     }

@@ -29,7 +29,7 @@ namespace SME.AE.Aplicacao.Consultas
 
             var modalidade = 0;
 
-            switch (aluno.CodigoModalidadeTurma)
+            switch (aluno.ModalidadeCodigo)
             {
                 case 1:
                     modalidade = 3;
@@ -42,7 +42,7 @@ namespace SME.AE.Aplicacao.Consultas
                     modalidade = 1;
                     break;
                 default:
-                    modalidade = aluno.CodigoModalidadeTurma;
+                    modalidade = aluno.ModalidadeCodigo;
                     break;
             }
             var eventos = await eventoRepositorio.ObterPorDreUeTurmaMes(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno);
@@ -53,7 +53,8 @@ namespace SME.AE.Aplicacao.Consultas
 
             if (DateTime.Today < dataInicial)
             {
-                eventos = eventos.Where(e => e.tipo_evento == (int)TipoEvento.ReuniaoResponsaveis);
+                var tiposEventosPermitidos = new int[] { (int)TipoEvento.ReuniaoResponsaveis, (int)TipoEvento.Feriado, (int)TipoEvento.Avaliacao };
+                eventos = eventos.Where(e => tiposEventosPermitidos.Contains(e.tipo_evento));
             }
 
             var eventosResposta = eventos

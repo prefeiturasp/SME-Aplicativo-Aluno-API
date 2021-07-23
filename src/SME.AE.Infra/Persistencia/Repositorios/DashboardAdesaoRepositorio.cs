@@ -1,17 +1,22 @@
 ﻿using Dapper;
 using Npgsql;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class DashboardAdesaoRepositorio : IDashboardAdesaoRepositorio
     {
-        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.Conexao);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public DashboardAdesaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new System.ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task IncluiOuAtualizaPorDreUeTurmaEmBatch(IEnumerable<DashboardAdesaoDto> listaAdesao)
         {
@@ -38,25 +43,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					(@dre_codigo, @dre_nome, @ue_codigo, @ue_nome, @codigo_turma, @usuarios_primeiro_acesso_incompleto, @usuarios_validos, @usuarios_cpf_invalidos, @usuarios_sem_app_instalado) 
             ";
 
-            listaAdesao
-                .AsParallel()
-                .WithDegreeOfParallelism(4)
-                .ForAll(adesao =>
+            foreach (var adesao in listaAdesao)
+            {
+                var conn = CriaConexao();
+                try
                 {
-                    var conn = CriaConexao();
-                    try
-                    {
-                        conn.Open();
-                        var alterado = (conn.Execute(sqlUpdate, adesao)) > 0;
-                        if (!alterado)
-                            conn.Execute(sqlInsert, adesao);
-                        conn.Close();
-                    }                    
-                    finally
-                    {
-                        conn.Dispose();
-                    }
-                });
+                    conn.Open();
+                    var alterado = (conn.Execute(sqlUpdate, adesao)) > 0;
+                    if (!alterado)
+                        conn.Execute(sqlInsert, adesao);
+                    conn.Close();
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
             await Task.CompletedTask;
         }
     }

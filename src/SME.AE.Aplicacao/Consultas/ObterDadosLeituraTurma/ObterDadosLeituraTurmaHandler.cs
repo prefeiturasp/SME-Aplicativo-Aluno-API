@@ -2,9 +2,7 @@
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +19,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> Handle(ObterDadosLeituraTurmaQuery request, CancellationToken cancellationToken)
         {
-            var dadosLeituraComunicados =  await dadosLeituraRepositorio
+            var dadosLeituraComunicados = await dadosLeituraRepositorio
                     .ObterDadosLeituraTurma(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.Modalidades, request.CodigosTurmas, request.ModoVisualizacao == ModoVisualizacao.Responsavel);
 
             return ObterNomeModalidade(dadosLeituraComunicados);

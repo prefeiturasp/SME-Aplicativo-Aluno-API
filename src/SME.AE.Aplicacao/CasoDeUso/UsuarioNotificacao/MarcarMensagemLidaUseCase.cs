@@ -90,10 +90,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
         {
             var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
             var seriesResumidasNaoExistem = !seriesResumidas.Any();
-            var gruposNaoExistem = !notificacao.GruposId.Any();
+            var modalidadesNaoExistem = !notificacao.ModalidadesId.Any();
             var alunos =
                 listaEscolas
-                .Where(escola => gruposNaoExistem || notificacao.GruposId.Contains(escola.CodigoGrupo.ToString()))
+                .Where(escola => modalidadesNaoExistem || notificacao.ModalidadesId.Contains(escola.ModalidadeCodigo.ToString()))
                 .SelectMany(escola => escola.Alunos)
                 .Where(aluno => aluno.CodigoEscola == notificacao.CodigoUe.ToString())
                 .Where(aluno => (seriesResumidasNaoExistem || seriesResumidas.Contains(aluno.SerieResumida)));
@@ -136,7 +136,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
             listaEscolas.ForEach(escola =>
             {
-                if (notificacao.GruposId != null && notificacao.GruposId.Length > 0 && !notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())))
+                if (notificacao.ModalidadesId != null && notificacao.ModalidadesId.Length > 0 && !notificacao.ModalidadesId.Any(grupo => grupo.Equals(escola.ModalidadeCodigo.ToString())))
                     return;
 
                 var adicionar = escola.Alunos.Where(aluno => aluno.CodigoDre.Equals(notificacao.CodigoDre.ToString()));
@@ -158,10 +158,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
         {
             var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
             var seriesResumidasNaoExistem = !seriesResumidas.Any();
-            var gruposNaoExistem = !notificacao.GruposId.Any();
+            var modalidadesNaoExistem = !notificacao.ModalidadesId.Any();
             var alunos =
                 listaEscolas
-                .Where(escola => gruposNaoExistem || notificacao.GruposId.Contains(escola.CodigoGrupo.ToString()))
+                .Where(escola => modalidadesNaoExistem || notificacao.ModalidadesId.Contains(escola.ModalidadeCodigo.ToString()))
                 .SelectMany(escola => escola.Alunos)
                 .Where(aluno => aluno.CodigoDre == notificacao.CodigoDre.ToString())
                 .Where(aluno => (seriesResumidasNaoExistem || seriesResumidas.Contains(aluno.SerieResumida)));
@@ -179,7 +179,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
 
             listaEscolas.ForEach(escola =>
             {
-                var alunosAdicionar = notificacao.GruposId.Any(grupo => grupo.Equals(escola.CodigoGrupo.ToString())) ? escola.Alunos : default;
+                var alunosAdicionar = notificacao.ModalidadesId.Any(grupo => grupo.Equals(escola.ModalidadeCodigo.ToString())) ? escola.Alunos : default;
 
                 if (alunosAdicionar == null || !alunosAdicionar.Any())
                     return;
@@ -200,7 +200,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
             var seriesResumidasNaoExistem = !seriesResumidas.Any();
             var alunos = 
                 listaEscolas
-                .Where(escola => notificacao.GruposId.Contains(escola.CodigoGrupo.ToString()))
+                .Where(escola => notificacao.ModalidadesId.Contains(escola.ModalidadeCodigo.ToString()))
                 .SelectMany(escola => escola.Alunos)
                 .Where(alunos => (seriesResumidasNaoExistem || seriesResumidas.Contains(alunos.SerieResumida)));
 
@@ -244,6 +244,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                 CodigoEolAluno = aluno.CodigoEol,
                 UsuarioId = usuarioMensagem.UsuarioId,
                 MensagemVisualizada = usuarioMensagem.MensagemVisualizada,
+                CodigoEolTurma = aluno.CodigoTurma
             };
 
             await IncluiConfirmacaoDeLeitura(mediator, usuarioNotificacao);

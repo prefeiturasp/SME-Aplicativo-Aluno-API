@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Handle(ObterDadosLeituraComunicadosQuery request, CancellationToken cancellationToken)
         {
-            var dadosLeituraComunicados = await dadosLeituraRepositorio.ObterDadosLeituraComunicados(request.CodigoDre, request.CodigoUe, request.NotificaoId);
+            var dadosLeituraComunicados = await dadosLeituraRepositorio.ObterDadosLeituraComunicados(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.Modalidade);
 
             if (dadosLeituraComunicados == null || !dadosLeituraComunicados.Any())
                 throw new Exception("Não foram encontrados dados de leitura de comunicados");
