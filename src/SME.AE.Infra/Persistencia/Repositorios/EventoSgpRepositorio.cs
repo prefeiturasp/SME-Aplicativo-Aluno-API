@@ -1,23 +1,28 @@
 ﻿using Dapper;
 using Npgsql;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class EventoSgpRepositorio : IEventoSgpRepositorio
     {
-		private NpgsqlConnection CriaConexao() => new NpgsqlConnection(ConnectionStrings.ConexaoSgp);
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
-		public async Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao)
+        public EventoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
-			var sql =
-				@"
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
+
+        public async Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao)
+        {
+            var sql =
+                @"
 					select * from 
 					(
 						(select 
@@ -72,11 +77,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					order by alterado_em
 				";
 
-			using var conn = CriaConexao();
-			await conn.OpenAsync();
-			var eventosSgp = await conn.QueryAsync<EventoSgpDto>(sql, new { alterado_em = ultimaDataAlteracao });
-			await conn.CloseAsync();
-			return eventosSgp;
-		}
-	}
+            using var conn = CriaConexao();
+            await conn.OpenAsync();
+            var eventosSgp = await conn.QueryAsync<EventoSgpDto>(sql, new { alterado_em = ultimaDataAlteracao });
+            await conn.CloseAsync();
+            return eventosSgp;
+        }
+    }
 }

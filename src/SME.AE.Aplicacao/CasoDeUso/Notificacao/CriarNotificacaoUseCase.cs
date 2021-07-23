@@ -81,7 +81,7 @@ namespace SME.AE.Aplicacao
             switch (notificacao.TipoComunicado)
             {
                 case TipoComunicado.SME:
-                    await EnviarNotificacaoSME(notificacao.ObterGrupoLista(), dicionarioNotificacao, notificacaoFirebase);
+                    await EnviarNotificacaoSME(notificacao.ObterModalidades(), dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.SME_ANO:
                     await EnviarNotificacaoSerieResumida(notificacao, dicionarioNotificacao, notificacaoFirebase);
@@ -145,11 +145,11 @@ namespace SME.AE.Aplicacao
 
         private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
         {
-            var grupos = notificacao.ObterGrupoLista();
-            foreach (var grupo in grupos)
+            var modalidades = notificacao.ObterModalidades();
+            foreach (var modalidade in modalidades)
             {
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
-                var topico = "UE-" + notificacao.CodigoUe + "-MOD-" + grupo;
+                var topico = $"UE-{notificacao.CodigoUe}-MOD-{modalidade}";
                 data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
             }
@@ -185,13 +185,13 @@ namespace SME.AE.Aplicacao
             }
         }
 
-        private async Task EnviarNotificacaoSME(List<int> grupos, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        private async Task EnviarNotificacaoSME(IEnumerable<int> modalidades, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
-            foreach (var grupo in grupos)
+            foreach (var modalidade in modalidades)
             {
                 var data = dicionarioNotificacao;
 
-                var topico = "Grupo-" + grupo.ToString();
+                var topico = $"MODALIDADE-{modalidade}";
 
                 await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
 
@@ -200,14 +200,16 @@ namespace SME.AE.Aplicacao
         private async Task EnviarNotificacaoSerieResumida(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             var data = new Dictionary<String, String>(dicionarioNotificacao);
-            var grupos = notificacao.ObterGrupoLista();
+            
+            var modalidades = notificacao.ObterModalidades();
+
             var seriesResumidas = notificacao.ObterSeriesResumidas();
 
             foreach (var serieResumida in seriesResumidas)
             {
-                foreach (var grupo in grupos)
+                foreach (var modalidade in modalidades)
                 {
-                    var topico = $"SERIERESUMIDA-{serieResumida}-MOD-{grupo}";
+                    var topico = $"SERIERESUMIDA-{serieResumida}-MOD-{modalidade}";
                     await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
                 }
             }

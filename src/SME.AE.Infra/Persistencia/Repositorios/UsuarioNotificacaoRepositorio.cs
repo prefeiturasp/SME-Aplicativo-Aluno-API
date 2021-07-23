@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao.Comum.Config;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Text;
@@ -12,11 +12,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class UsuarioNotificacaoRepositorio : IUsuarioNotificacaoRepositorio
     {
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+
+        public UsuarioNotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+        }
         public async Task<bool> Criar(UsuarioNotificacao usuarioNotificacao)
         {
             try
             {
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var dataAtual = DateTime.Now;
                 var retorno = await conn.ExecuteAsync(
@@ -28,6 +34,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       dre_codigoeol, 
                        ue_codigoeol, 
                         usuario_cpf,
+                        codigo_eol_turma,
                           criadopor,
                      mensagemvisualizada,
                      mensagemexcluida
@@ -39,6 +46,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                            @DreCodigoEol,
                            @UeCodigoEol,
                            @UsuarioCpf,
+                           @CodigoEolTurma,
                            @CriadoPor,
                            @MensagemVisualizada,
                            @MensagemExcluida
@@ -52,6 +60,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuarioNotificacao.DreCodigoEol,
                         usuarioNotificacao.UeCodigoEol,
                         usuarioNotificacao.UsuarioCpf,
+                        usuarioNotificacao.CodigoEolTurma,
                         usuarioNotificacao.CriadoPor,
                         usuarioNotificacao.MensagemVisualizada,
                         usuarioNotificacao.MensagemExcluida
@@ -75,7 +84,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<bool> RemoverPorId(long id)
         {
 
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
             conn.Open();
 
             await conn.ExecuteAsync(
@@ -88,7 +97,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<UsuarioNotificacao> ObterPorUsuarioAlunoNotificacao(long usuarioId, long codigoAluno, long notificacaoId)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
             await conn.OpenAsync();
 
@@ -122,7 +131,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<bool> Remover(long notificacaoId)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
             conn.Open();
 
             await conn.ExecuteAsync(
@@ -134,7 +143,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<UsuarioNotificacao> Selecionar(UsuarioNotificacao usuarioNotificacao)
         {
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
             conn.Open();
             var dataAtual = DateTime.Now;
             var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
@@ -165,7 +174,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                        and ue_codigoeol = @ueCodigoEol";
 
             UsuarioNotificacao retorno = null;
-            await using (var conn = new NpgsqlConnection(ConnectionStrings.Conexao))
+            await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
             {
 
                 conn.Open();
@@ -180,7 +189,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
 
 
-            await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
             conn.Open();
             var dataAtual = DateTime.Now;
             var retorno = await conn.ExecuteAsync(
@@ -213,7 +222,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 if (codigoDre > 0)
                     query.AppendLine(" and dre_codigoeol = @codigoDre ");
 
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
                 var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre });
                 conn.Close();
@@ -233,12 +242,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var query = new StringBuilder();
                 query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
 
-                if (codigoDre > 0) 
+                if (codigoDre > 0)
                     query.AppendLine(" and dre_codigoeol = @codigoDre ");
 
-                await using var conn = new NpgsqlConnection(ConnectionStrings.Conexao);
+                await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
-                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre});
+                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre });
                 conn.Close();
                 return totalNotificacoesLeituraPorAluno;
             }

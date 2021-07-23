@@ -1,6 +1,5 @@
 ﻿using FluentValidation.Results;
 using MediatR;
-using Sentry;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Extensoes;
@@ -35,9 +34,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
         {
-            bool primeiroAcesso = false;
-            string email = "";
-            string celular = "";
+            bool primeiroAcesso = false;            
 
             var validator = new AutenticarUsuarioUseCaseValidatior();
             var validacao = validator.Validate(request);
@@ -69,7 +66,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             //buscar o usuario 
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
-            
+
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
             {
@@ -83,7 +80,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
-                else {
+                else
+                {
                     var senha = Regex.Replace(request.Senha, @"\-\/", "");
 
                     try
@@ -95,6 +93,20 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                         validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
                         return RespostaApi.Falha(validacao.Errors);
                     }
+                }
+            } else
+            {
+                primeiroAcesso = true;
+                var senha = Regex.Replace(request.Senha, @"\-\/", "");
+
+                try
+                {
+                    request.DataNascimento = DateTime.ParseExact(senha, "ddMMyyyy", CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                    return RespostaApi.Falha(validacao.Errors);
                 }
             }
 
@@ -127,22 +139,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 return RespostaApi.Falha(validacao.Errors);
             }
 
-            //verificar se o usuário tem e-mail e celular cadastrado
-            if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Email)))
-                email = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Email)).Email;
-
-            if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.Celular)))
-            {
-                celular = usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.Celular)).Celular;
-                if (usuarioAlunos.Any(w => !string.IsNullOrEmpty(w.DDD)))
-                    celular = $"{usuarioAlunos.FirstOrDefault(w => !string.IsNullOrEmpty(w.DDD)).DDD}{celular}";
-            }
-
             //necessário implementar unit of work para transacionar essas operações
-            senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
             var grupos = await _repositoryCoreSSO.SelecionarGrupos();
-            var usuario = usuarioAlunos.FirstOrDefault();
 
+            var usuarioParaSeBasear = usuarioAlunos
+                .OrderByDescending(a => a.DataAtualizacao)
+                .FirstOrDefault();
+         
             primeiroAcesso = primeiroAcesso || !grupos.Any(x => usuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
             //verificar se o usuário está incluído em todos os grupos            
@@ -150,17 +153,25 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.UsuId, StatusUsuarioCoreSSO.Ativo);
 
             if (usuarioCoreSSO != null && usuarioCoreSSO.TipoCriptografia != TipoCriptografia.TripleDES)
-                await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.UsuId, request.Senha);
+            {
+                senhaCriptografada = Criptografia.CriptografarSenhaTripleDES(request.Senha);
+                await _repositoryCoreSSO.AtualizarCriptografiaUsuario(usuarioCoreSSO.UsuId, senhaCriptografada);
+            }
 
-            usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuario, primeiroAcesso);
-
-            var informarCelularEmail = string.IsNullOrWhiteSpace(usuarioRetorno.Email) && string.IsNullOrWhiteSpace(usuarioRetorno.Celular);
-
-            usuarioRetorno.Email = usuarioRetorno.Email ?? email;
-            usuarioRetorno.Celular = usuarioRetorno.Celular ?? celular;
+            usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuarioParaSeBasear, primeiroAcesso);
+            
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
-            return MapearResposta(usuario, usuarioRetorno, primeiroAcesso, informarCelularEmail || primeiroAcesso);
+            var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
+
+            
+            return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
+        }
+
+        private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
+        {
+            return usuario.DataNascimentoResponsavel == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
+                   string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.Celular);
         }
 
         private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
@@ -175,7 +186,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
             else
             {
-                //
                 await _repository.SalvarAsync(MapearDominioUsuario(usuario, primeiroAcesso));
             }
 
@@ -193,7 +203,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             var usuario = new Dominio.Entidades.Usuario
             {
                 Cpf = usuarioEol.Cpf,
-                Nome = usuarioEol.Nome,
                 Excluido = false,
                 UltimoLogin = DateTime.Now,
                 PrimeiroAcesso = primeiroAcesso
@@ -202,18 +211,21 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             return usuario;
         }
 
-        private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool informarCelularEmail)
+        private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool atualizarDadosCadastrais)
         {
             RespostaAutenticar usuario = new RespostaAutenticar
             {
                 Cpf = usuarioEol.Cpf,
-                Email = usuarioApp.Email,
+                Email = usuarioEol.Email,
                 Id = usuarioApp.Id,
                 Nome = usuarioEol.Nome,
+                DataNascimento = usuarioEol.DataNascimentoResponsavel,
+                NomeMae = usuarioEol.NomeMae,
                 PrimeiroAcesso = primeiroAcesso,
-                InformarCelularEmail = informarCelularEmail,
-                Celular = usuarioApp.Celular,
-                Token = ""
+                AtualizarDadosCadastrais = atualizarDadosCadastrais,
+                Celular = usuarioEol.ObterCelularComDDD(),
+                Token = "",
+                UltimaAtualizacao = usuarioEol.DataAtualizacao
             };
 
             return RespostaApi.Sucesso(usuario);

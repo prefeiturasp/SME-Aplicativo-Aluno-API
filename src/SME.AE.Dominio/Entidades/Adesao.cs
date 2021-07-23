@@ -2,7 +2,6 @@
 {
     public class Adesao : EntidadeBase
     {
-        public long Id { get; private set; }
         public string CodigoDre { get; private set; }
         public string NomeDre { get; private set; }
         public string CodigoUe { get; private set; }

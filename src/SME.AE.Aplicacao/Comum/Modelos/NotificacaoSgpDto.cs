@@ -1,10 +1,7 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos
 {
@@ -14,7 +11,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string CriadoRF { get; set; }
         public DateTime DataEnvio { get; set; }
         public DateTime DataExpiracao { get; set; }
-        public string Grupo { get; set; }
         public IEnumerable<string> Alunos { get; set; }
         public string Mensagem { get; set; }
         public string Titulo { get; set; }
@@ -46,8 +42,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
                 }
             }
         }
-
-        public List<int> ObterGrupoLista() => Grupo.ToIntEnumerable().ToList();
         public IEnumerable<string> ObterSeriesResumidas() => SeriesResumidas.ToStringEnumerable();
+        public IEnumerable<int> ObterModalidades() => Modalidades.ToIntEnumerable();
     }
 }

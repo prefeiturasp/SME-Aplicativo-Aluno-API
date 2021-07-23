@@ -24,18 +24,19 @@
                ciclo_ensino.cd_ciclo_ensino AS CodigoCicloEnsino,
                serie_ensino.sg_resumida_serie AS SerieResumida,
                etapa_ensino.cd_etapa_ensino as CodigoModalidadeTurma
-
         FROM   v_aluno_cotic aluno 
                INNER JOIN responsavel_aluno responsavel 
                        ON aluno.cd_aluno = responsavel.cd_aluno 
                INNER JOIN(SELECT cd_aluno, 
                                  cd_matricula, 
-                                 cd_escola, 
+                                 vmc.cd_escola, 
                                  cd_serie_ensino 
-                          FROM   v_matricula_cotic 
-                          WHERE  st_matricula = 1 
-                                 AND cd_serie_ensino IS NOT NULL -- turma regular 
-                                 AND an_letivo = Year(Getdate())) AS matricula 
+                          FROM   v_matricula_cotic vmc
+                          inner join escola esc on esc.cd_escola = vmc.cd_escola
+			                  where st_matricula = 1
+			                    and (cd_serie_ensino is not null -- turma regular 
+			                    or esc.tp_escola in (22, 23))
+				                and an_letivo = year(getdate())) AS matricula 
                        ON matricula.cd_aluno = aluno.cd_aluno 
                INNER JOIN(SELECT cd_matricula, 
                                  cd_turma_escola, 
@@ -69,11 +70,11 @@
                           vue.cd_unidade_administrativa_referencia 
                INNER JOIN turma_escola(nolock) te 
                        ON te.cd_turma_escola = mte.cd_turma_escola 
-               INNER JOIN serie_ensino 
+               LEFT JOIN serie_ensino 
                        ON matricula.cd_serie_ensino = serie_ensino.cd_serie_ensino 
-               INNER JOIN etapa_ensino 
+               LEFT JOIN etapa_ensino 
                        ON serie_ensino.cd_etapa_ensino = etapa_ensino.cd_etapa_ensino 
-               INNER JOIN ciclo_ensino 
+               LEFT JOIN ciclo_ensino 
                        ON serie_ensino.cd_ciclo_ensino = ciclo_ensino.cd_ciclo_ensino  ";
 
 

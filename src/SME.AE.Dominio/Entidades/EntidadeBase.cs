@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace SME.AE.Dominio.Entidades
 {
     public abstract class  EntidadeBase
@@ -7,7 +8,7 @@ namespace SME.AE.Dominio.Entidades
         public DateTime CriadoEm { get; set; }
         public string CriadoPor { get; set; }
         public DateTime? AlteradoEm { get; set; }
-        public string? AlteradoPor { get; set; }
+        public string AlteradoPor { get; set; }
 
         public void AtualizarAuditoria()
         {

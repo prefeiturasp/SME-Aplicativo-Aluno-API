@@ -13,14 +13,17 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public long NotificaoId { get; set; }
 
+        public short Modalidade { get; set; }
+
         public ModoVisualizacao ModoVisualizacao { get; set; }
 
-        public ObterDadosLeituraComunicadosQuery(string codigoDre, string codigoUe, long notificaoId, ModoVisualizacao modoVisualizacao)
+        public ObterDadosLeituraComunicadosQuery(string codigoDre, string codigoUe, long notificaoId, short modalidade, ModoVisualizacao modoVisualizacao)
         {
             CodigoDre = codigoDre;
             CodigoUe = codigoUe;
             NotificaoId = notificaoId;
             ModoVisualizacao = modoVisualizacao;
+            Modalidade = modalidade;
         }
     }
 }

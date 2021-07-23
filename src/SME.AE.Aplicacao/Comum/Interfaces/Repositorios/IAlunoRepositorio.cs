@@ -12,5 +12,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 
         Task<List<CpfResponsavelAlunoEol>> ObterCpfsDeResponsaveis(string codigoDre, string codigoUe);
         Task<IEnumerable<AlunoTurmaEol>> ObterAlunosTurma(long codigoTurma);
+
+        Task<AlunoRespostaEol> ObterDadosAlunoPorCodigo(long codigoAluno);
     }
 }

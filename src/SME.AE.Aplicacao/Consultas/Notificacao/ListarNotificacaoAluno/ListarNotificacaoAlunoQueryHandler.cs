@@ -23,22 +23,11 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 
         public async Task<IEnumerable<NotificacaoResposta>> Handle(ListarNotificacaoAlunoQuery request, CancellationToken cancellationToken)
         {
-            var retorno = await notificacaoRepository.ListarNotificacoes(request.GruposId, request.CodigoUE, request.CodigoDRE, request.CodigoTurma, request.CodigoAluno, request.CodigoUsuario, request.SerieResumida);
+            var retorno = await notificacaoRepository.ListarNotificacoes(request.ModalidadesCodigo, request.CodigoUE, request.CodigoDRE, request.CodigoTurma, request.CodigoAluno, request.CodigoUsuario, request.SerieResumida);
 
-            if (retorno == null || !retorno.Any())
+            if (retorno != null || retorno.Any())
                 return retorno;
-
-            var grupos = await grupoComunicadoRepository.ObterTodos();
-
-            if (grupos == null || !retorno.Any())
-                return retorno;
-
-            return retorno.Select(x =>
-            {
-                x.Grupos = grupos.Where(z => x.GruposId.Any(y => z.Id == long.Parse(y))).Select(z => new Grupo { Codigo = z.Id, Nome = z.Nome });
-                
-                return x;
-            }); 
+            else return default;
         }
     }
 }
