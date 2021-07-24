@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using Sentry;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -21,18 +22,23 @@ namespace SME.AE.Aplicacao
             var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
 
             var turmasCodigos = string.Join("&turmasCodigo=", request.TurmaCodigo);
-
             var resposta = await httpClient.GetAsync($"v1/turmas/modalidades?turmasCodigo={turmasCodigos}");
-            if (resposta.IsSuccessStatusCode)
+            var json = "";
+            try
             {
-                var json = await resposta.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<IEnumerable<TurmaModalidadeCodigoDto>>(json);
+                if (resposta.IsSuccessStatusCode)
+                {
+                    json = await resposta.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<IEnumerable<TurmaModalidadeCodigoDto>>(json);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                SentrySdk.CaptureMessage($"ObterTurmasModalidadesPorCodigosQueryHandler: {resposta}");
+                SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureMessage($"ObterTurmasModalidadesPorCodigosQueryHandler {json}");
                 throw new System.Exception($"Não foi possível obter as modalidades das turmas {turmasCodigos}");
-            }            
+            }
+            return null;
         }
     }
 }
