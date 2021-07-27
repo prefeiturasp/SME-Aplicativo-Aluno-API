@@ -15,18 +15,28 @@ namespace SME.AE.Aplicacao.Consultas
     {
         private readonly IEventoRepositorio eventoRepositorio;
         private readonly IAlunoRepositorio alunoRepositorio;
+        private readonly IMediator mediator;
         private readonly IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio;
 
-        public ObterEventosAlunoPorMesQueryHandler(IEventoRepositorio eventoRepositorio, IAlunoRepositorio alunoRepositorio, IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio)
+        public ObterEventosAlunoPorMesQueryHandler(IEventoRepositorio eventoRepositorio, IAlunoRepositorio alunoRepositorio, IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
         {
             this.eventoRepositorio = eventoRepositorio ?? throw new ArgumentNullException(nameof(eventoRepositorio));
             this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
             this.parametrosEscolaAquiRepositorio = parametrosEscolaAquiRepositorio ?? throw new ArgumentNullException(nameof(parametrosEscolaAquiRepositorio));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
         public async Task<IEnumerable<EventoRespostaDto>> Handle(ObterEventosAlunoPorMesQuery request, CancellationToken cancellationToken)
         {
             var aluno = (await alunoRepositorio.ObterDadosAlunos(request.Cpf)).Where(a => a.CodigoEol == request.CodigoAluno).FirstOrDefault();
 
+            var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { aluno.CodigoTurma.ToString() }));
+            if(turmasModalidade.Any())
+            {
+                var modalidadeDaTurma = turmasModalidade.FirstOrDefault();
+                aluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
+                aluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
+            }
+            
             var modalidade = 0;
 
             switch (aluno.ModalidadeCodigo)
