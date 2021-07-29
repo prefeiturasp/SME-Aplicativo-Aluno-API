@@ -26,7 +26,7 @@ namespace SME.AE.Aplicacao
 
             var body = JsonConvert.SerializeObject(request.ResponsavelDto, UtilJson.ObterConfigConverterNulosEmVazio());
             var resposta = await httpClient.PostAsync($"AtualizarResponsavelAluno", new StringContent(body, Encoding.UTF8, "application/json"));
-
+            Console.WriteLine(body);
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
             {
                 var json = await resposta.Content.ReadAsStringAsync();
