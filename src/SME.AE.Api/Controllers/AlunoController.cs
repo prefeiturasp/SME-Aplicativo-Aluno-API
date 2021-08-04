@@ -13,8 +13,8 @@ namespace SME.AE.Api.Controllers
     [ApiController]
     public class AlunoController : ApiController
     {
-        [HttpPost]
-        public async Task<ActionResult> ObterDadosAlunos([FromQuery] string cpf, [FromServices] IDadosDoAlunoUseCase dadosDoAlunoUseCase)
+        [HttpGet]
+        public async Task<ObjectResult> ObterDadosAlunos([FromQuery] string cpf, [FromServices] IDadosDoAlunoUseCase dadosDoAlunoUseCase)
         {
             return Ok(await dadosDoAlunoUseCase.Executar(cpf));
         }
