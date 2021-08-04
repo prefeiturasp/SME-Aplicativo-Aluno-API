@@ -7,6 +7,7 @@ namespace SME.AE.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]    
+    [Authorize]
     public abstract class ApiController : ControllerBase
     {
         private IMediator _mediator;
