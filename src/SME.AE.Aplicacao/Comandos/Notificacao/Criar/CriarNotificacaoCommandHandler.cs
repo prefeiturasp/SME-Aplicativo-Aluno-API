@@ -11,9 +11,9 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 {
     public class CriarNotificacaoCommandHandler : IRequestHandler<CriarNotificacaoCommand, Unit>
     {
-        private readonly INotificacaoRepository _repository;
+        private readonly INotificacaoRepositorio _repository;
 
-        public CriarNotificacaoCommandHandler(INotificacaoRepository repository)
+        public CriarNotificacaoCommandHandler(INotificacaoRepositorio repository)
         {
             _repository = repository;
         }

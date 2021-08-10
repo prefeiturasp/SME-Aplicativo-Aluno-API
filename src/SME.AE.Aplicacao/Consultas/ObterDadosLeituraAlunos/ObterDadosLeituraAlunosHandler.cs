@@ -16,12 +16,12 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         private readonly IAlunoRepositorio alunoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
         private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
-        private readonly INotificacaoRepository notificacaoRepository;
+        private readonly INotificacaoRepositorio notificacaoRepository;
 
         public ObterDadosLeituraAlunosQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
                                                     IAlunoRepositorio alunoRepositorio,
                                                     IUsuarioRepository usuarioRepository,
-                                                    INotificacaoRepository notificacaoRepository,
+                                                    INotificacaoRepositorio notificacaoRepository,
                                                     IResponsavelEOLRepositorio responsavelEOLRepositorio)
         {
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new System.ArgumentNullException(nameof(dadosLeituraRepositorio));

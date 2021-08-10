@@ -1,14 +1,8 @@
-﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Modelos;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SME.AE.Aplicacao.Comum.Modelos;
 
-namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
+namespace SME.AE.Aplicacao.Interfaces
 {
-    public interface IRemoverNotificacaoEmLoteUseCase
+    public interface IRemoverNotificacaoEmLoteUseCase : IUseCase<long[], RespostaApi>
     {
-        Task<RespostaApi> Executar(long[] id);
     }
 }

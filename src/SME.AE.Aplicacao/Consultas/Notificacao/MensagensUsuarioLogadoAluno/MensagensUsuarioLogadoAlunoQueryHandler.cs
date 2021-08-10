@@ -11,9 +11,9 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
     public class MensagensUsuarioLogadoAlunoQueryHandler : IRequestHandler<MensagensUsuarioLogadoAlunoQuery, IEnumerable<NotificacaoResposta>>
     {
-        private readonly INotificacaoRepository notificacaoRepository;
+        private readonly INotificacaoRepositorio notificacaoRepository;
 
-        public MensagensUsuarioLogadoAlunoQueryHandler(INotificacaoRepository notificacaoRepository)
+        public MensagensUsuarioLogadoAlunoQueryHandler(INotificacaoRepositorio notificacaoRepository)
         {
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
         }

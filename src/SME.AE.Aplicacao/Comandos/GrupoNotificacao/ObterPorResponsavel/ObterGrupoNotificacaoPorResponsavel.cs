@@ -20,12 +20,12 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterPorResponsavel
 
     public class ObterGrupoNotificacaoPorResponsavelCommandHandler : IRequestHandler<ObterGrupoNotificacaoPorResponsavelCommand, List<string>>
     {
-        private readonly INotificacaoRepository _repository;
+        private readonly INotificacaoRepositorio _repository;
 
         private readonly IGrupoComunicadoRepository _grupoComunicadoRepository;
         
         public ObterGrupoNotificacaoPorResponsavelCommandHandler(
-            INotificacaoRepository repository, IGrupoComunicadoRepository grupo
+            INotificacaoRepositorio repository, IGrupoComunicadoRepository grupo
         )
         {
             _repository = repository;

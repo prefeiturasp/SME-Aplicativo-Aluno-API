@@ -14,12 +14,12 @@ namespace SME.AE.Aplicacao.Teste.Comandos
 {
     public class CriarNotificacaoCommandTeste
     {
-        public Mock<INotificacaoRepository> notificacaoRepository;
+        public Mock<INotificacaoRepositorio> notificacaoRepository;
         public CriarNotificacaoCommandHandler handler;
 
         public CriarNotificacaoCommandTeste()
         {
-            notificacaoRepository = new Mock<INotificacaoRepository>();
+            notificacaoRepository = new Mock<INotificacaoRepositorio>();
             handler = new CriarNotificacaoCommandHandler(notificacaoRepository.Object);
         }
 
