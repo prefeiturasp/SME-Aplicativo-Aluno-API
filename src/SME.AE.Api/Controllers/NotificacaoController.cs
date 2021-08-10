@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SME.AE.Api.Filtros;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Interfaces;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers

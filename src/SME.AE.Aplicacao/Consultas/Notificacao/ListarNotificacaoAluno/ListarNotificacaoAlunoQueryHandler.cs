@@ -12,10 +12,10 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
     public class ListarNotificacaoAlunoQueryHandler : IRequestHandler<ListarNotificacaoAlunoQuery, IEnumerable<NotificacaoResposta>>
     {
-        private readonly INotificacaoRepository notificacaoRepository;
+        private readonly INotificacaoRepositorio notificacaoRepository;
         private readonly IGrupoComunicadoRepository grupoComunicadoRepository;
 
-        public ListarNotificacaoAlunoQueryHandler(INotificacaoRepository notificacaoRepository, IGrupoComunicadoRepository grupoComunicadoRepository)
+        public ListarNotificacaoAlunoQueryHandler(INotificacaoRepositorio notificacaoRepository, IGrupoComunicadoRepository grupoComunicadoRepository)
         {
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
             this.grupoComunicadoRepository = grupoComunicadoRepository ?? throw new ArgumentNullException(nameof(grupoComunicadoRepository));

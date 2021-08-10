@@ -25,9 +25,9 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
     public class ObterNotificacaoPorGrupoCommandHandler : IRequestHandler<ObterNotificacaoPorGrupoCommand,
         IEnumerable<NotificacaoResposta>>
     {
-        private readonly INotificacaoRepository _repository;
+        private readonly INotificacaoRepositorio _repository;
         private readonly IGrupoComunicadoRepository _grupoComunicadoRepository;
-        public ObterNotificacaoPorGrupoCommandHandler(INotificacaoRepository repository, IGrupoComunicadoRepository grupoComunicadoRepository)
+        public ObterNotificacaoPorGrupoCommandHandler(INotificacaoRepositorio repository, IGrupoComunicadoRepository grupoComunicadoRepository)
         {
             _repository = repository;
             _grupoComunicadoRepository = grupoComunicadoRepository;

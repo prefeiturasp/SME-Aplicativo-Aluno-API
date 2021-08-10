@@ -88,7 +88,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Open();
 
             await conn.ExecuteAsync(
-               @"DELETE FROM usuario_notificacao_leitura where id = @id", new { id });
+               @"UPDATE FROM usuario_notificacao_leitura SET excluido = true where id = @id", new { id });
             conn.Close();
 
             return true;
@@ -121,7 +121,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where
                         usuario_id = @usuario_id and
                         codigo_eol_aluno = @codigo_eol_aluno and
-                        notificacao_id = @notificacaoId
+                        notificacao_id = @notificacaoId and not excluido
                 ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId });
 
             await conn.CloseAsync();
@@ -135,7 +135,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Open();
 
             await conn.ExecuteAsync(
-               @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
+               @"UPDATE FROM usuario_notificacao_leitura SET excluido = true where notificacao_id = @notificacaoId", new { notificacaoId });
             conn.Close();
 
             return true;
@@ -148,7 +148,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var dataAtual = DateTime.Now;
             var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
                 @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
-                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId });
+                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId and not excluido", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId });
             conn.Close();
             return retorno;
         }
@@ -171,7 +171,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and codigo_eol_aluno = @codigoEolAluno
 	                        and notificacao_id = @notificacaoId
 	                        and dre_codigoeol = @dreCodigoEol
-	                        and ue_codigoeol = @ueCodigoEol";
+	                        and ue_codigoeol = @ueCodigoEo and not excluido";
 
             UsuarioNotificacao retorno = null;
             await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
@@ -218,7 +218,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var query = new StringBuilder();
-                query.AppendLine(@"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+                query.AppendLine(@"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId and not excluido ");
                 if (codigoDre > 0)
                     query.AppendLine(" and dre_codigoeol = @codigoDre ");
 
@@ -240,7 +240,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var query = new StringBuilder();
-                query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+                query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId and not excluido ");
 
                 if (codigoDre > 0)
                     query.AppendLine(" and dre_codigoeol = @codigoDre ");
