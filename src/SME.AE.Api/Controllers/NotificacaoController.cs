@@ -27,7 +27,6 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpDelete]
-        [AllowAnonymous]
         [ChaveIntegracaoFiltro]
         public async Task<ActionResult> Remover([FromBody] long[] ids, [FromServices] IRemoverNotificacaoEmLoteUseCase removerNotificacaoEmLoteUseCase)
         {
