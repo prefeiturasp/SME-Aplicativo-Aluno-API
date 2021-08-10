@@ -48,7 +48,7 @@ namespace SME.AE.Worker
         {
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
             services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
-            services.AddTransient(typeof(INotificacaoRepository), typeof(NotificacaoRepository));
+            services.AddTransient(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
             services.AddTransient(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.AddTransient(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepository));
             services.AddTransient(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));

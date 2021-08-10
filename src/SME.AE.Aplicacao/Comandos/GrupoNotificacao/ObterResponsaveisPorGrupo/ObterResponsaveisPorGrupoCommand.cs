@@ -22,14 +22,14 @@ namespace SME.AE.Aplicacao.Comandos.GrupoNotificacao.ObterResponsaveisPorGrupo
 
         public class ObterResponsaveisPorGrupoCommandHandler : IRequestHandler<ObterResponsaveisPorGrupoCommand, IEnumerable<string>>
         {
-            private readonly INotificacaoRepository _repository;
+            private readonly INotificacaoRepositorio _repository;
 
             private readonly IGrupoComunicadoRepository _grupoComunicadoRepository;
 
             private readonly IUsuarioRepository _usuarioRepository;
 
             public ObterResponsaveisPorGrupoCommandHandler(
-                INotificacaoRepository repository, IGrupoComunicadoRepository grupo,
+                INotificacaoRepositorio repository, IGrupoComunicadoRepository grupo,
                IUsuarioRepository usuario
             )
             {

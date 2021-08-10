@@ -20,6 +20,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.UseCase.UltimaAtualizacaoWorker;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Middlewares;
+using SME.AE.Aplicacao.Interfaces;
 using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using System;

@@ -13,10 +13,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class EnviarNotificacaoDataFuturaCasoDeUso
     {
-        private readonly INotificacaoRepository notificacaoRepository;
+        private readonly INotificacaoRepositorio notificacaoRepository;
         private readonly ICriarNotificacaoUseCase criarNotificacaoUseCase;
 
-        public EnviarNotificacaoDataFuturaCasoDeUso(INotificacaoRepository notificacaoRepository, ICriarNotificacaoUseCase criarNotificacaoUseCase)
+        public EnviarNotificacaoDataFuturaCasoDeUso(INotificacaoRepositorio notificacaoRepository, ICriarNotificacaoUseCase criarNotificacaoUseCase)
         {
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
             this.criarNotificacaoUseCase = criarNotificacaoUseCase ?? throw new ArgumentNullException(nameof(criarNotificacaoUseCase));
