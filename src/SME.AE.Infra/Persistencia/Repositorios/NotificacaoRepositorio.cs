@@ -275,7 +275,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       where 
                           date_trunc('day', n.dataenvio) <= current_date
                       and date_trunc('day', n.dataexpiracao) >= current_date
-                      and (not n.enviadopushnotification)
+                      and (not n.enviadopushnotification) and not n.excluido 
                 ";
         }
         private string QueryComunicadosSME()
