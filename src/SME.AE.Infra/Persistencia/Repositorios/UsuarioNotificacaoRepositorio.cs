@@ -135,7 +135,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Open();
 
             await conn.ExecuteAsync(
-               @"UPDATE FROM usuario_notificacao_leitura SET excluido = true where notificacao_id = @notificacaoId", new { notificacaoId });
+               @"UPDATE usuario_notificacao_leitura SET excluido = true where notificacao_id = @notificacaoId", new { notificacaoId });
             conn.Close();
 
             return true;
