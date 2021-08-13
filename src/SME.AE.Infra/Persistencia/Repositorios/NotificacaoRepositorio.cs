@@ -135,7 +135,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return retorno == null || !retorno.Any() ? default : retorno;
         }
 
-        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string gruposId, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
+        public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string modalidades, string tiposEscolas, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
         {
             using var conexao = InstanciarConexao();
             var consulta =
@@ -143,7 +143,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
             conexao.Open();
-            var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { gruposId, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
+            var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
 
             conexao.Close();
 
@@ -258,7 +258,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       and unl.usuario_id = @usuarioId
                       and unl.codigo_eol_aluno = @codigoAluno
                       where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
-                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao > current_date) and 
+                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao >= current_date) and 
                         date_trunc('day', notificacao.dataenvio) <= current_date and
                         notificacao.enviadopushnotification
                 ";
@@ -282,41 +282,42 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
-                        where n.tipocomunicado = {(int)TipoComunicado.SME} and not excluido 
+                        where n.tipocomunicado = {(int)TipoComunicado.SME} and not n.excluido 
                         and string_to_array(n.modalidades,',') 
-                        && string_to_array(@gruposId,',')";
+                        && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
+                        && string_to_array(@tiposEscolas,',')";
         }
         private string QueryComunicadosSME_ANO()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
-                        where n.tipocomunicado = {(int)TipoComunicado.SME_ANO} and not excluido 
-                        and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
-                ";
+                        where n.tipocomunicado = {(int)TipoComunicado.SME_ANO} and not n.excluido 
+                        and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
+                        && string_to_array(@tiposEscolas,',')";
         }
 
         private string QueryComunicadosDRE()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
-                    where n.tipocomunicado = {(int)TipoComunicado.DRE} and not excluido 
-                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
-                    and n.dre_codigoeol = @codigoDre";
+                    where n.tipocomunicado = {(int)TipoComunicado.DRE} and not n.excluido 
+                    and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
+                        && string_to_array(@tiposEscolas,',') and n.dre_codigoeol = @codigoDre";
         }
         private string QueryComunicadosDRE_ANO()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n 
-                    where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO} and not excluido 
-                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')
-                    and n.dre_codigoeol = @codigoDre";
+                    where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO} and not n.excluido 
+                    and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
+                        && string_to_array(@tiposEscolas,',') and n.dre_codigoeol = @codigoDre";
         }
 
         private string QueryComunicadosUE()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                       from notificacao n
-                      where n.tipocomunicado = {(int)TipoComunicado.UE} and not excluido 
+                      where n.tipocomunicado = {(int)TipoComunicado.UE} and not n.excluido 
                       and n.ue_codigoeol = @codigoUe";
         }
 
@@ -326,7 +327,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     from notificacao n
                     where n.tipocomunicado = {(int)TipoComunicado.UEMOD} and not excluido 
                     and n.ue_codigoeol = @codigoUe 
-                    and string_to_array(n.modalidades,',') && string_to_array(@gruposId,',')";
+                    and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') && string_to_array(@tiposEscolas,',')";
         }
 
         private string QueryComunicadosTurmas()

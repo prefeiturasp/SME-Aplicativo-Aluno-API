@@ -52,6 +52,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 CodigoUE = aluno.CodigoEscola,
                 CodigoUsuario  = usuario.Id,
                 ModalidadesId = string.Join(',', modalidades),
+                TiposEscolas = aluno.CodigoTipoEscola.ToString(),
                 DataUltimaConsulta = dataUltimaConsulta,
                 SerieResumida = aluno.SerieResumida
             });

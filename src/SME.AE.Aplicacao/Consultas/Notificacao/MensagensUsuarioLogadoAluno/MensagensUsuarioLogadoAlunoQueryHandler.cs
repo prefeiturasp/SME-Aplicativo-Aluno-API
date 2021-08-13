@@ -20,7 +20,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 
         public async Task<IEnumerable<NotificacaoResposta>> Handle(MensagensUsuarioLogadoAlunoQuery request, CancellationToken cancellationToken)
         {
-            var retorno = await notificacaoRepository.ListarNotificacoes(request.ModalidadesId, request.CodigoUE, request.CodigoDRE, request.CodigoTurma, request.CodigoAluno, request.CodigoUsuario, request.SerieResumida);
+            var retorno = await notificacaoRepository.ListarNotificacoes(request.ModalidadesId, request.TiposEscolas, request.CodigoUE, request.CodigoDRE, request.CodigoTurma, request.CodigoAluno, request.CodigoUsuario, request.SerieResumida);
 
             if (retorno != null || retorno.Any())
                 return retorno;
