@@ -129,15 +129,27 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return usuarioNotificacao;
         }
 
-        public async Task<bool> Remover(long notificacaoId)
+        public async Task<bool> RemoverPorNotificacaoId(long notificacaoId)
         {
-            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
-            conn.Open();
-
-            await conn.ExecuteAsync(
+            await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
+            {
+                conn.Open();
+                await conn.ExecuteAsync(
                @"UPDATE usuario_notificacao_leitura SET excluido = true where notificacao_id = @notificacaoId", new { notificacaoId });
-            conn.Close();
+                conn.Close();
+            }
+            return true;
+        }
 
+        public async Task<bool> RemoverPorNotificacoesIds(long[] notificacoesIds)
+        {
+            await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
+            {
+                conn.Open();
+                await conn.ExecuteAsync(
+               @"UPDATE usuario_notificacao_leitura SET excluido = true where notificacao_id = ANY(@notificacoesIds)", new { notificacoesIds });
+                conn.Close();
+            }
             return true;
         }
 

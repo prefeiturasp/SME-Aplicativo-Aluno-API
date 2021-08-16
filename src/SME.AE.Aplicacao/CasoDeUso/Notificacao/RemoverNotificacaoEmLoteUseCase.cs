@@ -18,6 +18,10 @@ namespace SME.AE.Aplicacao
 
             var removeuNotificaoUsuarios = await mediator.Send(new RemoverNotificacaoUsuarioCommand(id));
 
+            await mediator.Send(new RemoverNotificacaoAlunoPorNotificacoesIdsCommand(id));
+
+            await mediator.Send(new RemoverNotificacaoTurmaPorNotificacoesIdsCommand(id));
+
             if (!removeuNotificaoUsuarios)
             {
                 resposta.Erros.SetValue($"Erro ao excluir Registros de leitura", 0);
