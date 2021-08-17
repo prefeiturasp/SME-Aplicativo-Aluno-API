@@ -23,6 +23,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string CategoriaNotificacao { get; set; }
         public bool EnviadoPushNotification { get; set; }
         public string Modalidades { get; set; }
+        public string TiposEscolas { get; set; }
 
         public void InserirCategoria()
         {
@@ -44,5 +45,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         }
         public IEnumerable<string> ObterSeriesResumidas() => SeriesResumidas.ToStringEnumerable();
         public IEnumerable<int> ObterModalidades() => Modalidades.ToIntEnumerable();
+        public IEnumerable<int> ObterTiposEscolas() => TiposEscolas.ToIntEnumerable();
     }
 }

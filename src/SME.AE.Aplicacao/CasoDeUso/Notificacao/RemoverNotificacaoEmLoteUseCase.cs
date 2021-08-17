@@ -1,18 +1,15 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
-using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Interfaces;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
+namespace SME.AE.Aplicacao
 {
-    public class RemoverNotificacaoEmLoteUseCase : IRemoverNotificacaoEmLoteUseCase
+    public class RemoverNotificacaoEmLoteUseCase : AbstractUseCase, IRemoverNotificacaoEmLoteUseCase
     {
-        private readonly IMediator mediator;
-
-        public RemoverNotificacaoEmLoteUseCase(IMediator mediator)
+        public RemoverNotificacaoEmLoteUseCase(IMediator mediator) : base(mediator)
         {
-            this.mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
         }
 
         public async Task<RespostaApi> Executar(long[] id)
@@ -20,6 +17,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
             RespostaApi resposta = new RespostaApi();
 
             var removeuNotificaoUsuarios = await mediator.Send(new RemoverNotificacaoUsuarioCommand(id));
+
+            await mediator.Send(new RemoverNotificacaoAlunoPorNotificacoesIdsCommand(id));
+
+            await mediator.Send(new RemoverNotificacaoTurmaPorNotificacoesIdsCommand(id));
 
             if (!removeuNotificaoUsuarios)
             {

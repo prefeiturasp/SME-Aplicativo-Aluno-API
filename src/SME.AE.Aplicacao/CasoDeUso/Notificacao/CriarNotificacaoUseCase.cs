@@ -81,7 +81,7 @@ namespace SME.AE.Aplicacao
             switch (notificacao.TipoComunicado)
             {
                 case TipoComunicado.SME:
-                    await EnviarNotificacaoSME(notificacao.ObterModalidades(), dicionarioNotificacao, notificacaoFirebase);
+                    await EnviarNotificacaoSME(notificacao.ObterModalidades(), notificacao.ObterTiposEscolas(), dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.SME_ANO:
                     await EnviarNotificacaoSerieResumida(notificacao, dicionarioNotificacao, notificacaoFirebase);
@@ -143,7 +143,7 @@ namespace SME.AE.Aplicacao
             }
         }
 
-        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarComunicadoUEModalidade(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             var modalidades = notificacao.ObterModalidades();
             foreach (var modalidade in modalidades)
@@ -151,7 +151,14 @@ namespace SME.AE.Aplicacao
                 var data = new Dictionary<String, String>(dicionarioNotificacao);
                 var topico = $"UE-{notificacao.CodigoUe}-MOD-{modalidade}";
                 data.Add("CodigoUe", "UE-" + notificacao.CodigoUe);
-                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+
+                if (!String.IsNullOrEmpty(notificacao.TiposEscolas))
+                {
+                    foreach (var tipoEscola in notificacao.TiposEscolas.ToIntEnumerable())
+                        await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem($"{topico}-TE-{tipoEscola}", notificacaoFirebase, data)));
+                }
+                else
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
             }
         }
 
@@ -161,16 +168,28 @@ namespace SME.AE.Aplicacao
             var topico = "UE-" + notificacao.CodigoUe;
             data.Add("CodigoUe", "UE-" + topico);
 
-            await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+            if (!String.IsNullOrEmpty(notificacao.TiposEscolas))
+            {
+                foreach (var tipoEscola in notificacao.TiposEscolas.ToIntEnumerable())
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem($"{topico}-TE-{tipoEscola}", Notificacao, data)));
+            }
+            else
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
         }
 
-        private async Task EnviarComunicadoDRE(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification Notificacao)
+        private async Task EnviarComunicadoDRE(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             var data = new Dictionary<String, String>(dicionarioNotificacao);
             var topico = "DRE-" + notificacao.CodigoDre;
             data.Add("CodigoDre", "DRE-" + topico);
 
-            await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, Notificacao, data)));
+            if (!String.IsNullOrEmpty(notificacao.TiposEscolas))
+            {
+                foreach (var tipoEscola in notificacao.TiposEscolas.ToIntEnumerable())
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem($"{topico}-TE-{tipoEscola}", notificacaoFirebase, data)));
+            }
+            else
+                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
         }
 
         private async Task EnviarComunicadoDRE_ANO(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
@@ -181,26 +200,50 @@ namespace SME.AE.Aplicacao
             foreach (var serieResumida in seriesResumidas)
             {
                 var topico = $"SERIERESUMIDA-{serieResumida}-DRE-{notificacao.CodigoDre}";
-                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+
+                if (!String.IsNullOrEmpty(notificacao.TiposEscolas))
+                {
+                    foreach (var tipoEscola in notificacao.TiposEscolas.ToIntEnumerable())
+                        await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem($"{topico}-TE-{tipoEscola}", notificacaoFirebase, data)));
+                }
+                else
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
             }
         }
 
-        private async Task EnviarNotificacaoSME(IEnumerable<int> modalidades, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
+        private async Task EnviarNotificacaoSME(IEnumerable<int> modalidades, IEnumerable<int> tiposEscolas, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
-            foreach (var modalidade in modalidades)
+            if (modalidades.Any())
             {
-                var data = dicionarioNotificacao;
+                foreach (var modalidade in modalidades)
+                {
+                    var data = dicionarioNotificacao;
 
-                var topico = $"MODALIDADE-{modalidade}";
+                    var topico = $"MODALIDADE-{modalidade}";
 
-                await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+                    foreach (var tipoEscola in tiposEscolas)
+                        topico = $"MODALIDADE-{modalidade}-TE-{tipoEscola}";
 
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+                }
+                return;
+            }
+
+            if (!modalidades.Any() && tiposEscolas.Any())
+            {
+                foreach (var tipoEscola in tiposEscolas)
+                {
+                    var data = dicionarioNotificacao;
+
+                    var topico = $"TE-{tipoEscola}";
+                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+                }
             }
         }
         private async Task EnviarNotificacaoSerieResumida(NotificacaoSgpDto notificacao, Dictionary<string, string> dicionarioNotificacao, Notification notificacaoFirebase)
         {
             var data = new Dictionary<String, String>(dicionarioNotificacao);
-            
+
             var modalidades = notificacao.ObterModalidades();
 
             var seriesResumidas = notificacao.ObterSeriesResumidas();
@@ -210,7 +253,13 @@ namespace SME.AE.Aplicacao
                 foreach (var modalidade in modalidades)
                 {
                     var topico = $"SERIERESUMIDA-{serieResumida}-MOD-{modalidade}";
-                    await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
+                    if (!String.IsNullOrEmpty(notificacao.TiposEscolas))
+                    {
+                        foreach (var tipoEscola in notificacao.TiposEscolas.ToIntEnumerable())
+                            await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem($"{topico}-TE-{tipoEscola}", notificacaoFirebase, data)));
+                    }
+                    else
+                        await mediator.Send(new EnviarNotificacaoPorGrupoCommand(MontaMensagem(topico, notificacaoFirebase, data)));
                 }
             }
         }

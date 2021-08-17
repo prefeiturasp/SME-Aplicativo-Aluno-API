@@ -20,6 +20,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
             Map(x => x.CategoriaNotificacao).ToColumn("categorianotificacao");
             Map(x => x.SeriesResumidas).ToColumn("seriesresumidas");
             Map(x => x.Modalidades).ToColumn("modalidades");
+            Map(x => x.TiposEscolas).ToColumn("tipos_escolas");
         }
     }
 }

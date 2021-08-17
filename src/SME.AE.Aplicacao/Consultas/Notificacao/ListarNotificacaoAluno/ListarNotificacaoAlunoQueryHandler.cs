@@ -12,10 +12,10 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
     public class ListarNotificacaoAlunoQueryHandler : IRequestHandler<ListarNotificacaoAlunoQuery, IEnumerable<NotificacaoResposta>>
     {
-        private readonly INotificacaoRepository notificacaoRepository;
+        private readonly INotificacaoRepositorio notificacaoRepository;
         private readonly IGrupoComunicadoRepository grupoComunicadoRepository;
 
-        public ListarNotificacaoAlunoQueryHandler(INotificacaoRepository notificacaoRepository, IGrupoComunicadoRepository grupoComunicadoRepository)
+        public ListarNotificacaoAlunoQueryHandler(INotificacaoRepositorio notificacaoRepository, IGrupoComunicadoRepository grupoComunicadoRepository)
         {
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
             this.grupoComunicadoRepository = grupoComunicadoRepository ?? throw new ArgumentNullException(nameof(grupoComunicadoRepository));
@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 
         public async Task<IEnumerable<NotificacaoResposta>> Handle(ListarNotificacaoAlunoQuery request, CancellationToken cancellationToken)
         {
-            var retorno = await notificacaoRepository.ListarNotificacoes(request.ModalidadesCodigo, request.CodigoUE, request.CodigoDRE, request.CodigoTurma, request.CodigoAluno, request.CodigoUsuario, request.SerieResumida);
+            var retorno = await notificacaoRepository.ListarNotificacoes(request.Modalidades, request.TiposEscolas, request.CodigoUE, request.CodigoDRE, request.CodigoTurma, request.CodigoAluno, request.CodigoUsuario, request.SerieResumida);
 
             if (retorno != null || retorno.Any())
                 return retorno;
