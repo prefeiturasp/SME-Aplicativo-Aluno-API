@@ -47,7 +47,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	               c.ano_letivo >= extract(year from current_date)
                 --and	date_trunc('day', c.data_envio) <= current_date 
                 --and date_trunc('day', c.data_expiracao) >= current_date
-                and not c.excluido 
+                and not c.excluido  and c.tipo_comunicado <>9
                 and not coalesce(ca.excluido, false)
                 and not coalesce(ct.excluido, false)
                 and not coalesce(cg.excluido, false)
