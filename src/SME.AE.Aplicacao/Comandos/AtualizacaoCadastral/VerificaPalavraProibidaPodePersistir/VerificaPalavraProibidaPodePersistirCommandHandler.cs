@@ -39,9 +39,9 @@ namespace SME.AE.Aplicacao
             else
                 palavrasBloqueadas = JsonConvert.DeserializeObject<string[]>(cachePalavrasBloqueadas);
 
-            var palavrasTratadas = request.Texto.ToLower();                        
+            var palavrasTratadas = request.Texto.ToLower();
 
-            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).ToList();
+            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).Where(x => x != "").ToList();
 
             var palavrasProibidas = string.Join("|", listaPalavrasBloqueadas);
 

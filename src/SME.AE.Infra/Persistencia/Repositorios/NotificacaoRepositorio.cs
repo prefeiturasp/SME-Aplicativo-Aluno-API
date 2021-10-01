@@ -236,6 +236,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       unl.mensagemvisualizada from(
                       {QueryComunicadosSME()}
                       union
+                      {QueryComunicadosAutomaticos()}
+                      union
                       {QueryComunicadosDRE()}
                       union
                       {QueryComunicadosSME_ANO()}
@@ -286,6 +288,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         and string_to_array(n.modalidades,',') 
                         && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
                         && string_to_array(@tiposEscolas,',')";
+        }
+        private string QueryComunicadosAutomaticos()
+        {
+            return $@"select {CamposConsultaNotificacao("n")}
+                        from notificacao n 
+                        where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido ";
         }
         private string QueryComunicadosSME_ANO()
         {
