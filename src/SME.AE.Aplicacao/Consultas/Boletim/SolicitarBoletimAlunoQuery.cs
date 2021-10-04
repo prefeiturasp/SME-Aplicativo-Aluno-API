@@ -5,7 +5,7 @@ namespace SME.AE.Aplicacao
 {
     public class SolicitarBoletimAlunoQuery : IRequest<bool>
     {
-        public SolicitarBoletimAlunoQuery(string dreCodigo, string ueCodigo, int semestre, string turmaCodigo, int anoLetivo, int modalidadeCodigo, int modelo, string alunosCodigo)
+        public SolicitarBoletimAlunoQuery(string dreCodigo, string ueCodigo, int semestre, string turmaCodigo, int anoLetivo, int modalidadeCodigo, int modelo, string alunoCodigo)
         {
             DreCodigo = dreCodigo;
             UeCodigo = ueCodigo;
@@ -14,7 +14,7 @@ namespace SME.AE.Aplicacao
             AnoLetivo = anoLetivo;
             ModalidadeCodigo = modalidadeCodigo;
             Modelo = modelo;
-            AlunosCodigo = alunosCodigo;
+            AlunoCodigo = alunoCodigo;
         }
 
         public string DreCodigo { get; set; }
@@ -31,6 +31,6 @@ namespace SME.AE.Aplicacao
 
         public int Modelo { get; set; }
 
-        public string AlunosCodigo { get; set; }
+        public string AlunoCodigo { get; set; }
     }
 }

@@ -18,6 +18,6 @@ namespace SME.AE.Aplicacao
 
         public int Modelo { get; set; }
 
-        public string AlunosCodigo { get; set; }
+        public string AlunoCodigo { get; set; }
     }
 }
