@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:3.1-focal as build
+﻿FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as build
 
 ARG SME_AE_ENVIRONMENT=dev
 
@@ -25,7 +25,7 @@ RUN dotnet restore \
     && cp -R /src/src/SME.AE.Api/bin/Release/netcoreapp3.1/publish /app \ 
     && rm -Rf /src
 
-FROM mcr.microsoft.com/dotnet/aspnet:3.1-focal as final
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-bionic as final
 COPY --from=build /app /app
 WORKDIR /app
 
@@ -33,7 +33,5 @@ RUN apt-get update -y \
     && apt-get install -y tzdata \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
   
-RUN apt-get update && apt-get upgrade -y && update-ca-certificates --fresh
-
 EXPOSE 5000-5001
 CMD ["/app/SME.AE.Api"]
