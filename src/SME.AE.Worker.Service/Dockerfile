@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-focal AS build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic AS build-env
 WORKDIR /src
 
 copy . ./
@@ -6,7 +6,7 @@ copy . ./
 run dotnet restore
 run dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-focal
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-bionic
 WORKDIR /app
 COPY --from=build-env /src/out .
 
@@ -19,7 +19,5 @@ ENV AEConnection=$AEConnection
 ENV EolConnection=$EolConnection
 ENV SgpConnection=$SgpConnection
 ENV CoreSSOConnection=$CoreSSOConnection
-
-RUN apt-get update && apt-get upgrade -y && update-ca-certificates --fresh
 
 CMD ["dotnet", "SME.AE.Worker.Service.dll"]
