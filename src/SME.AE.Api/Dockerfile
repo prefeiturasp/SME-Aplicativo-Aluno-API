@@ -1,9 +1,9 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-FROM mcr.microsoft.com/dotnet/sdk:3.1-focal as base
+FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as base
 
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:3.1-focal as build
+FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as build
 WORKDIR /src
 COPY ["src/SME.AE.Api/SME.AE.Api.csproj", "src/SME.AE.Api/"]
 COPY ["src/SME.AE.Infra/SME.AE.Infra.csproj", "src/SME.AE.Infra/"]
@@ -23,8 +23,6 @@ ENV TZ=America/Sao_Paulo
 RUN apt-get update -y \
     && apt-get install -y tzdata \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-    
-RUN apt-get update && apt-get upgrade -y && update-ca-certificates --fresh
     
 WORKDIR /app
 COPY --from=publish /app/publish .
