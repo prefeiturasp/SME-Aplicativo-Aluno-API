@@ -59,6 +59,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                 case TipoComunicado.ALUNO:
                     await ConfirmarLeituraAlunoEspecifico(mediator, usuarioMensagem, cpfUsuario, listaEscolas);
                     break;
+                case TipoComunicado.MENSAGEM_AUTOMATICA:
+                    await ConfirmarLeituraAlunoEspecifico(mediator, usuarioMensagem, cpfUsuario, listaEscolas);
+                    break;
                 default:
                     throw new NegocioException("Não identificado o Tipo desta notificação");
             };
