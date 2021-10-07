@@ -27,7 +27,11 @@ namespace SME.AE.Aplicacao.Comum.Modelos
 
         public void InserirCategoria()
         {
-            if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+            if(TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
+            {
+                CategoriaNotificacao = "UE";
+            }
+            else if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
             {
                 CategoriaNotificacao = "SME";
             }

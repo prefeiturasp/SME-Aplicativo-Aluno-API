@@ -183,7 +183,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and codigo_eol_aluno = @codigoEolAluno
 	                        and notificacao_id = @notificacaoId
 	                        and dre_codigoeol = @dreCodigoEol
-	                        and ue_codigoeol = @ueCodigoEo and not excluido";
+	                        and ue_codigoeol = @ueCodigoEol and not excluido";
 
             UsuarioNotificacao retorno = null;
             await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
