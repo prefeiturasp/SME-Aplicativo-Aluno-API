@@ -25,7 +25,11 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string SeriesResumidas { get; set; }
         public string CategoriaNotificacao { 
             get {
-                if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+                if (TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
+                {
+                    return "UE";
+                }
+                else if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
                 {
                     return "SME";
                 }
