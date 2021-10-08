@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using Sentry;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
@@ -47,7 +48,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	               c.ano_letivo >= extract(year from current_date)
                 --and	date_trunc('day', c.data_envio) <= current_date 
                 --and date_trunc('day', c.data_expiracao) >= current_date
-                and not c.excluido 
+                and not c.excluido  and c.tipo_comunicado <> @tipocomunicado
                 and not coalesce(ca.excluido, false)
                 and not coalesce(ct.excluido, false)
                 and not coalesce(cg.excluido, false)
@@ -58,7 +59,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
-                var comunicadosSgp = await conn.QueryAsync<ComunicadoSgpDto>(sql);
+                var comunicadosSgp = await conn.QueryAsync<ComunicadoSgpDto>(sql, new { tipocomunicado = TipoComunicado.MENSAGEM_AUTOMATICA });
                 conn.Close();
                 return comunicadosSgp;
             }

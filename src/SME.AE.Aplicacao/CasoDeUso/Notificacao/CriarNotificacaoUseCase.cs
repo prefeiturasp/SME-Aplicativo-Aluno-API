@@ -109,6 +109,7 @@ namespace SME.AE.Aplicacao
                     await EnviarComunicadoTurmas(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 case TipoComunicado.ALUNO:
+                case TipoComunicado.MENSAGEM_AUTOMATICA:
                     await EnviarComunicadoAlunos(notificacao, dicionarioNotificacao, notificacaoFirebase);
                     break;
                 default:
