@@ -11,7 +11,7 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        //[ChaveIntegracaoFiltro]
+        [ChaveIntegracaoFiltro]
         public async Task<ObjectResult> Criar([FromBody] NotificacaoSgpDto notificacao, [FromServices] ICriarNotificacaoUseCase criarNotificacaoUseCase)
         {
             return Ok(await criarNotificacaoUseCase.Executar(notificacao));
@@ -19,7 +19,7 @@ namespace SME.AE.Api.Controllers
 
         [HttpPut("{id}")]
         [AllowAnonymous]
-        //[ChaveIntegracaoFiltro]
+        [ChaveIntegracaoFiltro]
         public async Task<ObjectResult> Atualizar([FromBody] NotificacaoSgpDto notificacao, [FromServices] IAtualizarNotificacaoUseCase atualizarNotificacaoUseCase)
         {
             return Ok(await atualizarNotificacaoUseCase.Executar(notificacao));
