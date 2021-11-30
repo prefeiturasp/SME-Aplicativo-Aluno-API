@@ -17,9 +17,10 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
 
         public async Task<RespostaApi> Executar(long[] id)
         {
-            RespostaApi resposta = new RespostaApi();
+            RespostaApi resposta = new RespostaApi();            
 
-            var removeuNotificaoUsuarios = await mediator.Send(new RemoverNotificacaoUsuarioCommand(id));
+            var removeuNotificaoUsuarios = await mediator
+                .Send(new RemoverNotificacaoUsuarioCommand(id));
 
             if (!removeuNotificaoUsuarios)
             {
@@ -27,7 +28,8 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 return resposta;
             }
 
-            resposta.Erros = await mediator.Send(new RemoverNotificacaoCommand(id));
+            resposta.Erros = await mediator
+                .Send(new RemoverNotificacaoCommand(id));
 
             resposta.Ok = resposta.Erros?[0] == null;
 

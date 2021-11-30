@@ -26,6 +26,7 @@ namespace SME.AE.Comum
         public string UrlArquivosEstaticos { get; set; }
 
         public string ApiSgp { get; set; }
+        public string ChaveIntegracaoSgpApi { get; set; }
 
     }
 }
