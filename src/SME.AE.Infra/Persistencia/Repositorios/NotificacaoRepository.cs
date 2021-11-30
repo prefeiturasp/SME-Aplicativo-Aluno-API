@@ -204,8 +204,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 conn.Open();
 
-                var retorno = await conn.ExecuteAsync(
-                    @"DELETE FROM notificacao where id = @ID", notificacao);
+                await conn
+                    .ExecuteAsync(@"DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;
+                                    DELETE FROM notificacao where id = @ID;", new { ID = notificacao.Id });
+
                 conn.Close();
 
             }
@@ -258,7 +260,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       and unl.usuario_id = @usuarioId
                       and unl.codigo_eol_aluno = @codigoAluno
                       where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
-                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao > current_date) and 
+                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao >= current_date) and 
                         date_trunc('day', notificacao.dataenvio) <= current_date and
                         notificacao.enviadopushnotification
                 ";
