@@ -22,26 +22,19 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
         public async Task<RespostaApi> Executar(string cpf, string senha, string dispositivoId)
         {
-            try
-            {
-                var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
+            var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
 
-                if (!resposta.Ok)
-                    throw new NegocioException(string.Join("", resposta.Erros));
+            if (!resposta.Ok)
+                throw new NegocioException(string.Join("", resposta.Erros));
+            
+            var token = await mediator.Send(new CriarTokenCommand(cpf));
+            await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
 
-                var token = await mediator.Send(new CriarTokenCommand(cpf));
-                await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
+            var data = ((RespostaAutenticar)resposta.Data);
+            data.Token = token;
+            resposta.Data = data;
 
-                var data = ((RespostaAutenticar)resposta.Data);
-                data.Token = token;
-                resposta.Data = data;
-
-                return resposta;
-            }
-            catch (Exception ex)
-            {
-                throw new NegocioException($"Erro: {ex.ToString()}");
-            }            
+            return resposta;
         }
     }
 }
