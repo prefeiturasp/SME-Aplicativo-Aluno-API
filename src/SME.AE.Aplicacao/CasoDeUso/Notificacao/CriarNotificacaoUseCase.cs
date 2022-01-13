@@ -30,21 +30,29 @@ namespace SME.AE.Aplicacao
 
         public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
         {
-            notificacao.DataEnvio = notificacao.DataEnvio.Date;
-            var dataEnvio = TimeZoneInfo.ConvertTimeToUtc(notificacao.DataEnvio).Date;
-            var hoje = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now).Date;
-
-            notificacao.EnviadoPushNotification = (hoje >= dataEnvio);
-
-            await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
-
-            if (notificacao.EnviadoPushNotification)
+            try
             {
-                notificacao.InserirCategoria();
-                await EnviarNotificacaoImediataAsync(notificacao);
-            }
+                notificacao.DataEnvio = notificacao.DataEnvio.Date;
+                var dataEnvio = TimeZoneInfo.ConvertTimeToUtc(notificacao.DataEnvio).Date;
+                var hoje = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now).Date;
 
-            return notificacao;
+                notificacao.EnviadoPushNotification = (hoje >= dataEnvio);
+
+                await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+
+                if (notificacao.EnviadoPushNotification)
+                {
+                    notificacao.InserirCategoria();
+                    await EnviarNotificacaoImediataAsync(notificacao);
+                }
+
+                return notificacao;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
 
         public async Task EnviarNotificacaoImediataAsync(NotificacaoSgpDto notificacao)
