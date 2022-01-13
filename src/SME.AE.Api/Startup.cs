@@ -101,7 +101,7 @@ namespace SME.AE.Api
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhemento Escolar", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhamento Escolar", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -163,7 +163,7 @@ namespace SME.AE.Api
 
             app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhemento Escolar V1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME - Acompanhamento Escolar V1");
                 });
 
             app
