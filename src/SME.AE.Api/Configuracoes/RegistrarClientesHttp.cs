@@ -38,7 +38,8 @@ namespace SME.AE.Api.Configuracoes
                 c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
-            }).AddPolicyHandler(policy);
+            }).AddPolicyHandler(policy)
+            .AddHttpMessageHandler<AutenticacaoSgpDelegatingHandler>();
         }
 
         static IAsyncPolicy<HttpResponseMessage> ObterPolicyBaseHttp()
