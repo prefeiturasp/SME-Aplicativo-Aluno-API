@@ -69,9 +69,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
 
             if(usuarioRetorno == null)
-            {
                 return RespostaApi.Falha("Usuário não cadastrado, qualquer dúvida procure a unidade escolar.");
-            }
+                
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
             {
