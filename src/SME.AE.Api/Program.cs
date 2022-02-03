@@ -20,7 +20,6 @@ namespace SME.AE.Api
             })
             .UseStartup<Startup>()
             .UseSentry()
-            //.UseUrls("http://0.0.0.0:5000;");
-            .UseUrls("http://192.168.34.27:9000;");
+            .UseUrls("http://0.0.0.0:5000;");
     }
 }
