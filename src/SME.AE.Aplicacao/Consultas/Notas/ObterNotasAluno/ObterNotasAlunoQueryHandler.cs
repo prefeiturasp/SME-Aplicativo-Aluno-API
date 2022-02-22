@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using SME.AE.Comum.Excecoes;
 using System.Collections.Generic;

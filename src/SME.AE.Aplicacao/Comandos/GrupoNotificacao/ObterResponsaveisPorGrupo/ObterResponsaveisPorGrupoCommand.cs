@@ -1,11 +1,9 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Practices.ObjectBuilder2;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

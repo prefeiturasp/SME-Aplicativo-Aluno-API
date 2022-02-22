@@ -4,7 +4,7 @@ namespace SME.AE.Aplicacao
 {
     public class ComponenteCurricularDto : IEquatable<ComponenteCurricularDto>
     {
-        public ComponenteCurricularDto(long codigo, string descricao )
+        public ComponenteCurricularDto(long codigo, string descricao)
         {
             Codigo = codigo;
             Descricao = descricao;

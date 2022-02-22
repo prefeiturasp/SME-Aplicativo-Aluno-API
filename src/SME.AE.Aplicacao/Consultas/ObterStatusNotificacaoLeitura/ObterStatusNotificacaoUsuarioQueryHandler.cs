@@ -16,8 +16,8 @@ namespace SME.AE.Aplicacao.Consultas
         private readonly IUsuarioRepository usuarioRepositorio;
         private readonly IAlunoRepositorio alunoRepositorio;
 
-        public ObterStatusNotificacaoUsuarioQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio, 
-                                                         IUsuarioRepository usuarioRepositorio, 
+        public ObterStatusNotificacaoUsuarioQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
+                                                         IUsuarioRepository usuarioRepositorio,
                                                          IAlunoRepositorio alunoRepositorio)
         {
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new ArgumentNullException(nameof(dadosLeituraRepositorio));

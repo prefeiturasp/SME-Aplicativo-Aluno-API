@@ -6,7 +6,6 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -50,7 +49,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
 
         private void InstanciarSetup()
         {
-            usuarioCoreSSORepositorio.Setup(x => x.SelecionarGrupos()).ReturnsAsync(new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()});
+            usuarioCoreSSORepositorio.Setup(x => x.SelecionarGrupos()).ReturnsAsync(new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() });
             usuarioCoreSSORepositorio.Setup(x => x.IncluirUsuarioNosGrupos(It.IsAny<Guid>(), It.IsAny<IEnumerable<Guid>>()));
         }
 

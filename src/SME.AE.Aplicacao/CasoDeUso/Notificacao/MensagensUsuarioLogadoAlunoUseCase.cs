@@ -50,7 +50,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 CodigoDRE = aluno.CodigoDre,
                 CodigoTurma = aluno.CodigoTurma.ToString(),
                 CodigoUE = aluno.CodigoEscola,
-                CodigoUsuario  = usuario.Id,
+                CodigoUsuario = usuario.Id,
                 ModalidadesId = string.Join(',', modalidades),
                 TiposEscolas = aluno.CodigoTipoEscola.ToString(),
                 DataUltimaConsulta = dataUltimaConsulta,

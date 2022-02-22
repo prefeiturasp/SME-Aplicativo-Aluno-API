@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SME.AE.Dominio.Entidades
+﻿namespace SME.AE.Dominio.Entidades
 {
     public class UsuarioNotificacao : EntidadeBase
     {

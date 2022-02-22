@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace SME.AE.Api.Controllers
 {
     [Route("api/v1/[controller]")]
-    [ApiController]    
+    [ApiController]
     [Authorize]
     public abstract class ApiController : ControllerBase
     {

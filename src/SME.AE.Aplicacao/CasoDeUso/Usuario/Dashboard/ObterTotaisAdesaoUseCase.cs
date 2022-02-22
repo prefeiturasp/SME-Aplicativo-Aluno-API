@@ -2,7 +2,6 @@
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterTotaisAdesao;
-using SME.AE.Aplicacao.Consultas.ObterTotalUsuariosValidos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,5 +21,5 @@ namespace SME.AE.Aplicacao.CasoDeUso
         {
             return await mediator.Send(new ObterTotaisAdesaoQuery(codigoDre, codigoUe));
         }
-    }    
+    }
 }

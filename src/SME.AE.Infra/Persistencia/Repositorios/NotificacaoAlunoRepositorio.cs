@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using Npgsql;
-using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using System;
 using System.Threading.Tasks;

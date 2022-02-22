@@ -1,7 +1,4 @@
 ﻿using SME.AE.Dominio.Entidades.Externas;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos.Externos
 {

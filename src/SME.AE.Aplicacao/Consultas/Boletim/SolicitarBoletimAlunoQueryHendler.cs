@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
 {
-    public class SolicitarBoletimAlunoQueryHendler : IRequestHandler<SolicitarBoletimAlunoQuery,bool>
+    public class SolicitarBoletimAlunoQueryHendler : IRequestHandler<SolicitarBoletimAlunoQuery, bool>
     {
         private readonly IHttpClientFactory httpClientFactory;
         public SolicitarBoletimAlunoQueryHendler(IHttpClientFactory httpClientFactory)

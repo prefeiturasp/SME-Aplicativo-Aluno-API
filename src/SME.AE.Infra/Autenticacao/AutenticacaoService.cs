@@ -30,7 +30,7 @@ namespace SME.AE.Infra.Autenticacao
             var usuario = await _userManager.Users.FirstAsync(u => u.Id == id);
             return usuario.UserName;
         }
-        
+
         public async Task<(RespostaApi resposta, string id)> CriarUsuarioAsync(string cpf, string senha)
         {
             var usuario = new UsuarioAplicacao

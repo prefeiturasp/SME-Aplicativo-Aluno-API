@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+﻿using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -25,7 +21,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task ExecutarAsync()
         {
             var notificacoesParaEnviar = await notificacaoRepository.ListarNotificacoesNaoEnviadas();
-            foreach(var notificacao in notificacoesParaEnviar)
+            foreach (var notificacao in notificacoesParaEnviar)
             {
                 await EnviaPushNotification(notificacao);
                 await AlteraFlagEnviado(notificacao);

@@ -2,7 +2,6 @@
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {

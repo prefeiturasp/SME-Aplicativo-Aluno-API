@@ -9,8 +9,6 @@ using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Aplicacao.Consultas.VerificarSenha;
 using SME.AE.Comum.Excecoes;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -63,7 +61,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
         [InlineData("61056974141", "", "Ab#12345")]
         [InlineData("", "#Aa12345", "Ab#12345")]
         [InlineData("23814767159", "Ab#12345", "Ab#12345")]
-        [InlineData("00000100000", "Ab#12345", "Ab#12345")]        
+        [InlineData("00000100000", "Ab#12345", "Ab#12345")]
         public async Task Deve_Acusar_Erro_Validacao(string cpf, string senha, string senhaAnterior)
         {
             InstanciarSetup();

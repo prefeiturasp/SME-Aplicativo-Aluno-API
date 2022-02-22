@@ -14,7 +14,7 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromBody] AutenticacaoDTO autenticacao,[FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
+        public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromBody] AutenticacaoDTO autenticacao, [FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
         {
             return Ok(await autenticarUsuarioUseCase.Executar(autenticacao.Cpf, autenticacao.Senha, autenticacao.DispositivoId));
         }
@@ -27,34 +27,34 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpPost("PrimeiroAcesso")]
-        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices]IPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
+        public async Task<ActionResult<RespostaApi>> PrimeiroAcesso([FromBody] NovaSenhaDto novaSenhaDto, [FromServices] IPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase)
         {
             return Ok(await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDto));
         }
-        
+
         [HttpPut("Senha/Alterar")]
-        public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody]SenhaDto senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)
+        public async Task<ActionResult<RespostaApi>> AlterarSenha([FromBody] SenhaDto senha, [FromServices] IAlterarSenhaUseCase alterarSenhaUseCase)
         {
             return await alterarSenhaUseCase.Executar(new AlterarSenhaDto(User.Identity.Name, senha.NovaSenha), senha.SenhaAntiga);
         }
 
         [HttpPut("Senha/Token")]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> SolicitarRedefinicao([FromBody]GerarTokenDto gerarTokenDto, [FromServices]ISolicitarRedifinicaoSenhaUseCase solicitarRedifinicaoSenhaUseCase)
+        public async Task<ActionResult<RespostaApi>> SolicitarRedefinicao([FromBody] GerarTokenDto gerarTokenDto, [FromServices] ISolicitarRedifinicaoSenhaUseCase solicitarRedifinicaoSenhaUseCase)
         {
             return await solicitarRedifinicaoSenhaUseCase.Executar(gerarTokenDto);
         }
 
         [HttpPut("Senha/Token/Validar")]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> ValidarToken([FromBody]ValidarTokenDto validarTokenDto,[FromServices]IValidarTokenUseCase validarTokenUseCase)
+        public async Task<ActionResult<RespostaApi>> ValidarToken([FromBody] ValidarTokenDto validarTokenDto, [FromServices] IValidarTokenUseCase validarTokenUseCase)
         {
             return await validarTokenUseCase.Executar(validarTokenDto);
         }
 
         [HttpPut("Senha/Redefinir")]
         [AllowAnonymous]
-        public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody]RedefinirSenhaDto redefinirSenhaDto,[FromServices]IRedefinirSenhaUseCase redefinirSenhaUseCase)
+        public async Task<ActionResult<RespostaApi>> RedefinirSenha([FromBody] RedefinirSenhaDto redefinirSenhaDto, [FromServices] IRedefinirSenhaUseCase redefinirSenhaUseCase)
         {
             return await redefinirSenhaUseCase.Executar(redefinirSenhaDto);
         }

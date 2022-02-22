@@ -2,9 +2,7 @@
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +21,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         {
             var dadosLeituraComunicados = await dadosLeituraRepositorio
                     .ObterDadosLeituraModalidade(request.CodigoDre, request.CodigoUe, request.NotificaoId, request.ModoVisualizacao == ModoVisualizacao.Responsavel);
-            
+
             return ObterNomeModalidade(dadosLeituraComunicados);
         }
 

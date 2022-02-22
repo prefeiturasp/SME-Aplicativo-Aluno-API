@@ -1,5 +1,4 @@
 ﻿using SME.AE.Comum.Excecoes;
-using System;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario.Excecoes
 {

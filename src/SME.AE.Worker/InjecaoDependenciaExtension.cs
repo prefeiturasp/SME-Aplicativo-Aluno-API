@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
@@ -12,6 +11,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using SME.AE.Comum.Utilitarios;
+using SME.AE.Infra;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
 using SME.AE.Infra.Persistencia.Repositorios;
@@ -74,6 +74,7 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddTransient(typeof(IServicoLog), typeof(ServicoLog));
+            services.AddTransient(typeof(IOutroServicoRepositorio), typeof(OutroServicoRepositorio));
 
             return services;
         }

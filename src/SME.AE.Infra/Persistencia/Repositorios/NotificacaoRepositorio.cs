@@ -225,7 +225,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where n.id = @Id and not n.excluido ";
         }
 
-        private string MontarQueryListagemCompleta(string serieResumida,string codigoAluno)
+        private string MontarQueryListagemCompleta(string serieResumida, string codigoAluno)
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or n.SeriesResumidas = '' or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
 
@@ -291,7 +291,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
         private string QueryComunicadosAutomaticos(string codigoAluno)
         {
-            return  $@"select {CamposConsultaNotificacao("n")}
+            return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
                         inner join notificacao_aluno na 
                          on na.notificacao_id = n.id

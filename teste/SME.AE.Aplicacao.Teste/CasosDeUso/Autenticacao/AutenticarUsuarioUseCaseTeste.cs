@@ -28,7 +28,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             mediator.Setup(a => a.Send(It.IsAny<UsuarioDispositivoCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
-            var autenticacao = await autenticarUsuarioUseCase.Executar("000.000.000-00", "Ab#123456","Teste");
+            var autenticacao = await autenticarUsuarioUseCase.Executar("000.000.000-00", "Ab#123456", "Teste");
 
             Assert.True(autenticacao.Ok);
         }

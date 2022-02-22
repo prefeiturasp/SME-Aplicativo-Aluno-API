@@ -37,10 +37,10 @@ namespace SME.AE.Worker.Service
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration( a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
+                .ConfigureAppConfiguration(a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
                 .ConfigureServices((hostContext, services) =>
                 {
-                    
+
                     AdicionarAutoMapper(services);
                     AdicionarMediatr(services);
                     services

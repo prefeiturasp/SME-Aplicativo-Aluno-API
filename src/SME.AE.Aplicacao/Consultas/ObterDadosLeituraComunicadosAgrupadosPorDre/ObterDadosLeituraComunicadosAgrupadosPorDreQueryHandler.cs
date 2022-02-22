@@ -17,7 +17,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         private readonly IUsuarioNotificacaoRepositorio usuarioNotificacaoLeituraRepositorio;
         private readonly IDreSgpRepositorio dreSgpRepositorio;
 
-        public ObterDadosLeituraComunicadosAgrupadosPorDreQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio, 
+        public ObterDadosLeituraComunicadosAgrupadosPorDreQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
                                                                        IUsuarioNotificacaoRepositorio usuarioNotificacaoLeituraRepositorio,
                                                                        IDreSgpRepositorio dreSgpRepositorio)
         {
@@ -34,7 +34,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                 throw new Exception("Não foram encontrados dados de leitura de comunicados");
 
             var retornoDadosLeituraComunicadosResultado = new List<DadosLeituraComunicadosResultado>();
-            
+
             foreach (var dadosLeituraDre in dadosLeituraComunicadosAgrupadosPorDre)
             {
                 var dadosLeituraComunicadosResultado = new DadosLeituraComunicadosResultado();
@@ -65,7 +65,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         private async Task ObterTotaisDeLeituraPorResponsavel(ObterDadosLeituraComunicadosAgrupadosPorDreQuery request, DadosConsolidacaoNotificacaoResultado dadosLeituraComunicados, DadosLeituraComunicadosResultado dadosLeituraComunicadosResultado)
         {
             var totalNotificacoesLeituraPorResponsavel = await usuarioNotificacaoLeituraRepositorio.ObterTotalNotificacoesLeituraPorResponsavel(request.NotificaoId, long.Parse(dadosLeituraComunicados.DreCodigo));
-            
+
             var nomeAbreviadoDre = await ObterNomeAvreviadoDrePorCodigo(dadosLeituraComunicados);
             dadosLeituraComunicadosResultado.NomeAbreviadoDre = nomeAbreviadoDre.NomeAbreviado;
             dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.QuantidadeResponsaveisComApp - totalNotificacoesLeituraPorResponsavel);

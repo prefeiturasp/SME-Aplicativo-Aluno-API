@@ -27,7 +27,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
 
         public void InserirCategoria()
         {
-            if(TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
+            if (TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
             {
                 CategoriaNotificacao = "UE";
             }

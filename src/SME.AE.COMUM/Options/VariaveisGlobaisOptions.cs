@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace SME.AE.Comum
+﻿namespace SME.AE.Comum
 {
     public class VariaveisGlobaisOptions
     {

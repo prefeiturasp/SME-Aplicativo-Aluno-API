@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using SME.AE.Aplicacao.Consultas.Frequencia;
 
 namespace SME.AE.Aplicacao.Consultas.Frequencia.PorComponenteCurricular
 {

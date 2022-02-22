@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
 using SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo;
-using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
