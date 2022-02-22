@@ -39,7 +39,7 @@ true,true,3,now(),'Sistema',null,null,1,null);
 
 -- Insert Icone  SIC
 insert into public.outroservico(titulo,descricao,categoria,urlsite,icone,destaque,ativo,ordem,criado_em,criado_por,alterado_em,alterado_por,criado_rf,alterado_rf)
-values('SIC - Serviço de informações ao cidadão','O SIC recebe e registra pedidos de acesso à informação feitos por cidadõas.','Solicitações e Informações',
+values('SIC - Serviço de informações ao cidadão','O SIC recebe e registra pedidos de acesso à informação feitos por cidadãos.','Solicitações e Informações',
 'http://esic.prefeitura.sp.gov.br/','https://novosgp.sme.prefeitura.sp.gov.br/Arquivos/EscolaAqui/sic.png',
 false,true,null,now(),'Sistema',null,null,1,null);
 
