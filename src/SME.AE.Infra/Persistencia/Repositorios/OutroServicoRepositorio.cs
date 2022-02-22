@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Npgsql;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum;
@@ -10,17 +11,19 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Infra
 {
-    public class OutroServicoRepositorio : BaseRepositorio<OutroServico>, IOutroServicoRepositorio
+    public class OutroServicoRepositorio : IOutroServicoRepositorio
     {
-        protected OutroServicoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        public OutroServicoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
-
+        private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
         public async Task<IEnumerable<OutroServicoDto>> Links()
         {
             try
             {
-                using var conexao = InstanciarConexao();
+                using var conexao = CriaConexao();
                 conexao.Open();
                 var lista = await conexao.QueryAsync<OutroServicoDto>(@"
                         select 
@@ -31,7 +34,7 @@ namespace SME.AE.Infra
 	                        icone,
 	                        destaque
                         from OutroServico
-                        where ativo and destaque");
+                        where ativo ");
                 conexao.Close();
 
                 return lista;
@@ -46,7 +49,7 @@ namespace SME.AE.Infra
         {
             try
             {
-                using var conexao = InstanciarConexao();
+                using var conexao = CriaConexao();
                 conexao.Open();
                 var lista = await conexao.QueryAsync<OutroServicoDto>(@"
                         select 
@@ -57,7 +60,7 @@ namespace SME.AE.Infra
 	                        icone,
 	                        destaque
                         from OutroServico
-                        where ativo");
+                        where ativo and destaque");
                 conexao.Close();
 
                 return lista;

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public interface IOutroServicoRepositorio : IBaseRepositorio<OutroServico>
+    public interface IOutroServicoRepositorio
     {
         Task<IEnumerable<OutroServicoDto>> LinksPrioritarios();
         Task<IEnumerable<OutroServicoDto>> Links();
