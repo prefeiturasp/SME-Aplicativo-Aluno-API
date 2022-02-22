@@ -62,8 +62,7 @@ namespace SME.AE.Infra
 	                        destaque,ordem
                         from OutroServico
                         where ativo and destaque
-                        and ordem between 1 and 6
-                        order by ordem");
+                        order by ordem limit 6;");
                 conexao.Close();
 
                 return lista;
