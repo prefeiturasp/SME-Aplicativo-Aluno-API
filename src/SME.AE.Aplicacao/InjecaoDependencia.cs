@@ -11,7 +11,6 @@ using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
-using SME.AE.Aplicacao.Comum;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
@@ -129,7 +128,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterBimestresLiberacaoBoletimAlunoUseCase, ObterBimestresLiberacaoBoletimAlunoUseCase>();
             services.TryAddScoped<IObterComponentesCurricularesIdsUseCase, ObterComponentesCurricularesIdsUseCase>();
 
-            services.TryAddScoped<IObterDadosUsuarioPorCpfUseCase, ObterDadosUsuarioPorCpfUseCase>();            
+            services.TryAddScoped<IObterDadosUsuarioPorCpfUseCase, ObterDadosUsuarioPorCpfUseCase>();
         }
     }
 }

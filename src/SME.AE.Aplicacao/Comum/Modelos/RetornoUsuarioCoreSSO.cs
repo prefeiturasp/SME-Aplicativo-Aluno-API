@@ -12,8 +12,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string Cpf { get; set; }
         public string Senha { get; set; }
         public IEnumerable<Guid> Grupos { get; set; }
-        public int Status { get;set; }
-        public TipoCriptografia TipoCriptografia {get;set;}
+        public int Status { get; set; }
+        public TipoCriptografia TipoCriptografia { get; set; }
 
         public void AlterarSenha(string senha)
         {

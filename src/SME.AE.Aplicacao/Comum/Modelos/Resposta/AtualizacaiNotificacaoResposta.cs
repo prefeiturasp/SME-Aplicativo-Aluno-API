@@ -2,7 +2,7 @@
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
-    public class AtualizacaoNotificacaoResposta 
+    public class AtualizacaoNotificacaoResposta
     {
         public long Id { get; set; }
         public string Titulo { get; set; }

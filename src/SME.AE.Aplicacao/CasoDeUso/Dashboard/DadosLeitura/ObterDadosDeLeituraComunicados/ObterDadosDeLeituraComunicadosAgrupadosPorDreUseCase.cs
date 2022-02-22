@@ -20,6 +20,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task<IEnumerable<DadosLeituraComunicadosResultado>> Executar(long notificacaoId, ModoVisualizacao modoVisualizacao)
         {
             return await mediator.Send(new ObterDadosLeituraComunicadosAgrupadosPorDreQuery(notificacaoId, modoVisualizacao));
-        }   
+        }
     }
 }

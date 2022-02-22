@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using SME.AE.Dominio.Entidades;
-using SME.AE.Aplicacao.Comum.Interfaces.Geral;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf
@@ -17,11 +14,11 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ObterPorCpf
             Cpf = cpf;
         }
     }
-    
+
     public class ObterUsuarioPorCpfCommandHandler : IRequestHandler<ObterUsuarioPorCpfCommand, Dominio.Entidades.Usuario>
-    {        
+    {
         private readonly IUsuarioRepository _repository;
-        
+
         public ObterUsuarioPorCpfCommandHandler(IUsuarioRepository repository)
         {
             _repository = repository;

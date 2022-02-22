@@ -34,7 +34,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
         {
-            bool primeiroAcesso = false;            
+            bool primeiroAcesso = false;
 
             var validator = new AutenticarUsuarioUseCaseValidatior();
             var validacao = validator.Validate(request);
@@ -94,7 +94,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
-            } else
+            }
+            else
             {
                 primeiroAcesso = true;
                 var senha = Regex.Replace(request.Senha, @"\-\/", "");
@@ -145,7 +146,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             var usuarioParaSeBasear = usuarioAlunos
                 .OrderByDescending(a => a.DataAtualizacao)
                 .FirstOrDefault();
-         
+
             primeiroAcesso = primeiroAcesso || !grupos.Any(x => usuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
             //verificar se o usuário está incluído em todos os grupos            
@@ -159,12 +160,12 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             usuarioRetorno = await CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(request, usuarioRetorno, usuarioParaSeBasear, primeiroAcesso);
-            
+
             usuarioRetorno.PrimeiroAcesso = usuarioRetorno.PrimeiroAcesso || primeiroAcesso;
 
             var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
 
-            
+
             return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
         }
 

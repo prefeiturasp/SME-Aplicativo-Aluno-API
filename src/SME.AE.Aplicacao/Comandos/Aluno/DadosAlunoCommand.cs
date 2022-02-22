@@ -4,7 +4,6 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Excecoes;
-using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +49,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     var modalidadeDaTurma = turmasModalidade.FirstOrDefault(a => a.TurmaCodigo == dadoDoAluno.CodigoTurma);
                     dadoDoAluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
                     dadoDoAluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
-                });              
+                });
 
                 var tipoEscola =
                     dadosDosAlunos
@@ -87,7 +86,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     });
 
                 return RespostaApi.Sucesso(tipoEscola);
-            }            
+            }
         }
     }
 }

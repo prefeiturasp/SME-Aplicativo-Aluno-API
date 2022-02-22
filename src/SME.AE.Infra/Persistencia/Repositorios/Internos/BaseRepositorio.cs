@@ -9,7 +9,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class BaseRepositorio<T> : IBaseRepositorio<T> where T : EntidadeBase
     {
-       
+
         private readonly string _connectionString;
         protected BaseRepositorio(string connectionString)
         {
@@ -34,7 +34,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 return retorno;
             }
         }
-        
+
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
             using (var conexao = InstanciarConexao())
@@ -74,15 +74,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conexao.CloseAsync();
             }
         }
-        
+
         public virtual async Task<long> SalvarAsync(T entidade)
         {
             if (entidade.Id == 0)
                 return await InserirAsync(entidade);
-           
+
             return await AtualizarAsync(entidade);
         }
-        
+
         private async Task<long> InserirAsync(T entidade)
         {
             using (var conexao = InstanciarConexao())

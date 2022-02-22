@@ -1,6 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
-
-namespace SME.AE.Aplicacao
+﻿namespace SME.AE.Aplicacao
 {
     public class SolicitarBoletimAlunoDto
     {

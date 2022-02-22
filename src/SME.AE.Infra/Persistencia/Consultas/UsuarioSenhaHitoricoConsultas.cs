@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.AE.Infra.Persistencia.Consultas
+﻿namespace SME.AE.Infra.Persistencia.Consultas
 {
     public static class UsuarioSenhaHitoricoConsultas
     {

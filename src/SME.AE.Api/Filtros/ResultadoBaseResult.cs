@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.Comum.Modelos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SME.AE.Api.Filtros
 {

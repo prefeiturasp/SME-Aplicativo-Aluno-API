@@ -26,7 +26,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 
                 if (request.Notificacao.TipoComunicado == TipoComunicado.ALUNO)
                     await IncluirNotificacaoAlunos(request);
-                else if(request.Notificacao.TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
+                else if (request.Notificacao.TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
                     await IncluirNotificacaoAlunos(request);
                 else if (request.Notificacao.TipoComunicado == TipoComunicado.TURMA)
                     await IncluirNotificacaoTurma(request);

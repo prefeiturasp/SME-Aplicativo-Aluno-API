@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
 {
-  public interface IObterBimestresLiberacaoBoletimAlunoUseCase
+    public interface IObterBimestresLiberacaoBoletimAlunoUseCase
     {
         Task<int[]> Executar(string turmaCodigo);
     }

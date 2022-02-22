@@ -1,7 +1,6 @@
 ﻿using SME.AE.Aplicacao.Comum.Modelos;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Infra.Autenticacao
 {

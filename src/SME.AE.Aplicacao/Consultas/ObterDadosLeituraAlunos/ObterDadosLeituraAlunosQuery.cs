@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 

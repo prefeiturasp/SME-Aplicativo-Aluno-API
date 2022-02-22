@@ -11,7 +11,8 @@ namespace SME.AE.Comum
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
             return type.GetProperties()
-                    .Select(p => {
+                    .Select(p =>
+                    {
                         var jp = base.CreateProperty(p, memberSerialization);
                         jp.ValueProvider = new NullToEmptyStringValueProvider(p);
                         return jp;

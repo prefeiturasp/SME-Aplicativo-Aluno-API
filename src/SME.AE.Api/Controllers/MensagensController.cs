@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
-using SME.AE.Api.Filtros;
-using SME.AE.Aplicacao.CasoDeUso.Notificacao;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Threading.Tasks;
 

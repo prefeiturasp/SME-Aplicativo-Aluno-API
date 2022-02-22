@@ -13,17 +13,17 @@ namespace SME.AE.Aplicacao.Comandos.Token.Criar
     public class CriarTokenCommand : IRequest<string>
     {
         public string Usuario { get; set; }
-        
+
         public CriarTokenCommand(string usuario)
         {
             Usuario = usuario;
         }
     }
-    
+
     public class CriarTokenCommandHandler : IRequestHandler<CriarTokenCommand, string>
     {
         private readonly string JwtTokenSecret;
-        
+
         public CriarTokenCommandHandler(VariaveisGlobaisOptions variaveisGlobais)
         {
             JwtTokenSecret = variaveisGlobais.SME_AE_JWT_TOKEN_SECRET;
@@ -37,15 +37,15 @@ namespace SME.AE.Aplicacao.Comandos.Token.Criar
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, request.Usuario) 
+                    new Claim(ClaimTypes.Name, request.Usuario)
                 }),
                 Issuer = "self",
                 Expires = DateTime.UtcNow.AddDays(30),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key), 
+                    new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
             };
-            
+
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             return await Task.FromResult(tokenHandler.WriteToken(token));
         }

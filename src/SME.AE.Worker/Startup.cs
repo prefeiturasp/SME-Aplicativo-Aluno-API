@@ -24,7 +24,7 @@ namespace SME.AE.Worker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
+
             AdicionarMediatr(services);
             ConfiguraVariaveisAmbiente(services);
             ConfiguraSentry();
@@ -32,7 +32,7 @@ namespace SME.AE.Worker
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
             services.AddSingleton(servicoProdam);
-            
+
             RegistrarMapeamentos.Registrar();
 
             services
@@ -46,7 +46,7 @@ namespace SME.AE.Worker
                 .AddApplicationInsightsTelemetry()
                 .AddHostedService<WorkerRabbitMQ>();
 
-           
+
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -57,9 +57,9 @@ namespace SME.AE.Worker
 
         private void ConfiguraSentry()
         {
-            Sentry.SentrySdk.Init(Configuration.GetSection("Sentry:DSN").Value);            
+            Sentry.SentrySdk.Init(Configuration.GetSection("Sentry:DSN").Value);
         }
-        
+
         private void ConfiguraVariaveisAmbiente(IServiceCollection services)
         {
             var variaveisGlobais = new VariaveisGlobaisOptions();

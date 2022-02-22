@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao
             else
             {
                 throw new System.Exception($"Não foi possível obter as modalidades das turmas {turmasCodigos}");
-            }            
+            }
         }
     }
 }

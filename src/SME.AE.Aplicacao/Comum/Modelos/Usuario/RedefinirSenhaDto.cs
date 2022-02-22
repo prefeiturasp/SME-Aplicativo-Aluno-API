@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.AE.Aplicacao.Comum.Modelos.Usuario
+﻿namespace SME.AE.Aplicacao.Comum.Modelos.Usuario
 {
     public class RedefinirSenhaDto
     {

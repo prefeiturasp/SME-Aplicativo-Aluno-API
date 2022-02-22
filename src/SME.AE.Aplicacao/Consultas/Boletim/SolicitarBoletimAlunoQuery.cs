@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Enumeradores;
 
 namespace SME.AE.Aplicacao
 {

@@ -34,7 +34,7 @@ namespace SME.AE.Aplicacao
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
-            await AtualizaUsuario(usuarioApp, usuarioDto);            
+            await AtualizaUsuario(usuarioApp, usuarioDto);
 
             return MapearResposta(usuarioApp);
         }

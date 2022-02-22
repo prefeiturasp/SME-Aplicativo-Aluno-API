@@ -24,10 +24,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task ExecutarAsync()
         {
             var desdeAnoLetivo = DateTime.Today.Year - 1;
-            var frequenciaAlunosSgp = 
+            var frequenciaAlunosSgp =
                 (await frequenciaAlunoSgpRepositorio.ObterFrequenciaAlunoSgp(desdeAnoLetivo))
                 .Where(freq => (
-                    string.IsNullOrWhiteSpace(freq.CodigoAluno) 
+                    string.IsNullOrWhiteSpace(freq.CodigoAluno)
                     ||
                     !string.IsNullOrWhiteSpace(freq.DiasAusencias)
                     ));

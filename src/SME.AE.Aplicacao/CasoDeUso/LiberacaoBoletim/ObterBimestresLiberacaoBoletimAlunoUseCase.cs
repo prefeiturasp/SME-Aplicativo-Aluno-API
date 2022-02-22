@@ -1,9 +1,6 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Consultas;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
