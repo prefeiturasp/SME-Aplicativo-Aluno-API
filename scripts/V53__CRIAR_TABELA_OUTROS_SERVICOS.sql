@@ -8,6 +8,7 @@ CREATE TABLE public.OutroServico (
 	icone varchar(200) NOT NULL,
 	destaque bool default false,
 	ativo bool default  true,
+	ordem int,
 	criado_em timestamp NOT NULL,
 	criado_por varchar(200) NOT NULL,
 	alterado_em timestamp NULL,

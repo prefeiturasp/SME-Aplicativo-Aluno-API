@@ -34,7 +34,8 @@ namespace SME.AE.Infra
 	                        icone,
 	                        destaque
                         from OutroServico
-                        where ativo ");
+                        where ativo
+                        order by categoria,titulo");
                 conexao.Close();
 
                 return lista;
@@ -58,9 +59,11 @@ namespace SME.AE.Infra
 	                        categoria,
 	                        urlsite,
 	                        icone,
-	                        destaque
+	                        destaque,ordem
                         from OutroServico
-                        where ativo and destaque");
+                        where ativo and destaque
+                        and ordem between 1 and 6
+                        order by ordem");
                 conexao.Close();
 
                 return lista;
