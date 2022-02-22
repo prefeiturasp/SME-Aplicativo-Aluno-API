@@ -41,6 +41,7 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
             services.TryAddScoped(typeof(IResponsavelEOLRepositorio), typeof(ResponsavelEOLRepositorio));
             services.TryAddScoped(typeof(ITermosDeUsoRepositorio), typeof(TermosDeUsoRepositorio));
+            services.TryAddScoped(typeof(IOutroServicoRepositorio), typeof(OutroServicoRepositorio));
             services.TryAddScoped(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.TryAddScoped(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
             services.TryAddScoped(typeof(IParametrosEscolaAquiRepositorio), (typeof(ParametroEscolaAquiRepositorio)));
