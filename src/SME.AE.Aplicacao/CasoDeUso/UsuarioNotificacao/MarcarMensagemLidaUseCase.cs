@@ -201,7 +201,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
         {
             var seriesResumidas = notificacao.SeriesResumidas.ToStringEnumerable();
             var seriesResumidasNaoExistem = !seriesResumidas.Any();
-            var alunos = 
+            var alunos =
                 listaEscolas
                 .Where(escola => notificacao.ModalidadesId.Contains(escola.ModalidadeCodigo.ToString()))
                 .SelectMany(escola => escola.Alunos)

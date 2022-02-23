@@ -1,6 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno.PorComponenteCurricular
 {

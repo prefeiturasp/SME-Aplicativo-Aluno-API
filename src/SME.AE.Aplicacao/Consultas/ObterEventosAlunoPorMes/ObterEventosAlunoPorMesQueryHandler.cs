@@ -30,13 +30,13 @@ namespace SME.AE.Aplicacao.Consultas
             var aluno = (await alunoRepositorio.ObterDadosAlunos(request.Cpf)).Where(a => a.CodigoEol == request.CodigoAluno).FirstOrDefault();
 
             var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { aluno.CodigoTurma.ToString() }));
-            if(turmasModalidade.Any())
+            if (turmasModalidade.Any())
             {
                 var modalidadeDaTurma = turmasModalidade.FirstOrDefault();
                 aluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
                 aluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
             }
-            
+
             var modalidade = 0;
 
             switch (aluno.ModalidadeCodigo)

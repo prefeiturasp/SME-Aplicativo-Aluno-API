@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
             var retornoDadosLeituraComunicadosResultado = new List<DadosLeituraComunicadosResultado>();
             var dadosLeituraComunicadosResultado = new DadosLeituraComunicadosResultado();
-            
+
             if (request.ModoVisualizacao == ModoVisualizacao.Responsavel)
                 await ObterTotaisDeLeituraPorResponsavel(request, dadosLeituraComunicados, dadosLeituraComunicadosResultado);
 
@@ -50,7 +50,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
             {
                 dadosLeituraComunicadosResultado.ReceberamENaoVisualizaram = (dadosLeituraComunicados.FirstOrDefault().QuantidadeAlunosComApp - totalNotificacoesLeituraPorAluno);
                 dadosLeituraComunicadosResultado.NaoReceberamComunicado = dadosLeituraComunicados.FirstOrDefault().QuantidadeAlunosSemApp;
-                dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorAluno;                
+                dadosLeituraComunicadosResultado.VisualizaramComunicado = totalNotificacoesLeituraPorAluno;
             }
 
             if (dadosLeituraComunicados.Count() > 1)

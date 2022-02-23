@@ -1,7 +1,5 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
-using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using System;
 using System.Collections.Generic;
 using System.Linq;

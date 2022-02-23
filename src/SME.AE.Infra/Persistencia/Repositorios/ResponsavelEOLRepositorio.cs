@@ -262,7 +262,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.OpenAsync();
             var responsavelEol = await conn.QueryFirstOrDefaultAsync<UsuarioDadosDetalhesDto>(query, new { cpf });
             await conn.CloseAsync();
-          
+
             return responsavelEol;
 
         }

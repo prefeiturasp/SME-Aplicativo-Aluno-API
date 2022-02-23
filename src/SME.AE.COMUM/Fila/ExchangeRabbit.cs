@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.AE.Comum
+﻿namespace SME.AE.Comum
 {
     public class ExchangeRabbit
     {

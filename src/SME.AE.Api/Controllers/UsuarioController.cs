@@ -8,7 +8,7 @@ namespace SME.AE.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class UsuarioController :  ControllerBase
+    public class UsuarioController : ControllerBase
     {
         [HttpGet("dre/{codigoDre}/ue/{codigoUe}/cpf/{cpf}")]
         [AllowAnonymous]

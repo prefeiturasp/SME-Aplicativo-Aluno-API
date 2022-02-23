@@ -20,8 +20,8 @@ namespace SME.AE.Infra.Teste.Persistencia.Repositorios
             {
                 new GrupoComunicado
                 {
-                    Id = 1, 
-                    Nome = "EMEBS", 
+                    Id = 1,
+                    Nome = "EMEBS",
                     TipoEscolaId = "4",
                     TipoCicloId = null,
                     CriadoEm = DateTime.Parse("2020-04-08 22:16:51.027671"),
@@ -31,8 +31,8 @@ namespace SME.AE.Infra.Teste.Persistencia.Repositorios
                 },
                 new GrupoComunicado
                 {
-                    Id = 2, 
-                    Nome = "CEI", 
+                    Id = 2,
+                    Nome = "CEI",
                     TipoEscolaId = null,
                     TipoCicloId = "1,23",
                     CriadoEm = DateTime.Parse("2020-04-08 22:16:51.027671"),
@@ -42,8 +42,8 @@ namespace SME.AE.Infra.Teste.Persistencia.Repositorios
                 },
                 new GrupoComunicado
                 {
-                    Id = 3, 
-                    Nome = "EMEI", 
+                    Id = 3,
+                    Nome = "EMEI",
                     TipoEscolaId = null,
                     TipoCicloId = "2,14",
                     CriadoEm = DateTime.Parse("2020-04-08 22:16:51.027671"),
@@ -53,8 +53,8 @@ namespace SME.AE.Infra.Teste.Persistencia.Repositorios
                 },
                 new GrupoComunicado
                 {
-                    Id = 1, 
-                    Nome = "Fundamental", 
+                    Id = 1,
+                    Nome = "Fundamental",
                     TipoEscolaId = null,
                     TipoCicloId = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17",
                     CriadoEm = DateTime.Parse("2020-04-08 22:16:51.027671"),
@@ -64,8 +64,8 @@ namespace SME.AE.Infra.Teste.Persistencia.Repositorios
                 },
                 new GrupoComunicado
                 {
-                    Id = 5, 
-                    Nome = "Médio", 
+                    Id = 5,
+                    Nome = "Médio",
                     TipoEscolaId = null,
                     TipoCicloId = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17",
                     CriadoEm = DateTime.Parse("2020-04-08 22:16:51.027671"),
@@ -75,8 +75,8 @@ namespace SME.AE.Infra.Teste.Persistencia.Repositorios
                 },
                 new GrupoComunicado
                 {
-                    Id = 6, 
-                    Nome = "EJA", 
+                    Id = 6,
+                    Nome = "EJA",
                     TipoEscolaId = null,
                     TipoCicloId = "2,14",
                     CriadoEm = DateTime.Parse("2020-04-08 22:16:51.027671"),

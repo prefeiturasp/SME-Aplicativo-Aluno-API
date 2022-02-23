@@ -139,7 +139,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using var conexao = InstanciarConexao();
             var consulta =
-                MontarQueryListagemCompleta(serieResumida);
+                MontarQueryListagemCompleta(serieResumida, codigoAluno);
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
             conexao.Open();
@@ -227,7 +227,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where n.id = @Id and not n.excluido ";
         }
 
-        private string MontarQueryListagemCompleta(string serieResumida)
+        private string MontarQueryListagemCompleta(string serieResumida, string codigoAluno)
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or n.SeriesResumidas = '' or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
 
@@ -238,7 +238,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       unl.mensagemvisualizada from(
                       {QueryComunicadosSME()}
                       union
-                      {QueryComunicadosAutomaticos()}
+                      {QueryComunicadosAutomaticos(codigoAluno)}
                       union
                       {QueryComunicadosDRE()}
                       union
@@ -291,11 +291,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
                         && string_to_array(@tiposEscolas,',')";
         }
-        private string QueryComunicadosAutomaticos()
+        private string QueryComunicadosAutomaticos(string codigoAluno)
         {
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
-                        where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido ";
+                        inner join notificacao_aluno na 
+                         on na.notificacao_id = n.id
+                        where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido  and na.codigo_eol_aluno =@codigoAluno";
         }
         private string QueryComunicadosSME_ANO()
         {

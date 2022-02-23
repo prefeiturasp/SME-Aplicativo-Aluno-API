@@ -10,7 +10,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
 
             Map(x => x.Id).ToColumn("id").IsKey();
             Map(x => x.Titulo).ToColumn("titulo");
-            Map(x => x.Mensagem).ToColumn("mensagem");            
+            Map(x => x.Mensagem).ToColumn("mensagem");
             Map(x => x.DataEnvio).ToColumn("dataenvio");
             Map(x => x.DataExpiracao).ToColumn("dataexpiracao");
             Map(x => x.CodigoDre).ToColumn("dre_codigoeol");

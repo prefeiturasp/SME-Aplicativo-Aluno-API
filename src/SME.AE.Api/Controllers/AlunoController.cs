@@ -30,7 +30,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("notas")]
-        public async Task<ObjectResult> ObterNotasAluno([FromQuery] NotaAlunoDto notaAlunoDto,[FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
+        public async Task<ObjectResult> ObterNotasAluno([FromQuery] NotaAlunoDto notaAlunoDto, [FromServices] IObterNotasAlunoUseCase obterNotasAlunoUseCase)
         {
             return Ok(await obterNotasAlunoUseCase.Executar(notaAlunoDto));
         }
@@ -67,7 +67,7 @@ namespace SME.AE.Api.Controllers
         [HttpPost("notas/imprimirboletim")]
         public async Task<IActionResult> ImprimirBoletimAluno([FromBody] SolicitarBoletimAlunoDto filtro, [FromServices] ISolicitarBoletimAlunoUseCase solicitarBoletimAluno)
         {
-           return Ok(await solicitarBoletimAluno.Executar(filtro));
+            return Ok(await solicitarBoletimAluno.Executar(filtro));
         }
     }
 }

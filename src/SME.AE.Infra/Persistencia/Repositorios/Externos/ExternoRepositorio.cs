@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class ExternoRepositorio<T,Z> : IExternoRepositorio<T,Z> where T : EntidadeExterna where Z : IDbConnection , IDisposable
+    public class ExternoRepositorio<T, Z> : IExternoRepositorio<T, Z> where T : EntidadeExterna where Z : IDbConnection, IDisposable
     {
         protected IAplicacaoDapperContext<Z> database;
 
         protected ExternoRepositorio(Z connection)
-        {            
+        {
             database = new AplicacaoDapperContext<Z>(connection);
         }
 

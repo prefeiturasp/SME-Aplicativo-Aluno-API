@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
@@ -35,7 +31,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
             var usuario = await usuarioRepository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf) ?? throw new ArgumentException($"CPF não encontrado {request.Cpf}");
 
             var usuarioNotificacao = await usuarioNotificacaoRepositorio.ObterPorUsuarioAlunoNotificacao(usuario.Id, request.CodigoAluno, request.NotificacaoId);
-            if(usuarioNotificacao == null)
+            if (usuarioNotificacao == null)
             {
                 usuarioNotificacao = new UsuarioNotificacao
                 {
@@ -47,7 +43,8 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
                     MensagemVisualizada = true
                 };
                 return await usuarioNotificacaoRepositorio.Criar(usuarioNotificacao);
-            } else
+            }
+            else
             {
                 usuarioNotificacao.MensagemExcluida = true;
                 return await usuarioNotificacaoRepositorio.Atualizar(usuarioNotificacao);

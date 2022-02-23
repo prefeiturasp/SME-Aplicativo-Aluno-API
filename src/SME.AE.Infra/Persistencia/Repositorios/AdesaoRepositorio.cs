@@ -13,10 +13,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AdesaoRepositorio : BaseRepositorio<Adesao>, IAdesaoRepositorio
     {
-        
+
         public AdesaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
         {
-            
+
         }
 
         public async Task<IEnumerable<TotaisAdesaoResultado>> ObterDadosAdesaoAgrupadosPorDre()

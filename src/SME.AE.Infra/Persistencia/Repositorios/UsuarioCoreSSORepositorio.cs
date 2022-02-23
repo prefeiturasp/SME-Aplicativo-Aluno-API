@@ -164,7 +164,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                RetornoUsuarioCoreSSO usuarioCoreSSO;
+                RetornoUsuarioCoreSSO usuarioCoreSSO = new RetornoUsuarioCoreSSO();
 
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
 
@@ -175,8 +175,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             WHERE u.usu_login = @cpf "
                     , new { cpf });
                 conn.Close();
-
-
                 return usuarioCoreSSO;
             }
             catch (Exception ex)

@@ -12,7 +12,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
-        public EnviarNotificacaoPorGrupoCommandHandler(VariaveisGlobaisOptions variaveisGlobaisOptions )
+        public EnviarNotificacaoPorGrupoCommandHandler(VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new System.ArgumentNullException(nameof(variaveisGlobaisOptions));
         }

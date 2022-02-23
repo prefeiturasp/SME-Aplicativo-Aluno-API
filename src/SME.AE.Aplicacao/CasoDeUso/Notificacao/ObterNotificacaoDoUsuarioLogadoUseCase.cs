@@ -41,14 +41,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
                 throw new NegocioException($"Não encontrado usuário com o codigo {codigoAluno}");
 
             var modalidades = listaEscolas.Where(x => x.Alunos.Any(z => z.CodigoEol == aluno.CodigoEol)).Select(x => x.ModalidadeCodigo);
-            
+
             return await mediator.Send(new ListarNotificacaoAlunoQuery
             {
                 CodigoAluno = aluno.CodigoEol.ToString(),
                 CodigoDRE = aluno.CodigoDre,
                 CodigoTurma = aluno.CodigoTurma.ToString(),
                 CodigoUE = aluno.CodigoEscola,
-                CodigoUsuario  = usuario.Id,
+                CodigoUsuario = usuario.Id,
                 Modalidades = string.Join(',', modalidades),
                 TiposEscolas = aluno.CodigoTipoEscola.ToString(),
                 SerieResumida = aluno.SerieResumida

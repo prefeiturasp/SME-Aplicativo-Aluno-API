@@ -1,7 +1,5 @@
 ﻿using SME.AE.Dominio.Entidades;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
@@ -10,7 +8,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
 
         Task<T> ObterPorIdAsync(long id);
-        
+
         Task<long> SalvarAsync(T entidade);
 
         Task<IEnumerable<T>> ListarAsync();

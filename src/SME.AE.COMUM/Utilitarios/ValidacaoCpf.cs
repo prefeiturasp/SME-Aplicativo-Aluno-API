@@ -10,7 +10,7 @@
             {
                 return false;
             }
-            if(!long.TryParse(cpf, out _))
+            if (!long.TryParse(cpf, out _))
             {
                 return false;
             }

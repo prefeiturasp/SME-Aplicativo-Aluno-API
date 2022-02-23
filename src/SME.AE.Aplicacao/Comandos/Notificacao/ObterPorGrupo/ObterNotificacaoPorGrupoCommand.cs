@@ -51,12 +51,12 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.ObterPorGrupo
                 DataExpiracao = x.DataExpiracao,
                 Mensagem = x.Mensagem,
                 Titulo = x.Titulo,
-                MensagemVisualizada =  x.MensagemVisualizada,
-              //  Grupos = SelecionarGrupos(x.Grupo, grupos),
+                MensagemVisualizada = x.MensagemVisualizada,
+                //  Grupos = SelecionarGrupos(x.Grupo, grupos),
                 TipoComunicado = x.TipoComunicado,
                 CategoriaNotificacao = x.CategoriaNotificacao,
                 SeriesResumidas = x.SeriesResumidas
-                
+
             });
         }
 

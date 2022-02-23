@@ -26,7 +26,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             if (!resposta.Ok)
                 throw new NegocioException(string.Join("", resposta.Erros));
-            
+
             var token = await mediator.Send(new CriarTokenCommand(cpf));
             await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
 

@@ -11,7 +11,6 @@ using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
-using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -60,8 +59,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             await Assert.ThrowsAsync<NegocioException>(async () => await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDtoCerta));
         }
-        
-        private void InstanciarComandos() 
+
+        private void InstanciarComandos()
         {
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(usuario);
 
@@ -80,7 +79,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
         private Dominio.Entidades.Usuario usuario { get; set; } = new Dominio.Entidades.Usuario
         {
-            Cpf = "00000000000",         
+            Cpf = "00000000000",
             Id = 1,
             PrimeiroAcesso = true,
             UltimoLogin = DateTime.Now

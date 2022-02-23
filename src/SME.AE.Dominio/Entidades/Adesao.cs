@@ -28,6 +28,6 @@
             UsuariosValidos = usuariosValidos;
             UsuariosCpfInvalidos = usuariosCpfInvalidos;
             UsuariosSemAppInstalado = usuariosSemAppInstalado;
-        }        
+        }
     }
 }

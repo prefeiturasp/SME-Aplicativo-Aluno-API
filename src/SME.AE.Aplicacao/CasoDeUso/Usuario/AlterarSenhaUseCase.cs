@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
         private async Task<RetornoUsuarioCoreSSO> ObterUsuarioCoreSSO(AlterarSenhaDto alterarSenhaDto)
         {
-            var query = new ObterUsuarioCoreSSOQuery(alterarSenhaDto.CPF);   
+            var query = new ObterUsuarioCoreSSOQuery(alterarSenhaDto.CPF);
 
             return await mediator.Send(query) ?? throw new NegocioException($"Usuário com o CPF '{alterarSenhaDto.CPF}' não encontrado");
         }

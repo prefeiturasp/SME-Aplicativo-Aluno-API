@@ -2,8 +2,6 @@
 using SME.AE.Aplicacao.Comandos.Notificacao.Remover;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Notificacao

@@ -8,6 +8,6 @@
 
         public string ExpiresInMinutes { get; set; }
 
-        public string IssuerSigningKey { get; set; }       
+        public string IssuerSigningKey { get; set; }
     }
 }

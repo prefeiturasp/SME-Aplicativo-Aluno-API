@@ -31,7 +31,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return await mediator.Send(new ObterTotalUsuariosComAcessoIncompletoQuery(cpfsDeResponsaveis));
         }
 
-        private List<string> ConverterCpfsParaLista(IEnumerable<CpfResponsavelAlunoEol> cpfsResponsaveis) {
+        private List<string> ConverterCpfsParaLista(IEnumerable<CpfResponsavelAlunoEol> cpfsResponsaveis)
+        {
             return (cpfsResponsaveis.Select(item => item.CpfResponsavel)).ToList();
         }
     }
