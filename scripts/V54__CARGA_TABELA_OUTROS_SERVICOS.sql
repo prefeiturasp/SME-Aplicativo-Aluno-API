@@ -1,3 +1,5 @@
+--Limpar Tabela
+delete from outroservico;
 
 -- Insert Icone Prato Feito
 insert into public.outroservico(titulo,descricao,categoria,urlsite,icone,destaque,ativo,ordem,criado_em,criado_por,alterado_em,alterado_por,criado_rf,alterado_rf)
