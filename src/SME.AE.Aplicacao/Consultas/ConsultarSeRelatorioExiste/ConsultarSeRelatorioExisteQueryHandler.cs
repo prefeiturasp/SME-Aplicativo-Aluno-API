@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao
                 bool existe = false;
                 var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
                 
-                var resposta = await httpClient.GetAsync($"v1/relatorios/relatorio-existe?codigoRelatorio={request.CodigoCorrelacao}");
+                var resposta = await httpClient.GetAsync($"v1/relatorios/existe?codigoRelatorio={request.CodigoCorrelacao}");
                 if (resposta.IsSuccessStatusCode)
                 {
                     var json = await resposta.Content.ReadAsStringAsync();

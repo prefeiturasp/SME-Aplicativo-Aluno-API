@@ -70,11 +70,5 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await solicitarBoletimAluno.Executar(filtro));
         }
-
-        [HttpPost("relatorio-existe")]
-        public async Task<IActionResult> VerificarSeRelatorioExiste([FromBody] Guid codigoRelatorio, [FromServices] IRelatorioImpressaoUseCase useCase)
-        {
-            return Ok(await useCase.Executar(codigoRelatorio));
-        }
     }
 }
