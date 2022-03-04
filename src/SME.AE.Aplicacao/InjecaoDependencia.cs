@@ -111,6 +111,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
             services.TryAddScoped<IObterNotasAlunoUseCase, ObterNotasAlunoUseCase>();
             services.TryAddScoped<ISolicitarBoletimAlunoUseCase, SolicitarBoletimAlunoUseCase>();
+            services.TryAddScoped<IRelatorioImpressaoUseCase, RelatorioImpressaoUseCase>();
             services.TryAddScoped<IOutroServicoUseCase, OutroServicoUseCase>();
             services.TryAddScoped<IValidarUsuarioEhResponsavelDeAlunoUseCase, ValidarUsuarioEhResponsavelDeAlunoUseCase>();
             services.TryAddScoped<IObterDadosDeLeituraComunicadosUseCase, ObterDadosDeLeituraComunicadosUseCase>();
