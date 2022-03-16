@@ -4,7 +4,6 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers

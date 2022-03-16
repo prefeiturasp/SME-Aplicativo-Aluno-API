@@ -21,7 +21,7 @@ namespace SME.AE.Aplicacao
             bool sucesso = false;
             var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
             var body = JsonConvert.SerializeObject(request);
-            var resposta = await httpClient.PostAsync($"v1/boletim/integracoes/imprimir", new StringContent(body, Encoding.UTF8, "application/json"));
+            var resposta = await httpClient.PostAsync($"v1/relatorios/integracoes/boletim", new StringContent(body, Encoding.UTF8, "application/json"));
             if (resposta.IsSuccessStatusCode)
             {
                 sucesso = true;
