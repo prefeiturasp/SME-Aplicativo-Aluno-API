@@ -64,10 +64,5 @@ namespace SME.AE.Api.Controllers
         {
             return Ok(await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto(turmaCodigo, alunoCodigo, bimestres, componenteCurricularId)));
         }
-        [HttpPost("notas/imprimirboletim")]
-        public async Task<IActionResult> ImprimirBoletimAluno([FromBody] SolicitarBoletimAlunoDto filtro, [FromServices] ISolicitarBoletimAlunoUseCase solicitarBoletimAluno)
-        {
-            return Ok(await solicitarBoletimAluno.Executar(filtro));
-        }
     }
 }
