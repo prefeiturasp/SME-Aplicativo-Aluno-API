@@ -15,7 +15,7 @@ namespace SME.AE.Aplicacao
 
         public async Task<bool> Executar(SolicitarRelatorioRaaDto filtro)
         {
-            return await mediator.Send(new SolicitarRelatorioRaaQuery(filtro.TurmaId, filtro.AlunoCodigo, filtro.Semestre));
+            return await mediator.Send(new SolicitarRelatorioRaaQuery(filtro.DreCodigo, filtro.UeCodigo, filtro.Semestre,filtro.TurmaCodigo,filtro.AnoLetivo,filtro.ModalidadeCodigo,filtro.AlunoCodigo));;
         }
     }
 }
