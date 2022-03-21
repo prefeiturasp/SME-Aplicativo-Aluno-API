@@ -47,7 +47,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
                 throw ex;
             }
         }
