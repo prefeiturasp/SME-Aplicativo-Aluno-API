@@ -204,8 +204,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 conn.Open();
 
-                var retorno = await conn.ExecuteAsync(
-                    @"UPDATE notificacao SET excluido = true where id = @id", new { id = notificacao.Id });
+                await conn
+                    .ExecuteAsync(@"DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;
+                                    DELETE FROM notificacao where id = @ID;", new { ID = notificacao.Id });
+
                 conn.Close();
 
             }

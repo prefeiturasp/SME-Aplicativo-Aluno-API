@@ -19,7 +19,6 @@ namespace SME.AE.Aplicacao.HandlerExtensions
 
             request.Headers.Clear();
             request.Headers.Add("Authorization", $"Bearer {token}");
-
             var response = await base.SendAsync(request, cancellationToken);
             return response;
         }

@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
 {
-    public class SolicitarBoletimAlunoQueryHendler : IRequestHandler<SolicitarBoletimAlunoQuery, bool>
+    public class SolicitarBoletimAlunoQueryHandler : IRequestHandler<SolicitarBoletimAlunoQuery, bool>
     {
         private readonly IHttpClientFactory httpClientFactory;
-        public SolicitarBoletimAlunoQueryHendler(IHttpClientFactory httpClientFactory)
+        public SolicitarBoletimAlunoQueryHandler(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
@@ -21,7 +21,7 @@ namespace SME.AE.Aplicacao
             bool sucesso = false;
             var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
             var body = JsonConvert.SerializeObject(request);
-            var resposta = await httpClient.PostAsync($"v1/boletim/integracoes/imprimir", new StringContent(body, Encoding.UTF8, "application/json"));
+            var resposta = await httpClient.PostAsync($"v1/relatorios/integracoes/boletim", new StringContent(body, Encoding.UTF8, "application/json"));
             if (resposta.IsSuccessStatusCode)
             {
                 sucesso = true;

@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
+using SME.AE.Comum.Excecoes;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -67,6 +68,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             //buscar o usuario 
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
 
+            if(usuarioRetorno == null)
+                return RespostaApi.Falha("Usuário não cadastrado, qualquer dúvida procure a unidade escolar.");
+                
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
             {
