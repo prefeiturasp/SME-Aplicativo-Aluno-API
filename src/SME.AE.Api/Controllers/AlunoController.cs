@@ -4,7 +4,6 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
@@ -64,11 +63,6 @@ namespace SME.AE.Api.Controllers
         public async Task<IActionResult> ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricular(string turmaCodigo, string alunoCodigo, string componenteCurricularId, [FromQuery] int[] bimestres, [FromServices] IObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase useCase)
         {
             return Ok(await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto(turmaCodigo, alunoCodigo, bimestres, componenteCurricularId)));
-        }
-        [HttpPost("notas/imprimirboletim")]
-        public async Task<IActionResult> ImprimirBoletimAluno([FromBody] SolicitarBoletimAlunoDto filtro, [FromServices] ISolicitarBoletimAlunoUseCase solicitarBoletimAluno)
-        {
-            return Ok(await solicitarBoletimAluno.Executar(filtro));
         }
     }
 }
