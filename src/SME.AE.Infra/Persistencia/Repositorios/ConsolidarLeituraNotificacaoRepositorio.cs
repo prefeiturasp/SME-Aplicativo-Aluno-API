@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -14,11 +15,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class ConsolidarLeituraNotificacaoRepositorio : IConsolidarLeituraNotificacaoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public ConsolidarLeituraNotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public ConsolidarLeituraNotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task<IEnumerable<UsuarioAlunoNotificacaoApp>> ObterUsuariosAlunosNotificacoesApp()
@@ -48,7 +53,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
-                var usuariosAlunosNotificacoes = await conn.QueryAsync<UsuarioAlunoNotificacaoApp>(sql);
+
+                var usuariosAlunosNotificacoes = await servicoTelemetria.RegistrarComRetornoAsync<UsuarioAlunoNotificacaoApp>(async () => await SqlMapper.QueryAsync(conn,
+                    sql), "query", "Query AE", sql);
+
                 conn.Close();
                 return usuariosAlunosNotificacoes;
             }
@@ -57,7 +65,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
 
         public async Task SalvarConsolidacaoNotificacoesEmBatch(IEnumerable<ConsolidacaoNotificacaoDto> consolidacaoNotificacoes)

@@ -57,12 +57,15 @@ namespace SME.AE.Aplicacao
         private static void AddServices(this IServiceCollection services)
         {
             services.TryAddScoped(typeof(IEmailServico), typeof(EmailServico));
+            services.TryAddScoped(typeof(IServicoLog), typeof(ServicoLog));
+            services.TryAddScoped<IServicoTelemetria, ServicoTelemetria>();
         }
 
-        private static void AddFiltros(this IServiceCollection services)
+       private static void AddFiltros(this IServiceCollection services)
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidacaoRequisicaoMiddleware<,>));
         }
+
         public static void AddPolicies(this IServiceCollection services)
         {
             IPolicyRegistry<string> registry = services.AddPolicyRegistry();

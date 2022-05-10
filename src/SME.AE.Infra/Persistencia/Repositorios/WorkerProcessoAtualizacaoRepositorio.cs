@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using System;
@@ -11,11 +12,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class WorkerProcessoAtualizacaoRepositorio : IWorkerProcessoAtualizacaoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public WorkerProcessoAtualizacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public WorkerProcessoAtualizacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task IncluiOuAtualizaUltimaAtualizacao(string nomeProcesso)
@@ -48,9 +53,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = CriaConexao();
+
                 conexao.Open();
-                var ultimaAtualizacao = await conexao.QueryFirstAsync<UltimaAtualizaoWorkerPorProcessoResultado>($"select nome_processo as NomeProcesso, data_ultima_atualizacao as DataUltimaAtualizacao from worker_processo_atualizacao wpa where nome_processo = @nomeProcesso", new { nomeProcesso });
+
+                var sql = $"select nome_processo as NomeProcesso, data_ultima_atualizacao as DataUltimaAtualizacao from worker_processo_atualizacao wpa where nome_processo = @nomeProcesso";
+                var parametros = new { nomeProcesso };
+
+                var ultimaAtualizacao = await servicoTelemetria.RegistrarComRetornoAsync<UltimaAtualizaoWorkerPorProcessoResultado>(async () =>
+                    await SqlMapper.QueryFirstAsync<UltimaAtualizaoWorkerPorProcessoResultado>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
                 conexao.Close();
+
                 return ultimaAtualizacao;
             }
             catch (Exception)

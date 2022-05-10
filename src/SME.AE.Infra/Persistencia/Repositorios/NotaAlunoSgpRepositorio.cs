@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -13,23 +14,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class NotaAlunoSgpRepositorio : INotaAlunoSgpRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+		private readonly IServicoTelemetria servicoTelemetria;
 
-        public NotaAlunoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public NotaAlunoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+			IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
-        }
+			this.servicoTelemetria = servicoTelemetria;
+		}
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo)
         {
-            try
-            {
-                using var conexao = CriaConexao();
-                conexao.Open();
-
-                var notaAlunosSgp = await conexao
-                    .QueryAsync<NotaAlunoSgpDto>(
-                        @"select * from(
+			var sql = @"select * from(
 							select distinct 
 								coalesce(con.AnoLetivo, fec.AnoLetivo) AnoLetivo,
 								coalesce(con.CodigoUe, fec.CodigoUe) CodigoUe,
@@ -135,7 +133,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							and con.codigoaluno = fec.codigoaluno
 						) aaa
 						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
-						order by cca_id ", new { desdeAnoLetivo });
+						order by cca_id ";
+
+			var parametros = new { desdeAnoLetivo };
+
+			try
+            {
+                using var conexao = CriaConexao();
+
+                conexao.Open();
+
+				var notaAlunosSgp = await servicoTelemetria.RegistrarComRetornoAsync<NotaAlunoSgpDto>(async () => await SqlMapper.QueryAsync<NotaAlunoSgpDto>(conexao, sql, parametros),
+					"quyer", "Query SGP", sql, parametros.ToString());
+
                 conexao.Close();
 
                 return notaAlunosSgp;

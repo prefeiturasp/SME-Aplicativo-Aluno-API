@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno.PorComponenteCurricular;
@@ -17,11 +18,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class FrequenciaAlunoRepositorio : IFrequenciaAlunoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task<FrequenciaAlunoPorComponenteCurricularResposta> ObterFrequenciaAlunoPorComponenteCurricularAsync(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno, short codigoComponenteCurricular)
@@ -86,7 +91,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var parametros = new { anoLetivo, codigoUe, codigoTurma, codigoAluno, codigoComponenteCurricular };
 
                 var dadosFrequenciaAlunos = await conexao.QueryParentChildSingleAsync<FrequenciaAlunoPorComponenteCurricularResposta, FrequenciaAlunoPorBimestre, short>(
-                    query, x => x.CodigoComponenteCurricular, x => x.FrequenciasPorBimestre, parametros, splitOn: "splitOn");
+                    query, x => x.CodigoComponenteCurricular, x => x.FrequenciasPorBimestre, servicoTelemetria, "Query AE", parametros, splitOn: "splitOn");
+
                 conexao.Close();
 
                 return dadosFrequenciaAlunos;
@@ -204,8 +210,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                            AND glob.AlunoCodigo = comp.AlunoCodigo;";
 
                 var parametros = new { anoLetivo, codigoUe, codigoTurma, codigoAluno };
+
                 var dadosFrequenciaAluno = await conexao.QueryParentChildSingleAsync<FrequenciaAlunoResposta, ComponenteCurricularDoAluno, string>(query,
-                    x => x.AlunoCodigo, x => x.ComponentesCurricularesDoAluno, parametros, splitOn: "splitOn");
+                    x => x.AlunoCodigo, x => x.ComponentesCurricularesDoAluno, servicoTelemetria, "Query AE", parametros, splitOn: "splitOn");
 
                 conexao.Close();
 
@@ -382,12 +389,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 where ano_letivo >= @desdeAnoLetivo
                 ";
 
+            var parametros = new { desdeAnoLetivo };
+
             try
             {
                 using var conn = CriaConexao();
+
                 conn.Open();
-                var frequenciaAlunoLista = await conn.QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo });
+
+                var frequenciaAlunoLista = await servicoTelemetria.RegistrarComRetornoAsync<FrequenciaAlunoSgpDto>(async () => await SqlMapper.QueryAsync<FrequenciaAlunoSgpDto>(conn,
+                    sqlSelect, parametros), "query", "Query AE", sqlSelect, parametros.ToString());
+
                 conn.Close();
+
                 return frequenciaAlunoLista;
             }
             catch (Exception ex)

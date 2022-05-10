@@ -19,6 +19,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+
         private readonly string whereReponsavelAluno = @" WHERE responsavel.cd_cpf_responsavel = @cpf 
                                                            AND responsavel.dt_fim IS NULL  
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
@@ -35,6 +36,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                            AND vue.cd_unidade_educacao = @codigoUe
                                                            AND responsavel.cd_cpf_responsavel IS NOT NULL
                                                            AND aluno.cd_tipo_sigilo is null";
+
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
         public async Task<List<AlunoRespostaEol>> ObterDadosAlunos(string cpf)
@@ -140,6 +142,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 		            ra.dt_fim IS NULL and
 		            te.cd_turma_escola = @codigoTurma
                 ";
+
             try
             {
                 using var conexao = new SqlConnection(variaveisGlobaisOptions.EolConnection);
