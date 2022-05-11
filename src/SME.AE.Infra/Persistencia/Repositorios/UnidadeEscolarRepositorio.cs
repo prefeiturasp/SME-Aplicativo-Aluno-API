@@ -17,6 +17,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+
         private SqlConnection CriaConexao() => new SqlConnection(variaveisGlobaisOptions.EolConnection);
 
         public async Task<UnidadeEscolarResposta> ObterDadosUnidadeEscolarPorCodigoUe(string codigoUe)

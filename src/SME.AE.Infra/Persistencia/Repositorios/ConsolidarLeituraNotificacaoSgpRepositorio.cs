@@ -3,6 +3,7 @@ using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -14,11 +15,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class ConsolidarLeituraNotificacaoSgpRepositorio : IConsolidarLeituraNotificacaoSgpRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public ConsolidarLeituraNotificacaoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public ConsolidarLeituraNotificacaoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<IEnumerable<ComunicadoSgpDto>> ObterComunicadosSgp()
@@ -59,7 +64,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
-                var comunicadosSgp = await conn.QueryAsync<ComunicadoSgpDto>(sql, new { tipocomunicado = TipoComunicado.MENSAGEM_AUTOMATICA });
+
+                var parametros = new { tipocomunicado = TipoComunicado.MENSAGEM_AUTOMATICA };
+                var comunicadosSgp = await servicoTelemetria.RegistrarComRetornoAsync<ComunicadoSgpDto>(async () => await SqlMapper.QueryAsync<ComunicadoSgpDto>(conn, sql, parametros),
+                    "query", "Query SGP", sql, parametros.ToString());
+
                 conn.Close();
                 return comunicadosSgp;
             }

@@ -1,21 +1,28 @@
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm.SqlClient;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 using SME.AE.Api.Configuracoes;
 using SME.AE.Aplicacao;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Servicos;
+using SME.AE.Comum;
+using SME.AE.Dominio.Options;
 using SME.AE.Infra;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System.Linq;
 using System.Text;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using SME.AE.Comum;
-using RabbitMQ.Client;
 
 namespace SME.AE.Api
 {
@@ -61,24 +68,27 @@ namespace SME.AE.Api
             RegistrarMapeamentos.Registrar();
             RegistrarMvc.Registrar(services, variaveisGlobais);
             RegistrarClientesHttp.Registrar(services, servicoProdam, variaveisGlobais);
+
             ConfiguraVariaveisAmbiente(services);
+            ConfiguraTelemetria(services);
 
             services.AddInfrastructure(variaveisGlobais);
             services.AddApplication();
             services.AdicionarValidadoresFluentValidation();
+
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>
                 {
                     builder.WithOrigins("*");
                 })
             );
+
             services
                 .AddControllers()
                 .AddNewtonsoftJson();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             RegistrarSwagger(services);
-            services.AddApplicationInsightsTelemetry();
         }
 
         private void ConfiguraVariaveisAmbiente(IServiceCollection services)
@@ -97,11 +107,24 @@ namespace SME.AE.Api
             services.AddSingleton(rabbitConn);
         }
 
+        private void ConfiguraTelemetria(IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var clientTelemetry = serviceProvider.GetService<TelemetryClient>();
+
+            var telemetriaOptions = new TelemetriaOptions();
+            Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
+
+            services.AddSingleton(telemetriaOptions);
+            services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
+        }
+
         private static void RegistrarSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME - Acompanhamento Escolar", Version = "v1" });
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -159,6 +182,10 @@ namespace SME.AE.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseElasticApm(Configuration,
+                new SqlClientDiagnosticSubscriber(),
+                new HttpDiagnosticsSubscriber());
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -167,18 +194,18 @@ namespace SME.AE.Api
                 });
 
             app
-                    .UseCors(x => x
-                        .AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod())
-                    // .UseHttpsRedirection()
-                    .UseAuthentication()
-                    .UseRouting()
-                    .UseAuthorization()
-                    .UseEndpoints(endpoints =>
-                    {
-                        endpoints.MapControllers();
-                    });
+                .UseCors(x => x
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod())
+                // .UseHttpsRedirection()
+                .UseAuthentication()
+                .UseRouting()
+                .UseAuthorization()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -13,11 +14,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class ParametroEscolaAquiRepositorio : IParametrosEscolaAquiRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public ParametroEscolaAquiRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public ParametroEscolaAquiRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection InstanciarConexao()
         {
             return new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
@@ -59,45 +64,61 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 return null;
             }
 
+            var sql = "select conteudo from parametroescolaaqui where chave = @chave";
+            var parametros = new { chave };
+
             using var conexao = InstanciarConexao();
+
             await conexao.OpenAsync();
-            var conteudoString = await conexao.QueryFirstOrDefaultAsync<string>("select conteudo from parametroescolaaqui where chave = @chave", new { chave });
+
+            var conteudoString = await servicoTelemetria.RegistrarComRetornoAsync<string>(async () =>
+                await SqlMapper.QueryFirstOrDefaultAsync<string>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
             await conexao.CloseAsync();
+
             return conteudoString;
         }
 
         public bool TentaObterString(string chave, out string conteudo)
         {
             string conteudoString = null;
+
             Task.Run(
                 async () =>
                 {
                     conteudoString = await ObterPorChaveAsync(chave);
                 }
             ).Wait();
+
             conteudo = conteudoString;
+
             return !string.IsNullOrWhiteSpace(conteudo);
         }
 
         public bool TentaObterInt(string chave, out int conteudo)
         {
             conteudo = 0;
+
             if (TentaObterString(chave, out var conteudoString))
                 return int.TryParse(conteudoString, out conteudo);
+
             return false;
         }
 
         public bool TentaObterLong(string chave, out long conteudo)
         {
             conteudo = 0;
+
             if (TentaObterString(chave, out var conteudoString))
                 return long.TryParse(conteudoString, out conteudo);
+
             return false;
         }
 
         public bool TentaObterDateTime(string chave, out DateTime conteudo)
         {
             conteudo = DateTime.MinValue;
+
             if (TentaObterString(chave, out var conteudoString))
                 return DateTime.TryParseExact(
                     conteudoString,
@@ -105,6 +126,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
                     out conteudo);
+
             return false;
         }
 
@@ -155,12 +177,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<ParametroEscolaAqui>> ObterParametros(IEnumerable<string> chaves)
         {
             var chavesConcatenadas = string.Join("','", chaves);
-            if (string.IsNullOrWhiteSpace(chavesConcatenadas)) return null;
+
+            if (string.IsNullOrWhiteSpace(chavesConcatenadas)) 
+                return null;
+
+            var sql = $"select chave, conteudo from parametroescolaaqui where chave IN ('{chavesConcatenadas}')";
 
             using var conexao = InstanciarConexao();
+
             await conexao.OpenAsync();
-            var parametros = await conexao.QueryAsync<ParametroEscolaAqui>($"select chave, conteudo from parametroescolaaqui where chave IN ('{chavesConcatenadas}')");
+
+            var parametros = await servicoTelemetria.RegistrarComRetornoAsync<ParametroEscolaAqui>(async () =>
+                await SqlMapper.QueryAsync<ParametroEscolaAqui>(conexao, sql), "query", "Query AE", sql);
+
             await conexao.CloseAsync();
+
             return parametros;
         }
 

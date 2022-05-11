@@ -3,6 +3,7 @@ using Dommel;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
@@ -21,31 +22,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class NotificacaoRepositorio : BaseRepositorio<Notificacao>, INotificacaoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
 
         public async Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf)
         {
             var query = NotificacaoConsultas.ObterPorUsuarioLogado
-                  //"WHERE UNL.usuario_cpf = @cpf" +
                   + " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual)  and not n.excluido ";
 
-
-            await using var conn = InstanciarConexao();
-            conn.Open();
             var dataAtual = DateTime.Now.Date;
-            IEnumerable<NotificacaoPorUsuario> list = await conn.QueryAsync<NotificacaoPorUsuario>(
-    query, new
-    {
-        grupo,
-        cpf,
-        dataAtual
-    });
+            var parametros = new { grupo, cpf, dataAtual };
+
+            using var conn = InstanciarConexao();
+
+            conn.Open();
+
+            IEnumerable<NotificacaoPorUsuario> list = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoPorUsuario>(async () => 
+                await SqlMapper.QueryAsync<NotificacaoPorUsuario>(conn, query, parametros), "query", "Query AE", query, parametros.ToString());
+
             conn.Close();
+
             return list;
         }
 
@@ -100,7 +103,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             conn.Close();
         }
 
-
         public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
         {
             await using var conn = InstanciarConexao();
@@ -124,13 +126,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var consulta = @"select nt.id, nt.notificacao_id, nt.codigo_eol_turma, nt.criadoem from notificacao_turma nt 
                             where notificacao_id = @id and not nt.excluido ";
 
+            var parametros = new { id };
+
             using var conexao = InstanciarConexao();
 
             conexao.Open();
 
-            IEnumerable<NotificacaoTurma> retorno = await conexao.QueryAsync<NotificacaoTurma>(consulta, new { id });
-            conexao.Close();
+            IEnumerable<NotificacaoTurma> retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoTurma>(async () =>
+                await SqlMapper.QueryAsync<NotificacaoTurma>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
+            conexao.Close();
 
             return retorno == null || !retorno.Any() ? default : retorno;
         }
@@ -138,12 +143,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string modalidades, string tiposEscolas, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
         {
             using var conexao = InstanciarConexao();
-            var consulta =
-                MontarQueryListagemCompleta(serieResumida, codigoAluno);
+
+            var consulta = MontarQueryListagemCompleta(serieResumida, codigoAluno);
+            var parametros = new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida };
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
             conexao.Open();
-            var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoResposta>(async () =>
+                await SqlMapper.QueryAsync<NotificacaoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
             conexao.Close();
 
@@ -153,9 +160,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<NotificacaoSgpDto>> ListarNotificacoesNaoEnviadas()
         {
             using var conexao = InstanciarConexao();
+
             var consulta = MontarQueryListagemCompletaNaoEnviadoPushNotification();
 
-            var retorno = await conexao.QueryAsync<NotificacaoSgpDto>(consulta);
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoSgpDto>(async () =>
+                await SqlMapper.QueryAsync<NotificacaoSgpDto>(conexao, consulta), "query", "Query AE", consulta);
 
             conexao.Close();
 
@@ -165,9 +174,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<NotificacaoResposta> NotificacaoPorId(long Id)
         {
             using var conexao = InstanciarConexao();
+
             var consulta = QueryPorId();
-            var retorno = await conexao.QueryFirstOrDefaultAsync<NotificacaoResposta>(consulta, new { Id });
+            var parametros = new { Id };
+
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoResposta>(async () =>
+                await SqlMapper.QueryFirstOrDefaultAsync<NotificacaoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
+
             conexao.Close();
+
             return retorno;
         }
 
@@ -238,7 +253,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       unl.mensagemvisualizada from(
                       {QueryComunicadosSME()}
                       union
-                      {QueryComunicadosAutomaticos(codigoAluno)}
+                      {QueryComunicadosAutomaticos()}
                       union
                       {QueryComunicadosDRE()}
                       union
@@ -282,6 +297,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       and (not n.enviadopushnotification) and not n.excluido 
                 ";
         }
+
         private string QueryComunicadosSME()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -291,7 +307,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
                         && string_to_array(@tiposEscolas,',')";
         }
-        private string QueryComunicadosAutomaticos(string codigoAluno)
+
+        private string QueryComunicadosAutomaticos()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
@@ -299,6 +316,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                          on na.notificacao_id = n.id
                         where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido  and na.codigo_eol_aluno =@codigoAluno";
         }
+
         private string QueryComunicadosSME_ANO()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -316,6 +334,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
                         && string_to_array(@tiposEscolas,',') and n.dre_codigoeol = @codigoDre";
         }
+
         private string QueryComunicadosDRE_ANO()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -386,9 +405,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using (var conexao = InstanciarConexao())
-                {
-                    var consulta = $@"select 
+                using var conexao = InstanciarConexao();
+
+                var consulta = $@"select 
                                   codigo_eol_aluno as codigoAluno,
                                   n.id as notificacaoId
                                   from notificacao n
@@ -397,10 +416,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                   where n.tipocomunicado = {(int)TipoComunicado.ALUNO} and not n.excluido 
                                     and n.id = @notificacaoId";
 
-                    var retorno = await conexao.QueryAsync<NotificacaoAlunoResposta>(consulta, new { notificacaoId });
-                    conexao.Close();
-                    return retorno;
-                }
+                var parametros = new { notificacaoId };
+
+                var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoAlunoResposta>(async () =>
+                    await SqlMapper.QueryAsync<NotificacaoAlunoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
+
+                conexao.Close();
+
+                return retorno;
 
             }
             catch (Exception ex)

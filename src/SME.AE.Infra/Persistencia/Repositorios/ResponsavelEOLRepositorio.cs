@@ -19,7 +19,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+
         private SqlConnection CriaConexao() => new SqlConnection(variaveisGlobaisOptions.EolConnection);
+
         public async Task<IEnumerable<ResponsavelEOLDto>> ListarCpfResponsavelDaDreUeTurma(long dreCodigo, int anoLetivo)
         {
             var sql =
@@ -47,7 +49,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             using var conn = CriaConexao();
             await conn.OpenAsync();
+
             var timer = Stopwatch.StartNew();
+
             try
             {
                 var responsaveisEOL = await conn.QueryAsync<ResponsavelEOLDto>(sql, new { dreCodigo, anoLetivo });
@@ -264,7 +268,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.CloseAsync();
 
             return responsavelEol;
-
         }
     }
 }

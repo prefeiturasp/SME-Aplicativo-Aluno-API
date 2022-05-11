@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -12,11 +13,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class EventoSgpRepositorio : IEventoSgpRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+		private readonly IServicoTelemetria servicoTelemetria;
 
-        public EventoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public EventoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+			IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+			this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao)
@@ -77,10 +82,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					order by alterado_em
 				";
 
-            using var conn = CriaConexao();
+			var parametros = new { alterado_em = ultimaDataAlteracao };
+
+			using var conn = CriaConexao();
+
             await conn.OpenAsync();
-            var eventosSgp = await conn.QueryAsync<EventoSgpDto>(sql, new { alterado_em = ultimaDataAlteracao });
+
+			var eventosSgp = await servicoTelemetria.RegistrarComRetornoAsync<EventoSgpDto>(async () => await SqlMapper.QueryAsync<EventoSgpDto>(conn,
+				sql, parametros), "query", "Query SGP", sql, parametros.ToString());
+
             await conn.CloseAsync();
+
             return eventosSgp;
         }
     }
