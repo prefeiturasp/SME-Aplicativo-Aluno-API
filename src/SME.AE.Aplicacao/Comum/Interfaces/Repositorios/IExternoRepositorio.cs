@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
-    public interface IExternoRepositorio<T, Z> where T : class where Z : IDbConnection, IDisposable
+    public interface IExternoRepositorio<T, Z> where T : class where Z : IDbConnection
     {
         IEnumerable<T> Listar();
 

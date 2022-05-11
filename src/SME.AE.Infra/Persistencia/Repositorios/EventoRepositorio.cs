@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -12,20 +13,28 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class EventoRepositorio : IEventoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public EventoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public EventoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task<DateTime?> ObterUltimaAlteracao()
         {
             var sql = @"select max(ultima_alteracao_sgp) from evento";
+
             using var conn = CriaConexao();
             await conn.OpenAsync();
-            var ultimaAlteracao = await conn.QueryFirstOrDefaultAsync<DateTime?>(sql);
+
+            var ultimaAlteracao = await servicoTelemetria.RegistrarComRetornoAsync<DateTime?>(async () => await SqlMapper.QueryFirstOrDefaultAsync<DateTime?>(conn,
+                sql), "query", "Query AE", sql);
+
             await conn.CloseAsync();
+
             return ultimaAlteracao;
         }
         public async Task Remover(EventoDto evento)
@@ -34,6 +43,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 delete from evento
                 where evento_id = @evento_id
             ";
+
             using var conn = CriaConexao();
             await conn.OpenAsync();
             await conn.ExecuteAsync(sql, evento);
@@ -65,6 +75,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     componente_curricular = excluded.componente_curricular,
                     tipo_calendario_id = excluded.tipo_calendario_id
             ";
+
             using var conn = CriaConexao();
             await conn.OpenAsync();
             await conn.ExecuteAsync(sql, evento);
@@ -92,10 +103,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     {queryUe}
                     {queryTurmna}
             ";
+
+            var parametros = new { dataInicio, dataFim, dre_id, ue_id, turma_id, modalidadeCalendario };
+
             using var conn = CriaConexao();
             await conn.OpenAsync();
-            var eventos = await conn.QueryAsync<EventoDto>(sql, new { dataInicio, dataFim, dre_id, ue_id, turma_id, modalidadeCalendario });
+
+            var eventos = await servicoTelemetria.RegistrarComRetornoAsync<EventoDto>(async () => await SqlMapper.QueryAsync<EventoDto>(conn, sql, parametros),
+                "query", "Query AE", sql, parametros.ToString());
+
             await conn.CloseAsync();
+
             return eventos;
         }
     }

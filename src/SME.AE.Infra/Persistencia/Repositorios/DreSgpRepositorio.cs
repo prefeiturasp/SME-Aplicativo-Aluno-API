@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre;
 using SME.AE.Comum;
 using System;
@@ -13,11 +14,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class DreSgpRepositorio : IDreSgpRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public DreSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public DreSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<DreResposta> ObterNomeAbreviadoDrePorCodigo(string codigoDre)
@@ -25,9 +30,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = CriaConexao();
+
                 conexao.Open();
+
                 var query = @"SELECT abreviacao as NomeAbreviado FROM dre WHERE dre_id = @codigoDre ";
-                var nomeAbreviadoDre = await conexao.QuerySingleAsync<DreResposta>(query, new { codigoDre });
+                var parametros = new { codigoDre };
+
+                var nomeAbreviadoDre = await servicoTelemetria.RegistrarComRetornoAsync<DreResposta>(async () => await
+                    SqlMapper.QuerySingleAsync<DreResposta>(conexao, query, parametros), "query", "Query SGP", query, parametros.ToString());
+
                 conexao.Close();
 
                 return nomeAbreviadoDre;
@@ -47,7 +58,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             var query = @"SELECT dre_id FROM dre";
 
-            var ids = await conexao.QueryAsync<long>(query);
+            var ids = await servicoTelemetria.RegistrarComRetornoAsync<long>(async () => await SqlMapper.QueryAsync<long>(conexao, query), "query", "Query SGP", query);
 
             conexao.Close();
 

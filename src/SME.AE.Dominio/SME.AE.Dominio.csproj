@@ -5,13 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Enumeradores\**" />
+    <Compile Remove="Excecoes\**" />
+    <EmbeddedResource Remove="Enumeradores\**" />
+    <EmbeddedResource Remove="Excecoes\**" />
+    <None Remove="Enumeradores\**" />
+    <None Remove="Excecoes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Class1.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Entidades\Externas\CoreSSO\" />
-    <Folder Include="Enumeradores" />
-    <Folder Include="Excecoes" />
   </ItemGroup>
 
   <ItemGroup>

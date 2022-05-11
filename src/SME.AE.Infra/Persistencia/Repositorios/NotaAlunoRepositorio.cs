@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
 using SME.AE.Comum;
@@ -16,11 +17,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class NotaAlunoRepositorio : INotaAlunoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public NotaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public NotaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task SalvarNotaAluno(NotaAlunoSgpDto notaAluno)
@@ -91,7 +96,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
+
                 var alterado = (await conn.ExecuteAsync(sqlUpdate, notaAluno));
+
                 if (alterado == 0)
                 {
                     await conn.ExecuteAsync(sqlInsert, notaAluno);
@@ -101,6 +108,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     await conn.ExecuteAsync(sqlDelete, notaAluno);
                     await conn.ExecuteAsync(sqlInsert, notaAluno);
                 }
+
                 conn.Close();
             }
             catch (Exception ex)
@@ -152,8 +160,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
+
             await Task.CompletedTask;
         }
+
         public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
         {
             const string sqlSelect =
@@ -176,13 +186,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     ano_letivo >= @anoLetivo
                 ";
 
+            var parametros = new { anoLetivo = desdeAnoLetivo };
+
             using var conn = CriaConexao();
 
             try
             {
                 conn.Open();
-                var notaAlunoLista = await conn.QueryAsync<NotaAlunoSgpDto>(sqlSelect, new { anoLetivo = desdeAnoLetivo });
+
+                var notaAlunoLista = await servicoTelemetria.RegistrarComRetornoAsync<NotaAlunoSgpDto>(async () => await SqlMapper.QueryAsync<NotaAlunoSgpDto>(conn, sqlSelect, parametros),
+                    "query", "Query AE", sqlSelect, parametros.ToString());
+
                 conn.Close();
+
                 return notaAlunoLista.ToArray();
             }
             catch (Exception ex)
@@ -191,7 +207,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
-
 
         public async Task<NotaAlunoPorBimestreResposta> ObterNotasAluno(int anoLetivo, short bimestre, string codigoUe, string codigoTurma, string codigoAluno)
         {
@@ -225,7 +240,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var dadosNotasAluno = await conexao.QueryParentChildSingleAsync<NotaAlunoPorBimestreResposta, NotaAlunoComponenteCurricular, int>(query,
                     notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.Bimestre,
                     notaAlunoRespostaBimestre => notaAlunoRespostaBimestre.NotasPorComponenteCurricular,
+                    servicoTelemetria, "Query AE",
                     parametros, splitOn: "splitOn");
+
                 conexao.Close();
 
                 return dadosNotasAluno;

@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
@@ -13,11 +14,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class FrequenciaAlunoSgpRepositorio : IFrequenciaAlunoSgpRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+		private readonly IServicoTelemetria servicoTelemetria;
 
-        public FrequenciaAlunoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public FrequenciaAlunoSgpRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+			IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+			this.servicoTelemetria = servicoTelemetria;
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
         public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo)
@@ -107,14 +112,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					ComponenteCurricular,
 					CodigoComponenteCurricular
             ";
-            try
+
+			var parametros = new { desdeAnoLetivo };
+
+			try
             {
                 using var conexao = CriaConexao();
+
                 conexao.Open();
 
-                var frequenciaAlunosSgp =
-                    await conexao
-                    .QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo });
+				var frequenciaAlunosSgp = await servicoTelemetria.RegistrarComRetornoAsync<FrequenciaAlunoSgpDto>(async () =>
+					await SqlMapper.QueryAsync<FrequenciaAlunoSgpDto>(conexao, sqlSelect, parametros), "query", "Query SGP", parametros.ToString());
 
                 conexao.Close();
 
