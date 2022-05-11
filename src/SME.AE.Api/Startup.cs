@@ -115,8 +115,6 @@ namespace SME.AE.Api
             var telemetriaOptions = new TelemetriaOptions();
             Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
 
-            var servicoTelemetria = new ServicoTelemetria(clientTelemetry, telemetriaOptions);
-
             services.AddSingleton(telemetriaOptions);
             services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
         }

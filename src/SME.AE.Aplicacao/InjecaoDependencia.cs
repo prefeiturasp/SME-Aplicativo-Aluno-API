@@ -58,7 +58,6 @@ namespace SME.AE.Aplicacao
         {
             services.TryAddScoped(typeof(IEmailServico), typeof(EmailServico));
             services.TryAddScoped(typeof(IServicoLog), typeof(ServicoLog));
-            services.TryAddScoped<IServicoTelemetria, ServicoTelemetria>();
         }
 
        private static void AddFiltros(this IServiceCollection services)
