@@ -29,7 +29,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = InstanciarConexao();
                 conexao.Open();
 
-                var dadosAdesaoAgrupadosPorDreUeETurma = await conexao.QueryAsync<TotaisAdesaoResultado>(AdesaoConsultas.ObterDadosAdesaoPorDre);
+                var dadosAdesaoAgrupadosPorDreUeETurma = await servicoTelemetria.RegistrarComRetornoAsync<TotaisAdesaoResultado>(async () =>
+                    await SqlMapper.QueryAsync<TotaisAdesaoResultado>(conexao, AdesaoConsultas.ObterDadosAdesaoPorDre), "query", "Query AE", AdesaoConsultas.ObterDadosAdesaoPorDre);
 
                 conexao.Close();
 

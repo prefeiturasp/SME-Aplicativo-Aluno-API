@@ -60,7 +60,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var parametros = new { nomeProcesso };
 
                 var ultimaAtualizacao = await servicoTelemetria.RegistrarComRetornoAsync<UltimaAtualizaoWorkerPorProcessoResultado>(async () =>
-                    await SqlMapper.QueryFirstAsync<UltimaAtualizaoWorkerPorProcessoResultado>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+                    await SqlMapper.QueryFirstOrDefaultAsync<UltimaAtualizaoWorkerPorProcessoResultado>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
 
                 conexao.Close();
 
