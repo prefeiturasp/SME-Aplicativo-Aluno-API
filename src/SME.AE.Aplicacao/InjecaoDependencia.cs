@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
 using SME.AE.Aplicacao.CasoDeUso.Frequencia;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.CasoDeUso.Recomendacoes;
 using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
@@ -15,6 +16,7 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Recomendacao;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.UltimaAtualizacaoWorker;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
@@ -131,7 +133,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase, ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase>();
             services.TryAddScoped<IObterBimestresLiberacaoBoletimAlunoUseCase, ObterBimestresLiberacaoBoletimAlunoUseCase>();
             services.TryAddScoped<IObterComponentesCurricularesIdsUseCase, ObterComponentesCurricularesIdsUseCase>();
-
+            services.TryAddScoped<IObterRecomendacaoAlunoUseCase, ObterRecomendacaoAlunoUseCase>();
             services.TryAddScoped<IObterDadosUsuarioPorCpfUseCase, ObterDadosUsuarioPorCpfUseCase>();
         }
     }

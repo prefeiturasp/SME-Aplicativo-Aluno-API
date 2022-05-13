@@ -1,4 +1,5 @@
-﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,5 +15,8 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task<IEnumerable<AlunoTurmaEol>> ObterAlunosTurma(long codigoTurma);
 
         Task<AlunoRespostaEol> ObterDadosAlunoPorCodigo(long codigoAluno);
+        Task<IEnumerable<RecomendacaoConselhoClasseAluno>> ObterRecomendacoesPorAlunoTurma(string codigosAluno, string codigosTurma, int anoLetivo, ModalidadeDeEnsino? modalidade, int semestre);
+        Task<IEnumerable<ConselhoClasseRecomendacao>> ObterRecomendacoesGeral();
+        Task<IEnumerable<RecomendacoesAlunoFamiliaDto>> ObterRecomendacoesAlunoFamiliaPorAlunoETurma(string codigoAluno, string codigoTurma);
     }
 }

@@ -3,6 +3,7 @@ using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Recomendacao;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using System.Threading.Tasks;
 
@@ -63,6 +64,12 @@ namespace SME.AE.Api.Controllers
         public async Task<IActionResult> ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricular(string turmaCodigo, string alunoCodigo, string componenteCurricularId, [FromQuery] int[] bimestres, [FromServices] IObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase useCase)
         {
             return Ok(await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto(turmaCodigo, alunoCodigo, bimestres, componenteCurricularId)));
+        }
+
+        [HttpGet("recomendacao-aluno")]
+        public async Task<IActionResult> ObterRecomendacoesAluno([FromQuery] FiltroRecomendacaoAlunoDto filtro, [FromServices] IObterRecomendacaoAlunoUseCase useCase)
+        {
+            return Ok(await useCase.Executar(filtro));
         }
     }
 }
