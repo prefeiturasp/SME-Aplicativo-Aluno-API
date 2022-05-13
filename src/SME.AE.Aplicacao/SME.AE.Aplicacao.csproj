@@ -7,7 +7,6 @@
   <ItemGroup>
     <Compile Remove="Compartilhado\**" />
     <Compile Remove="Comum\Modelos\Resposta\**" />
-    <Compile Remove="Consultas\NewFolder\**" />
     <Compile Remove="Comum\Interfaces\IDateTime.cs" />
     <Compile Remove="Autenticacao\**" />
   </ItemGroup>
@@ -15,17 +14,16 @@
   <ItemGroup>
     <EmbeddedResource Remove="Compartilhado\**" />
     <EmbeddedResource Remove="Autenticacao\**" />
-    <EmbeddedResource Remove="Consultas\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Compartilhado\**" />
     <None Remove="Autenticacao\**" />
-    <None Remove="Consultas\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="Comum\Modelos\Resposta\AlunoTurmaEol.cs" />
+    <Compile Include="Comum\Modelos\Resposta\ConselhoClasseRecomendacao.cs" />
     <Compile Include="Comum\Modelos\Resposta\DadosConsolidacaoNotificacaoResultado.cs" />
     <Compile Include="Comum\Modelos\Resposta\DataLeituraAluno.cs" />
     <Compile Include="Comum\Modelos\Resposta\DadosLeituraAlunosComunicado.cs" />
@@ -35,6 +33,8 @@
     <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\FrequenciaAlunoFaixa.cs" />
     <Compile Include="Comum\Modelos\Resposta\FrequenciasDoAluno\PorComponenteCurricular\FrequenciaAlunoPorBimestreAusencia.cs" />
     <Compile Include="Comum\Modelos\Resposta\NotificacaoAlunoResposta.cs" />
+    <Compile Include="Comum\Modelos\Resposta\RecomendacaoConselhoClasseAluno.cs" />
+    <Compile Include="Comum\Modelos\Resposta\RecomendacoesAlunoFamilia.cs" />
     <Compile Include="Comum\Modelos\Resposta\TurmaModalidadeDeEnsinoDto.cs" />
     <Compile Include="Comum\Modelos\Resposta\AtualizacaiNotificacaoResposta.cs" />
     <Compile Include="Comum\Modelos\Resposta\CpfResponsavelAlunoEol.cs" />
