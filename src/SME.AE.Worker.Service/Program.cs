@@ -5,7 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
+using SME.AE.Dominio.Options;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
 using System.Reflection;
@@ -36,14 +39,19 @@ namespace SME.AE.Worker.Service
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
+            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddUserSecrets(Assembly.GetExecutingAssembly());
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
-
                     AdicionarAutoMapper(services);
                     AdicionarMediatr(services);
+
                     services
+                        .AddApplicationInsightsTelemetry(hostContext.Configuration)
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso();
@@ -53,11 +61,17 @@ namespace SME.AE.Worker.Service
 
                     services.AddSingleton(variaveisGlobais);
 
+                    var telemetriaOptions = new TelemetriaOptions();
+                    hostContext.Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
 
-                }).ConfigureLogging((context, logging) =>
+                    services.AddSingleton(telemetriaOptions);
+                    services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
+                })
+                .ConfigureLogging((context, logging) =>
                 {
                     logging.AddConfiguration(context.Configuration);
                     logging.AddSentry();
                 });
+            });
     }
 }
