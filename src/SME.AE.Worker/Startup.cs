@@ -2,7 +2,6 @@ using Elastic.Apm.AspNetCore;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.SqlClient;
 using MediatR;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using SME.AE.Dominio.Options;
@@ -68,14 +68,11 @@ namespace SME.AE.Worker
 
         private void ConfiguraTelemetria(IServiceCollection services)
         {
-            var serviceProvider = services.BuildServiceProvider();
-            var clientTelemetry = serviceProvider.GetService<TelemetryClient>();
-
             var telemetriaOptions = new TelemetriaOptions();
             Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
 
-            var servicoTelemetria = new ServicoTelemetria(clientTelemetry, telemetriaOptions);
-            services.AddSingleton(servicoTelemetria);
+            services.AddSingleton(telemetriaOptions);
+            services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
         }
 
         private void ConfiguraVariaveisAmbiente(IServiceCollection services)
