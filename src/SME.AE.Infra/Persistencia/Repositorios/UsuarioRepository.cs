@@ -339,7 +339,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var parametros = new { usuarioId, dispositivoId };
 
-                var retorno = await servicoTelemetria.RegistrarComRetornoAsync<bool>(async () =>
+                System.Collections.Generic.List<bool> retorno;
+
+                 retorno = await servicoTelemetria.RegistrarComRetornoAsync<bool>(async () =>
                     await SqlMapper.QueryAsync<bool>(conn, query, parametros), "query", "Query AE", query, parametros.ToString());
 
                 if (!retorno.Any())
