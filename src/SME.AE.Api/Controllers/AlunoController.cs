@@ -49,7 +49,7 @@ namespace SME.AE.Api.Controllers
         }
 
         [HttpGet("ues/{ueCodigo}/turmas/{turmaCodigo}/alunos/{alunoCodigo}/componentes-curriculares")]
-        public async Task<ObjectResult> ObterComponentesCurriculares(string ueCodigo, string turmaCodigo, string alunoCodigo, [FromQuery] int[] bimestres, [FromServices] IObterComponentesCurricularesIdsUseCase useCase)
+        public async Task<IActionResult> ObterComponentesCurriculares(string ueCodigo, string turmaCodigo, string alunoCodigo, [FromQuery] int[] bimestres, [FromServices] IObterComponentesCurricularesIdsUseCase useCase)
         {
             return Ok(await useCase.Executar(new AlunoBimestresTurmaDto(ueCodigo, turmaCodigo, alunoCodigo, bimestres)));
         }
