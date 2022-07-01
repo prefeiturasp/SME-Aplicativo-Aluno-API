@@ -8,15 +8,6 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
     public class MensagensUsuarioLogadoAlunoQuery : IRequest<IEnumerable<NotificacaoResposta>>
     {
-        public MensagensUsuarioLogadoAlunoQuery()
-        {
-            Parametros = new HashSet<ParametrosMensagensUsuarioLogado>();
-        }
-        public ICollection<ParametrosMensagensUsuarioLogado> Parametros { get; set; }
-    }
-
-    public class ParametrosMensagensUsuarioLogado
-    {
         public string ModalidadesId { get; set; }
         public string CodigoUE { get; set; }
         public string CodigoDRE { get; set; }

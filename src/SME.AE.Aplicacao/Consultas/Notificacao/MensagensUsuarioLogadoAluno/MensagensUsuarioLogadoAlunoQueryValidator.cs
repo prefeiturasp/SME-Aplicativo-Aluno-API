@@ -2,7 +2,7 @@
 
 namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
-    public class MensagensUsuarioLogadoAlunoQueryValidator : AbstractValidator<ParametrosMensagensUsuarioLogado>
+    public class MensagensUsuarioLogadoAlunoQueryValidator : AbstractValidator<MensagensUsuarioLogadoAlunoQuery>
     {
         public MensagensUsuarioLogadoAlunoQueryValidator()
         {

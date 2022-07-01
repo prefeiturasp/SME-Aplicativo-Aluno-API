@@ -17,11 +17,11 @@ namespace SME.AE.Aplicacao
         }
         public async Task<IEnumerable<TurmaModalidadeCodigoDto>> Handle(ObterTurmasModalidadesPorCodigosQuery request, CancellationToken cancellationToken)
         {
-            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
 
             var turmasCodigos = string.Join("&turmasCodigo=", request.TurmaCodigo);
 
-            var resposta = await httpClient.GetAsync($"v1/turma/integracoes/modalidades?turmasCodigo={turmasCodigos}");
+            var resposta = await httpClient.GetAsync($"v1/turmas/modalidades?turmasCodigo={turmasCodigos}");
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();
