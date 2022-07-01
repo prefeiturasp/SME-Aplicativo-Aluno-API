@@ -1,4 +1,8 @@
-﻿namespace SME.AE.Dominio.Comum.Enumeradores
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace SME.AE.Dominio.Comum.Enumeradores
 {
     public enum TipoComunicado
     {
