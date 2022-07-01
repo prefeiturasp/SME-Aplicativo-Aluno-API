@@ -29,37 +29,32 @@ namespace SME.AE.Aplicacao.CasoDeUso.Notificacao
             if (usuario == null)
                 throw new NegocioException($"Não encontrado usuário com o CPF {cpf}");
 
-            var resposta = await mediator.Send(new DadosAlunoCommand(cpf));
+            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpf));
 
             if (resposta.Data == null)
                 throw new NegocioException("Não foi possivel obter os alunos por escola");
 
             var listaEscolas = (IEnumerable<ListaEscola>)resposta.Data;
 
-            if (listaEscolas == null || !listaEscolas.Any())
+            var aluno = listaEscolas.FirstOrDefault(
+                x => x.Alunos.Any(z => z.CodigoEol == codigoAluno)).Alunos.FirstOrDefault(x => x.CodigoEol == codigoAluno);
+
+            if (aluno == null)
                 throw new NegocioException($"Não encontrado usuário com o codigo {codigoAluno}");
 
-            var mensagensUsuarioLogadoAlunoQuery = new MensagensUsuarioLogadoAlunoQuery();
+            var modalidades = listaEscolas.Where(x => x.Alunos.Any(z => z.CodigoEol == aluno.CodigoEol)).Select(x => x.ModalidadeCodigo);
 
-            foreach (var item in listaEscolas)
+            return await mediator.Send(new MensagensUsuarioLogadoAlunoQuery
             {
-                item.Alunos.ToList().ForEach(a =>
-                {
-                    mensagensUsuarioLogadoAlunoQuery.Parametros.Add(new ParametrosMensagensUsuarioLogado()
-                    {
-                        CodigoAluno = a.CodigoEol.ToString(),
-                        CodigoDRE = a.CodigoDre,
-                        CodigoTurma = a.CodigoTurma.ToString(),
-                        CodigoUE = a.CodigoEscola,
-                        CodigoUsuario = usuario.Id,
-                        DataUltimaConsulta = dataUltimaConsulta,
-                        ModalidadesId = item.ModalidadeCodigo.ToString(),
-                        SerieResumida = a.SerieResumida
-                    });
-                });
-            }
-
-            return await mediator.Send(mensagensUsuarioLogadoAlunoQuery);
+                CodigoAluno = aluno.CodigoEol.ToString(),
+                CodigoDRE = aluno.CodigoDre,
+                CodigoTurma = aluno.CodigoTurma.ToString(),
+                CodigoUE = aluno.CodigoEscola,
+                CodigoUsuario = usuario.Id,
+                ModalidadesId = string.Join(',', modalidades),
+                DataUltimaConsulta = dataUltimaConsulta,
+                SerieResumida = aluno.SerieResumida
+            });
         }
     }
 }
