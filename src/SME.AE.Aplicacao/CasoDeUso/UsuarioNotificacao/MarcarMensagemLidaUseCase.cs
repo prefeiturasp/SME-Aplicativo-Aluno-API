@@ -244,7 +244,6 @@ namespace SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida
                 CodigoEolAluno = aluno.CodigoEol,
                 UsuarioId = usuarioMensagem.UsuarioId,
                 MensagemVisualizada = usuarioMensagem.MensagemVisualizada,
-                CodigoEolTurma = aluno.CodigoTurma
             };
 
             await IncluiConfirmacaoDeLeitura(mediator, usuarioNotificacao);
