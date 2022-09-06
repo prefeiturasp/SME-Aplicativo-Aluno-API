@@ -65,17 +65,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             //buscar o usuario 
-            Dominio.Entidades.Usuario usuarioRetorno;
-
-            try
-            {
-                usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
-            }
-            catch (Exception ex)
-            {
-                validacao.Errors.Add(new ValidationFailure("Usuário", ex.ToString()));
-                return RespostaApi.Falha(validacao.Errors);
-            }
+            var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
 
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
