@@ -59,7 +59,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 }
                 catch
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida. linha 62"));
                     return RespostaApi.Falha(validacao.Errors);
                 }
             }
@@ -90,7 +90,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                     }
                     catch
                     {
-                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida. linha 93"));
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
@@ -105,7 +105,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 }
                 catch
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida. linha 108"));
                     return RespostaApi.Falha(validacao.Errors);
                 }
             }
