@@ -59,13 +59,23 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 }
                 catch
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida. linha 62"));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
                     return RespostaApi.Falha(validacao.Errors);
                 }
             }
 
             //buscar o usuario 
-            var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
+            Dominio.Entidades.Usuario usuarioRetorno;
+
+            try
+            {
+                usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
+            }
+            catch (Exception ex)
+            {
+                validacao.Errors.Add(new ValidationFailure("Usuário", ex.ToString()));
+                return RespostaApi.Falha(validacao.Errors);
+            }
 
             //verificar se as senhas são iguais
             if (usuarioRetorno != null)
@@ -90,7 +100,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                     }
                     catch
                     {
-                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida. linha 93"));
+                        validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
                         return RespostaApi.Falha(validacao.Errors);
                     }
                 }
@@ -105,7 +115,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 }
                 catch
                 {
-                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida. linha 108"));
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de nascimento inválida."));
                     return RespostaApi.Falha(validacao.Errors);
                 }
             }
