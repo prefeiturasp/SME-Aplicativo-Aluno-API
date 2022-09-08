@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
+using SME.AE.Comum;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -23,12 +24,14 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
         private readonly IUsuarioRepository _repository;
         private readonly IUsuarioCoreSSORepositorio _repositoryCoreSSO;
         private readonly IMediator mediator;
+        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
 
-        public AutenticarUsuarioCommandHandler(IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO, IMediator mediator)
+        public AutenticarUsuarioCommandHandler(IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO, IMediator mediator, VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             _autenticacaoService = autenticacaoService;
             _repositoryCoreSSO = repositoryCoreSSO;
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.variaveisGlobaisOptions = variaveisGlobaisOptions;
             _repository = repository;
         }
 
@@ -39,7 +42,11 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             var validator = new AutenticarUsuarioUseCaseValidatior();
             var validacao = validator.Validate(request);
 
-            if (!validacao.IsValid)
+            var stringConexao = variaveisGlobaisOptions.AEConnection;
+            validacao.Errors.Add(new ValidationFailure("Usuário", stringConexao));
+            return RespostaApi.Falha(validacao.Errors);
+
+            /*if (!validacao.IsValid)
                 return RespostaApi.Falha(validacao.Errors);
 
             //verificar se o usuário está cadastrado no CoreSSO
@@ -165,7 +172,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
 
             
-            return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
+            return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);*/
         }
 
         private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
