@@ -12,15 +12,8 @@ namespace SME.AE.Api.Controllers
         [Authorize]
         public async Task<ObjectResult> MensagensUsuarioLogadoAlunoDesdeData(long codigoAluno, DateTime dataUltimaConsulta, [FromServices] IMensagensUsuarioLogadoAlunoUseCase mensagensUsuarioLogadoAluno)
         {
-            try
-            {
-                return Ok(await mensagensUsuarioLogadoAluno
-                    .Executar(User.Identity.Name, codigoAluno, dataUltimaConsulta));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }            
+            return Ok(await mensagensUsuarioLogadoAluno
+                .Executar(User.Identity.Name, codigoAluno, dataUltimaConsulta));
         }
 
         [HttpGet("{id}")]
