@@ -3,6 +3,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class TranferirEventoSgpCasoDeUso
     {
+        private const int QUANTIDADE_REGISTROS_POR_PAGINA_EVENTOS = 1000;
+
         private readonly IEventoRepositorio eventoRepositorio;
         private readonly IEventoSgpRepositorio eventoSgpRepositorio;
 
@@ -22,26 +25,29 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task ExecutarAsync()
         {
             DateTime ultimaData = await ObterUltimaDataEvento();
-            IEnumerable<EventoSgpDto> listaEvendosSgp = await ObterListaEventosSgp(ultimaData);
-            IEnumerable<EventoDto> listaEventos = MapearEventos(listaEvendosSgp);
-            await SalvarEventos(listaEventos.Where(e => !e.excluido));
-            await RemoverEventos(listaEventos.Where(e => e.excluido));
+            var contadorPaginacao = 1;
+
+            IEnumerable<EventoSgpDto> listaEvendosSgp = null;
+            do
+            {
+                listaEvendosSgp = await ObterListaEventosSgp(ultimaData, contadorPaginacao);
+                IEnumerable<EventoDto> listaEventos = MapearEventos(listaEvendosSgp);
+                await SalvarEventos(listaEventos.Where(e => !e.excluido));
+                await RemoverEventos(listaEventos.Where(e => e.excluido));
+                contadorPaginacao++;
+            } while (listaEvendosSgp != null && listaEvendosSgp.Any());
         }
 
         private async Task RemoverEventos(IEnumerable<EventoDto> listaEventos)
         {
             foreach (var evento in listaEventos)
-            {
                 await eventoRepositorio.Remover(evento);
-            }
         }
 
         private async Task SalvarEventos(IEnumerable<EventoDto> listaEventos)
         {
             foreach (var evento in listaEventos)
-            {
                 await eventoRepositorio.Salvar(evento);
-            }
         }
 
         private IEnumerable<EventoDto> MapearEventos(IEnumerable<EventoSgpDto> listaEventosSgp)
@@ -57,7 +63,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     tipo_evento = eventoSgp.tipo_evento_id,
                     turma_id = eventoSgp.turma_id,
                     nome = eventoSgp.nome,
-                    descricao = eventoSgp.descricao,
+                    descricao = eventoSgp.descricao?.Length > 5000 ? eventoSgp.descricao?.Substring(0, 5000) : eventoSgp.descricao,
                     dre_id = eventoSgp.dre_id,
                     ue_id = eventoSgp.ue_id,
                     ultima_alteracao_sgp = eventoSgp.alterado_em,
@@ -87,9 +93,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return 0;
         }
 
-        private async Task<IEnumerable<EventoSgpDto>> ObterListaEventosSgp(DateTime ultimaDataAlteracao)
+        private async Task<IEnumerable<EventoSgpDto>> ObterListaEventosSgp(DateTime ultimaDataAlteracao, int pagina)
         {
-            return await eventoSgpRepositorio.ListaEventoPorDataAlteracao(ultimaDataAlteracao);
+            return await eventoSgpRepositorio.ListaEventoPorDataAlteracao(ultimaDataAlteracao, pagina, QUANTIDADE_REGISTROS_POR_PAGINA_EVENTOS);
         }
 
         private async Task<DateTime> ObterUltimaDataEvento()
