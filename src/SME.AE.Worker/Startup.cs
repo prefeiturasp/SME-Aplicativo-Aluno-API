@@ -54,13 +54,7 @@ namespace SME.AE.Worker
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME.AE.Worker", Version = "v1" });
-            });
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            var eventoRepositorio = serviceProvider.GetService<IEventoRepositorio>();
-            var eventoSgpRepositorio = serviceProvider.GetService<IEventoSgpRepositorio>();
-            new TranferirEventoSgpCasoDeUso(eventoRepositorio, eventoSgpRepositorio).ExecutarAsync().Wait();
+            });            
         }
 
         private void ConfiguraSentry()
