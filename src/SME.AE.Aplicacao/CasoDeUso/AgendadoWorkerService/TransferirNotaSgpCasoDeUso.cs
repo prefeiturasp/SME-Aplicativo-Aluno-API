@@ -41,7 +41,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
                     var notaAlunoAE = await notaAlunoRepositorio.ObterListaParaExclusao(anoAtual);
                     await RemoverExcetoSgp(notaAlunoSgp, notaAlunoAE);
-                    Debug.WriteLine($"• • • UE Id: {id} concluída • • •");
                 }                
             }
 
