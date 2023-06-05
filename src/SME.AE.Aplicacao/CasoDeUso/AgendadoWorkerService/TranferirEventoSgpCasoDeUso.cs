@@ -24,14 +24,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task ExecutarAsync()
         {
-            DateTime ultimaData = await ObterUltimaDataEvento();
+            var ultimaData = await ObterUltimaDataEvento();
             var contadorPaginacao = 1;
 
             IEnumerable<EventoSgpDto> listaEvendosSgp = null;
             do
             {
                 listaEvendosSgp = await ObterListaEventosSgp(ultimaData, contadorPaginacao);
-                IEnumerable<EventoDto> listaEventos = MapearEventos(listaEvendosSgp);
+                var listaEventos = MapearEventos(listaEvendosSgp);
                 await SalvarEventos(listaEventos.Where(e => !e.excluido));
                 await RemoverEventos(listaEventos.Where(e => e.excluido));
                 contadorPaginacao++;

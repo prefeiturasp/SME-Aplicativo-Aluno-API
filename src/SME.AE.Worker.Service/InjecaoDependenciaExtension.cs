@@ -60,7 +60,8 @@ namespace SME.AE.Worker.Service
                 .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
                 .AddTransient<INotificacaoRepository, NotificacaoRepository>()
                 .AddTransient<IDreSgpRepositorio, DreSgpRepositorio>()
-                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>();
+                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>()
+                .AddTransient<IUeSgpRepositorio, UeSgpRepositorio>();
         }
         #endregion
     }
