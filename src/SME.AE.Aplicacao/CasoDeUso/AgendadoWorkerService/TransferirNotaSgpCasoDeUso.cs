@@ -1,15 +1,14 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
+﻿using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
 {
-    public class TransferirNotaSgpCasoDeUso
+    public class TransferirNotaSgpCasoDeUso : ITransferirNotaSgpCasoDeUso
     {
         private readonly INotaAlunoRepositorio notaAlunoRepositorio;
         private readonly INotaAlunoSgpRepositorio notaAlunoSgpRepositorio;
@@ -41,7 +40,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
                     var notaAlunoAE = await notaAlunoRepositorio.ObterListaParaExclusao(anoAtual);
                     await RemoverExcetoSgp(notaAlunoSgp, notaAlunoAE);
-                }                
+                }
             }
 
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirNotaSgp");
@@ -62,11 +61,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
                        notaSgp.Bimestre == notaAE.Bimestre
                    ))
                 .ToArray();
-
-            //await Task.Run(() =>
-            //    notaAlunoSobrando
-            //        .ForEach(async notaExcluir => await notaAlunoRepositorio.ExcluirNotaAluno(notaExcluir))
-            //);
 
             foreach (var notaExcluir in notaAlunoSobrando)
                 await notaAlunoRepositorio.ExcluirNotaAluno(notaExcluir);

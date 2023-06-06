@@ -20,7 +20,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
-        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo)
+        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo, long ueId)
         {
             const string sqlSelect = @"
 				select
@@ -59,7 +59,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     				not (fa.excluido)
 				and cc.permite_registro_frequencia
 				and	fa.tipo = 1
-				and (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
+				and t.ano_letivo = @desdeAnoLetivo
+				and ue.id = @ueId
 				union 
 				select 
 					AnoLetivo,
@@ -95,7 +96,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					where
 						not (rf.excluido or a.excluido)
 					and	cc.permite_registro_frequencia
-					and (t.ano_letivo >= 2020 and t.ano_letivo >= @desdeAnoLetivo)
+					and t.ano_letivo = @desdeAnoLetivo
+					and ue.id = @ueId
 					) aaa 
 				group by 
 					AnoLetivo,
@@ -114,7 +116,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var frequenciaAlunosSgp =
                     await conexao
-                    .QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo });
+                    .QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo, ueId }, commandTimeout: 240);
 
                 conexao.Close();
 
