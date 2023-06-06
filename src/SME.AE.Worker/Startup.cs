@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
+using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
@@ -24,7 +26,7 @@ namespace SME.AE.Worker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
+
             AdicionarMediatr(services);
             ConfiguraVariaveisAmbiente(services);
             ConfiguraSentry();
@@ -32,7 +34,7 @@ namespace SME.AE.Worker
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
             services.AddSingleton(servicoProdam);
-            
+
             RegistrarMapeamentos.Registrar();
 
             services
@@ -46,20 +48,20 @@ namespace SME.AE.Worker
                 .AddApplicationInsightsTelemetry()
                 .AddHostedService<WorkerRabbitMQ>();
 
-           
+
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME.AE.Worker", Version = "v1" });
-            });
+            });            
         }
 
         private void ConfiguraSentry()
         {
-            Sentry.SentrySdk.Init(Configuration.GetSection("Sentry:DSN").Value);            
+            Sentry.SentrySdk.Init(Configuration.GetSection("Sentry:DSN").Value);
         }
-        
+
         private void ConfiguraVariaveisAmbiente(IServiceCollection services)
         {
             var variaveisGlobais = new VariaveisGlobaisOptions();

@@ -142,10 +142,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                notaAlunosSgp
-                    .AsParallel()
-                    .WithDegreeOfParallelism(4)
-                    .ForAll(async notaAluno => await SalvarNotaAluno(notaAluno));
+                foreach (var notaAtual in notaAlunosSgp)
+                    await SalvarNotaAluno(notaAtual);
             }
             catch (Exception ex)
             {
@@ -173,7 +171,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 from
                     nota_aluno
                 where
-                    ano_letivo >= @anoLetivo
+                    ano_letivo = @anoLetivo
                 ";
 
             using var conn = CriaConexao();

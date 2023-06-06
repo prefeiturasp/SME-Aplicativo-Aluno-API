@@ -53,7 +53,7 @@ namespace SME.AE.Worker.Service
                     return cron;
                 }
             }
-            parametrosEscolaAqui.Salvar(atributo.CronParametroDB, "* * * * *");
+            parametrosEscolaAqui.Salvar(atributo?.CronParametroDB, "* * * * *");
             return CrontabSchedule.Parse("* * * * *");
         }
 
