@@ -8,6 +8,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IFrequenciaAlunoSgpRepositorio
     {
-        Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo);
+        Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo, long ueId);
     }
 }

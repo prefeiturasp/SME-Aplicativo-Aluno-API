@@ -316,10 +316,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                frequenciaAlunosSgp
-                    .AsParallel()
-                    .WithDegreeOfParallelism(4)
-                    .ForAll(async frequenciaAluno => await SalvarFrequenciaAluno(frequenciaAluno));
+                foreach (var frequencia in frequenciaAlunosSgp)
+                    await SalvarFrequenciaAluno(frequencia);
             }
             catch (Exception ex)
             {
