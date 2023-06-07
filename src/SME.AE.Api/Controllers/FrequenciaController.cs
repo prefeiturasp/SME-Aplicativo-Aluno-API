@@ -19,7 +19,7 @@ namespace SME.AE.Api.Controllers
             if (ueId == 0) throw new ArgumentNullException(nameof(ueId));
 
             await transferirFrequenciaSgpCasoDeUso
-                .ExecutarAsync(anoLetivo, ueId);
+                .ExecutarPorAnoUeAsync(anoLetivo, ueId);
 
             return Ok();
         }
