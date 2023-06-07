@@ -1,5 +1,8 @@
 ﻿using Dapper;
 using Npgsql;
+using Polly;
+using Polly.Registry;
+using RabbitMQ.Client;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -8,6 +11,7 @@ using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,10 +20,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class NotaAlunoRepositorio : INotaAlunoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
-
-        public NotaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        private readonly IAsyncPolicy policy;
+        private readonly ConnectionFactory connectionFactory;
+        public NotaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions, IReadOnlyPolicyRegistry<string> registry, ConnectionFactory connectionFactory)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            this.policy = registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila);
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
@@ -143,7 +150,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 foreach (var notaAtual in notaAlunosSgp)
-                    await SalvarNotaAluno(notaAtual);
+                    await policy.ExecuteAsync(() => SalvarNotaAluno(notaAtual));
             }
             catch (Exception ex)
             {
@@ -152,7 +159,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             await Task.CompletedTask;
         }
-        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
+        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo, string ueCodigo)
         {
             const string sqlSelect =
                 @"
@@ -171,7 +178,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 from
                     nota_aluno
                 where
-                    ano_letivo = @anoLetivo
+                    ano_letivo = @anoLetivo and
+                    ue_codigo = @ueCodigo
                 ";
 
             using var conn = CriaConexao();
@@ -179,7 +187,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 conn.Open();
-                var notaAlunoLista = await conn.QueryAsync<NotaAlunoSgpDto>(sqlSelect, new { anoLetivo = desdeAnoLetivo });
+                var notaAlunoLista = await conn.QueryAsync<NotaAlunoSgpDto>(sqlSelect, new { anoLetivo = desdeAnoLetivo, ueCodigo });
                 conn.Close();
                 return notaAlunoLista.ToArray();
             }

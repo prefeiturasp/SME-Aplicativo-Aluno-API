@@ -1,5 +1,9 @@
 ﻿using Dapper;
+using Microsoft.Win32;
 using Npgsql;
+using Polly;
+using Polly.Registry;
+using RabbitMQ.Client;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -17,10 +21,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class FrequenciaAlunoRepositorio : IFrequenciaAlunoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IAsyncPolicy policy;
+        private readonly ConnectionFactory connectionFactory;
 
-        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+                                          IReadOnlyPolicyRegistry<string> registry,
+                                          ConnectionFactory connectionFactory)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            this.policy = registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila);
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
@@ -317,7 +327,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 foreach (var frequencia in frequenciaAlunosSgp)
-                    await SalvarFrequenciaAluno(frequencia);
+                    await policy.ExecuteAsync(() => SalvarFrequenciaAluno(frequencia));
             }
             catch (Exception ex)
             {
