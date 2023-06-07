@@ -45,7 +45,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirNotaSgp");
         }
 
-        public async Task ExecutarAsync(int anoLetivo, long ueId)
+        public async Task ExecutarPorAnoUeAsync(int anoLetivo, long ueId)
         {
             await Executar(new int[] { anoLetivo}, new List<long> { ueId });
         }
@@ -59,7 +59,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     var notaAlunoSgp = await notaAlunoSgpRepositorio.ObterNotaAlunoSgp(anoAtual, id);
                     await notaAlunoRepositorio.SalvarNotaAlunosBatch(notaAlunoSgp);
 
-                    var notaAlunoAE = await notaAlunoRepositorio.ObterListaParaExclusao(anoAtual, notaAlunoSgp.First().CodigoUe);
+                    var notaAlunoAE = await notaAlunoRepositorio.ObterListaParaExclusao(anoAtual, notaAlunoSgp.FirstOrDefault().CodigoUe);
                     await RemoverExcetoSgp(notaAlunoSgp, notaAlunoAE);
                 }
             }            
@@ -81,8 +81,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
                    ))
                 .ToArray();
 
+            var contador = 1;
+            var total = notaAlunoSobrando.Length;
             foreach (var notaExcluir in notaAlunoSobrando)
+            {
                 await policy.ExecuteAsync(() => notaAlunoRepositorio.ExcluirNotaAluno(notaExcluir));
+                Debug.WriteLine($"• • • Excluir nota {contador}/{total} • • •");
+                contador++;
+            }
         }
     }
 }

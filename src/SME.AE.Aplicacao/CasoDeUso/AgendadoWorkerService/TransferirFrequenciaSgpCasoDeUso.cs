@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirFrequenciaSgp");
         }
 
-        public async Task ExecutarAsync(int anoLetivo, long ueId)
+        public async Task ExecutarPorAnoUeAsync(int anoLetivo, long ueId)
         {
             await Executar(new int[] { anoLetivo }, new long[] { ueId });
         }
@@ -62,7 +63,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     ));
                     await frequenciaAlunoRepositorio.SalvarFrequenciaAlunosBatch(frequenciaAlunosSgp);
 
-                    var frequenciaAlunosAE = await frequenciaAlunoRepositorio.ObterListaParaExclusao(anoAtual);
+                    var frequenciaAlunosAE = await frequenciaAlunoRepositorio.ObterListaParaExclusao(anoAtual, frequenciaAlunosSgp.FirstOrDefault()?.CodigoUe);
                     await RemoverExcetoSgp(frequenciaAlunosSgp, frequenciaAlunosAE);
                 }
             }            
@@ -85,8 +86,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
                    ))
                 .ToArray();
 
+            var contador = 1;
+            var total = frequenciaAlunoSobrando.Length;
             foreach (var frequencia in frequenciaAlunoSobrando)
+            {
                 await policy.ExecuteAsync(() => frequenciaAlunoRepositorio.ExcluirFrequenciaAluno(frequencia));
+                Debug.WriteLine($"• • • Excluir frequência {contador}/{total} • • •");
+                contador++;
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -326,8 +327,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
+                var contador = 1;
+                var total = frequenciaAlunosSgp.Count();
                 foreach (var frequencia in frequenciaAlunosSgp)
+                {
                     await policy.ExecuteAsync(() => SalvarFrequenciaAluno(frequencia));
+                    Debug.WriteLine($"• • • Salvar frequência {contador}/{total} • • •");
+                    contador++;
+                }
             }
             catch (Exception ex)
             {
@@ -367,10 +374,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
+        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo, string ueCodigo)
         {
-            const string sqlSelect =
-                @"
+            string sqlSelect =
+                $@"
                 select
                     ue_codigo CodigoUe,
                     ue_nome NomeUe,
@@ -388,13 +395,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 from
                     frequencia_aluno
                 where ano_letivo >= @desdeAnoLetivo
+                      {(!string.IsNullOrWhiteSpace(ueCodigo) ? " and ue_codigo = @ueCodigo" : string.Empty)};
                 ";
 
             try
             {
                 using var conn = CriaConexao();
                 conn.Open();
-                var frequenciaAlunoLista = await conn.QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo });
+                var frequenciaAlunoLista = await conn.QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo, ueCodigo });
                 conn.Close();
                 return frequenciaAlunoLista;
             }
