@@ -10,10 +10,12 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -210,16 +212,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<bool> Remover(Notificacao notificacao)
         {
             bool resultado = false;
-
+            var queryExcluirNotificacao = new StringBuilder();
             try
             {
                 await using var conn = InstanciarConexao();
-
                 conn.Open();
 
-                await conn
-                    .ExecuteAsync(@"DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;
-                                    DELETE FROM notificacao where id = @ID;", new { ID = notificacao.Id });
+                if(notificacao.TipoComunicado == Dominio.Comum.Enumeradores.TipoComunicado.ALUNO)
+                    queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;");
+
+                if (notificacao.TipoComunicado== Dominio.Comum.Enumeradores.TipoComunicado.TURMA)
+                    queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_turma WHERE notificacao_id = @ID;");
+
+                queryExcluirNotificacao.AppendLine("DELETE FROM notificacao where id = @ID;");
+
+                await conn.ExecuteAsync(queryExcluirNotificacao.ToString(), new { ID = notificacao.Id });
 
                 conn.Close();
 
