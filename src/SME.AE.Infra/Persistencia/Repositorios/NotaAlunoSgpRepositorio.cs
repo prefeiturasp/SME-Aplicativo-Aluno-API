@@ -20,7 +20,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
-        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo, long ueId)
+        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo, long ueId, int pagina, int quantidadeRegistrosPagina)
         {
             try
             {
@@ -137,7 +137,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							and con.codigoaluno = fec.codigoaluno
 						) aaa
 						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
-						order by cca_id ", new { desdeAnoLetivo, ueId }, commandTimeout: 240);
+						order by cca_id 
+						limit @quantidadeRegistrosPagina
+						offset (@pagina - 1) * @quantidadeRegistrosPagina", new { desdeAnoLetivo, ueId, pagina, quantidadeRegistrosPagina }, commandTimeout: 240);
                 conexao.Close();
 
                 return notaAlunosSgp;
