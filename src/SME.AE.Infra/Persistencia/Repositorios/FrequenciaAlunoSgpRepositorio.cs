@@ -20,7 +20,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
-        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo, long ueId)
+        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo, long ueId, int pagina, int quantidadeRegistrosPagina)
         {
             const string sqlSelect = @"
 				select
@@ -107,7 +107,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					NomeTurma,
 					Bimestre,
 					ComponenteCurricular,
-					CodigoComponenteCurricular
+					CodigoComponenteCurricular				
+				limit @quantidadeRegistrosPagina
+				offset (@pagina - 1) * @quantidadeRegistrosPagina
             ";
             try
             {
@@ -116,7 +118,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var frequenciaAlunosSgp =
                     await conexao
-                    .QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo, ueId }, commandTimeout: 240);
+                    .QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo, ueId, pagina, quantidadeRegistrosPagina }, commandTimeout: 240);
 
                 conexao.Close();
 

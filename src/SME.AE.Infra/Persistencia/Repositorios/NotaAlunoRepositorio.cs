@@ -149,14 +149,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                var contador = 1;
-                var total = notaAlunosSgp.Count();
                 foreach (var notaAtual in notaAlunosSgp)
-                {
                     await policy.ExecuteAsync(() => SalvarNotaAluno(notaAtual));
-                    Debug.WriteLine($"• • • Salvar nota {contador}/{total} • • •");
-                    contador++;
-                }
             }
             catch (Exception ex)
             {
