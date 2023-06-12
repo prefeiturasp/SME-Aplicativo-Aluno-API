@@ -1,4 +1,5 @@
 ﻿using Google.Apis.Logging;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Registry;
@@ -6,6 +7,7 @@ using RabbitMQ.Client;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private readonly IAsyncPolicy policy;
         private readonly ConnectionFactory connectionFactory;
         private readonly ILogger<TransferirFrequenciaSgpCasoDeUso> logger;
+        private readonly IMediator mediator;
 
         public TransferirFrequenciaSgpCasoDeUso(IFrequenciaAlunoRepositorio frequenciaAlunoRepositorio,
                                                 IFrequenciaAlunoSgpRepositorio frequenciaAlunoSgpRepositorio,
@@ -33,7 +36,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                                                 IUeSgpRepositorio ueSgpRepositorio,
                                                 IReadOnlyPolicyRegistry<string> registry,
                                                 ConnectionFactory connectionFactory,
-                                                ILogger<TransferirFrequenciaSgpCasoDeUso> logger)
+                                                ILogger<TransferirFrequenciaSgpCasoDeUso> logger,
+                                                IMediator mediator)
         {
             this.frequenciaAlunoRepositorio = frequenciaAlunoRepositorio ?? throw new ArgumentNullException(nameof(frequenciaAlunoRepositorio));
             this.frequenciaAlunoSgpRepositorio = frequenciaAlunoSgpRepositorio ?? throw new ArgumentNullException(nameof(frequenciaAlunoSgpRepositorio));
@@ -41,12 +45,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.ueSgpRepositorio = ueSgpRepositorio ?? throw new ArgumentNullException(nameof(ueSgpRepositorio));
             this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.policy = registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila);
         }
 
         public async Task ExecutarAsync()
         {
-            var anosConsiderados = new int[] { DateTime.Today.Year - 1, DateTime.Today.Year };
+            var parametrosAnosConsiderados = await mediator.Send(new ObterParametrosSistemaPorChavesQuery(new string[] { "TransferirFrequenciaSgpAnosConsiderados" }));
+            var anosConsiderados = parametrosAnosConsiderados.FirstOrDefault()?.Conteudo.Split(",").Select(c => int.Parse(c)).ToArray() ?? new int[] { DateTime.Now.Year };
             var uesId = await ueSgpRepositorio.ObterIdUes();
             await Executar(anosConsiderados, uesId);
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("TransferirFrequenciaSgp");
