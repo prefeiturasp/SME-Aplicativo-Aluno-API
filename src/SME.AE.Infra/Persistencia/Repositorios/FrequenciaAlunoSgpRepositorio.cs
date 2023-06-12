@@ -23,7 +23,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterFrequenciaAlunoSgp(int desdeAnoLetivo, long ueId, int pagina, int quantidadeRegistrosPagina)
         {
             const string sqlSelect = @"
-				select
+				with lista as (
+					select
 					t.ano_letivo AnoLetivo,
 					ue.ue_id CodigoUe,
 					ue.nome NomeUe,
@@ -38,16 +39,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					total_compensacoes QuantidadeCompensacoes,
         				(
         					select array_to_string(array(
-        					select concat(to_char(a.data_aula, 'YYYY-MM-DD'),':',raa.numero_aula::text)
+        					select concat(to_char(a.data_aula, 'YYYY-MM-DD'),':',rfa.numero_aula::text)
 							from registro_frequencia rf
 							inner join aula a on a.id = rf.aula_id
-							inner join registro_ausencia_aluno raa on raa.registro_frequencia_id = rf.id 
-							where not (a.excluido or raa.excluido)
-							and fa.codigo_aluno = raa.codigo_aluno 
+							inner join registro_frequencia_aluno rfa on rfa.registro_frequencia_id = rf.id 
+							where not (a.excluido or rfa.excluido)
+							and fa.codigo_aluno = rfa.codigo_aluno 
 							and a.turma_id = t.turma_id 
 							and a.tipo_calendario_id = pe.tipo_calendario_id 
 							and a.disciplina_id = fa.disciplina_id
 							and a.data_aula between pe.periodo_inicio and pe.periodo_fim 
+							and rfa.valor = 2
 							),',')
 						) DiasAusencias
 				from frequencia_aluno fa 
@@ -60,7 +62,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 				and cc.permite_registro_frequencia
 				and	fa.tipo = 1
 				and t.ano_letivo = @desdeAnoLetivo
-				and ue.id = @ueId
+				and ue.id = @ueId				
 				union 
 				select 
 					AnoLetivo,
@@ -97,8 +99,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 						not (rf.excluido or a.excluido)
 					and	cc.permite_registro_frequencia
 					and t.ano_letivo = @desdeAnoLetivo
-					and ue.id = @ueId
-					) aaa 
+					and ue.id = @ueId					
+					) aaa
 				group by 
 					AnoLetivo,
 					CodigoUe,
@@ -107,10 +109,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 					NomeTurma,
 					Bimestre,
 					ComponenteCurricular,
-					CodigoComponenteCurricular				
+					CodigoComponenteCurricular)
+				select *
+					from lista
+				where (CodigoAluno <> '' and CodigoAluno is not null) or 
+					  (DiasAusencias <> '' and DiasAusencias is not null)
 				limit @quantidadeRegistrosPagina
-				offset (@pagina - 1) * @quantidadeRegistrosPagina
-            ";
+				offset (@pagina - 1) * @quantidadeRegistrosPagina;";
             try
             {
                 using var conexao = CriaConexao();
