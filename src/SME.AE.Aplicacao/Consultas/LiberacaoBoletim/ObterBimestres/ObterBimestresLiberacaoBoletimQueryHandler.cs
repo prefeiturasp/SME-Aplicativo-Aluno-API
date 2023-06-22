@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterBimestres
         public async Task<int[]> Handle(ObterBimestresLiberacaoBoletimQuery request, CancellationToken cancellationToken)
         {
             int[] bimestres;
-            var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
             var resposta = await httpClient.GetAsync($"v1/calendarios/eventos/liberacao-boletim/turmas/{request.TurmaCodigo}/bimestres");
             if (resposta.IsSuccessStatusCode)
             {
