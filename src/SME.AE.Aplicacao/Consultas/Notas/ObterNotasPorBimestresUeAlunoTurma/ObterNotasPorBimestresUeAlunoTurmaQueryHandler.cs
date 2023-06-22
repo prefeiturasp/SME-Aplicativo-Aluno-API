@@ -24,8 +24,8 @@ namespace SME.AE.Aplicacao
         {
             IEnumerable<NotaConceitoBimestreComponenteDto> notasConceitos;
 
-            var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
-            var resposta = await httpClient.GetAsync($"v1/avaliacoes/notas/ues/{request.UeCodigo}/turmas/{request.TurmaCodigo}/alunos/{request.AlunoCodigo}?bimestres={string.Join("&bimestres=", request.Bimestres)}");
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
+            var resposta = await httpClient.GetAsync($"v1/avaliacoes/notas/integracoes/ues/{request.UeCodigo}/turmas/{request.TurmaCodigo}/alunos/{request.AlunoCodigo}?bimestres={string.Join("&bimestres=", request.Bimestres)}");
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();
