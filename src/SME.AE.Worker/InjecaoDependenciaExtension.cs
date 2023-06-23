@@ -76,6 +76,8 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddTransient(typeof(IServicoLog), typeof(ServicoLog));
             services.AddTransient(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
+            services.AddTransient(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
+            
 
             return services;
         }

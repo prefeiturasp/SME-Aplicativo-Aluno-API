@@ -1,5 +1,9 @@
 ﻿using Dapper;
+using Microsoft.Win32;
 using Npgsql;
+using Polly;
+using Polly.Registry;
+using RabbitMQ.Client;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -9,6 +13,7 @@ using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,10 +22,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class FrequenciaAlunoRepositorio : IFrequenciaAlunoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IAsyncPolicy policy;
+        private readonly ConnectionFactory connectionFactory;
 
-        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public FrequenciaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+                                          IReadOnlyPolicyRegistry<string> registry,
+                                          ConnectionFactory connectionFactory)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            this.policy = registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila);
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
@@ -316,10 +327,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                frequenciaAlunosSgp
-                    .AsParallel()
-                    .WithDegreeOfParallelism(4)
-                    .ForAll(async frequenciaAluno => await SalvarFrequenciaAluno(frequenciaAluno));
+                var contador = 1;
+                var total = frequenciaAlunosSgp.Count();
+                foreach (var frequencia in frequenciaAlunosSgp)
+                {
+                    await policy.ExecuteAsync(() => SalvarFrequenciaAluno(frequencia));
+                    Debug.WriteLine($"• • • Salvar frequência {contador}/{total} • • •");
+                    contador++;
+                }
             }
             catch (Exception ex)
             {
@@ -359,10 +374,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo)
+        public async Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo, string ueCodigo)
         {
-            const string sqlSelect =
-                @"
+            string sqlSelect =
+                $@"
                 select
                     ue_codigo CodigoUe,
                     ue_nome NomeUe,
@@ -380,13 +395,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 from
                     frequencia_aluno
                 where ano_letivo >= @desdeAnoLetivo
+                      {(!string.IsNullOrWhiteSpace(ueCodigo) ? " and ue_codigo = @ueCodigo" : string.Empty)};
                 ";
 
             try
             {
                 using var conn = CriaConexao();
                 conn.Open();
-                var frequenciaAlunoLista = await conn.QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo });
+                var frequenciaAlunoLista = await conn.QueryAsync<FrequenciaAlunoSgpDto>(sqlSelect, new { desdeAnoLetivo, ueCodigo });
                 conn.Close();
                 return frequenciaAlunoLista;
             }

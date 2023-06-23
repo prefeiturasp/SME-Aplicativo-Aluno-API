@@ -1,6 +1,10 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+﻿using Polly;
+using Polly.Registry;
+using RabbitMQ.Client;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,11 +19,18 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         private readonly IEventoRepositorio eventoRepositorio;
         private readonly IEventoSgpRepositorio eventoSgpRepositorio;
+        private readonly IAsyncPolicy policy;
+        private readonly ConnectionFactory connectionFactory;
 
-        public TranferirEventoSgpCasoDeUso(IEventoRepositorio eventoRepositorio, IEventoSgpRepositorio eventoSgpRepositorio)
+        public TranferirEventoSgpCasoDeUso(IEventoRepositorio eventoRepositorio,
+                                           IEventoSgpRepositorio eventoSgpRepositorio,
+                                           IReadOnlyPolicyRegistry<string> registry,
+                                           ConnectionFactory connectionFactory)
         {
             this.eventoRepositorio = eventoRepositorio ?? throw new ArgumentNullException(nameof(eventoRepositorio));
             this.eventoSgpRepositorio = eventoSgpRepositorio ?? throw new ArgumentNullException(nameof(eventoSgpRepositorio));
+            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            this.policy = registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila);
         }
 
         public async Task ExecutarAsync()
@@ -41,13 +52,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private async Task RemoverEventos(IEnumerable<EventoDto> listaEventos)
         {
             foreach (var evento in listaEventos)
-                await eventoRepositorio.Remover(evento);
+                await policy.ExecuteAsync(() => eventoRepositorio.Remover(evento));
         }
 
         private async Task SalvarEventos(IEnumerable<EventoDto> listaEventos)
         {
             foreach (var evento in listaEventos)
-                await eventoRepositorio.Salvar(evento);
+                await policy.ExecuteAsync(() => eventoRepositorio.Salvar(evento));
         }
 
         private IEnumerable<EventoDto> MapearEventos(IEnumerable<EventoSgpDto> listaEventosSgp)

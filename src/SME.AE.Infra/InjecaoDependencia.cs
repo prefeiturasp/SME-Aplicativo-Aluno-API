@@ -54,6 +54,10 @@ namespace SME.AE.Infra
             services.AddScoped(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.AddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddScoped(typeof(IServicoLog), typeof(ServicoLog));
+            services.AddScoped(typeof(INotaAlunoSgpRepositorio), typeof(NotaAlunoSgpRepositorio));
+            services.AddScoped(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
+            services.AddScoped(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
+            services.AddScoped(typeof(IComponenteCurricularSgpRepositorio), typeof(ComponenteCurricularSgpRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.AddScoped<IAutenticacaoService, AutenticacaoService>();

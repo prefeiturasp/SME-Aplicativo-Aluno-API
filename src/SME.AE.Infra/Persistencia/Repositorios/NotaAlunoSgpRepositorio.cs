@@ -20,7 +20,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
-        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo, long ueId)
+        public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo, long ueId, int pagina, int quantidadeRegistrosPagina)
         {
             try
             {
@@ -29,8 +29,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 var notaAlunosSgp = await conexao
                     .QueryAsync<NotaAlunoSgpDto>(
-                        @"select * from(
-							select distinct 
+                        @"select distinct 
 								coalesce(con.AnoLetivo, fec.AnoLetivo) AnoLetivo,
 								coalesce(con.CodigoUe, fec.CodigoUe) CodigoUe,
 								coalesce(con.CodigoTurma, fec.CodigoTurma) CodigoTurma,
@@ -40,8 +39,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 								coalesce(con.ComponenteCurricular, fec.ComponenteCurricular) ComponenteCurricular,
 								coalesce(con.Nota, fec.Nota) Nota,
 								coalesce(con.NotaDescricao, fec.NotaDescricao) NotaDescricao,
-								coalesce(con.RecomendacoesAluno, fec.RecomendacoesAluno, '') RecomendacoesAluno,
-								coalesce(con.RecomendacoesFamilia, fec.RecomendacoesFamilia, '') RecomendacoesFamilia,
+								con.RecomendacoesAluno,
+								con.RecomendacoesFamilia,
+								ccra.recomendacao RecomendacoesAlunoComplementares,
+								ccrf.recomendacao RecomendacoesFamiliaComplementares,
 								coalesce(con.cca_id, fec.cca_id, 0) cca_id
 							from 
 								(
@@ -88,6 +89,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 										and not fa.excluido 
 										and not fn.excluido
 										and ue.id = @ueId
+									order by 12
+									limit @quantidadeRegistrosPagina
+									offset (@pagina - 1) * @quantidadeRegistrosPagina
 								) fec
 							full outer join
 								(
@@ -128,6 +132,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 									where t.ano_letivo = @desdeAnoLetivo
 									and not cc.excluido
 									and ue.id = @ueId
+									order by 12
+									limit @quantidadeRegistrosPagina
+									offset (@pagina - 1) * @quantidadeRegistrosPagina
 								) con 
 							on 	con.anoletivo = fec.anoletivo
 							and con.codigoue  = fec.codigoue
@@ -135,9 +142,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							and con.bimestre = fec.bimestre
 							and con.codigocomponentecurricular = fec.codigocomponentecurricular
 							and con.codigoaluno = fec.codigoaluno
-						) aaa
-						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
-						order by cca_id ", new { desdeAnoLetivo, ueId }, commandTimeout: 120);
+							left join conselho_classe_aluno_recomendacao ccar on coalesce(con.cca_id, fec.cca_id, 0) = ccar.conselho_classe_aluno_id
+							left join conselho_classe_recomendacao ccra on ccar.conselho_classe_recomendacao_id = ccra.id and ccra.tipo = 2
+							left join conselho_classe_recomendacao ccrf on ccar.conselho_classe_recomendacao_id = ccra.id and ccrf.tipo = 1
+							where ((con.RecomendacoesAluno = '' or con.RecomendacoesAluno is null) and 
+								   (con.RecomendacoesFamilia = '' or con.RecomendacoesFamilia is null)) and
+								  ccra.id is not null and
+								  ccrf.id is not null;", new { desdeAnoLetivo, ueId, pagina, quantidadeRegistrosPagina }, commandTimeout: 240);
                 conexao.Close();
 
                 return notaAlunosSgp;
