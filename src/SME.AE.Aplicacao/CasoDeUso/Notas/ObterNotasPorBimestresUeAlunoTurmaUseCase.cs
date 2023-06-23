@@ -28,6 +28,7 @@ namespace SME.AE.Aplicacao
 
             foreach (var notaConceito in notasConceitosBimestreComponente)
             {
+                notaConceito.ComponenteCurricularNome = await mediator.Send(new ObterNomeComponenteCurricularQuery(notaConceito.ComponenteCurricularCodigo));
                 notaConceito.CorDaNota = decimal.TryParse(notaConceito.NotaConceito, out var notaEmValor)
                     ? DefinirCorDaNotaPorValor(notaEmValor, notaAlunoCores)
                     : DefinirCorDaNotaPorConceito(notaConceito.NotaConceito, notaAlunoCores);
