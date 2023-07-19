@@ -7,6 +7,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 {
     public interface IEventoSgpRepositorio
     {
-        Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao);
+        Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao, int pagina, int quantidadeRegistrosPorPagina);
     }
 }

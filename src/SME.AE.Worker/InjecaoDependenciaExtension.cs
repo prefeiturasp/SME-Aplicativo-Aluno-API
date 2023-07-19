@@ -66,6 +66,7 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.AddTransient(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
             services.AddTransient(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
+            services.AddTransient(typeof(INotaAlunoSgpRepositorio), typeof(NotaAlunoSgpRepositorio));
             services.AddTransient(typeof(ITurmaRepositorio), typeof(TurmaRepositorio));
             services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.AddTransient(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
@@ -74,6 +75,9 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddTransient(typeof(IServicoLog), typeof(ServicoLog));
+            services.AddTransient(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
+            services.AddTransient(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
+            
             services.AddTransient(typeof(IOutroServicoRepositorio), typeof(OutroServicoRepositorio));
 
             return services;

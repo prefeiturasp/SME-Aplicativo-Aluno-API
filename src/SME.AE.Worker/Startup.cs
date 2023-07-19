@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Servicos;
+using SME.AE.Aplicacao.CasoDeUso;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum;
 using SME.AE.Dominio.Options;
 using SME.AE.Infra.Persistencia.Mapeamentos;
@@ -58,7 +60,7 @@ namespace SME.AE.Worker
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME.AE.Worker", Version = "v1" });
-            });
+            });            
         }
 
         private void ConfiguraSentry()

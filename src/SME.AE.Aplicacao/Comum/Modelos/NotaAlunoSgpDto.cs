@@ -13,6 +13,8 @@
         public string NotaDescricao { get; set; }
         public string RecomendacoesAluno { get; set; }
         public string RecomendacoesFamilia { get; set; }
+        public string RecomendacoesAlunoComplementares { get; set; }
+        public string RecomendacoesFamiliaComplementares { get; set; }
 
     }
 }
