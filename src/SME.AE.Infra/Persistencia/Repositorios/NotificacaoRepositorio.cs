@@ -26,8 +26,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
         private readonly IServicoTelemetria servicoTelemetria;
 
-        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
-            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
+        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions, IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
             this.servicoTelemetria = servicoTelemetria;

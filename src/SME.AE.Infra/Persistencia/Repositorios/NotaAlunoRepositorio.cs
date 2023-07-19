@@ -23,6 +23,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
         private readonly IAsyncPolicy policy;
         private readonly ConnectionFactory connectionFactory;
+        private readonly IServicoTelemetria servicoTelemetria;
+
         public NotaAlunoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions, IReadOnlyPolicyRegistry<string> registry, ConnectionFactory connectionFactory,
             IServicoTelemetria servicoTelemetria)
         {
