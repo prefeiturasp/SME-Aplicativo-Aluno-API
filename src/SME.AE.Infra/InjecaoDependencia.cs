@@ -57,12 +57,12 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(IDreSgpRepositorio), typeof(DreSgpRepositorio));
             services.TryAddScoped(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.TryAddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
-            services.AddScoped(typeof(INotificacaoRepository), typeof(NotificacaoRepository));
-            services.AddScoped(typeof(IServicoLog), typeof(ServicoLog));
-            services.AddScoped(typeof(INotaAlunoSgpRepositorio), typeof(NotaAlunoSgpRepositorio));
-            services.AddScoped(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
-            services.AddScoped(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
-            services.AddScoped(typeof(IComponenteCurricularSgpRepositorio), typeof(ComponenteCurricularSgpRepositorio));
+            services.TryAddScoped(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
+            services.TryAddScoped(typeof(IServicoLog), typeof(ServicoLog));
+            services.TryAddScoped(typeof(INotaAlunoSgpRepositorio), typeof(NotaAlunoSgpRepositorio));
+            services.TryAddScoped(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
+            services.TryAddScoped(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
+            services.TryAddScoped(typeof(IComponenteCurricularSgpRepositorio), typeof(ComponenteCurricularSgpRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.TryAddScoped<IAutenticacaoService, AutenticacaoService>();
