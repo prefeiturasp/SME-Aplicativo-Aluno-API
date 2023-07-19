@@ -25,7 +25,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
             foreach (var item in request.Parametros)
             {
                 var resultado = await notificacaoRepository
-                    .ListarNotificacoes(item.ModalidadesId, item.CodigoUE, item.CodigoDRE, item.CodigoTurma, item.CodigoAluno, item.CodigoUsuario, item.SerieResumida);
+                    .ListarNotificacoes(item.ModalidadesId, item.TiposEscolas, item.CodigoUE, item.CodigoDRE, item.CodigoTurma, item.CodigoAluno, item.CodigoUsuario, item.SerieResumida);
                 retorno.AddRange(resultado);
             }
 
