@@ -156,7 +156,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 conexao.Open();
 
-				var notaAlunosSgp = await servicoTelemetria.RegistrarComRetornoAsync<NotaAlunoSgpDto>(async () => await SqlMapper.QueryAsync<NotaAlunoSgpDto>(conexao, sql, parametros),
+				var notaAlunosSgp = await servicoTelemetria.RegistrarComRetornoAsync<NotaAlunoSgpDto>(async () => await SqlMapper.QueryAsync<NotaAlunoSgpDto>(conexao, sql, parametros, commandTimeout: 240),
 					"quyer", "Query SGP", sql, parametros.ToString());
 
                 conexao.Close();
