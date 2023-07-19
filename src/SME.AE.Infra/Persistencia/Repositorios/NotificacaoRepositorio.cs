@@ -145,7 +145,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using var conexao = InstanciarConexao();
 
-            var consulta = MontarQueryListagemCompleta(serieResumida, codigoAluno);
+            var consulta = MontarQueryListagemCompleta(serieResumida);
             var parametros = new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida };
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
@@ -248,7 +248,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where n.id = @Id and not n.excluido ";
         }
 
-        private string MontarQueryListagemCompleta(string serieResumida, string codigoAluno)
+        private string MontarQueryListagemCompleta(string serieResumida)
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ?
                 "" : " and (n.seriesresumidas isnull or n.seriesresumidas = '' or (string_to_array(n.seriesresumidas, ',') && string_to_array(@serieResumida, ',')))";
