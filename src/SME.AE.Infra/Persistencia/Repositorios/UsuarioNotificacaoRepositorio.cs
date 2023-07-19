@@ -40,6 +40,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       dre_codigoeol, 
                        ue_codigoeol, 
                         usuario_cpf,
+                        codigo_eol_turma,
                           criadopor,
                      mensagemvisualizada,
                      mensagemexcluida
@@ -51,6 +52,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                            @DreCodigoEol,
                            @UeCodigoEol,
                            @UsuarioCpf,
+                           @CodigoEolTurma,
                            @CriadoPor,
                            @MensagemVisualizada,
                            @MensagemExcluida
@@ -64,6 +66,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuarioNotificacao.DreCodigoEol,
                         usuarioNotificacao.UeCodigoEol,
                         usuarioNotificacao.UsuarioCpf,
+                        usuarioNotificacao.CodigoEolTurma,
                         usuarioNotificacao.CriadoPor,
                         usuarioNotificacao.MensagemVisualizada,
                         usuarioNotificacao.MensagemExcluida
