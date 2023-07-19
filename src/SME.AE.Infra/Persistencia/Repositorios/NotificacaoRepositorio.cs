@@ -311,40 +311,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    	     (tmp.dataexpiracao is null or tmp.dataexpiracao::date >= current_date) and
                    	     tmp.dataenvio::date <= current_date and
                    	     tmp.enviadopushnotification;";
-                $@"
-                    select {CamposConsultaNotificacao("notificacao", true)}
-                      notificacao.ano_letivo AnoLetivo,
-                      unl.mensagemvisualizada from(
-                      {QueryComunicadosSME()}
-                      union
-                      {QueryComunicadosAutomaticos()}
-                      union
-                      {QueryComunicadosDRE()}
-                      union
-                      {QueryComunicadosSME_ANO()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosDRE_ANO()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosUE()}
-                      union
-                      {QueryComunicadosUEMOD()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosTurmas()}
-                      union
-                      {QueryComunicadosAlunos()}
-                      )as notificacao
-                      left join usuario_notificacao_leitura unl on 
-                      unl.notificacao_id = notificacao.id 
-                      and unl.usuario_id = @usuarioId
-                      and unl.codigo_eol_aluno = @codigoAluno
-                      where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
-                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao >= current_date) and 
-                        date_trunc('day', notificacao.dataenvio) <= current_date and
-                        notificacao.enviadopushnotification
-                ";
         }
 
         private string MontarQueryListagemCompletaNaoEnviadoPushNotification()
