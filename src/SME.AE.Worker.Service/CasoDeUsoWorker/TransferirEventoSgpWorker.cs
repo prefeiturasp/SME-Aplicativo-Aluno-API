@@ -3,7 +3,7 @@ using System;
 
 namespace SME.AE.Worker.Service.CasoDeUsoWorker
 {
-    [UseCaseWorker(CronParametroDB = "TransferirEventosSgp", CronPadrao = "0 0 * * *")]
+    [UseCaseWorker(CronParametroDB = "TransferirEventosSgp", CronPadrao = "0 9 * * *")]
     public class TransferirEventoSgpWorker : UseCaseWorker<TranferirEventoSgpCasoDeUso>
     {
         public TransferirEventoSgpWorker(IServiceProvider serviceProvider) : base(serviceProvider)

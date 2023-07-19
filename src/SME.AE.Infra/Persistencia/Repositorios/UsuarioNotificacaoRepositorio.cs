@@ -76,7 +76,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }

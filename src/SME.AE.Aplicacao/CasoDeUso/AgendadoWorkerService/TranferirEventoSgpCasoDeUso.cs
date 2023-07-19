@@ -1,8 +1,13 @@
-﻿using SME.AE.Aplicacao.Comum.Enumeradores;
+﻿using Polly;
+using Polly.Registry;
+using RabbitMQ.Client;
+using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Comum;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,38 +15,50 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class TranferirEventoSgpCasoDeUso
     {
+        private const int QUANTIDADE_REGISTROS_POR_PAGINA_EVENTOS = 1000;
+
         private readonly IEventoRepositorio eventoRepositorio;
         private readonly IEventoSgpRepositorio eventoSgpRepositorio;
+        private readonly IAsyncPolicy policy;
+        private readonly ConnectionFactory connectionFactory;
 
-        public TranferirEventoSgpCasoDeUso(IEventoRepositorio eventoRepositorio, IEventoSgpRepositorio eventoSgpRepositorio)
+        public TranferirEventoSgpCasoDeUso(IEventoRepositorio eventoRepositorio,
+                                           IEventoSgpRepositorio eventoSgpRepositorio,
+                                           IReadOnlyPolicyRegistry<string> registry,
+                                           ConnectionFactory connectionFactory)
         {
             this.eventoRepositorio = eventoRepositorio ?? throw new ArgumentNullException(nameof(eventoRepositorio));
             this.eventoSgpRepositorio = eventoSgpRepositorio ?? throw new ArgumentNullException(nameof(eventoSgpRepositorio));
+            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            this.policy = registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila);
         }
 
         public async Task ExecutarAsync()
         {
-            DateTime ultimaData = await ObterUltimaDataEvento();
-            IEnumerable<EventoSgpDto> listaEvendosSgp = await ObterListaEventosSgp(ultimaData);
-            IEnumerable<EventoDto> listaEventos = MapearEventos(listaEvendosSgp);
-            await SalvarEventos(listaEventos.Where(e => !e.excluido));
-            await RemoverEventos(listaEventos.Where(e => e.excluido));
+            var ultimaData = await ObterUltimaDataEvento();
+            var contadorPaginacao = 1;
+
+            IEnumerable<EventoSgpDto> listaEvendosSgp = null;
+            do
+            {
+                listaEvendosSgp = await ObterListaEventosSgp(ultimaData, contadorPaginacao);
+                var listaEventos = MapearEventos(listaEvendosSgp);
+                await SalvarEventos(listaEventos.Where(e => !e.excluido));
+                await RemoverEventos(listaEventos.Where(e => e.excluido));
+                contadorPaginacao++;
+            } while (listaEvendosSgp != null && listaEvendosSgp.Any());
         }
 
         private async Task RemoverEventos(IEnumerable<EventoDto> listaEventos)
         {
             foreach (var evento in listaEventos)
-            {
-                await eventoRepositorio.Remover(evento);
-            }
+                await policy.ExecuteAsync(() => eventoRepositorio.Remover(evento));
         }
 
         private async Task SalvarEventos(IEnumerable<EventoDto> listaEventos)
         {
             foreach (var evento in listaEventos)
-            {
-                await eventoRepositorio.Salvar(evento);
-            }
+                await policy.ExecuteAsync(() => eventoRepositorio.Salvar(evento));
         }
 
         private IEnumerable<EventoDto> MapearEventos(IEnumerable<EventoSgpDto> listaEventosSgp)
@@ -57,7 +74,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     tipo_evento = eventoSgp.tipo_evento_id,
                     turma_id = eventoSgp.turma_id,
                     nome = eventoSgp.nome,
-                    descricao = eventoSgp.descricao,
+                    descricao = eventoSgp.descricao?.Length > 5000 ? eventoSgp.descricao?.Substring(0, 5000) : eventoSgp.descricao,
                     dre_id = eventoSgp.dre_id,
                     ue_id = eventoSgp.ue_id,
                     ultima_alteracao_sgp = eventoSgp.alterado_em,
@@ -87,9 +104,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return 0;
         }
 
-        private async Task<IEnumerable<EventoSgpDto>> ObterListaEventosSgp(DateTime ultimaDataAlteracao)
+        private async Task<IEnumerable<EventoSgpDto>> ObterListaEventosSgp(DateTime ultimaDataAlteracao, int pagina)
         {
-            return await eventoSgpRepositorio.ListaEventoPorDataAlteracao(ultimaDataAlteracao);
+            return await eventoSgpRepositorio.ListaEventoPorDataAlteracao(ultimaDataAlteracao, pagina, QUANTIDADE_REGISTROS_POR_PAGINA_EVENTOS);
         }
 
         private async Task<DateTime> ObterUltimaDataEvento()

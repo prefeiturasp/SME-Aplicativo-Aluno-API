@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         Task ExcluirNotaAluno(NotaAlunoSgpDto notaAluno);
 
-        Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo);
+        Task<IEnumerable<NotaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo, string ueCodigo);
 
         Task SalvarNotaAlunosBatch(IEnumerable<NotaAlunoSgpDto> notaAlunosSgp);
 

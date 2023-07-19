@@ -133,8 +133,11 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase, ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase>();
             services.TryAddScoped<IObterBimestresLiberacaoBoletimAlunoUseCase, ObterBimestresLiberacaoBoletimAlunoUseCase>();
             services.TryAddScoped<IObterComponentesCurricularesIdsUseCase, ObterComponentesCurricularesIdsUseCase>();
-            services.TryAddScoped<IObterRecomendacaoAlunoUseCase, ObterRecomendacaoAlunoUseCase>();
+
             services.TryAddScoped<IObterDadosUsuarioPorCpfUseCase, ObterDadosUsuarioPorCpfUseCase>();
+            services.TryAddScoped<ITransferirNotaSgpCasoDeUso, TransferirNotaSgpCasoDeUso>();
+            services.TryAddScoped<ITransferirFrequenciaSgpCasoDeUso, TransferirFrequenciaSgpCasoDeUso>();
+            services.TryAddScoped<IObterRecomendacaoAlunoUseCase, ObterRecomendacaoAlunoUseCase>();
         }
     }
 }

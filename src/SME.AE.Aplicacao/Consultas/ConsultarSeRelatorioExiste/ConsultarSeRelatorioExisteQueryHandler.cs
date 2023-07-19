@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao
                 }
                 return existe;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

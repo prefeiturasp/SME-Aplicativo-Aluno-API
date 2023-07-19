@@ -24,13 +24,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.SgpConnection);
 
-        public async Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao)
+        public async Task<IEnumerable<EventoSgpDto>> ListaEventoPorDataAlteracao(DateTime ultimaDataAlteracao, int pagina, int quantidadeRegistrosPorPagina)
         {
-            var sql =
-                @"
-					select * from 
-					(
-						(select 
+            var sql = @"(select 
 							coalesce (cc.descricao_sgp, cc.descricao) as componente_curricular,							
 							aa.id, aa.nome_avaliacao nome, aa.descricao_avaliacao descricao, aa.data_avaliacao data_inicio, aa.data_avaliacao data_fim,
 							aa.dre_id, aa.ue_id, 
@@ -47,8 +43,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 						inner join atividade_avaliativa_disciplina aad on aad.atividade_avaliativa_id = aa.id
 						inner join componente_curricular cc on cc.id::varchar = aad.disciplina_id 
 						where
-							(aa.migrado isnull or aa.migrado = false) 
-						)
+							(aa.migrado isnull or aa.migrado = false) and
+							greatest(aa.criado_em, aa.alterado_em)::date >= @ultimaDataAlteracao)
 						union 
 						(select
 							null as componente_curricular,
@@ -75,12 +71,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 						where
 							(e.status = 1) and
 							(e.migrado isnull or e.migrado = false) and
-							(et.evento_escolaaqui)
-						)
-					) as eae
-					where alterado_em >= @alterado_em 
-					order by alterado_em
-				";
+							(et.evento_escolaaqui) and
+							greatest(e.criado_em, e.alterado_em, tc.criado_em, tc.alterado_em, wan.criado_em, wan.alterado_em, n2.criado_em, n2.alterado_em)::date >= @ultimaDataAlteracao)
+						order by 14
+						limit @quantidadeRegistrosPorPagina
+						offset (@pagina - 1) * @quantidadeRegistrosPorPagina";
 
 			var parametros = new { alterado_em = ultimaDataAlteracao };
 

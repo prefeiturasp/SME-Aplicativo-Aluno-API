@@ -14,7 +14,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
 
         Task<FrequenciaAlunoResposta> ObterFrequenciaAlunoAsync(int anoLetivo, string codigoUe, string codigoTurma, string codigoAluno);
 
-        Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo);
+        Task<IEnumerable<FrequenciaAlunoSgpDto>> ObterListaParaExclusao(int desdeAnoLetivo, string ueCodigo);
 
         Task SalvarFrequenciaAlunosBatch(IEnumerable<FrequenciaAlunoSgpDto> frequenciaAlunosSgp);
     }

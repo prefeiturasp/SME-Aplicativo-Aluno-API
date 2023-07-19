@@ -11,10 +11,12 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -24,8 +26,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
         private readonly IServicoTelemetria servicoTelemetria;
 
-        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
-            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
+        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions, IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
             this.servicoTelemetria = servicoTelemetria;
@@ -144,7 +145,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             using var conexao = InstanciarConexao();
 
-            var consulta = MontarQueryListagemCompleta(serieResumida, codigoAluno);
+            var consulta = MontarQueryListagemCompleta(serieResumida);
             var parametros = new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida };
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
@@ -212,16 +213,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<bool> Remover(Notificacao notificacao)
         {
             bool resultado = false;
-
+            var queryExcluirNotificacao = new StringBuilder();
             try
             {
                 await using var conn = InstanciarConexao();
-
                 conn.Open();
 
-                await conn
-                    .ExecuteAsync(@"DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;
-                                    DELETE FROM notificacao where id = @ID;", new { ID = notificacao.Id });
+                if(notificacao.TipoComunicado == Dominio.Comum.Enumeradores.TipoComunicado.ALUNO)
+                    queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;");
+
+                if (notificacao.TipoComunicado== Dominio.Comum.Enumeradores.TipoComunicado.TURMA)
+                    queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_turma WHERE notificacao_id = @ID;");
+
+                queryExcluirNotificacao.AppendLine("DELETE FROM notificacao where id = @ID;");
+
+                await conn.ExecuteAsync(queryExcluirNotificacao.ToString(), new { ID = notificacao.Id });
 
                 conn.Close();
 
@@ -242,45 +248,69 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where n.id = @Id and not n.excluido ";
         }
 
-        private string MontarQueryListagemCompleta(string serieResumida, string codigoAluno)
+        private string MontarQueryListagemCompleta(string serieResumida)
         {
-            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or n.SeriesResumidas = '' or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
+            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ?
+                "" : " and (n.seriesresumidas isnull or n.seriesresumidas = '' or (string_to_array(n.seriesresumidas, ',') && string_to_array(@serieResumida, ',')))";
 
             return
-                $@"
-                    select {CamposConsultaNotificacao("notificacao", true)}
-                      notificacao.ano_letivo AnoLetivo,
-                      unl.mensagemvisualizada from(
-                      {QueryComunicadosSME()}
-                      union
-                      {QueryComunicadosAutomaticos()}
-                      union
-                      {QueryComunicadosDRE()}
-                      union
-                      {QueryComunicadosSME_ANO()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosDRE_ANO()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosUE()}
-                      union
-                      {QueryComunicadosUEMOD()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosTurmas()}
-                      union
-                      {QueryComunicadosAlunos()}
-                      )as notificacao
-                      left join usuario_notificacao_leitura unl on 
-                      unl.notificacao_id = notificacao.id 
-                      and unl.usuario_id = @usuarioId
-                      and unl.codigo_eol_aluno = @codigoAluno
-                      where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
-                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao >= current_date) and 
-                        date_trunc('day', notificacao.dataenvio) <= current_date and
-                        notificacao.enviadopushnotification
-                ";
+                $@"drop table if exists tmp_lista_notificacoes;
+                   create temporary table tmp_lista_notificacoes as
+                   select *
+                   	from notificacao n		
+                   where ((n.tipocomunicado = {(int)TipoComunicado.SME} or
+                   	      (n.tipocomunicado = {(int)TipoComunicado.DRE} and n.dre_codigoeol = @codigoDre) or
+                   	      (n.tipocomunicado = {(int)TipoComunicado.UEMOD} and n.ue_codigoeol = @codigoUe{whereSerieResumida}) or
+                   	      (n.tipocomunicado in ({(int)TipoComunicado.SME_ANO}, {(int)TipoComunicado.DRE_ANO}){whereSerieResumida}) and
+                   	      String_to_array(n.modalidades, ',') && String_to_array(@gruposId, ',') or
+                   	      (n.tipocomunicado = {(int)TipoComunicado.UE} and n.dre_codigoeol = @codigoDre)))
+                   
+                   union
+                   
+                   select n.*
+                   	from notificacao n 
+                   		inner join notificacao_turma nt 
+                   			on n.id = nt.notificacao_id 
+                   where n.tipocomunicado = {(int)TipoComunicado.TURMA} and
+                   	nt.codigo_eol_turma = @codigoTurma
+                   	
+                   union
+                   
+                   select n.*
+                   	from notificacao n 
+                   		inner join notificacao_aluno na 
+                   			on n.id = na.notificacao_id
+                   where n.tipocomunicado = {(int)TipoComunicado.ALUNO} and
+                   	na.codigo_eol_aluno = @codigoAluno;
+                   
+                   select tmp.id,
+                          tmp.mensagem,
+                          tmp.titulo,
+                          String_to_array(tmp.modalidades, ',') gruposid,
+                          tmp.dataenvio,
+                          tmp.dataexpiracao,
+                          tmp.criadoem,
+                          tmp.criadopor,
+                          tmp.alteradoem,
+                          tmp.alteradopor,
+                          tmp.tipocomunicado,
+                          tmp.seriesresumidas,
+                          tmp.ano_letivo,
+                          tmp.categorianotificacao,
+                          tmp.enviadopushnotification,
+                          tmp.dre_codigoeol codigodre,
+                          tmp.ue_codigoeol codigoue,
+                          tmp.ano_letivo anoletivo,
+                          unl.mensagemvisualizada 
+                   	from tmp_lista_notificacoes tmp
+                   		left join usuario_notificacao_leitura unl 
+                   			on tmp.id = unl.notificacao_id and
+                   			   unl.usuario_id = @usuarioId and
+                   			   unl.codigo_eol_aluno = @codigoAluno
+                   where (unl.mensagemexcluida is null or (unl.mensagemexcluida is not null and not unl.mensagemexcluida)) and
+                   	     (tmp.dataexpiracao is null or tmp.dataexpiracao::date >= current_date) and
+                   	     tmp.dataenvio::date <= current_date and
+                   	     tmp.enviadopushnotification;";
         }
 
         private string MontarQueryListagemCompletaNaoEnviadoPushNotification()
