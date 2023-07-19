@@ -9,9 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
 {
