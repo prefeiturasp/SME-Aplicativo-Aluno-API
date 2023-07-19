@@ -27,8 +27,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<IEnumerable<NotaAlunoSgpDto>> ObterNotaAlunoSgp(int desdeAnoLetivo, long ueId, int pagina, int quantidadeRegistrosPagina)
         {
-			var sql = @"select * from(
-							select distinct 
+			var sql = @"select distinct 
 								coalesce(con.AnoLetivo, fec.AnoLetivo) AnoLetivo,
 								coalesce(con.CodigoUe, fec.CodigoUe) CodigoUe,
 								coalesce(con.CodigoTurma, fec.CodigoTurma) CodigoTurma,
@@ -147,12 +146,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 							where ((con.RecomendacoesAluno = '' or con.RecomendacoesAluno is null) and 
 								   (con.RecomendacoesFamilia = '' or con.RecomendacoesFamilia is null)) and
 								  ccra.id is not null and
-								  ccrf.id is not null;", new { desdeAnoLetivo, ueId, pagina, quantidadeRegistrosPagina }, commandTimeout: 240);
-						) aaa
-						where nota <> '' and (recomendacoesaluno <> '' or RecomendacoesFamilia <> '')
-						order by cca_id ";
+								  ccrf.id is not null;";
 
-			var parametros = new { desdeAnoLetivo };
+            var parametros = new { desdeAnoLetivo, ueId, pagina, quantidadeRegistrosPagina };
 
 			try
             {
