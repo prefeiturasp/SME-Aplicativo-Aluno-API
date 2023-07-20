@@ -48,9 +48,6 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(IEventoRepositorio), (typeof(EventoRepositorio)));
             services.TryAddScoped(typeof(IEventoSgpRepositorio), (typeof(EventoSgpRepositorio)));
             services.TryAddScoped(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
-            services.TryAddScoped(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
-            services.TryAddScoped(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
-            services.TryAddScoped(typeof(ITurmaRepositorio), typeof(TurmaRepositorio));
             services.TryAddScoped(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.TryAddScoped(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
             services.TryAddScoped(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
@@ -59,10 +56,6 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.TryAddScoped(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
             services.TryAddScoped(typeof(IServicoLog), typeof(ServicoLog));
-            services.TryAddScoped(typeof(INotaAlunoSgpRepositorio), typeof(NotaAlunoSgpRepositorio));
-            services.TryAddScoped(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
-            services.TryAddScoped(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
-            services.TryAddScoped(typeof(IComponenteCurricularSgpRepositorio), typeof(ComponenteCurricularSgpRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.TryAddScoped<IAutenticacaoService, AutenticacaoService>();
