@@ -26,8 +26,6 @@ namespace SME.AE.Worker.Service
             return services
                 .AddTransient<TranferirEventoSgpCasoDeUso>()
                 .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
-                .AddTransient<TransferirFrequenciaSgpCasoDeUso>()
-                .AddTransient<TransferirNotaSgpCasoDeUso>()
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
                 .AddTransient<RemoverConexaoIdleCasoDeUso>()
@@ -40,8 +38,6 @@ namespace SME.AE.Worker.Service
             return services
                 //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
-                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
                 .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
                 .AddSingleton<IHostedService, RemoverConexaoIdleWorker>()
@@ -60,16 +56,11 @@ namespace SME.AE.Worker.Service
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
-                .AddTransient<IFrequenciaAlunoRepositorio, FrequenciaAlunoRepositorio>()
-                .AddTransient<IFrequenciaAlunoSgpRepositorio, FrequenciaAlunoSgpRepositorio>()
-                .AddTransient<INotaAlunoRepositorio, NotaAlunoRepositorio>()
-                .AddTransient<INotaAlunoSgpRepositorio, NotaAlunoSgpRepositorio>()
                 .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
                 .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
                 .AddTransient<INotificacaoRepositorio, NotificacaoRepositorio>()
                 .AddTransient<IDreSgpRepositorio, DreSgpRepositorio>()
                 .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>()
-                .AddTransient<IUeSgpRepositorio, UeSgpRepositorio>();
         }
 
         public static IServiceCollection AdicionarPoliticas(this IServiceCollection services)
