@@ -57,7 +57,6 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.TryAddScoped(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
             services.TryAddScoped(typeof(IServicoLog), typeof(ServicoLog));
-            services.TryAddScoped(typeof(IComponenteCurricularSgpRepositorio), typeof(ComponenteCurricularSgpRepositorio));
             services.AddDefaultIdentity<UsuarioAplicacao>().AddEntityFrameworkStores<AplicacaoContext>();
             services.AddIdentityServer().AddApiAuthorization<UsuarioAplicacao, AplicacaoContext>();
             services.TryAddScoped<IAutenticacaoService, AutenticacaoService>();

@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao
                                                                                                                    notaAlunoDto.AlunoCodigo));
 
             var componentes = notasConceitosBimestreComponente
-                .Select(a => new ComponenteCurricularDto(a.ComponenteCurricularCodigo, mediator.Send(new ObterNomeComponenteCurricularQuery(a.ComponenteCurricularCodigo)).Result))
+                .Select(a => new ComponenteCurricularDto(a.ComponenteCurricularCodigo, a.ComponenteCurricularNome))
                 .ToList();
 
             return componentes.Distinct();
