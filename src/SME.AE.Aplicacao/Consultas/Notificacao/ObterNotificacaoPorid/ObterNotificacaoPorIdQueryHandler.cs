@@ -13,7 +13,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
     {
         private readonly INotificacaoRepositorio _repository;
 
-        public ObterNotificacaoPorIdQueryHandler(INotificacaoRepositorio repository, IGrupoComunicadoRepository grupoComunicadoRepository)
+        public ObterNotificacaoPorIdQueryHandler(INotificacaoRepositorio repository)
         {
             this._repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
