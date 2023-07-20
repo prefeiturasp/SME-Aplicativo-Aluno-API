@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
@@ -6,6 +7,7 @@ using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,67 +16,30 @@ namespace SME.AE.Aplicacao.Consultas.ObterRecomendacoesPorAlunosTurmas
 {
     public class ObterRecomendacoesPorAlunosTurmasQueryHandler : IRequestHandler<ObterRecomendacoesPorAlunosTurmasQuery, IEnumerable<RecomendacaoConselhoClasseAluno>>
     {
-        private readonly IAlunoRepositorio alunoRepositorio;
-        public ObterRecomendacoesPorAlunosTurmasQueryHandler(IAlunoRepositorio alunoRepositorio)
+        private readonly IHttpClientFactory httpClientFactory;
+        public ObterRecomendacoesPorAlunosTurmasQueryHandler(IHttpClientFactory httpClientFactory)
         {
-            this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
+            this.httpClientFactory = httpClientFactory ?? throw new System.ArgumentNullException(nameof(httpClientFactory));
         }
         public async Task<IEnumerable<RecomendacaoConselhoClasseAluno>> Handle(ObterRecomendacoesPorAlunosTurmasQuery request, CancellationToken cancellationToken)
         {
-            var recomendacoes = await alunoRepositorio.ObterRecomendacoesPorAlunoTurma(request.CodigoAluno, request.CodigoTurma, request.AnoLetivo, request.Modalidade, request.Semestre);
-            if (recomendacoes == null && recomendacoes.Any())
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
+            var paramQueryAluno = $"codigoAluno={request.CodigoAluno}";
+            var paramQueryTurma = $"codigoTurma={request.CodigoTurma}";
+            var paramQueryAnoLetivo = $"anoLetivo={request.AnoLetivo}";
+            var paramQueryModalidade = $"modalidade={(int)request.Modalidade}";
+            var paramQuerySemestre = $"semestre={request.Semestre}";
+
+            var resposta = await httpClient.GetAsync($"v1/conselhos-classe/recomendacoes/integracoes/alunos?{paramQueryAluno}&{paramQueryTurma}&{paramQueryAnoLetivo}&{paramQueryModalidade}&{paramQuerySemestre}");
+            if (resposta.IsSuccessStatusCode)
             {
-                var recomendacoesGeral = await alunoRepositorio.ObterRecomendacoesGeral();
-                foreach (var recomendacao in recomendacoes)
-                {
-                    recomendacao.RecomendacoesAluno = recomendacao?.RecomendacoesAluno ?? MontaTextUlLis(recomendacoesGeral.Where(a => a.Tipo == ConselhoClasseRecomendacaoTipo.Aluno).Select(b => b.Recomendacao));
-                    recomendacao.RecomendacoesFamilia = recomendacao?.RecomendacoesFamilia ?? MontaTextUlLis(recomendacoesGeral.Where(a => a.Tipo == ConselhoClasseRecomendacaoTipo.Familia).Select(b => b.Recomendacao));
-                }
+                var json = await resposta.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IEnumerable<RecomendacaoConselhoClasseAluno>>(json);
             }
-            await FormatarRecomendacoes(recomendacoes);
-
-            return recomendacoes;
-        }
-
-
-        private async Task FormatarRecomendacoes(IEnumerable<RecomendacaoConselhoClasseAluno> recomendacoesConselho)
-        {
-            foreach (var recomendacao in recomendacoesConselho)
+            else
             {
-                var recomendacoesDoAluno = await alunoRepositorio.ObterRecomendacoesAlunoFamiliaPorAlunoETurma(recomendacao.AlunoCodigo, recomendacao.TurmaCodigo);
-
-                var concatenaRecomendacaoAluno = new StringBuilder();
-                foreach (var aluno in recomendacoesDoAluno.Where(r => r.Tipo == (int)ConselhoClasseRecomendacaoTipo.Aluno).ToList())
-                    concatenaRecomendacaoAluno.AppendLine("- " + aluno.Recomendacao);
-
-                concatenaRecomendacaoAluno.AppendLine("<br/>");
-                concatenaRecomendacaoAluno.AppendLine(UtilHtml.FormatarHtmlParaTexto(recomendacao.RecomendacoesAluno));
-
-                var concatenaRecomendacaoFamilia = new StringBuilder();
-                foreach (var aluno in recomendacoesDoAluno.Where(r => r.Tipo == (int)ConselhoClasseRecomendacaoTipo.Familia).ToList())
-                    concatenaRecomendacaoFamilia.AppendLine("- " + aluno.Recomendacao);
-
-                concatenaRecomendacaoFamilia.AppendLine("<br/>");
-                concatenaRecomendacaoFamilia.AppendLine(UtilHtml.FormatarHtmlParaTexto(recomendacao.RecomendacoesFamilia));
-
-
-                recomendacao.AnotacoesPedagogicas = UtilHtml.FormatarHtmlParaTexto(recomendacao.AnotacoesPedagogicas);
-                recomendacao.RecomendacoesAluno = concatenaRecomendacaoAluno.ToString();
-                recomendacao.RecomendacoesFamilia = concatenaRecomendacaoFamilia.ToString();
+                throw new System.Exception($"Não foi possível obter as recomendações de conselho de classe do aluno/turma");
             }
-
-        }
-
-        private string MontaTextUlLis(IEnumerable<string> textos)
-        {
-            var str = new StringBuilder();
-
-            foreach (var item in textos)
-            {
-                str.AppendFormat(item);
-            }
-
-            return str.ToString().Trim();
         }
     }
 }
