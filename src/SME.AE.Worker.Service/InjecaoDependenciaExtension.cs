@@ -53,7 +53,6 @@ namespace SME.AE.Worker.Service
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
                 .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
-                .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
                 .AddTransient<INotificacaoRepositorio, NotificacaoRepositorio>()
                 .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>();
         }
