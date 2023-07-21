@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,12 @@ namespace SME.AE.Aplicacao.Consultas
 {
     class ObterEventosAlunoPorMesQueryHandler : IRequestHandler<ObterEventosAlunoPorMesQuery, IEnumerable<EventoRespostaDto>>
     {
-        private readonly IEventoRepositorio eventoRepositorio;
         private readonly IAlunoRepositorio alunoRepositorio;
         private readonly IMediator mediator;
         private readonly IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio;
 
-        public ObterEventosAlunoPorMesQueryHandler(IEventoRepositorio eventoRepositorio, IAlunoRepositorio alunoRepositorio, IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
+        public ObterEventosAlunoPorMesQueryHandler(IAlunoRepositorio alunoRepositorio, IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
         {
-            this.eventoRepositorio = eventoRepositorio ?? throw new ArgumentNullException(nameof(eventoRepositorio));
             this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
             this.parametrosEscolaAquiRepositorio = parametrosEscolaAquiRepositorio ?? throw new ArgumentNullException(nameof(parametrosEscolaAquiRepositorio));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -55,7 +54,7 @@ namespace SME.AE.Aplicacao.Consultas
                     modalidade = aluno.ModalidadeCodigo;
                     break;
             }
-            var eventos = await eventoRepositorio.ObterPorDreUeTurmaMes(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno);
+            var eventos = await mediator.Send(new ObterEventosPorDreUeTurmaMesQuery(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno));
 
             var mesInicial = parametrosEscolaAquiRepositorio.ObterInt("MesInicioTransferenciaEventos", 3);
             var diaInicial = parametrosEscolaAquiRepositorio.ObterInt("DiaInicioTransferenciaEventos", 1);
