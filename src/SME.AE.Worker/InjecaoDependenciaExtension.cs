@@ -63,7 +63,6 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.AddTransient(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
-            services.AddTransient(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
             services.AddTransient(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddTransient(typeof(IServicoLog), typeof(ServicoLog));
