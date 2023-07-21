@@ -10,8 +10,6 @@
 
         public string EolConnection { get; set; }
 
-        public string SgpConnection { get; set; }
-
         public string CoreSSOConnection { get; set; }
 
         public string ChaveIntegracao { get; set; }
