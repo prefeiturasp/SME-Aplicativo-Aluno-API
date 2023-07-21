@@ -44,8 +44,6 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.TryAddScoped(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
             services.TryAddScoped(typeof(IParametrosEscolaAquiRepositorio), (typeof(ParametroEscolaAquiRepositorio)));
-            services.TryAddScoped(typeof(IEventoRepositorio), (typeof(EventoRepositorio)));
-            services.TryAddScoped(typeof(IEventoSgpRepositorio), (typeof(EventoSgpRepositorio)));
             services.TryAddScoped(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.TryAddScoped(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.TryAddScoped(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));

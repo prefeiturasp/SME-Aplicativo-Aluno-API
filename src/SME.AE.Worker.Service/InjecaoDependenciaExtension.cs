@@ -24,7 +24,6 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddTransient<TranferirEventoSgpCasoDeUso>()
                 .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
@@ -36,7 +35,6 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
                 .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
                 .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
@@ -50,8 +48,6 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
-                .AddTransient<IEventoRepositorio, EventoRepositorio>()
-                .AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>()
                 .AddTransient<IResponsavelEOLRepositorio, ResponsavelEOLRepositorio>()
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()

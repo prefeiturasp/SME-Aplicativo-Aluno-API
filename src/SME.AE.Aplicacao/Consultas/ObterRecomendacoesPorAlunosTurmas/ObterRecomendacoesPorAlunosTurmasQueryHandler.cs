@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SME.AE.Aplicacao.Consultas.ObterRecomendacoesPorAlunosTurmas
+namespace SME.AE.Aplicacao.Consultas
 {
     public class ObterRecomendacoesPorAlunosTurmasQueryHandler : IRequestHandler<ObterRecomendacoesPorAlunosTurmasQuery, IEnumerable<RecomendacaoConselhoClasseAluno>>
     {

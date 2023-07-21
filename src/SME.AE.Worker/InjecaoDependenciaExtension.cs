@@ -60,8 +60,6 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.AddTransient(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
             services.AddTransient(typeof(IParametrosEscolaAquiRepositorio), (typeof(ParametroEscolaAquiRepositorio)));
-            services.AddTransient(typeof(IEventoRepositorio), (typeof(EventoRepositorio)));
-            services.AddTransient(typeof(IEventoSgpRepositorio), (typeof(EventoSgpRepositorio)));
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.AddTransient(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
