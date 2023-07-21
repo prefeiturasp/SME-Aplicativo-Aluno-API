@@ -262,7 +262,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    	      (n.tipocomunicado = {(int)TipoComunicado.DRE} and n.dre_codigoeol = @codigoDre) or
                    	      (n.tipocomunicado = {(int)TipoComunicado.UEMOD} and n.ue_codigoeol = @codigoUe{whereSerieResumida}) or
                    	      (n.tipocomunicado in ({(int)TipoComunicado.SME_ANO}, {(int)TipoComunicado.DRE_ANO}){whereSerieResumida}) and
-                   	      String_to_array(n.modalidades, ',') && String_to_array(@gruposId, ',') or
+                   	      String_to_array(n.modalidades, ',') && String_to_array(@modalidades, ',') or
                    	      (n.tipocomunicado = {(int)TipoComunicado.UE} and n.dre_codigoeol = @codigoDre)))
                    
                    union
@@ -286,7 +286,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    select tmp.id,
                           tmp.mensagem,
                           tmp.titulo,
-                          String_to_array(tmp.modalidades, ',') gruposid,
+                          String_to_array(tmp.modalidades, ',') ModalidadesId,
                           tmp.dataenvio,
                           tmp.dataexpiracao,
                           tmp.criadoem,
@@ -415,7 +415,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"{abreviacao}.Id,
                     {abreviacao}.Mensagem,
                     {abreviacao}.Titulo,
-                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as GruposId" : $"{abreviacao}.modalidades")},
+                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as ModalidadesId" : $"{abreviacao}.modalidades")},
                     {abreviacao}.DataEnvio,
                     {abreviacao}.DataExpiracao,
                     {abreviacao}.CriadoEm,
