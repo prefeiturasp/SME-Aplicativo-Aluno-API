@@ -48,7 +48,6 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.TryAddScoped(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
             services.TryAddScoped(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
-            services.TryAddScoped(typeof(IDreSgpRepositorio), typeof(DreSgpRepositorio));
             services.TryAddScoped(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.TryAddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.TryAddScoped(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));

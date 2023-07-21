@@ -1,6 +1,8 @@
+using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Consultas;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly IDashboardAdesaoRepositorio dashboardAdesaoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
-        private readonly IDreSgpRepositorio dreSgpRepositorio;
+        private readonly IMediator mediator;
         private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private List<DashboardAdesaoUnificacaoDto> listaDeCpfsUtilizados { get; set; }
         private int cpfsInvalidosSME { get; set; }
@@ -22,13 +24,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public ConsolidarAdesaoEOLCasoDeUso(IResponsavelEOLRepositorio responsavelEOLRepositorio,
                                             IDashboardAdesaoRepositorio dashboardAdesaoRepositorio,
                                             IUsuarioRepository usuarioRepository,
-                                            IDreSgpRepositorio dreSgpRepositorio,
+                                            IMediator mediator,
                                             IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio)
         {
             this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new System.ArgumentNullException(nameof(responsavelEOLRepositorio));
             this.dashboardAdesaoRepositorio = dashboardAdesaoRepositorio ?? throw new ArgumentNullException(nameof(dashboardAdesaoRepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
-            this.dreSgpRepositorio = dreSgpRepositorio ?? throw new ArgumentNullException(nameof(dreSgpRepositorio));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
             listaDeCpfsUtilizados = new List<DashboardAdesaoUnificacaoDto>();
             cpfsInvalidosSME = 0;
@@ -51,7 +53,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             try
             {
                 var anoLetivoAtual = DateTime.Now.Year;
-                var dresDoSistema = await dreSgpRepositorio.ObterTodosCodigoDresAtivasAsync();
+                var dresDoSistema = (await mediator.Send(new ObterDresQuery())).Select(d => long.Parse(d.CodigoDre)); 
 
                 foreach (var dreCodigo in dresDoSistema)
                 {
