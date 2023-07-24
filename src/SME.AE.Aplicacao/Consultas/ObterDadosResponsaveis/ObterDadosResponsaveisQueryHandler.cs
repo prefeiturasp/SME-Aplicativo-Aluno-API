@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             }
             else
             {
-                throw new System.Exception($"Não foi possível obter dados do aluno");
+                throw new System.Exception($"Não foi possível obter dados do responsável");
             }
         }
     }
