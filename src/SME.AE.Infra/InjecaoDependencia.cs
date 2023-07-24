@@ -28,9 +28,7 @@ namespace SME.AE.Infra
 
             services.TryAddScoped(typeof(IAplicacaoContext), typeof(AplicacaoContext));
             services.TryAddScoped(typeof(IUsuarioRepository), typeof(UsuarioRepository));
-            services.TryAddScoped(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
             services.TryAddScoped(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
-            services.TryAddScoped(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.TryAddScoped(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
             services.TryAddScoped(typeof(INotificacaoTurmaRepositorio), typeof(NotificacaoTurmaRepositorio));
             services.TryAddScoped(typeof(INotificacaoAlunoRepositorio), typeof(NotificacaoAlunoRepositorio));
@@ -47,7 +45,6 @@ namespace SME.AE.Infra
             services.TryAddScoped(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.TryAddScoped(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.TryAddScoped(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
-            services.TryAddScoped(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
             services.TryAddScoped(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.TryAddScoped(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.TryAddScoped(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));

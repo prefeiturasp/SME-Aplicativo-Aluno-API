@@ -47,9 +47,7 @@ namespace SME.AE.Worker
         public static IServiceCollection AdicionarRepositorios(this IServiceCollection services)
         {
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
-            services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
             services.AddTransient(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
-            services.AddTransient(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
             services.AddTransient(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
             services.AddTransient(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
             services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
@@ -63,7 +61,6 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
             services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.AddTransient(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
-            services.AddTransient(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
             services.AddTransient(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddTransient(typeof(IServicoLog), typeof(ServicoLog));

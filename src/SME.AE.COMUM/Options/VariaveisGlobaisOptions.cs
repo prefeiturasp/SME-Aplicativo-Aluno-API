@@ -23,6 +23,7 @@
 
         public string ApiSgp { get; set; }
         public string ChaveIntegracaoSgpApi { get; set; }
-
+        public string ApiEol { get; set; }
+        public string ChaveIntegracaoEolApi { get; set; }
     }
 }

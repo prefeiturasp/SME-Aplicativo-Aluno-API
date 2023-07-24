@@ -3,6 +3,7 @@ using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,19 +15,17 @@ namespace SME.AE.Aplicacao.Consultas
 {
     class ObterEventosAlunoPorMesQueryHandler : IRequestHandler<ObterEventosAlunoPorMesQuery, IEnumerable<EventoRespostaDto>>
     {
-        private readonly IAlunoRepositorio alunoRepositorio;
         private readonly IMediator mediator;
         private readonly IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio;
 
-        public ObterEventosAlunoPorMesQueryHandler(IAlunoRepositorio alunoRepositorio, IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
+        public ObterEventosAlunoPorMesQueryHandler(IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
         {
-            this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
             this.parametrosEscolaAquiRepositorio = parametrosEscolaAquiRepositorio ?? throw new ArgumentNullException(nameof(parametrosEscolaAquiRepositorio));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
         public async Task<IEnumerable<EventoRespostaDto>> Handle(ObterEventosAlunoPorMesQuery request, CancellationToken cancellationToken)
         {
-            var aluno = (await alunoRepositorio.ObterDadosAlunos(request.Cpf)).Where(a => a.CodigoEol == request.CodigoAluno).FirstOrDefault();
+            var aluno = (await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null))).Where(a => a.CodigoEol == request.CodigoAluno).FirstOrDefault();
 
             var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { aluno.CodigoTurma.ToString() }));
             if (turmasModalidade.Any())

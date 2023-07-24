@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf));
+            await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf, null, null, null));
 
             var usuario = await mediator.Send(new ObterUsuarioPorCpfQuery(solicitarReiniciarSenhaDto.Cpf));
 

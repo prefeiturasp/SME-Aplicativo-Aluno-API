@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
 using System;
@@ -116,7 +117,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             //selecionar alunos do responsável buscando apenas pelo cpf
-            var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
+            var usuarioAlunos = await mediator.Send(new ObterDadosResponsaveisQuery(request.Cpf));
 
             //caso nao tenha nenhum filho matriculado, retornar falha e inativá-lo no coresso
             if (usuarioAlunos == null || !usuarioAlunos.Any())

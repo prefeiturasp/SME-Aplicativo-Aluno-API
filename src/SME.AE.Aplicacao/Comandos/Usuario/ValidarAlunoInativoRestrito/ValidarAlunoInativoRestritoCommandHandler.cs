@@ -2,6 +2,7 @@
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito
 {
     public class ValidarAlunoInativoRestritoCommandHandler : IRequestHandler<ValidarAlunoInativoRestritoCommand>
     {
-        private readonly IAutenticacaoService autenticacaoService;
+        private readonly IMediator mediator;
         private readonly IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio;
         private readonly IUsuarioRepository usuarioRepository;
 
-        public ValidarAlunoInativoRestritoCommandHandler(IAutenticacaoService autenticacaoService, IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio, IUsuarioRepository usuarioRepository)
+        public ValidarAlunoInativoRestritoCommandHandler(IMediator autenticamediatorcaoService, IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio, IUsuarioRepository usuarioRepository)
         {
-            this.autenticacaoService = autenticacaoService ?? throw new ArgumentNullException(nameof(autenticacaoService));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.usuarioCoreSSORepositorio = usuarioCoreSSORepositorio ?? throw new ArgumentNullException(nameof(usuarioCoreSSORepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
         }
@@ -26,7 +27,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito
 
         public async Task<Unit> Handle(ValidarAlunoInativoRestritoCommand request, CancellationToken cancellationToken)
         {
-            var usuarioAlunos = await autenticacaoService.SelecionarAlunosResponsavel(request.UsuarioCoreSSO.Cpf);
+            var usuarioAlunos = await mediator.Send(new ObterDadosResponsaveisQuery(request.UsuarioCoreSSO.Cpf));
 
             if (usuarioAlunos is null || !usuarioAlunos.Any())
                 await NenhumAlunoAtivo(request);

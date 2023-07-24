@@ -5,24 +5,19 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using System.Collections.Generic;
+using MediatR;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Infra.Autenticacao
 {
     public class AutenticacaoService : IAutenticacaoService
     {
         private readonly UserManager<UsuarioAplicacao> _userManager;
-        private readonly IAutenticacaoRepositorio _autenticaacoRepositorio;
 
-        public AutenticacaoService(UserManager<UsuarioAplicacao> userManager, IAutenticacaoRepositorio autenticaacoRepositorio)
+        public AutenticacaoService(UserManager<UsuarioAplicacao> userManager)
         {
             _userManager = userManager;
-            _autenticaacoRepositorio = autenticaacoRepositorio;
-        }
-
-
-        public async Task<IEnumerable<RetornoUsuarioEol>> SelecionarAlunosResponsavel(string cpf)
-        {
-            return await _autenticaacoRepositorio.SelecionarAlunosResponsavel(cpf);
         }
 
         public async Task<string> ObterNomeUsuarioAsync(string id)
