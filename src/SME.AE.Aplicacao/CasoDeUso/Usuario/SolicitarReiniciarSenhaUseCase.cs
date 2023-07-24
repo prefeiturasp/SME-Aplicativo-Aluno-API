@@ -9,6 +9,7 @@ using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Utilitarios;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -37,13 +38,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (usuario == null && usuarioCoreSSO != null)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(solicitarReiniciarSenhaDto.Cpf));
+            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(solicitarReiniciarSenhaDto.Cpf)))?.FirstOrDefault();
 
             if (usuario.PrimeiroAcesso == true)
-                throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
+                throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.ObterNome()} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
             await mediator.Send(new ReiniciarSenhaCommand() { Id = usuario.Id, PrimeiroAcesso = true });
-            var mensagemSucesso = $"A senha do usuário {Formatacao.FormatarCpf(usuario.Cpf)} - {usuarioEol.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
+            var mensagemSucesso = $"A senha do usuário {Formatacao.FormatarCpf(usuario.Cpf)} - {usuarioEol.ObterNome()} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
             return RespostaApi.Sucesso(mensagemSucesso);
         }
 

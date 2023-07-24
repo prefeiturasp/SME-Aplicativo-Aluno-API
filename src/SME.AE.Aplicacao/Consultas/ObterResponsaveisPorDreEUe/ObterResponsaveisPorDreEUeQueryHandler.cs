@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Excecoes;
 using System.Collections.Generic;
@@ -12,26 +13,27 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterCpfsDeResponsaveisPorDreEUeQueryHandler : IRequestHandler<ObterCpfsDeResponsaveisPorDreEUeQuery, IEnumerable<CpfResponsavelAlunoEol>>
+    public class ObterResponsaveisPorDreEUeQueryHandler : IRequestHandler<ObterResponsaveisPorDreEUeQuery, IEnumerable<ResponsavelAlunoEOLDto>>
     {
         private readonly IHttpClientFactory httpClientFactory;
-        public ObterCpfsDeResponsaveisPorDreEUeQueryHandler(IHttpClientFactory httpClientFactory)
+        public ObterResponsaveisPorDreEUeQueryHandler(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory ?? throw new System.ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<IEnumerable<CpfResponsavelAlunoEol>> Handle(ObterCpfsDeResponsaveisPorDreEUeQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<ResponsavelAlunoEOLDto>> Handle(ObterResponsaveisPorDreEUeQuery request, CancellationToken cancellationToken)
         {
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
             var paramQueryDre = $"codigoDre={request.CodigoDre}";
             var paramQueryUe = $"codigoUe={request.CodigoUe}";
-            var url = $"alunos/responsaveis?{paramQueryDre}&{paramQueryUe}";
+            var paramQueryAnoLetivo = $"anoLetivo={request.AnoLetivo}";
+            var url = $"alunos/responsaveis?{paramQueryDre}&{paramQueryUe}&{paramQueryAnoLetivo}";
 
             var resposta = await httpClient.GetAsync(url);
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();
-                var cpfsDeResponsavel = JsonConvert.DeserializeObject<IEnumerable<CpfResponsavelAlunoEol>>(json);
+                var cpfsDeResponsavel = JsonConvert.DeserializeObject<IEnumerable<ResponsavelAlunoEOLDto>>(json);
                 if (cpfsDeResponsavel == null || !cpfsDeResponsavel.Any())
                     throw new NegocioException("Não existem registros de responsáveis para a DRE e UE informadas.");
                 return cpfsDeResponsavel;

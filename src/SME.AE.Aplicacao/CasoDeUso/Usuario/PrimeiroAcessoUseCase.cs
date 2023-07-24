@@ -12,6 +12,7 @@ using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
@@ -35,14 +36,14 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             if (!usuario.PrimeiroAcesso)
                 throw new NegocioException("Somente é possivel utilizar essa função quando for o primeiro acesso do usuário");
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuario.Cpf));
+            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(usuario.Cpf)))?.FirstOrDefault();
 
             if (usuarioEol == null)
                 throw new NegocioException("Responsável não encontrado");
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
 
-            await CriarUsuarioOuAssociarGrupo(novaSenhaDto, usuario, usuarioCoreSSO, usuarioEol.Nome);
+            await CriarUsuarioOuAssociarGrupo(novaSenhaDto, usuario, usuarioCoreSSO, usuarioEol.ObterNome());
 
             var atualizarPrimeiroAcesso = MapearAtualizarPrimeiroAcessoCommand(usuario);
 

@@ -2,6 +2,7 @@
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
@@ -35,7 +36,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioApp = await mediator.Send(new ObterUsuarioNaoExcluidoPorCpfQuery(cpf));
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(cpf));
+            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(cpf)))?.FirstOrDefault();
 
             if (usuarioCoreSSO == null)
                 throw new NegocioException($"Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");
@@ -43,7 +44,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (usuarioApp == null && usuarioCoreSSO != null)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(cpf)} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
-            return new UsuarioDto(usuarioApp.Cpf, usuarioEol.Nome);
+            return new UsuarioDto(usuarioApp.Cpf, usuarioEol.ObterNome());
         }
     }
 }
