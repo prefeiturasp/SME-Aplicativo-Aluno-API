@@ -25,12 +25,10 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
 
         public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoCommand, RespostaApi>
         {
-            private readonly IAlunoRepositorio alunoRepositorio;
             private readonly IMediator mediator;
 
-            public DadosAlunoComandoHandler(IAlunoRepositorio alunoRepositorio, IMediator mediator)
+            public DadosAlunoComandoHandler(IMediator mediator)
             {
-                this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
                 this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             }
             public async Task<RespostaApi> Handle(DadosAlunoCommand request, CancellationToken cancellationToken)

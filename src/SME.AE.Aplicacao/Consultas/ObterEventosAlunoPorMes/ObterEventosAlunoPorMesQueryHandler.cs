@@ -15,13 +15,11 @@ namespace SME.AE.Aplicacao.Consultas
 {
     class ObterEventosAlunoPorMesQueryHandler : IRequestHandler<ObterEventosAlunoPorMesQuery, IEnumerable<EventoRespostaDto>>
     {
-        private readonly IAlunoRepositorio alunoRepositorio;
         private readonly IMediator mediator;
         private readonly IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio;
 
-        public ObterEventosAlunoPorMesQueryHandler(IAlunoRepositorio alunoRepositorio, IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
+        public ObterEventosAlunoPorMesQueryHandler(IParametrosEscolaAquiRepositorio parametrosEscolaAquiRepositorio, IMediator mediator)
         {
-            this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
             this.parametrosEscolaAquiRepositorio = parametrosEscolaAquiRepositorio ?? throw new ArgumentNullException(nameof(parametrosEscolaAquiRepositorio));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
