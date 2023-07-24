@@ -3,6 +3,7 @@ using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
@@ -57,9 +58,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
                 foreach (var dreCodigo in dresDoSistema)
                 {
-                    var responsaveisDreEOL =
-                        (await responsavelEOLRepositorio.ListarCpfResponsavelDaDreUeTurma(dreCodigo, anoLetivoAtual))
-                        .ToList();
+                    var responsaveisDreEOL = (await mediator.Send(new ObterResponsaveisPorDreEUeQuery(dreCodigo.ToString(), null, anoLetivoAtual))).ToList();
 
                     await TrataTurmas(usuariosDoSistema, responsaveisDreEOL);
 
@@ -78,7 +77,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
         }
 
-        private async Task TrataDre(string dreCodigo, List<ResponsavelEOLDto> responsaveis)
+        private async Task TrataDre(string dreCodigo, List<ResponsavelAlunoEOLDto> responsaveis)
         {
             try
             {
@@ -174,7 +173,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
         }
 
-        private async Task TrataUes(string dreCodigo, List<ResponsavelEOLDto> responsaveis)
+        private async Task TrataUes(string dreCodigo, List<ResponsavelAlunoEOLDto> responsaveis)
         {
 
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
@@ -235,7 +234,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             await dashboardAdesaoRepositorio.IncluiOuAtualizaPorDreUeTurmaEmBatch(listaDashBoardsParaIncluir);
         }
 
-        private async Task TrataTurmas(IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<ResponsavelEOLDto> responsaveisDreEOL)
+        private async Task TrataTurmas(IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<ResponsavelAlunoEOLDto> responsaveisDreEOL)
         {
 
             var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
@@ -287,7 +286,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
         }
 
-        private DashboardAdesaoDto ProcessaResponsavel(ResponsavelEOLDto responsavel, IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<DashboardAdesaoUnificacaoDto> listaCpfsUnificados)
+        private DashboardAdesaoDto ProcessaResponsavel(ResponsavelAlunoEOLDto responsavel, IEnumerable<Dominio.Entidades.Usuario> usuariosDoSistema, List<DashboardAdesaoUnificacaoDto> listaCpfsUnificados)
         {
 
             if (responsavel.CpfResponsavel == 0 || !listaCpfsUnificados.Any(a => a.CPF == responsavel.CpfResponsavel))

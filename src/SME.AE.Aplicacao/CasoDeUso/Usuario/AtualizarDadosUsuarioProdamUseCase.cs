@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace SME.AE.Aplicacao
             if (usuarioApp == null)
                 return false;
 
-            var usuariosEol = await mediator.Send(new ObterDadosReponsavelPorCpfQuery(usuarioApp.Cpf));
+            var usuariosEol = await mediator.Send(new ObterDadosResponsaveisQuery(usuarioApp.Cpf));
 
             if (usuariosEol == null || !usuariosEol.Any())
                 return false;
@@ -34,17 +35,17 @@ namespace SME.AE.Aplicacao
 
             foreach (var usuarioEol in usuariosEol)
             {
-                await mediator.Send(new EnviarAtualizacaoCadastralProdamCommand(usuarioEol));
+                //await mediator.Send(new EnviarAtualizacaoCadastralProdamCommand(usuarioEol));
             }
 
             return true;
         }
 
-        private void MapearAlteracoes(IEnumerable<ResponsavelAlunoDetalhadoEolDto> lstUsuarioEol, AtualizarDadosUsuarioDto dto)
+        private void MapearAlteracoes(IEnumerable<DadosResponsavelAluno> lstUsuarioEol, AtualizarDadosUsuarioDto dto)
         {
             foreach (var usuarioEol in lstUsuarioEol)
             {
-                usuarioEol.DataNascimentoMae = dto.DataNascimentoResponsavel.ToString("yyyyMMdd");
+                usuarioEol.DataNascimentoMae = dto.DataNascimentoResponsavel;
                 usuarioEol.NomeMae = dto.NomeMae;
                 usuarioEol.Email = dto.Email;
                 usuarioEol.NumeroCelular = dto.CelularResponsavel;

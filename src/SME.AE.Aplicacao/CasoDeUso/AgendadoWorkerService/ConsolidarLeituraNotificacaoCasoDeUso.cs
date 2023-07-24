@@ -2,6 +2,7 @@
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Concurrent;
@@ -294,7 +295,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 .ToArray();
 
             var responsaveisEOL =
-                (await responsavelEOLRepositorio.ListarCpfResponsavelAlunoDaDreUeTurma())
+                (await mediator.Send(new ObterResponsaveisPorDreEUeQuery(null, null, DateTime.Now.Year)))
                 .AsParallel()
                 .Where(resp => ValidacaoCpf.Valida(resp.CpfResponsavel.ToString("00000000000")))
                 .Select(usuarioAluno =>
