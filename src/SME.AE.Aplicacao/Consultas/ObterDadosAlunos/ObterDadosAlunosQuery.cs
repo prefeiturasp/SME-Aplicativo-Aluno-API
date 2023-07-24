@@ -7,11 +7,17 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
     public class ObterDadosAlunosQuery : IRequest<IEnumerable<AlunoRespostaEol>>
     {
 
-        public ObterDadosAlunosQuery(string cpf)
+        public ObterDadosAlunosQuery(string cpfResponsavel, long? codigoAluno, string codigoDre, string codigoUe)
         {
-            Cpf = cpf;
+            CpfResponsavel = cpfResponsavel;
+            CodigoAluno = codigoAluno;
+            CodigoDre = codigoDre;
+            CodigoUe = codigoUe;
         }
 
-        public string Cpf { get; set; }
+        public string CpfResponsavel { get; set; }
+        public long? CodigoAluno { get; set; }
+        public string CodigoDre { get; set; }
+        public string CodigoUe { get; set; }
     }
 }
