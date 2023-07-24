@@ -47,7 +47,6 @@ namespace SME.AE.Worker
         public static IServiceCollection AdicionarRepositorios(this IServiceCollection services)
         {
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
-            services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
             services.AddTransient(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
             services.AddTransient(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
             services.AddTransient(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
