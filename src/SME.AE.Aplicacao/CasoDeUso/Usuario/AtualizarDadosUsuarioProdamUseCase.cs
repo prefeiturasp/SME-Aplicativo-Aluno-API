@@ -35,7 +35,7 @@ namespace SME.AE.Aplicacao
 
             foreach (var usuarioEol in usuariosEol)
             {
-                //await mediator.Send(new EnviarAtualizacaoCadastralProdamCommand(usuarioEol));
+                await mediator.Send(new EnviarAtualizacaoCadastralProdamCommand(ResponsavelAlunoDetalhadoEolDto.Converter(usuarioEol)));
             }
 
             return true;

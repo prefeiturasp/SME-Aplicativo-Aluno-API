@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string NumeroRG { get; set; }
         public string DigitoRG { get; set; }
         public string UfRG { get; set; }
-        public bool CPFConfere { get; set; }
+        public string CPFConfere { get; set; }
         public string TipoTurnoCelular { get; set; }
         public string DDDTelefoneFixo { get; set; }
         public string NumeroTelefoneFixo { get; set; }
@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string DDDTelefoneComercial { get; set; }
         public string NumeroTelefoneComercial { get; set; }
         public string TipoTurnoTelefoneComercial { get; set; }
-        public bool AutorizaEnvioSMS { get; set; }
+        public string AutorizaEnvioSMS { get; set; }
         public DateTime? DataNascimentoMae { get; set; }
 
         public string ObterCelularComDDD()
