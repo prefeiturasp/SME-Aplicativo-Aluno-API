@@ -35,7 +35,7 @@ namespace SME.AE.Aplicacao
             if (usuarioApp == null)
                 return false;
 
-            var usuariosEol = await mediator.Send(new ObterDadosResponsaveisQuery(usuarioApp.Cpf));
+            var usuariosEol = await mediator.Send(new ObterDadosResponsavelQuery(usuarioApp.Cpf));
 
             if (usuariosEol == null || !usuariosEol.Any())
                 return false;

@@ -30,7 +30,7 @@ namespace SME.AE.Aplicacao
             if (!podePersistirTexto)
                 return RespostaApi.Falha("Conteúdo inadequado nos campos de cadastro, por favor revise e tente novamente.");
 
-            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(usuarioApp.Cpf)))?.FirstOrDefault();
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuarioApp.Cpf));
             
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");

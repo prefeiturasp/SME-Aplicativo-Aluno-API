@@ -27,7 +27,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito
 
         public async Task<Unit> Handle(ValidarAlunoInativoRestritoCommand request, CancellationToken cancellationToken)
         {
-            var usuarioAlunos = await mediator.Send(new ObterDadosResponsaveisQuery(request.UsuarioCoreSSO.Cpf));
+            var usuarioAlunos = await mediator.Send(new ObterDadosResponsavelQuery(request.UsuarioCoreSSO.Cpf));
 
             if (usuarioAlunos is null || !usuarioAlunos.Any())
                 await NenhumAlunoAtivo(request);

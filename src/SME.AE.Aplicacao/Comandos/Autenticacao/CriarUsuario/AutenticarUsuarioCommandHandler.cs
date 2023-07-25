@@ -117,7 +117,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             //selecionar alunos do responsável buscando apenas pelo cpf
-            var usuarioAlunos = await mediator.Send(new ObterDadosResponsaveisQuery(request.Cpf));
+            var usuarioAlunos = await mediator.Send(new ObterDadosResponsavelQuery(request.Cpf));
 
             //caso nao tenha nenhum filho matriculado, retornar falha e inativá-lo no coresso
             if (usuarioAlunos == null || !usuarioAlunos.Any())

@@ -36,7 +36,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioApp = await mediator.Send(new ObterUsuarioNaoExcluidoPorCpfQuery(cpf));
 
-            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(cpf)))?.FirstOrDefault();
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf));
 
             if (usuarioCoreSSO == null)
                 throw new NegocioException($"Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");
