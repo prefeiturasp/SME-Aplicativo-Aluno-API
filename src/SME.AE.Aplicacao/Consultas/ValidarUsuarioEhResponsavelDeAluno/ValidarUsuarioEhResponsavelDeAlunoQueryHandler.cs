@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Consultas
 
         public async Task<bool> Handle(ValidarUsuarioEhResponsavelDeAlunoQuery request, CancellationToken cancellationToken)
         {
-            var alunosDoResponsavel = await mediator.Send(new ObterDadosResponsaveisQuery(request.Cpf));
+            var alunosDoResponsavel = await mediator.Send(new ObterDadosResponsavelQuery(request.Cpf));
 
             if (alunosDoResponsavel == null || !alunosDoResponsavel.Any())
                 return false;

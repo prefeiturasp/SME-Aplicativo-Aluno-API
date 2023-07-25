@@ -63,7 +63,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
                     var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                     var possueApp = usuario != null;
-                    var usuarioEol = (mediator.Send(new ObterDadosResponsaveisQuery(cpf))).Result?.FirstOrDefault();
+                    var usuarioEol = (mediator.Send(new ObterDadosResponsavelQuery(cpf))).Result?.FirstOrDefault();
                     var telefone = possueApp ? usuarioEol.NumeroCelular : "";
                     if (string.IsNullOrWhiteSpace(telefone))
                         if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
@@ -101,7 +101,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
                         var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                         var possueApp = usuario != null;
-                        var usuarioEol = (mediator.Send(new ObterDadosResponsaveisQuery(cpf))).Result?.FirstOrDefault();
+                        var usuarioEol = (mediator.Send(new ObterDadosResponsavelQuery(cpf))).Result?.FirstOrDefault();
                         var telefone = possueApp ? usuarioEol.NumeroCelular : "";
                         if (string.IsNullOrWhiteSpace(telefone))
                             if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))

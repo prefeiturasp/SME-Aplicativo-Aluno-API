@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterDadosResponsaveisQueryHandler : IRequestHandler<ObterDadosResponsaveisQuery, IEnumerable<DadosResponsavelAluno>>
+    public class ObterDadosResponsavelQueryHandler : IRequestHandler<ObterDadosResponsavelQuery, IEnumerable<DadosResponsavelAluno>>
     {
         private readonly IHttpClientFactory httpClientFactory;
 
-        public ObterDadosResponsaveisQueryHandler(IHttpClientFactory httpClientFactory)
+        public ObterDadosResponsavelQueryHandler(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory ?? throw new System.ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<IEnumerable<DadosResponsavelAluno>> Handle(ObterDadosResponsaveisQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<DadosResponsavelAluno>> Handle(ObterDadosResponsavelQuery request, CancellationToken cancellationToken)
         {
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
             var url = $"alunos/responsaveis/{request.CpfResponsavel}";

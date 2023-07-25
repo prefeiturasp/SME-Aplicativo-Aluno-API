@@ -36,7 +36,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             if (!usuario.PrimeiroAcesso)
                 throw new NegocioException("Somente é possivel utilizar essa função quando for o primeiro acesso do usuário");
 
-            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(usuario.Cpf)))?.FirstOrDefault();
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
 
             if (usuarioEol == null)
                 throw new NegocioException("Responsável não encontrado");

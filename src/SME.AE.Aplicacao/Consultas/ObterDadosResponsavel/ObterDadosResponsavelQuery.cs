@@ -6,10 +6,10 @@ using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterDadosResponsaveisQuery : IRequest<IEnumerable<DadosResponsavelAluno>>
+    public class ObterDadosResponsavelQuery : IRequest<IEnumerable<DadosResponsavelAluno>>
     {
 
-        public ObterDadosResponsaveisQuery(string cpfResponsavel)
+        public ObterDadosResponsavelQuery(string cpfResponsavel)
         {
             CpfResponsavel = cpfResponsavel;
         }
@@ -17,7 +17,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
         public string CpfResponsavel { get; set; }
     }
 
-    public class ObterDadosResponsaveisQueryValidator : AbstractValidator<ObterDadosResponsaveisQuery>
+    public class ObterDadosResponsaveisQueryValidator : AbstractValidator<ObterDadosResponsavelQuery>
     {
         public ObterDadosResponsaveisQueryValidator()
         {

@@ -38,7 +38,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (usuario == null && usuarioCoreSSO != null)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
-            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(solicitarReiniciarSenhaDto.Cpf)))?.FirstOrDefault();
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(solicitarReiniciarSenhaDto.Cpf));
 
             if (usuario.PrimeiroAcesso == true)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.ObterNome()} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");

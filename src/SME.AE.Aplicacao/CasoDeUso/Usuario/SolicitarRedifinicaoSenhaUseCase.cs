@@ -38,7 +38,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
 
-            var usuarioEol = (await mediator.Send(new ObterDadosResponsaveisQuery(usuario.Cpf)))?.FirstOrDefault();
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
 
             await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 

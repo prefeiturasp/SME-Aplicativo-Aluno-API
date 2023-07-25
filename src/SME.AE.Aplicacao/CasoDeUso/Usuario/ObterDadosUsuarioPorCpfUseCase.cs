@@ -17,8 +17,8 @@ namespace SME.AE.Aplicacao
         }
         public async Task<UsuarioDadosDetalhesDto> Executar(string cpf)
         {
-            var dadosResponsavel = await mediator.Send(new ObterDadosResponsaveisQuery(cpf));
-            return dadosResponsavel?.Select(responsavel => new UsuarioDadosDetalhesDto()
+            var responsavel = await mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf));
+            return new UsuarioDadosDetalhesDto()
             {
                 Celular = responsavel.ObterCelularComDDD(),
                 Cpf = responsavel.Cpf,
@@ -27,7 +27,7 @@ namespace SME.AE.Aplicacao
                 Nome = responsavel.Nome,
                 NomeMae = responsavel.NomeMae,
                 UltimaAtualizacao = responsavel.DataAtualizacao
-            }).OrderByDescending(responsavel => responsavel.UltimaAtualizacao).FirstOrDefault();
+            };
         }
     }
 }

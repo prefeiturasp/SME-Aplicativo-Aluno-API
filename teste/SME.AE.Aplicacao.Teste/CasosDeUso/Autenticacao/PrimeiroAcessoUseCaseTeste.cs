@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(retornoUsuarioCoreSSO);
 
-            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsaveisQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
 
             mediator.Setup(a => a.Send(It.IsAny<AssociarGrupoUsuarioCommand>(), It.IsAny<CancellationToken>()));
 
