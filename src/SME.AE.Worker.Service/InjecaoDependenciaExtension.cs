@@ -48,7 +48,6 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
-                .AddTransient<IResponsavelEOLRepositorio, ResponsavelEOLRepositorio>()
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
@@ -74,7 +73,7 @@ namespace SME.AE.Worker.Service
         #endregion
 
         #region Clientes HTTP
-        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions)
+        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions, VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             var policy = ObterPolicyBaseHttp();
 
@@ -85,6 +84,20 @@ namespace SME.AE.Worker.Service
                 c.BaseAddress = new Uri(servicoProdamOptions.Url);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiSgpChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiEolChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiEol);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-api-eol-key", variaveisGlobaisOptions.ChaveIntegracaoEolApi);
             }).AddPolicyHandler(policy);
 
             return services;

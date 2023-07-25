@@ -14,7 +14,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class ConsolidarAdesaoEOLCasoDeUso
     {
-        private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly IDashboardAdesaoRepositorio dashboardAdesaoRepositorio;
         private readonly IUsuarioRepository usuarioRepository;
         private readonly IMediator mediator;
@@ -22,13 +21,11 @@ namespace SME.AE.Aplicacao.CasoDeUso
         private List<DashboardAdesaoUnificacaoDto> listaDeCpfsUtilizados { get; set; }
         private int cpfsInvalidosSME { get; set; }
 
-        public ConsolidarAdesaoEOLCasoDeUso(IResponsavelEOLRepositorio responsavelEOLRepositorio,
-                                            IDashboardAdesaoRepositorio dashboardAdesaoRepositorio,
+        public ConsolidarAdesaoEOLCasoDeUso(IDashboardAdesaoRepositorio dashboardAdesaoRepositorio,
                                             IUsuarioRepository usuarioRepository,
                                             IMediator mediator,
                                             IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio)
         {
-            this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new System.ArgumentNullException(nameof(responsavelEOLRepositorio));
             this.dashboardAdesaoRepositorio = dashboardAdesaoRepositorio ?? throw new ArgumentNullException(nameof(dashboardAdesaoRepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));

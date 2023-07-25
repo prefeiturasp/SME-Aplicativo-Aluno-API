@@ -8,6 +8,7 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.HandlerExtensions;
 using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using SME.AE.Comum.Utilitarios;
@@ -53,7 +54,6 @@ namespace SME.AE.Worker
             services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddTransient(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddTransient(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
-            services.AddTransient(typeof(IResponsavelEOLRepositorio), typeof(ResponsavelEOLRepositorio));
             services.AddTransient(typeof(ITermosDeUsoRepositorio), typeof(TermosDeUsoRepositorio));
             services.AddTransient(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.AddTransient(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
@@ -100,7 +100,7 @@ namespace SME.AE.Worker
         #endregion
 
         #region Clientes HTTP
-        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions)
+        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions, VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             var policy = ObterPolicyBaseHttp();
 
@@ -112,6 +112,20 @@ namespace SME.AE.Worker
                  c.DefaultRequestHeaders.Add("Accept", "application/json");
                  c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
              }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiSgpChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiEolChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiEol);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-api-eol-key", variaveisGlobaisOptions.ChaveIntegracaoEolApi);
+            }).AddPolicyHandler(policy);
 
             return services;
         }

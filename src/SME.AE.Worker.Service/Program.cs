@@ -48,6 +48,9 @@ namespace SME.AE.Worker.Service
             var servicoProdam = new ServicoProdamOptions();
             config.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
+            var variaveisGlobais = new VariaveisGlobaisOptions();
+            config.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
             return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
                 .ConfigureServices((hostContext, services) =>
@@ -62,7 +65,7 @@ namespace SME.AE.Worker.Service
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso()
                         .AdicionarPoliticas()
-                        .AdicionarClientesHttp(servicoProdam);
+                        .AdicionarClientesHttp(servicoProdam, variaveisGlobais);
 
                     var variaveisGlobais = new VariaveisGlobaisOptions();
                     hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
