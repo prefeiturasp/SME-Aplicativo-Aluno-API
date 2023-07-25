@@ -48,9 +48,6 @@ namespace SME.AE.Worker.Service
             var servicoProdam = new ServicoProdamOptions();
             config.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
-            var variaveisGlobais = new VariaveisGlobaisOptions();
-            config.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
-
             return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
                 .ConfigureServices((hostContext, services) =>
@@ -58,17 +55,22 @@ namespace SME.AE.Worker.Service
 
                     AdicionarAutoMapper(services);
                     AdicionarMediatr(services);
+                    var telemetriaOptions = new TelemetriaOptions();
+                    hostContext.Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
+
+                    services.AddSingleton(telemetriaOptions);
+                    services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
+
+                    var variaveisGlobais = new VariaveisGlobaisOptions();
+                    hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
 
                     services
-                        .AddApplicationInsightsTelemetry(hostContext.Configuration)
+                        .AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration)
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso()
                         .AdicionarPoliticas()
                         .AdicionarClientesHttp(servicoProdam, variaveisGlobais);
-
-                    var variaveisGlobais = new VariaveisGlobaisOptions();
-                    hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
 
                     services.AddSingleton(variaveisGlobais);
 
@@ -82,14 +84,7 @@ namespace SME.AE.Worker.Service
                         Password = configuracaoRabbitOptions.Password,
                         VirtualHost = configuracaoRabbitOptions.VirtualHost
                     };
-
                     services.AddSingleton(rabbitConn);
-
-                    var telemetriaOptions = new TelemetriaOptions();
-                    hostContext.Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
-
-                    services.AddSingleton(telemetriaOptions);
-                    services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {

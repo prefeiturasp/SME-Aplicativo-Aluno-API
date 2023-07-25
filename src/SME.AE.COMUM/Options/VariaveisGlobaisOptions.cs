@@ -8,8 +8,6 @@
 
         public string AEConnection { get; set; }
 
-        public string EolConnection { get; set; }
-
         public string CoreSSOConnection { get; set; }
 
         public string ChaveIntegracao { get; set; }

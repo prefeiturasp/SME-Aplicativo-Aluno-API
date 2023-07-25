@@ -32,8 +32,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task ExecutarAsync()
         {
             var comunicadosAtivos = await mediator.Send(new ObterComunicadosAnoAtualQuery());
-            var usuariosAlunos = await ObterUsuariosAlunos();
-            await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos);
+            var anoLetivoAtual = DateTime.Now.Year;
+            var dresDoSistema = (await mediator.Send(new ObterDresQuery())).Select(d => long.Parse(d.CodigoDre));
+            foreach (var dreCodigo in dresDoSistema)
+            {
+                var comunicadosAtivosDre = comunicadosAtivos.Where(c => c.CodigoDre == dreCodigo.ToString());
+                var usuariosAlunos = await ObterUsuariosAlunos(anoLetivoAtual, dreCodigo.ToString());
+                await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivosDre);
+            }
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarLeituraNotificacao");
         }
 
@@ -282,7 +288,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return new ResponsavelAlunoEOLDto[] { };
         }
 
-        private async Task<IEnumerable<ResponsavelAlunoEOLDto>> ObterUsuariosAlunos()
+        private async Task<IEnumerable<ResponsavelAlunoEOLDto>> ObterUsuariosAlunos(int anoLetivo, string codigoDre)
         {
             var usuariosComApp =
                 (await ObterUsuariosAlunosNotificacoesApp())
@@ -292,7 +298,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 .ToArray();
 
             var responsaveisEOL =
-                (await mediator.Send(new ObterResponsaveisPorDreEUeQuery(null, null, DateTime.Now.Year)))
+                (await mediator.Send(new ObterResponsaveisPorDreEUeQuery(codigoDre, null, anoLetivo)))
                 .AsParallel()
                 .Where(resp => ValidacaoCpf.Valida(resp.CpfResponsavel.ToString("00000000000")))
                 .Select(usuarioAluno =>
