@@ -15,6 +15,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string NomeMae { get; set; }
         public string DDDCelular { get; set; }
         public string NumeroCelular { get; set; }
+        public string CodigoAluno { get; set; }
         public string ObterCelularComDDD()
         {
             return $"{DDDCelular}{NumeroCelular}";

@@ -16,19 +16,16 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
         private readonly IDadosLeituraRepositorio dadosLeituraRepositorio;
         private readonly IMediator mediator;
         private readonly IUsuarioRepository usuarioRepository;
-        private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly INotificacaoRepositorio notificacaoRepository;
 
         public ObterDadosLeituraAlunosQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
                                                     IUsuarioRepository usuarioRepository,
                                                     INotificacaoRepositorio notificacaoRepository,
-                                                    IResponsavelEOLRepositorio responsavelEOLRepositorio,
                                                     IMediator mediator)
         {
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new System.ArgumentNullException(nameof(dadosLeituraRepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
-            this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new ArgumentNullException(nameof(responsavelEOLRepositorio));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 

@@ -14,19 +14,16 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class ConsolidarLeituraNotificacaoCasoDeUso
     {
-        private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private readonly IConsolidarLeituraNotificacaoRepositorio consolidarLeituraNotificacaoRepositorio;
         private readonly IMediator mediator;
 
         public ConsolidarLeituraNotificacaoCasoDeUso(
-                                            IResponsavelEOLRepositorio responsavelEOLRepositorio,
                                             IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio,
                                             IConsolidarLeituraNotificacaoRepositorio consolidarLeituraNotificacaoRepositorio,
                                             IMediator mediator
                                             )
         {
-            this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new ArgumentNullException(nameof(responsavelEOLRepositorio));
             this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
             this.consolidarLeituraNotificacaoRepositorio = consolidarLeituraNotificacaoRepositorio ?? throw new ArgumentNullException(nameof(consolidarLeituraNotificacaoRepositorio));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));

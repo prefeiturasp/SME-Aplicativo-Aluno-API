@@ -40,6 +40,9 @@ namespace SME.AE.Worker
             var servicoProdam = new ServicoProdamOptions();
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
+            var variaveisGlobais = new VariaveisGlobaisOptions();
+            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
             services.AddSingleton(servicoProdam);
 
             RegistrarMapeamentos.Registrar();
@@ -50,7 +53,7 @@ namespace SME.AE.Worker
                 .AdicionarServicos()
                 .AdicionarCasosDeUso()
                 .AdicionarPoliticas()
-                .AdicionarClientesHttp(servicoProdam)
+                .AdicionarClientesHttp(servicoProdam, variaveisGlobais)
                 .AddMemoryCache()
                 .AddApplicationInsightsTelemetry(Configuration)
                 .AddHostedService<WorkerRabbitMQ>();
