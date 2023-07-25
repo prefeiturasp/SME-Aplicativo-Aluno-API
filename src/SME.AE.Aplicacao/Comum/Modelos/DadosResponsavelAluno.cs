@@ -10,7 +10,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string Email { get; set; }
         public string Nome { get; set; }
         public TipoResponsavelEnum TipoResponsavel { get; set; }
-        public string NomeSocial { get; set; }
+        public string NomeSocialAluno { get; set; }
         public DateTime DataNascimentoAluno { get; set; }
         public DateTime? DataNascimento { get; set; }
         public DateTime DataAtualizacao { get; set; }
@@ -41,7 +41,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos
 
         public string ObterNome()
         {
-            return TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno && !string.IsNullOrWhiteSpace(NomeSocial) ? NomeSocial : Nome;
+            return TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno && !string.IsNullOrWhiteSpace(NomeSocialAluno) ? NomeSocialAluno : Nome;
         }
     }
 }
