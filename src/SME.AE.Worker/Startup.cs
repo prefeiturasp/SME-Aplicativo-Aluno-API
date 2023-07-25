@@ -32,16 +32,16 @@ namespace SME.AE.Worker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var variaveisGlobais = new VariaveisGlobaisOptions();
+            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
             AdicionarMediatr(services);
-            ConfiguraVariaveisAmbiente(services);
+            ConfiguraVariaveisAmbiente(services, variaveisGlobais);
             ConfiguraSentry();
             ConfiguraTelemetria(services);
 
             var servicoProdam = new ServicoProdamOptions();
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
-
-            var variaveisGlobais = new VariaveisGlobaisOptions();
-            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
 
             services.AddSingleton(servicoProdam);
 
@@ -80,11 +80,8 @@ namespace SME.AE.Worker
             services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
         }
 
-        private void ConfiguraVariaveisAmbiente(IServiceCollection services)
+        private void ConfiguraVariaveisAmbiente(IServiceCollection services, VariaveisGlobaisOptions variaveisGlobais)
         {
-            var variaveisGlobais = new VariaveisGlobaisOptions();
-            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
-
             services.AddSingleton(variaveisGlobais);
 
             var configuracaoRabbitOptions = new ConfiguracaoRabbitOptions();

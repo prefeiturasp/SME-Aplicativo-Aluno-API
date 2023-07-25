@@ -35,7 +35,7 @@ namespace SME.AE.Aplicacao
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
             var body = JsonConvert.SerializeObject(dadosResponsavel, UtilJson.ObterConfigConverterNulosEmVazio());
 
-            var url = $"alunos/responsaveis/{request.Cpf}/alunos/{request.CodigoAluno}";
+            var url = $"alunos/{request.CodigoAluno}/responsaveis/{request.Cpf}";
             var resposta = await httpClient.PostAsync(url, new StringContent(body, Encoding.UTF8, "application/json"));
             Console.WriteLine(body);
             if (resposta.IsSuccessStatusCode && resposta.StatusCode != HttpStatusCode.NoContent)
