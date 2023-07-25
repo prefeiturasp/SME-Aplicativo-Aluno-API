@@ -41,10 +41,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
             var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(solicitarReiniciarSenhaDto.Cpf));
 
             if (usuario.PrimeiroAcesso == true)
-                throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.ObterNome()} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
+                throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
             await mediator.Send(new ReiniciarSenhaCommand() { Id = usuario.Id, PrimeiroAcesso = true });
-            var mensagemSucesso = $"A senha do usuário {Formatacao.FormatarCpf(usuario.Cpf)} - {usuarioEol.ObterNome()} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
+            var mensagemSucesso = $"A senha do usuário {Formatacao.FormatarCpf(usuario.Cpf)} - {usuarioEol.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
             return RespostaApi.Sucesso(mensagemSucesso);
         }
 
