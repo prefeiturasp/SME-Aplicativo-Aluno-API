@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterDadosResponsavelResumidoQuery : IRequest<DadosResponsavelAluno>
+    public class ObterDadosResponsavelResumidoQuery : IRequest<DadosResponsavelAlunoResumido>
     {
 
         public ObterDadosResponsavelResumidoQuery(string cpfResponsavel)

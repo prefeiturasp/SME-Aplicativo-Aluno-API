@@ -79,7 +79,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return usuarioCoreSSO;
         }
 
-        private async Task EnvioEmail(DadosResponsavelAluno usuarioEol, Dominio.Entidades.Usuario usuario)
+        private async Task EnvioEmail(DadosResponsavelAlunoResumido usuarioEol, Dominio.Entidades.Usuario usuario)
         {
             try
             {

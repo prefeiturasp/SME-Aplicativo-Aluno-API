@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(usuario.Cpf));
 
-            await CriarUsuarioOuAssociarGrupo(novaSenhaDto, usuario, usuarioCoreSSO, usuarioEol.ObterNome());
+            await CriarUsuarioOuAssociarGrupo(novaSenhaDto, usuario, usuarioCoreSSO, usuarioEol.Nome);
 
             var atualizarPrimeiroAcesso = MapearAtualizarPrimeiroAcessoCommand(usuario);
 

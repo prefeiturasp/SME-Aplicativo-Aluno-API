@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
-    public class ObterDadosResponsavelResumidoQueryHandler : IRequestHandler<ObterDadosResponsavelResumidoQuery, DadosResponsavelAluno>
+    public class ObterDadosResponsavelResumidoQueryHandler : IRequestHandler<ObterDadosResponsavelResumidoQuery, DadosResponsavelAlunoResumido>
     {
         private readonly IHttpClientFactory httpClientFactory;
 
@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             this.httpClientFactory = httpClientFactory ?? throw new System.ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<DadosResponsavelAluno> Handle(ObterDadosResponsavelResumidoQuery request, CancellationToken cancellationToken)
+        public async Task<DadosResponsavelAlunoResumido> Handle(ObterDadosResponsavelResumidoQuery request, CancellationToken cancellationToken)
         {
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
             var url = $"alunos/responsaveis/{request.CpfResponsavel}/resumido";
@@ -27,7 +27,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             if (resposta.IsSuccessStatusCode)
             {
                 var json = await resposta.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<DadosResponsavelAluno>(json);
+                return JsonConvert.DeserializeObject<DadosResponsavelAlunoResumido>(json);
             }
             else
             {
