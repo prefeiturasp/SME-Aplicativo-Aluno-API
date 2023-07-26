@@ -53,47 +53,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return list;
         }
 
-        // TODO Refatorar para montar a query aqui ao inves de receber por parametro
-        public async Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos, string nomeGrupos)
-        {
-            IDictionary<string, object> list = null;
-
-            try
-            {
-                await using var conn = new SqlConnection(variaveisGlobaisOptions.EolConnection);
-                conn.Open();
-                var query = $"select {nomeGrupos} from(select {grupos + NotificacaoConsultas.GruposDoResponsavel}) grupos";
-                var resultado = await conn.QueryAsync(query, new { cpf });
-
-                if (resultado.Any())
-                    list = resultado.First() as IDictionary<string, object>;
-
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return null;
-            }
-
-            return list;
-        }
-
-        public async Task<IEnumerable<string>> ObterResponsaveisPorGrupo(string where)
-        {
-            await using var conn = new SqlConnection(variaveisGlobaisOptions.EolConnection);
-            {
-                conn.Open();
-                var query = $"{NotificacaoConsultas.ResponsaveisPorGrupo}{where}";
-                var resultado = await conn.QueryAsync<string>(query);
-                conn.Close();
-                if (resultado.Any())
-                    return resultado;
-            }
-
-            return null;
-        }
-
         public async Task Criar(Notificacao notificacao)
         {
             await using var conn = InstanciarConexao();
@@ -262,7 +221,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    	      (n.tipocomunicado = {(int)TipoComunicado.DRE} and n.dre_codigoeol = @codigoDre) or
                    	      (n.tipocomunicado = {(int)TipoComunicado.UEMOD} and n.ue_codigoeol = @codigoUe{whereSerieResumida}) or
                    	      (n.tipocomunicado in ({(int)TipoComunicado.SME_ANO}, {(int)TipoComunicado.DRE_ANO}){whereSerieResumida}) and
-                   	      String_to_array(n.modalidades, ',') && String_to_array(@gruposId, ',') or
+                   	      String_to_array(n.modalidades, ',') && String_to_array(@modalidades, ',') or
                    	      (n.tipocomunicado = {(int)TipoComunicado.UE} and n.dre_codigoeol = @codigoDre)))
                    
                    union
@@ -286,7 +245,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    select tmp.id,
                           tmp.mensagem,
                           tmp.titulo,
-                          String_to_array(tmp.modalidades, ',') gruposid,
+                          String_to_array(tmp.modalidades, ',') ModalidadesId,
                           tmp.dataenvio,
                           tmp.dataexpiracao,
                           tmp.criadoem,
@@ -415,7 +374,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"{abreviacao}.Id,
                     {abreviacao}.Mensagem,
                     {abreviacao}.Titulo,
-                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as GruposId" : $"{abreviacao}.modalidades")},
+                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as ModalidadesId" : $"{abreviacao}.modalidades")},
                     {abreviacao}.DataEnvio,
                     {abreviacao}.DataExpiracao,
                     {abreviacao}.CriadoEm,

@@ -10,12 +10,10 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
     public class MensagenUsuarioLogadoAlunoIdQueryHandler : IRequestHandler<MensagenUsuarioLogadoAlunoIdQuery, NotificacaoResposta>
     {
         private readonly INotificacaoRepositorio notificacaoRepository;
-        private readonly IGrupoComunicadoRepository grupoComunicadoRepository;
-
-        public MensagenUsuarioLogadoAlunoIdQueryHandler(INotificacaoRepositorio notificacaoRepository, IGrupoComunicadoRepository grupoComunicadoRepository)
+        
+        public MensagenUsuarioLogadoAlunoIdQueryHandler(INotificacaoRepositorio notificacaoRepository)
         {
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
-            this.grupoComunicadoRepository = grupoComunicadoRepository ?? throw new ArgumentNullException(nameof(grupoComunicadoRepository));
         }
 
         public async Task<NotificacaoResposta> Handle(MensagenUsuarioLogadoAlunoIdQuery request, CancellationToken cancellationToken)

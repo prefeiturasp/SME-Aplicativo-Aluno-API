@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(retornoUsuarioCoreSSO);
 
-            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResumidosReponsavelPorCpfQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
 
             mediator.Setup(a => a.Send(It.IsAny<AssociarGrupoUsuarioCommand>(), It.IsAny<CancellationToken>()));
 
@@ -94,12 +94,13 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             UsuId = Guid.NewGuid()
         };
 
-        private ResponsavelAlunoEolResumidoDto responsavelAlunoEolResumido { get; set; } = new ResponsavelAlunoEolResumidoDto
+        private DadosResponsavelAluno[] responsavelAlunoEolResumido { get; set; } = new DadosResponsavelAluno[]
         {
-            Celular = "999999999",
-            DDD = "99",
-            Email = "Teste@teste.com",
-            Nome = "Teste"
+            new DadosResponsavelAluno {  NumeroCelular = "999999999",
+                DDDCelular = "99",
+                Email = "Teste@teste.com",
+                Nome = "Teste"
+            }
         };
 
         private NovaSenhaDto novaSenhaDtoCerta { get; set; } = new NovaSenhaDto

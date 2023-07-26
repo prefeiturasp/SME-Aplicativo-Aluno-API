@@ -54,7 +54,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 conn.Open();
 
-                var usuariosAlunosNotificacoes = await servicoTelemetria.RegistrarComRetornoAsync<UsuarioAlunoNotificacaoApp>(async () => await SqlMapper.QueryAsync(conn,
+                var usuariosAlunosNotificacoes = await servicoTelemetria.RegistrarComRetornoAsync<UsuarioAlunoNotificacaoApp>(async () => await SqlMapper.QueryAsync<UsuarioAlunoNotificacaoApp>(conn,
                     sql), "query", "Query AE", sql);
 
                 conn.Close();

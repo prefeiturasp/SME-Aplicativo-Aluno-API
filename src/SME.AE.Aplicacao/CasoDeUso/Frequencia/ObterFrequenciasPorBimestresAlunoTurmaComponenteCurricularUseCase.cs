@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
@@ -24,8 +25,10 @@ namespace SME.AE.Aplicacao
 
             if (notasConceitosBimestreComponente != null)
             {
-                var turmaModalidadeDeEnsino = await mediator.Send(new ObterModalidadeDeEnsinoQuery(dto.TurmaCodigo));
-                var parametros = turmaModalidadeDeEnsino.ModalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+                var turmaModalidadeDeEnsino = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { dto.TurmaCodigo }));
+                var modalidadeDeEnsino = (ModalidadeDeEnsino)turmaModalidadeDeEnsino.FirstOrDefault().ModalidadeCodigo;
+
+                var parametros = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
                 ? await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametrosParaEnsinoInfantil()))
                 : await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametros()));
 
@@ -37,7 +40,7 @@ namespace SME.AE.Aplicacao
                 {
                     frequencia.CorDaFrequencia = await mediator.Send(new ObterCorQuery(parametros, frequencia.PercentualFrequencia,
                     obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa,
-                    turmaModalidadeDeEnsino.ModalidadeDeEnsino));
+                    modalidadeDeEnsino));
                     frequenciasAtualizada.Add(frequencia);
                 }
                 return frequenciasAtualizada;

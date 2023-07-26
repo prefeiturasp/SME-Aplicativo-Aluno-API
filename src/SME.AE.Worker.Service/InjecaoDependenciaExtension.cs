@@ -24,10 +24,7 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddTransient<TranferirEventoSgpCasoDeUso>()
                 .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
-                .AddTransient<TransferirFrequenciaSgpCasoDeUso>()
-                .AddTransient<TransferirNotaSgpCasoDeUso>()
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
                 .AddTransient<RemoverConexaoIdleCasoDeUso>()
@@ -38,10 +35,7 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
-                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
                 .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
                 .AddSingleton<IHostedService, RemoverConexaoIdleWorker>()
@@ -54,22 +48,12 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
-                .AddTransient<IEventoRepositorio, EventoRepositorio>()
-                .AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>()
-                .AddTransient<IResponsavelEOLRepositorio, ResponsavelEOLRepositorio>()
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
-                .AddTransient<IFrequenciaAlunoRepositorio, FrequenciaAlunoRepositorio>()
-                .AddTransient<IFrequenciaAlunoSgpRepositorio, FrequenciaAlunoSgpRepositorio>()
-                .AddTransient<INotaAlunoRepositorio, NotaAlunoRepositorio>()
-                .AddTransient<INotaAlunoSgpRepositorio, NotaAlunoSgpRepositorio>()
                 .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
-                .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
                 .AddTransient<INotificacaoRepositorio, NotificacaoRepositorio>()
-                .AddTransient<IDreSgpRepositorio, DreSgpRepositorio>()
-                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>()
-                .AddTransient<IUeSgpRepositorio, UeSgpRepositorio>();
+                .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>();
         }
 
         public static IServiceCollection AdicionarPoliticas(this IServiceCollection services)
@@ -89,7 +73,7 @@ namespace SME.AE.Worker.Service
         #endregion
 
         #region Clientes HTTP
-        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions)
+        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions, VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             var policy = ObterPolicyBaseHttp();
 
@@ -100,6 +84,20 @@ namespace SME.AE.Worker.Service
                 c.BaseAddress = new Uri(servicoProdamOptions.Url);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiSgpChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiEolChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiEol);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-api-eol-key", variaveisGlobaisOptions.ChaveIntegracaoEolApi);
             }).AddPolicyHandler(policy);
 
             return services;

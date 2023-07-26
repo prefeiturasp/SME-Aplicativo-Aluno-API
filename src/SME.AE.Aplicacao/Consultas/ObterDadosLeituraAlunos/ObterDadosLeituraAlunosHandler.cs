@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;
@@ -13,27 +14,24 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
     public class ObterDadosLeituraAlunosQueryHandler : IRequestHandler<ObterDadosLeituraAlunosQuery, IEnumerable<DadosLeituraAlunosComunicado>>
     {
         private readonly IDadosLeituraRepositorio dadosLeituraRepositorio;
-        private readonly IAlunoRepositorio alunoRepositorio;
+        private readonly IMediator mediator;
         private readonly IUsuarioRepository usuarioRepository;
-        private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly INotificacaoRepositorio notificacaoRepository;
 
         public ObterDadosLeituraAlunosQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
-                                                    IAlunoRepositorio alunoRepositorio,
                                                     IUsuarioRepository usuarioRepository,
                                                     INotificacaoRepositorio notificacaoRepository,
-                                                    IResponsavelEOLRepositorio responsavelEOLRepositorio)
+                                                    IMediator mediator)
         {
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new System.ArgumentNullException(nameof(dadosLeituraRepositorio));
-            this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
             this.notificacaoRepository = notificacaoRepository ?? throw new ArgumentNullException(nameof(notificacaoRepository));
-            this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new ArgumentNullException(nameof(responsavelEOLRepositorio));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public async Task<IEnumerable<DadosLeituraAlunosComunicado>> Handle(ObterDadosLeituraAlunosQuery request, CancellationToken cancellationToken)
         {
-            var alunosTurma = await alunoRepositorio.ObterAlunosTurma(request.CodigoTurma);
+            var alunosTurma = await mediator.Send(new ObterAlunosPorTurmaQuery(request.CodigoTurma));
 
             var notificacaoAlunos = await notificacaoRepository.ObterNotificacoesAlunoPorId(request.NotificaoId);
 
@@ -62,8 +60,8 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
                     var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                     var possueApp = usuario != null;
-                    var usuarioEol = responsavelEOLRepositorio.ObterDadosResumidosReponsavelPorCpf(cpf).Result;
-                    var telefone = possueApp ? usuarioEol.Celular : "";
+                    var usuarioEol = (mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf))).Result;
+                    var telefone = possueApp ? usuarioEol.NumeroCelular : "";
                     if (string.IsNullOrWhiteSpace(telefone))
                         if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
                         {
@@ -100,8 +98,8 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
                         var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                         var possueApp = usuario != null;
-                        var usuarioEol = responsavelEOLRepositorio.ObterDadosResumidosReponsavelPorCpf(cpf).Result;
-                        var telefone = possueApp ? usuarioEol.Celular : "";
+                        var usuarioEol = (mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf))).Result;
+                        var telefone = possueApp ? usuarioEol.NumeroCelular : "";
                         if (string.IsNullOrWhiteSpace(telefone))
                             if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
                             {

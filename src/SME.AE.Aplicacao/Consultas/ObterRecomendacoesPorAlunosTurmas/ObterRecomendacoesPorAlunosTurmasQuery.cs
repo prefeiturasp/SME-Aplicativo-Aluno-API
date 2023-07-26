@@ -3,7 +3,7 @@ using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 
-namespace SME.AE.Aplicacao.Consultas.ObterRecomendacoesPorAlunosTurmas
+namespace SME.AE.Aplicacao.Consultas
 {
     public class ObterRecomendacoesPorAlunosTurmasQuery : IRequest<IEnumerable<RecomendacaoConselhoClasseAluno>>
     {
