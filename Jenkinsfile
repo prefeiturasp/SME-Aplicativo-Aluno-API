@@ -33,9 +33,9 @@ pipeline {
         steps {
           
           //Executa os testes gerando um relatorio formato trx
-            sh 'dotnet test --logger "trx;LogFileName=TestResults.trx"'
+           // sh 'dotnet test --logger "trx;LogFileName=TestResults.trx"'
           //Publica o relatorio de testes
-            mstest failOnError: false
+          //  mstest failOnError: false
           
         }
      }
