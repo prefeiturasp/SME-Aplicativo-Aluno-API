@@ -18,7 +18,7 @@
 				ue_codigo  = @ue_codigo
 		";
 
-		internal static string ObterDadosAdesaoPorDre = @"
+        internal static string ObterDadosAdesaoPorDre = @"
 			SELECT 
 				dre_nome AS NomeCompletoDre,
 				usuarios_cpf_invalidos AS TotalUsuariosComCpfInvalidos,
@@ -32,5 +32,5 @@
 				dre_codigo <> '' 
 			ORDER BY dre_codigo 
 		";
-	}
+    }
 }

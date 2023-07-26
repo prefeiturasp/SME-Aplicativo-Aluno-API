@@ -5,7 +5,6 @@ using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -14,12 +13,12 @@ namespace SME.AE.Aplicacao.Teste.Comandos
 {
     public class CriarNotificacaoCommandTeste
     {
-        public Mock<INotificacaoRepository> notificacaoRepository;
+        public Mock<INotificacaoRepositorio> notificacaoRepository;
         public CriarNotificacaoCommandHandler handler;
 
         public CriarNotificacaoCommandTeste()
         {
-            notificacaoRepository = new Mock<INotificacaoRepository>();
+            notificacaoRepository = new Mock<INotificacaoRepositorio>();
             handler = new CriarNotificacaoCommandHandler(notificacaoRepository.Object);
         }
 
@@ -70,7 +69,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
 
             await handler.Handle(new CriarNotificacaoCommand(NotificacaoAluno), new CancellationToken());
         }
-      
+
 
         private void InstanciarSetup()
         {

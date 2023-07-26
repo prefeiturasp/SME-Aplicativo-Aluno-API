@@ -4,7 +4,6 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
-using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +18,7 @@ namespace SME.AE.Aplicacao.Servicos
             this.repositorioConfiguracaoEmail = repositorioConfiguracaoEmail ?? throw new System.ArgumentNullException(nameof(repositorioConfiguracaoEmail));
         }
 
-        public async Task Enviar(string nomeDestinatario,string destinatario, string assunto, string mensagemHtml)
+        public async Task Enviar(string nomeDestinatario, string destinatario, string assunto, string mensagemHtml)
         {
             ConfiguracaoEmail configuracaoEmail = await ObterConfiguracoes();
 

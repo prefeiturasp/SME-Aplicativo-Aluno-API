@@ -1,11 +1,10 @@
-﻿
-using Dapper;
+﻿using Dapper;
 using Dapper.Dommel;
 using Dommel;
 using Npgsql;
 using Sentry;
-using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
@@ -20,10 +19,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class UsuarioRepository : BaseRepositorio<Usuario>, IUsuarioRepository
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public UsuarioRepository(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        public UsuarioRepository(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
 
         public async Task<Usuario> ObterPorCpf(string cpf)
@@ -31,8 +33,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = InstanciarConexao();
+
                 conexao.Open();
-                var usuario = await conexao.QueryFirstOrDefaultAsync<Usuario>("select * from usuario where cpf = @cpf", new { cpf });
+
+                var sql = "select * from usuario where cpf = @cpf";
+                var parametros = new { cpf };
+
+                var usuario = await servicoTelemetria.RegistrarComRetornoAsync<Usuario>(async () =>
+                    await SqlMapper.QueryFirstOrDefaultAsync<Usuario>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
                 return usuario;
             }
             catch (Exception ex)
@@ -42,7 +51,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-
         public async Task<IEnumerable<Usuario>> ObterTodosUsuariosAtivos()
         {
             var query = "select * from usuario where excluido = false";
@@ -50,9 +58,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = InstanciarConexao();
+
                 await conexao.OpenAsync();
 
-                var usuarios = await conexao.QueryAsync<Usuario>(query);
+                var usuarios = await servicoTelemetria.RegistrarComRetornoAsync<Usuario>(async () =>
+                    await SqlMapper.QueryAsync<Usuario>(conexao, query), "query", "Query AE", query);
+
                 await conexao.CloseAsync();
 
                 return usuarios;
@@ -85,9 +96,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
                 conn.Open();
-                var cpfsUsuarios = await conn.QueryAsync<string>(UsuarioConsultas.ObterTodos);
+
+                var cpfsUsuarios = await servicoTelemetria.RegistrarComRetornoAsync<string>(async () =>
+                    await SqlMapper.QueryAsync<string>(conn, UsuarioConsultas.ObterTodos), "query", "Query AE", UsuarioConsultas.ObterTodos);
+
                 conn.Close();
+
                 return cpfsUsuarios;
             }
             catch (Exception ex)
@@ -109,9 +125,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     query.AppendLine($" and cpf IN ({cpfsIN})");
 
                 using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
                 conn.Open();
-                var totalUsuariosComAcessoIncompleto = await conn.ExecuteScalarAsync(query.ToString());
+
+                var totalUsuariosComAcessoIncompleto = await servicoTelemetria.RegistrarComRetornoAsync<long>(async () =>
+                    await SqlMapper.ExecuteScalarAsync<long>(conn, query.ToString()), "query", "Query AE", query.ToString());
+
                 conn.Close();
+
                 return (long)totalUsuariosComAcessoIncompleto;
             }
             catch (Exception ex)
@@ -126,6 +147,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var cpfsIN = "'" + string.Join<string>("','", cpfs) + "'";
+
                 var query = new StringBuilder();
                 query.AppendLine($"{UsuarioConsultas.ObterTotalUsuariosValidos}");
 
@@ -133,9 +155,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     query.AppendLine($" and cpf IN ({cpfsIN})");
 
                 using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
                 conn.Open();
-                var totalUsuariosValidos = await conn.ExecuteScalarAsync(query.ToString());
+
+                var totalUsuariosValidos = await servicoTelemetria.RegistrarComRetornoAsync<long>(async () =>
+                    await SqlMapper.ExecuteScalarAsync<long>(conn, query.ToString()), "query", "Query AE", query.ToString());
+
                 conn.Close();
+
                 return (long)totalUsuariosValidos;
             }
             catch (Exception ex)
@@ -301,13 +328,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
                 conn.Open();
+
                 string query =
                      @"SELECT usuario_id 
                             FROM public.usuario_dispositivo
                            WHERE usuario_id = @usuarioId
                              AND codigo_dispositivo =  @dispositivoId";
-                var retorno = await conn.QueryAsync(query, new { usuarioId, dispositivoId });
+
+                var parametros = new { usuarioId, dispositivoId };
+
+                System.Collections.Generic.List<bool> retorno;
+
+                 retorno = await servicoTelemetria.RegistrarComRetornoAsync<bool>(async () =>
+                    await SqlMapper.QueryAsync<bool>(conn, query, parametros), "query", "Query AE", query, parametros.ToString());
+
                 if (!retorno.Any())
                     return false;
 

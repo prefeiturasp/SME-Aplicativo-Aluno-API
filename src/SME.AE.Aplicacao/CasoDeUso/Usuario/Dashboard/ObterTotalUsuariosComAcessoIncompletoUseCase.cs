@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using SME.AE.Aplicacao.Comum.Modelos;
 
 namespace SME.AE.Aplicacao.CasoDeUso
 {
@@ -24,15 +25,16 @@ namespace SME.AE.Aplicacao.CasoDeUso
             var cpfsDeResponsaveis = new List<string>();
             if (!String.IsNullOrEmpty(codigoDre) || !String.IsNullOrEmpty(codigoUe))
             {
-                var cpfsDaAbrangencia = await mediator.Send(new ObterCpfsDeResponsaveisPorDreEUeQuery(codigoDre, codigoUe));
+                var cpfsDaAbrangencia = await mediator.Send(new ObterResponsaveisPorDreEUeQuery(codigoDre, codigoUe));
                 cpfsDeResponsaveis = ConverterCpfsParaLista(cpfsDaAbrangencia);
             }
 
             return await mediator.Send(new ObterTotalUsuariosComAcessoIncompletoQuery(cpfsDeResponsaveis));
         }
 
-        private List<string> ConverterCpfsParaLista(IEnumerable<CpfResponsavelAlunoEol> cpfsResponsaveis) {
-            return (cpfsResponsaveis.Select(item => item.CpfResponsavel)).ToList();
+        private List<string> ConverterCpfsParaLista(IEnumerable<ResponsavelAlunoEOLDto> cpfsResponsaveis)
+        {
+            return (cpfsResponsaveis.Select(item => item.CpfResponsavel.ToString()).Distinct()).ToList();
         }
     }
 }

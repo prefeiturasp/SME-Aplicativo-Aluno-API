@@ -15,7 +15,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public CacheRepositorio(IServicoLog servicoLog, IMemoryCache memoryCache)
         {
-
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         }
@@ -85,8 +84,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 return default;
             }
         }
-
-
 
         public async Task<T> ObterAsync<T>(string nomeChave, Func<Task<T>> buscarDados, int minutosParaExpirar = 720, bool utilizarGZip = false)
         {
@@ -187,7 +184,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             try
             {
-
                 if (utilizarGZip)
                 {
                     var valorComprimido = UtilGZip.Comprimir(valor);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.AE.Aplicacao.Comum.Enumeradores
+﻿namespace SME.AE.Aplicacao.Comum.Enumeradores
 {
     public enum AlunoTipoSigilo
     {

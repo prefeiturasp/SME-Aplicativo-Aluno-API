@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.AE.Aplicacao.Comum.Modelos
+﻿namespace SME.AE.Aplicacao.Comum.Modelos
 {
     public class ComunicadoSgpDto
     {
@@ -15,8 +11,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public short? Modalidade { get; set; }
         public string SeriesResumidas { get; set; }
         public short TipoComunicado { get; set; }
-        public string TipoEscolaId { get; set; }
-        public string EtapaEnsinoId { get; set; }
-        public string TipoCicloId { get; set; }
+        public string TipoEscola { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
@@ -29,12 +30,12 @@ namespace SME.AE.Aplicacao
             if (!podePersistirTexto)
                 return RespostaApi.Falha("Conteúdo inadequado nos campos de cadastro, por favor revise e tente novamente.");
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuarioApp.Cpf));
-
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuarioApp.Cpf));
+            
             if (usuarioEol == null)
                 return RespostaApi.Falha("Usuário não encontrado!");
 
-            await AtualizaUsuario(usuarioApp, usuarioDto);            
+            await AtualizaUsuario(usuarioApp, usuarioDto);
 
             return MapearResposta(usuarioApp);
         }

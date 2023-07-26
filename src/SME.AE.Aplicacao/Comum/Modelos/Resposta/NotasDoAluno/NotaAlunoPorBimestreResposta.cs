@@ -1,5 +1,4 @@
-﻿using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno
 {

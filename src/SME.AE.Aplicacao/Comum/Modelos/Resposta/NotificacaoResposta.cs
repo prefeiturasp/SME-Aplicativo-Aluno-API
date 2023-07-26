@@ -9,7 +9,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
     {
         public long Id { get; set; }
         public string Mensagem { get; set; }
-        public string Titulo { get; set; }        
+        public string Titulo { get; set; }
         public string[] ModalidadesId { get; set; }
         public DateTime DataEnvio { get; set; }
         public DateTime? DataExpiracao { get; set; }
@@ -23,9 +23,15 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public string CodigoDre { get; set; }
         public string CodigoUe { get; set; }
         public string SeriesResumidas { get; set; }
-        public string CategoriaNotificacao { 
-            get {
-                if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+        public string CategoriaNotificacao
+        {
+            get
+            {
+                if (TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
+                {
+                    return "UE";
+                }
+                else if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
                 {
                     return "SME";
                 }

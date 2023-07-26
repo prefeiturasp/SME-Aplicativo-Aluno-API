@@ -23,7 +23,7 @@ namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
         public DateTime DataNascimento { get; set; }
         public DateTime DataSituacaoMatricula { get; set; }
         public int CodigoCicloEnsino { get; set; }
-        public int CodigoEtapaEnsino { get; set; }        
+        public int CodigoEtapaEnsino { get; set; }
         public string SerieResumida { get; set; }
         public int ModalidadeCodigo { get; set; }
         public string ModalidadeDescricao { get; set; }

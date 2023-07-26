@@ -1,7 +1,6 @@
 ﻿using SME.AE.Aplicacao.Comum.Extensoes;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Entrada
 {

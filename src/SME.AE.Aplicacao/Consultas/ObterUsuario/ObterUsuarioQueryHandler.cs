@@ -18,7 +18,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 
         public async Task<Usuario> Handle(ObterUsuarioQuery request, CancellationToken cancellationToken)
         {
-            
+
             Usuario usuario = default;
 
             if (!string.IsNullOrWhiteSpace(request.Cpf))

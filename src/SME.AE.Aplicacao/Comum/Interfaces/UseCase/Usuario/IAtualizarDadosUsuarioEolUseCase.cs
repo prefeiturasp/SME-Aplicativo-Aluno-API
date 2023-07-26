@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comum.Interfaces
 {
-    public interface IAtualizarDadosUsuarioEolUseCase 
+    public interface IAtualizarDadosUsuarioEolUseCase
     {
         Task<bool> Executar(MensagemRabbit mensagemRabbit);
     }

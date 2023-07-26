@@ -11,9 +11,9 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ObterNotificacaoPorid
 {
     public class ObterNotificacaoPorIdQueryHandler : IRequestHandler<ObterNotificacaoPorIdQuery, NotificacaoResposta>
     {
-        private readonly INotificacaoRepository _repository;
+        private readonly INotificacaoRepositorio _repository;
 
-        public ObterNotificacaoPorIdQueryHandler(INotificacaoRepository repository, IGrupoComunicadoRepository grupoComunicadoRepository)
+        public ObterNotificacaoPorIdQueryHandler(INotificacaoRepositorio repository)
         {
             this._repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }

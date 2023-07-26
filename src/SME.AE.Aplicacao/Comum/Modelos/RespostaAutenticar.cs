@@ -2,7 +2,7 @@
 
 namespace SME.AE.Aplicacao.Comum.Modelos.Resposta
 {
-    public class RespostaAutenticar 
+    public class RespostaAutenticar
     {
         public long Id { get; set; }
         public string Nome { get; set; }

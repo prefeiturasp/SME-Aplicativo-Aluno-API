@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore.Internal;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using Newtonsoft.Json;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Comum.Excecoes;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,20 +11,32 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
     public class ObterDadosAlunosQueryHandler : IRequestHandler<ObterDadosAlunosQuery, IEnumerable<AlunoRespostaEol>>
     {
-        private readonly IAlunoRepositorio _alunoRepositorio;
+        private readonly IHttpClientFactory httpClientFactory;
 
-        public ObterDadosAlunosQueryHandler(IAlunoRepositorio alunoRepositorio)
+        public ObterDadosAlunosQueryHandler(IHttpClientFactory httpClientFactory)
         {
-            _alunoRepositorio = alunoRepositorio ?? throw new System.ArgumentNullException(nameof(alunoRepositorio));
+            this.httpClientFactory = httpClientFactory ?? throw new System.ArgumentNullException(nameof(httpClientFactory));
         }
 
         public async Task<IEnumerable<AlunoRespostaEol>> Handle(ObterDadosAlunosQuery request, CancellationToken cancellationToken)
         {
-            var alunos = await _alunoRepositorio.ObterDadosAlunos(request.Cpf);
-            if (alunos == null || !alunos.Any())
-                throw new NegocioException("Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");
+            var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
+            var paramQueryDre = $"codigoDre={request.CodigoDre}";
+            var paramQueryUe = $"codigoUe={request.CodigoUe}";
+            var paramQueryAluno = $"codigoAluno={request.CodigoAluno}";
+            var paramQueryResponsavel = $"cpfResponsavel={request.CpfResponsavel}";
+            var url = $"alunos/dados-acompanhamento-escolar?{paramQueryResponsavel}&{paramQueryDre}&{paramQueryUe}&{paramQueryAluno}";
 
-            return alunos;
+            var resposta = await httpClient.GetAsync(url);
+            if (resposta.IsSuccessStatusCode)
+            {
+                var json = await resposta.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IEnumerable<AlunoRespostaEol>>(json);
+            }
+            else
+            {
+                throw new System.Exception($"Não foi possível obter dados do aluno");
+            }
         }
     }
 }

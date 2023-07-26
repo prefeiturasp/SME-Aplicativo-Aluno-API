@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using Microsoft.Practices.ObjectBuilder2;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Excecoes;
-using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,18 +25,16 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
 
         public class DadosAlunoComandoHandler : IRequestHandler<DadosAlunoCommand, RespostaApi>
         {
-            private readonly IAlunoRepositorio alunoRepositorio;
             private readonly IMediator mediator;
 
-            public DadosAlunoComandoHandler(IAlunoRepositorio alunoRepositorio, IMediator mediator)
+            public DadosAlunoComandoHandler(IMediator mediator)
             {
-                this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
                 this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             }
             public async Task<RespostaApi> Handle(DadosAlunoCommand request, CancellationToken cancellationToken)
             {
-                var dadosDosAlunos = await alunoRepositorio.ObterDadosAlunos(request.Cpf);
-
+                var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null));
+                
                 if (dadosDosAlunos == null || !dadosDosAlunos.Any())
                     throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
 
@@ -50,7 +49,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     var modalidadeDaTurma = turmasModalidade.FirstOrDefault(a => a.TurmaCodigo == dadoDoAluno.CodigoTurma);
                     dadoDoAluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
                     dadoDoAluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
-                });              
+                });
 
                 var tipoEscola =
                     dadosDosAlunos
@@ -87,7 +86,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                     });
 
                 return RespostaApi.Sucesso(tipoEscola);
-            }            
+            }
         }
     }
 }

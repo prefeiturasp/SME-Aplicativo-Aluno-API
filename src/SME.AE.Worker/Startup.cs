@@ -1,3 +1,6 @@
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm.SqlClient;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,9 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Servicos;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum;
+using SME.AE.Dominio.Options;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
 
@@ -26,10 +32,14 @@ namespace SME.AE.Worker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var variaveisGlobais = new VariaveisGlobaisOptions();
+            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
 
             AdicionarMediatr(services);
-            ConfiguraVariaveisAmbiente(services);
+            ConfiguraVariaveisAmbiente(services, variaveisGlobais);
             ConfiguraSentry();
+            ConfiguraTelemetria(services);
+
             var servicoProdam = new ServicoProdamOptions();
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
@@ -43,14 +53,13 @@ namespace SME.AE.Worker
                 .AdicionarServicos()
                 .AdicionarCasosDeUso()
                 .AdicionarPoliticas()
-                .AdicionarClientesHttp(servicoProdam)
+                .AdicionarClientesHttp(servicoProdam, variaveisGlobais)
                 .AddMemoryCache()
-                .AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetry(Configuration)
                 .AddHostedService<WorkerRabbitMQ>();
 
-
-
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SME.AE.Worker", Version = "v1" });
@@ -62,11 +71,17 @@ namespace SME.AE.Worker
             Sentry.SentrySdk.Init(Configuration.GetSection("Sentry:DSN").Value);
         }
 
-        private void ConfiguraVariaveisAmbiente(IServiceCollection services)
+        private void ConfiguraTelemetria(IServiceCollection services)
         {
-            var variaveisGlobais = new VariaveisGlobaisOptions();
-            Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+            var telemetriaOptions = new TelemetriaOptions();
+            Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
 
+            services.AddSingleton(telemetriaOptions);
+            services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
+        }
+
+        private void ConfiguraVariaveisAmbiente(IServiceCollection services, VariaveisGlobaisOptions variaveisGlobais)
+        {
             services.AddSingleton(variaveisGlobais);
 
             var configuracaoRabbitOptions = new ConfiguracaoRabbitOptions();
@@ -90,6 +105,10 @@ namespace SME.AE.Worker
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseElasticApm(Configuration,
+                new SqlClientDiagnosticSubscriber(),
+                new HttpDiagnosticsSubscriber());
 
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SME.AE.Worker v1"));

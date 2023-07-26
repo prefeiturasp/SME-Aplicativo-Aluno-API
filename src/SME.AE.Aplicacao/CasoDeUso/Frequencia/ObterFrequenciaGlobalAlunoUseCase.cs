@@ -5,6 +5,7 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta.FrequenciasDoAluno;
 using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
@@ -24,8 +25,10 @@ namespace SME.AE.Aplicacao
 
             if (frequenciaGlobal != null)
             {
-                var turmaModalidadeDeEnsino = await mediator.Send(new ObterModalidadeDeEnsinoQuery(filtro.TurmaCodigo));
-                var parametros = turmaModalidadeDeEnsino.ModalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+                var turmaModalidadeDeEnsino = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { filtro.TurmaCodigo }));
+                var modalidadeDeEnsino = (ModalidadeDeEnsino)turmaModalidadeDeEnsino.FirstOrDefault().ModalidadeCodigo;
+
+                var parametros = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
                 ? await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametrosParaEnsinoInfantil()))
                 : await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametros()));
 
@@ -34,7 +37,7 @@ namespace SME.AE.Aplicacao
 
                 frequenciaGlobal.CorDaFrequencia = await mediator.Send(new ObterCorQuery(parametros, frequenciaGlobal.Frequencia,
                     obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa,
-                    turmaModalidadeDeEnsino.ModalidadeDeEnsino));
+                    modalidadeDeEnsino));
             }
 
             return frequenciaGlobal;

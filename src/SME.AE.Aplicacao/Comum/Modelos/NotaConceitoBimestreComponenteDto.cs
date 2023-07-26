@@ -11,9 +11,16 @@
 
         public string CorDaNota { get; set; }
         public long? ConceitoId { get; set; }
-        public double Nota { get; set; }
-        public string NotaConceito { get => ConceitoId.HasValue ? ObterConceito(ConceitoId.Value) : Nota.ToString(); }
+        public string Nota { get; set; }
+        public string NotaConceito { get => ConceitoId.HasValue ? ObterConceito(ConceitoId.Value) : TratarNotaNull(); }
 
+        private string TratarNotaNull()
+        {
+            if (Nota == null)
+                return Nota = "-";
+            else
+                return Nota;
+        }
         private string ObterConceito(long conceitoId)
         {
             if (conceitoId == 1)

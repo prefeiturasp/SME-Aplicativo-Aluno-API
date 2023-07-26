@@ -37,7 +37,7 @@ namespace SME.AE.Aplicacao
 
             return Task.FromResult(new JwtSecurityTokenHandler()
                       .WriteToken(token));
-            
+
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Comum
 {
-   public class FrequenciaAlunoDto
+    public class FrequenciaAlunoDto
     {
         public FrequenciaAlunoDto(string codigoAluno,
                 string turmaId,

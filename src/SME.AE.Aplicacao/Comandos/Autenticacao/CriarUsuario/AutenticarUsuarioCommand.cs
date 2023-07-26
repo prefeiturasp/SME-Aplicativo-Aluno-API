@@ -15,6 +15,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario
 
         public string Cpf { get; set; }
         public DateTime DataNascimento { get; set; }
-        public string Senha { get; set; }       
+        public string Senha { get; set; }
     }
 }

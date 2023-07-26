@@ -5,13 +5,10 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "environmentVariables": {     
-      },
       "applicationUrl": "http://localhost:5000;https://localhost:5001;"
     },
     "Docker": {
       "commandName": "Docker",
-      "launchBrowser": false,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
       "publishAllPorts": true,
       "useSSL": true

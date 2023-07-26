@@ -22,6 +22,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+
         public async Task AlterarStatusUsuario(Guid usuId, StatusUsuarioCoreSSO novoStatus)
         {
             try
@@ -63,7 +64,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
 
         public async Task AtualizarCriptografiaUsuario(Guid usuId, string senha)
@@ -80,7 +80,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
 
         public async Task<Guid> Criar(UsuarioCoreSSODto usuario)
@@ -114,7 +113,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
 
         public async Task IncluirUsuarioNosGrupos(Guid usuId, IEnumerable<Guid> gruposNaoIncluidos)
@@ -164,7 +162,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                RetornoUsuarioCoreSSO usuarioCoreSSO;
+                RetornoUsuarioCoreSSO usuarioCoreSSO = new RetornoUsuarioCoreSSO();
 
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
 
@@ -175,8 +173,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             WHERE u.usu_login = @cpf "
                     , new { cpf });
                 conn.Close();
-
-
                 return usuarioCoreSSO;
             }
             catch (Exception ex)
@@ -205,7 +201,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 SentrySdk.CaptureException(ex);
                 throw ex;
             }
-
         }
     }
 }

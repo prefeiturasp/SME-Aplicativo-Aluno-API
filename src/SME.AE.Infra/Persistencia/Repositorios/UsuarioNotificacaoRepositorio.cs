@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
@@ -13,17 +14,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class UsuarioNotificacaoRepositorio : IUsuarioNotificacaoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public UsuarioNotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public UsuarioNotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         public async Task<bool> Criar(UsuarioNotificacao usuarioNotificacao)
         {
             try
             {
                 await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
                 conn.Open();
+
                 var dataAtual = DateTime.Now;
                 var retorno = await conn.ExecuteAsync(
                     @"INSERT INTO public.usuario_notificacao_leitura
@@ -34,6 +40,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       dre_codigoeol, 
                        ue_codigoeol, 
                         usuario_cpf,
+                        codigo_eol_turma,
                           criadopor,
                      mensagemvisualizada,
                      mensagemexcluida
@@ -45,6 +52,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                            @DreCodigoEol,
                            @UeCodigoEol,
                            @UsuarioCpf,
+                           @CodigoEolTurma,
                            @CriadoPor,
                            @MensagemVisualizada,
                            @MensagemExcluida
@@ -58,6 +66,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         usuarioNotificacao.DreCodigoEol,
                         usuarioNotificacao.UeCodigoEol,
                         usuarioNotificacao.UsuarioCpf,
+                        usuarioNotificacao.CodigoEolTurma,
                         usuarioNotificacao.CriadoPor,
                         usuarioNotificacao.MensagemVisualizada,
                         usuarioNotificacao.MensagemExcluida
@@ -78,27 +87,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<bool> RemoverPorId(long id)
         {
-
             await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
             conn.Open();
 
             await conn.ExecuteAsync(
-               @"DELETE FROM usuario_notificacao_leitura where id = @id", new { id });
+               @"UPDATE FROM usuario_notificacao_leitura SET excluido = true where id = @id", new { id });
+
             conn.Close();
 
             return true;
         }
 
-
         public async Task<UsuarioNotificacao> ObterPorUsuarioAlunoNotificacao(long usuarioId, long codigoAluno, long notificacaoId)
         {
-            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+            using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
             await conn.OpenAsync();
 
-            var usuarioNotificacao = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
-                @"
-                    SELECT 
+            var sql = @"SELECT 
                     	id, 
                     	usuario_id usuarioid, 
                     	codigo_eol_aluno codigoeolaluno, 
@@ -116,38 +122,60 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where
                         usuario_id = @usuario_id and
                         codigo_eol_aluno = @codigo_eol_aluno and
-                        notificacao_id = @notificacaoId
-                ", new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId });
+                        notificacao_id = @notificacaoId and not excluido";
+
+            var parametros = new { usuario_id = usuarioId, codigo_eol_aluno = codigoAluno, notificacaoId };
+
+            var usuarioNotificacao = await servicoTelemetria.RegistrarComRetornoAsync<UsuarioNotificacao>(async () =>
+                await SqlMapper.QueryFirstOrDefaultAsync<UsuarioNotificacao>(conn, sql, parametros), "query", "Query AE", sql, parametros.ToString());
 
             await conn.CloseAsync();
 
             return usuarioNotificacao;
         }
 
-        public async Task<bool> Remover(long notificacaoId)
+        public async Task<bool> RemoverPorNotificacaoId(long notificacaoId)
         {
-            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
-            conn.Open();
+            await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
+            {
+                conn.Open();
+                await conn.ExecuteAsync(
+               @"UPDATE usuario_notificacao_leitura SET excluido = true where notificacao_id = @notificacaoId", new { notificacaoId });
+                conn.Close();
+            }
+            return true;
+        }
 
-            await conn.ExecuteAsync(
-               @"DELETE FROM usuario_notificacao_leitura where notificacao_id = @notificacaoId", new { notificacaoId });
-            conn.Close();
-
+        public async Task<bool> RemoverPorNotificacoesIds(long[] notificacoesIds)
+        {
+            await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
+            {
+                conn.Open();
+                await conn.ExecuteAsync(
+               @"UPDATE usuario_notificacao_leitura SET excluido = true where notificacao_id = ANY(@notificacoesIds)", new { notificacoesIds });
+                conn.Close();
+            }
             return true;
         }
 
         public async Task<UsuarioNotificacao> Selecionar(UsuarioNotificacao usuarioNotificacao)
         {
-            await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+            using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
             conn.Open();
-            var dataAtual = DateTime.Now;
-            var retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
-                @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
-                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId", new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId });
+
+            var sql = @"SELECT id, usuario_id UsuarioId, notificacao_id NotificacaoId from public.usuario_notificacao_leitura
+                     WHERE usuario_id = @UsuarioId AND notificacao_id = @NotificacaoId and not excluido";
+
+            var parametros = new { usuarioNotificacao.UsuarioId, usuarioNotificacao.NotificacaoId };
+
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<UsuarioNotificacao>(async () =>
+                await SqlMapper.QueryFirstOrDefaultAsync<UsuarioNotificacao>(conn, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
             conn.Close();
+
             return retorno;
         }
-
 
         public async Task<UsuarioNotificacao> ObterPorNotificacaoIdEhUsuarioCpf(long notificacaoId, string usuarioCpf, long dreCodigoEol, string ueCodigoEol, long codigoEolAluno)
         {
@@ -166,27 +194,32 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and codigo_eol_aluno = @codigoEolAluno
 	                        and notificacao_id = @notificacaoId
 	                        and dre_codigoeol = @dreCodigoEol
-	                        and ue_codigoeol = @ueCodigoEol";
+	                        and ue_codigoeol = @ueCodigoEol and not excluido";
+
+            var parametros = new { usuarioCpf, notificacaoId, dreCodigoEol, ueCodigoEol, codigoEolAluno };
 
             UsuarioNotificacao retorno = null;
+
             await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
             {
-
                 conn.Open();
-                retorno = await conn.QueryFirstOrDefaultAsync<UsuarioNotificacao>(
-                    query, new { usuarioCpf, notificacaoId, dreCodigoEol, ueCodigoEol, codigoEolAluno });
+
+                retorno = await servicoTelemetria.RegistrarComRetornoAsync<UsuarioNotificacao>(async () =>
+                    await SqlMapper.QueryFirstOrDefaultAsync<UsuarioNotificacao>(conn, query, parametros), "query", "Query AE", query, parametros.ToString());
+
                 conn.Close();
             }
+
             return retorno;
         }
 
         public async Task<bool> Atualizar(UsuarioNotificacao usuarioNotificacao)
         {
-
-
             await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
             conn.Open();
             var dataAtual = DateTime.Now;
+
             var retorno = await conn.ExecuteAsync(
                 @"UPDATE public.usuario_notificacao_leitura
                          SET 
@@ -204,7 +237,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     usuarioNotificacao.Id
 
                 });
+
             conn.Close();
+
             return true;
         }
 
@@ -213,14 +248,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var query = new StringBuilder();
-                query.AppendLine(@"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+                query.AppendLine(@"select count(distinct usuario_cpf) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId and not excluido ");
+
                 if (codigoDre > 0)
                     query.AppendLine(" and dre_codigoeol = @codigoDre ");
 
+                var parametros = new { notificacaoId, codigoDre };
+
                 await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
                 conn.Open();
-                var totalNotificacoesLeituraPorReponsavel = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre });
+
+                var totalNotificacoesLeituraPorReponsavel = await servicoTelemetria.RegistrarComRetornoAsync<long>(async () =>
+                    await SqlMapper.QuerySingleAsync<long>(conn, query.ToString(), parametros), "query", "Query AE", query.ToString(), parametros.ToString());
+
                 conn.Close();
+
                 return totalNotificacoesLeituraPorReponsavel;
             }
             catch (Exception ex)
@@ -235,15 +278,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var query = new StringBuilder();
-                query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId ");
+                query.AppendLine(@"select count(distinct codigo_eol_aluno) from usuario_notificacao_leitura unl where notificacao_id = @notificacaoId and not excluido ");
+
+                var parametros = new { notificacaoId, codigoDre };
 
                 if (codigoDre > 0)
                     query.AppendLine(" and dre_codigoeol = @codigoDre ");
 
                 await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+
                 conn.Open();
-                var totalNotificacoesLeituraPorAluno = await conn.QuerySingleAsync<long>(query.ToString(), new { notificacaoId, codigoDre });
+
+                var totalNotificacoesLeituraPorAluno = await servicoTelemetria.RegistrarComRetornoAsync<long>(async () =>
+                    await SqlMapper.QuerySingleAsync<long>(conn, query.ToString(), parametros), "query", "Query AE", query.ToString(), parametros.ToString());
+
                 conn.Close();
+
                 return totalNotificacoesLeituraPorAluno;
             }
             catch (Exception ex)

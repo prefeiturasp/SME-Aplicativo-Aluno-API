@@ -2,7 +2,7 @@
 using System;
 
 namespace SME.AE.Dominio.Entidades
-{  
+{
     public class Usuario : EntidadeBase
     {
         public string Cpf { get; set; }

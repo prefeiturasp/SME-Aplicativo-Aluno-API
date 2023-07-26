@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace SME.AE.Comum
+﻿namespace SME.AE.Comum
 {
     public class VariaveisGlobaisOptions
     {
@@ -9,10 +7,6 @@ namespace SME.AE.Comum
         public string SME_AE_JWT_TOKEN_SECRET { get; set; }
 
         public string AEConnection { get; set; }
-
-        public string EolConnection { get; set; }
-
-        public string SgpConnection { get; set; }
 
         public string CoreSSOConnection { get; set; }
 
@@ -27,6 +21,7 @@ namespace SME.AE.Comum
 
         public string ApiSgp { get; set; }
         public string ChaveIntegracaoSgpApi { get; set; }
-
+        public string ApiEol { get; set; }
+        public string ChaveIntegracaoEolApi { get; set; }
     }
 }

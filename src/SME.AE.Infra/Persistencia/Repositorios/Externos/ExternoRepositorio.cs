@@ -3,19 +3,18 @@ using Dommel;
 using SME.AE.Aplicacao.Comum.Interfaces.Contextos;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades.Externas;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
 {
-    public class ExternoRepositorio<T,Z> : IExternoRepositorio<T,Z> where T : EntidadeExterna where Z : IDbConnection , IDisposable
+    public class ExternoRepositorio<T, Z> : IExternoRepositorio<T, Z> where T : EntidadeExterna where Z : IDbConnection
     {
         protected IAplicacaoDapperContext<Z> database;
 
         protected ExternoRepositorio(Z connection)
-        {            
+        {
             database = new AplicacaoDapperContext<Z>(connection);
         }
 
@@ -59,6 +58,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return await database.Conexao.GetAsync<T>(id);
         }
 
-        public void Dispose() => database.Conexao.Close();
+        public void Dispose() => database.Conexao?.Dispose();
     }
 }
