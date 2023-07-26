@@ -9,6 +9,7 @@ using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Utilitarios;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -30,14 +31,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(solicitarReiniciarSenhaDto.Cpf));
 
-            await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf));
+            await mediator.Send(new ObterDadosAlunosQuery(solicitarReiniciarSenhaDto.Cpf, null, null, null));
 
             var usuario = await mediator.Send(new ObterUsuarioPorCpfQuery(solicitarReiniciarSenhaDto.Cpf));
 
             if (usuario == null && usuarioCoreSSO != null)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(solicitarReiniciarSenhaDto.Cpf));
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(solicitarReiniciarSenhaDto.Cpf));
 
             if (usuario.PrimeiroAcesso == true)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");

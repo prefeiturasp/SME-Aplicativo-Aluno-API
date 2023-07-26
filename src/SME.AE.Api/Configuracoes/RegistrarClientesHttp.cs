@@ -38,6 +38,21 @@ namespace SME.AE.Api.Configuracoes
                 c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy)
+            .AddHttpMessageHandler<AutenticacaoSgpDelegatingHandler>();
+
+            services.AddHttpClient(name: "servicoApiSgpChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiEolChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiEol);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-api-eol-key", variaveisGlobaisOptions.ChaveIntegracaoEolApi);
             }).AddPolicyHandler(policy);
         }
 

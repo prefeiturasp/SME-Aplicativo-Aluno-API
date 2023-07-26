@@ -13,6 +13,7 @@ using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -37,7 +38,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(usuario.Cpf));
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
 
             await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 
@@ -78,7 +79,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             return usuarioCoreSSO;
         }
 
-        private async Task EnvioEmail(ResponsavelAlunoEolResumidoDto usuarioEol, Dominio.Entidades.Usuario usuario)
+        private async Task EnvioEmail(DadosResponsavelAlunoResumido usuarioEol, Dominio.Entidades.Usuario usuario)
         {
             try
             {

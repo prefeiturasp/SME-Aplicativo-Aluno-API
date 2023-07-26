@@ -7,6 +7,8 @@ using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
 using System;
@@ -116,7 +118,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             //selecionar alunos do responsável buscando apenas pelo cpf
-            var usuarioAlunos = await _autenticacaoService.SelecionarAlunosResponsavel(request.Cpf);
+            var usuarioAlunos = await mediator.Send(new ObterDadosResponsavelQuery(request.Cpf));
 
             //caso nao tenha nenhum filho matriculado, retornar falha e inativá-lo no coresso
             if (usuarioAlunos == null || !usuarioAlunos.Any())
@@ -131,14 +133,14 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
 
             //se for primeiro acesso, a senha validar se a senha inputada é alguma data de nascimento de algum aluno do responsável
-            if (primeiroAcesso && (!usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento)))
+            if (primeiroAcesso && (!usuarioAlunos.Any(w => w.DataNascimentoAluno == request.DataNascimento)))
             {
                 validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
                 //ExcluiUsuarioSeExistir(request, usuarioRetorno);
                 return RespostaApi.Falha(validacao.Errors);
             }
 
-            if (primeiroAcesso && (usuarioAlunos.Any(w => w.DataNascimento == request.DataNascimento && w.TipoSigilo == (int)AlunoTipoSigilo.Restricao)))
+            if (primeiroAcesso && (usuarioAlunos.Any(w => w.DataNascimentoAluno == request.DataNascimento && w.TipoSigilo == (int)AlunoTipoSigilo.Restricao)))
             {
                 validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
                 return RespostaApi.Falha(validacao.Errors);
@@ -173,13 +175,13 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
         }
 
-        private bool VerificarAtualizacaoCadastral(RetornoUsuarioEol usuario)
+        private bool VerificarAtualizacaoCadastral(DadosResponsavelAluno usuario)
         {
-            return usuario.DataNascimentoResponsavel == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
-                   string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.Celular);
+            return usuario.DataNascimento == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
+                   string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.NumeroCelular);
         }
 
-        private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, RetornoUsuarioEol usuario, bool primeiroAcesso)
+        private async Task<Dominio.Entidades.Usuario> CriaUsuarioEhSeJaExistirAtualizaUltimoLogin(AutenticarUsuarioCommand request, Dominio.Entidades.Usuario usuarioRetorno, DadosResponsavelAluno usuario, bool primeiroAcesso)
         {
             usuario.Cpf = request.Cpf;
 
@@ -203,7 +205,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 _repository.ExcluirUsuario(request.Cpf);
         }
 
-        private Dominio.Entidades.Usuario MapearDominioUsuario(RetornoUsuarioEol usuarioEol, bool primeiroAcesso)
+        private Dominio.Entidades.Usuario MapearDominioUsuario(DadosResponsavelAluno usuarioEol, bool primeiroAcesso)
         {
             var usuario = new Dominio.Entidades.Usuario
             {
@@ -216,7 +218,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             return usuario;
         }
 
-        private RespostaApi MapearResposta(RetornoUsuarioEol usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool atualizarDadosCadastrais)
+        private RespostaApi MapearResposta(DadosResponsavelAluno usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool atualizarDadosCadastrais)
         {
             RespostaAutenticar usuario = new RespostaAutenticar
             {
@@ -224,7 +226,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 Email = usuarioEol.Email,
                 Id = usuarioApp.Id,
                 Nome = usuarioEol.Nome,
-                DataNascimento = usuarioEol.DataNascimentoResponsavel,
+                DataNascimento = usuarioEol.DataNascimento,
                 NomeMae = usuarioEol.NomeMae,
                 PrimeiroAcesso = primeiroAcesso,
                 AtualizarDadosCadastrais = atualizarDadosCadastrais,

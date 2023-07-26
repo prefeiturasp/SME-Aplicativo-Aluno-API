@@ -23,6 +23,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string CategoriaNotificacao { get; set; }
         public bool EnviadoPushNotification { get; set; }
         public string Modalidades { get; set; }
+        public string[] ModalidadesId { get; set; }
+
         public string TiposEscolas { get; set; }
 
         public void InserirCategoria()

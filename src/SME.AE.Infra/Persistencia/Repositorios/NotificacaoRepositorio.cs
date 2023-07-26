@@ -3,6 +3,7 @@ using Dommel;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.NotificacaoPorUsuario;
@@ -10,10 +11,12 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.AE.Infra.Persistencia.Repositorios
@@ -21,73 +24,33 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class NotificacaoRepositorio : BaseRepositorio<Notificacao>, INotificacaoRepositorio
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions, IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
 
         public async Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf)
         {
             var query = NotificacaoConsultas.ObterPorUsuarioLogado
-                  //"WHERE UNL.usuario_cpf = @cpf" +
                   + " WHERE (DATE(DataExpiracao) >= @dataAtual OR DataExpiracao IS NULL) " +
                     " AND (DATE(DataEnvio) <= @dataAtual)  and not n.excluido ";
 
-
-            await using var conn = InstanciarConexao();
-            conn.Open();
             var dataAtual = DateTime.Now.Date;
-            IEnumerable<NotificacaoPorUsuario> list = await conn.QueryAsync<NotificacaoPorUsuario>(
-    query, new
-    {
-        grupo,
-        cpf,
-        dataAtual
-    });
+            var parametros = new { grupo, cpf, dataAtual };
+
+            using var conn = InstanciarConexao();
+
+            conn.Open();
+
+            IEnumerable<NotificacaoPorUsuario> list = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoPorUsuario>(async () => 
+                await SqlMapper.QueryAsync<NotificacaoPorUsuario>(conn, query, parametros), "query", "Query AE", query, parametros.ToString());
+
             conn.Close();
-            return list;
-        }
-
-        // TODO Refatorar para montar a query aqui ao inves de receber por parametro
-        public async Task<IDictionary<string, object>> ObterGruposDoResponsavel(string cpf, string grupos, string nomeGrupos)
-        {
-            IDictionary<string, object> list = null;
-
-            try
-            {
-                await using var conn = new SqlConnection(variaveisGlobaisOptions.EolConnection);
-                conn.Open();
-                var query = $"select {nomeGrupos} from(select {grupos + NotificacaoConsultas.GruposDoResponsavel}) grupos";
-                var resultado = await conn.QueryAsync(query, new { cpf });
-
-                if (resultado.Any())
-                    list = resultado.First() as IDictionary<string, object>;
-
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-                return null;
-            }
 
             return list;
-        }
-
-        public async Task<IEnumerable<string>> ObterResponsaveisPorGrupo(string where)
-        {
-            await using var conn = new SqlConnection(variaveisGlobaisOptions.EolConnection);
-            {
-                conn.Open();
-                var query = $"{NotificacaoConsultas.ResponsaveisPorGrupo}{where}";
-                var resultado = await conn.QueryAsync<string>(query);
-                conn.Close();
-                if (resultado.Any())
-                    return resultado;
-            }
-
-            return null;
         }
 
         public async Task Criar(Notificacao notificacao)
@@ -99,7 +62,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             await conn.InsertAsync(notificacao);
             conn.Close();
         }
-
 
         public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
         {
@@ -124,13 +86,16 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var consulta = @"select nt.id, nt.notificacao_id, nt.codigo_eol_turma, nt.criadoem from notificacao_turma nt 
                             where notificacao_id = @id and not nt.excluido ";
 
+            var parametros = new { id };
+
             using var conexao = InstanciarConexao();
 
             conexao.Open();
 
-            IEnumerable<NotificacaoTurma> retorno = await conexao.QueryAsync<NotificacaoTurma>(consulta, new { id });
-            conexao.Close();
+            IEnumerable<NotificacaoTurma> retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoTurma>(async () =>
+                await SqlMapper.QueryAsync<NotificacaoTurma>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
+            conexao.Close();
 
             return retorno == null || !retorno.Any() ? default : retorno;
         }
@@ -138,12 +103,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<NotificacaoResposta>> ListarNotificacoes(string modalidades, string tiposEscolas, string codigoUe, string codigoDre, string codigoTurma, string codigoAluno, long usuarioId, string serieResumida, DateTime? ultimaAtualizacao = null)
         {
             using var conexao = InstanciarConexao();
-            var consulta =
-                MontarQueryListagemCompleta(serieResumida, codigoAluno);
+
+            var consulta = MontarQueryListagemCompleta(serieResumida);
+            var parametros = new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida };
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
             conexao.Open();
-            var retorno = await conexao.QueryAsync<NotificacaoResposta>(consulta, new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida });
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoResposta>(async () =>
+                await SqlMapper.QueryAsync<NotificacaoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
             conexao.Close();
 
@@ -153,9 +120,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<IEnumerable<NotificacaoSgpDto>> ListarNotificacoesNaoEnviadas()
         {
             using var conexao = InstanciarConexao();
+
             var consulta = MontarQueryListagemCompletaNaoEnviadoPushNotification();
 
-            var retorno = await conexao.QueryAsync<NotificacaoSgpDto>(consulta);
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoSgpDto>(async () =>
+                await SqlMapper.QueryAsync<NotificacaoSgpDto>(conexao, consulta), "query", "Query AE", consulta);
 
             conexao.Close();
 
@@ -165,9 +134,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<NotificacaoResposta> NotificacaoPorId(long Id)
         {
             using var conexao = InstanciarConexao();
+
             var consulta = QueryPorId();
-            var retorno = await conexao.QueryFirstOrDefaultAsync<NotificacaoResposta>(consulta, new { Id });
+            var parametros = new { Id };
+
+            var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoResposta>(async () =>
+                await SqlMapper.QueryFirstOrDefaultAsync<NotificacaoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
+
             conexao.Close();
+
             return retorno;
         }
 
@@ -197,16 +172,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         public async Task<bool> Remover(Notificacao notificacao)
         {
             bool resultado = false;
-
+            var queryExcluirNotificacao = new StringBuilder();
             try
             {
                 await using var conn = InstanciarConexao();
-
                 conn.Open();
 
-                await conn
-                    .ExecuteAsync(@"DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;
-                                    DELETE FROM notificacao where id = @ID;", new { ID = notificacao.Id });
+                if(notificacao.TipoComunicado == Dominio.Comum.Enumeradores.TipoComunicado.ALUNO)
+                    queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;");
+
+                if (notificacao.TipoComunicado== Dominio.Comum.Enumeradores.TipoComunicado.TURMA)
+                    queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_turma WHERE notificacao_id = @ID;");
+
+                queryExcluirNotificacao.AppendLine("DELETE FROM notificacao where id = @ID;");
+
+                await conn.ExecuteAsync(queryExcluirNotificacao.ToString(), new { ID = notificacao.Id });
 
                 conn.Close();
 
@@ -227,45 +207,69 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     where n.id = @Id and not n.excluido ";
         }
 
-        private string MontarQueryListagemCompleta(string serieResumida, string codigoAluno)
+        private string MontarQueryListagemCompleta(string serieResumida)
         {
-            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ? "" : " and (n.SeriesResumidas isnull or n.SeriesResumidas = '' or (string_to_array(n.SeriesResumidas,',') && string_to_array(@serieResumida,','))) ";
+            var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ?
+                "" : " and (n.seriesresumidas isnull or n.seriesresumidas = '' or (string_to_array(n.seriesresumidas, ',') && string_to_array(@serieResumida, ',')))";
 
             return
-                $@"
-                    select {CamposConsultaNotificacao("notificacao", true)}
-                      notificacao.ano_letivo AnoLetivo,
-                      unl.mensagemvisualizada from(
-                      {QueryComunicadosSME()}
-                      union
-                      {QueryComunicadosAutomaticos(codigoAluno)}
-                      union
-                      {QueryComunicadosDRE()}
-                      union
-                      {QueryComunicadosSME_ANO()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosDRE_ANO()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosUE()}
-                      union
-                      {QueryComunicadosUEMOD()}
-                      {whereSerieResumida}
-                      union
-                      {QueryComunicadosTurmas()}
-                      union
-                      {QueryComunicadosAlunos()}
-                      )as notificacao
-                      left join usuario_notificacao_leitura unl on 
-                      unl.notificacao_id = notificacao.id 
-                      and unl.usuario_id = @usuarioId
-                      and unl.codigo_eol_aluno = @codigoAluno
-                      where (unl.mensagemexcluida isnull or unl.mensagemexcluida = false) and
-                      	(notificacao.dataexpiracao isnull or notificacao.dataexpiracao >= current_date) and 
-                        date_trunc('day', notificacao.dataenvio) <= current_date and
-                        notificacao.enviadopushnotification
-                ";
+                $@"drop table if exists tmp_lista_notificacoes;
+                   create temporary table tmp_lista_notificacoes as
+                   select *
+                   	from notificacao n		
+                   where ((n.tipocomunicado = {(int)TipoComunicado.SME} or
+                   	      (n.tipocomunicado = {(int)TipoComunicado.DRE} and n.dre_codigoeol = @codigoDre) or
+                   	      (n.tipocomunicado = {(int)TipoComunicado.UEMOD} and n.ue_codigoeol = @codigoUe{whereSerieResumida}) or
+                   	      (n.tipocomunicado in ({(int)TipoComunicado.SME_ANO}, {(int)TipoComunicado.DRE_ANO}){whereSerieResumida}) and
+                   	      String_to_array(n.modalidades, ',') && String_to_array(@modalidades, ',') or
+                   	      (n.tipocomunicado = {(int)TipoComunicado.UE} and n.dre_codigoeol = @codigoDre)))
+                   
+                   union
+                   
+                   select n.*
+                   	from notificacao n 
+                   		inner join notificacao_turma nt 
+                   			on n.id = nt.notificacao_id 
+                   where n.tipocomunicado = {(int)TipoComunicado.TURMA} and
+                   	nt.codigo_eol_turma = @codigoTurma
+                   	
+                   union
+                   
+                   select n.*
+                   	from notificacao n 
+                   		inner join notificacao_aluno na 
+                   			on n.id = na.notificacao_id
+                   where n.tipocomunicado = {(int)TipoComunicado.ALUNO} and
+                   	na.codigo_eol_aluno = @codigoAluno;
+                   
+                   select tmp.id,
+                          tmp.mensagem,
+                          tmp.titulo,
+                          String_to_array(tmp.modalidades, ',') ModalidadesId,
+                          tmp.dataenvio,
+                          tmp.dataexpiracao,
+                          tmp.criadoem,
+                          tmp.criadopor,
+                          tmp.alteradoem,
+                          tmp.alteradopor,
+                          tmp.tipocomunicado,
+                          tmp.seriesresumidas,
+                          tmp.ano_letivo,
+                          tmp.categorianotificacao,
+                          tmp.enviadopushnotification,
+                          tmp.dre_codigoeol codigodre,
+                          tmp.ue_codigoeol codigoue,
+                          tmp.ano_letivo anoletivo,
+                          unl.mensagemvisualizada 
+                   	from tmp_lista_notificacoes tmp
+                   		left join usuario_notificacao_leitura unl 
+                   			on tmp.id = unl.notificacao_id and
+                   			   unl.usuario_id = @usuarioId and
+                   			   unl.codigo_eol_aluno = @codigoAluno
+                   where (unl.mensagemexcluida is null or (unl.mensagemexcluida is not null and not unl.mensagemexcluida)) and
+                   	     (tmp.dataexpiracao is null or tmp.dataexpiracao::date >= current_date) and
+                   	     tmp.dataenvio::date <= current_date and
+                   	     tmp.enviadopushnotification;";
         }
 
         private string MontarQueryListagemCompletaNaoEnviadoPushNotification()
@@ -282,6 +286,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                       and (not n.enviadopushnotification) and not n.excluido 
                 ";
         }
+
         private string QueryComunicadosSME()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -291,7 +296,8 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
                         && string_to_array(@tiposEscolas,',')";
         }
-        private string QueryComunicadosAutomaticos(string codigoAluno)
+
+        private string QueryComunicadosAutomaticos()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                         from notificacao n 
@@ -299,6 +305,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                          on na.notificacao_id = n.id
                         where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido  and na.codigo_eol_aluno =@codigoAluno";
         }
+
         private string QueryComunicadosSME_ANO()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -316,6 +323,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
                         && string_to_array(@tiposEscolas,',') and n.dre_codigoeol = @codigoDre";
         }
+
         private string QueryComunicadosDRE_ANO()
         {
             return $@"select {CamposConsultaNotificacao("n")}
@@ -366,7 +374,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return $@"{abreviacao}.Id,
                     {abreviacao}.Mensagem,
                     {abreviacao}.Titulo,
-                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as GruposId" : $"{abreviacao}.modalidades")},
+                    {(camposGeral ? $"string_to_array({abreviacao}.modalidades,',') as ModalidadesId" : $"{abreviacao}.modalidades")},
                     {abreviacao}.DataEnvio,
                     {abreviacao}.DataExpiracao,
                     {abreviacao}.CriadoEm,
@@ -386,9 +394,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using (var conexao = InstanciarConexao())
-                {
-                    var consulta = $@"select 
+                using var conexao = InstanciarConexao();
+
+                var consulta = $@"select 
                                   codigo_eol_aluno as codigoAluno,
                                   n.id as notificacaoId
                                   from notificacao n
@@ -397,10 +405,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                   where n.tipocomunicado = {(int)TipoComunicado.ALUNO} and not n.excluido 
                                     and n.id = @notificacaoId";
 
-                    var retorno = await conexao.QueryAsync<NotificacaoAlunoResposta>(consulta, new { notificacaoId });
-                    conexao.Close();
-                    return retorno;
-                }
+                var parametros = new { notificacaoId };
+
+                var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoAlunoResposta>(async () =>
+                    await SqlMapper.QueryAsync<NotificacaoAlunoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
+
+                conexao.Close();
+
+                return retorno;
 
             }
             catch (Exception ex)

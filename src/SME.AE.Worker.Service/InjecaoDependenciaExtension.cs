@@ -1,12 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly.Extensions.Http;
+using Polly;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.AgendadoWorkerService;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
+using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Worker.Service.CasoDeUsoWorker;
+using System;
+using System.Net.Http;
+using System.Net;
+using SME.AE.Comum.Utilitarios;
+using Polly.Registry;
 
 namespace SME.AE.Worker.Service
 {
@@ -16,10 +24,7 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarCasosDeUso(this IServiceCollection services)
         {
             return services
-                .AddTransient<TranferirEventoSgpCasoDeUso>()
                 .AddTransient<ConsolidarAdesaoEOLCasoDeUso>()
-                .AddTransient<TransferirFrequenciaSgpCasoDeUso>()
-                .AddTransient<TransferirNotaSgpCasoDeUso>()
                 .AddTransient<ConsolidarLeituraNotificacaoCasoDeUso>()
                 .AddTransient<EnviarNotificacaoDataFuturaCasoDeUso>()
                 .AddTransient<RemoverConexaoIdleCasoDeUso>()
@@ -30,10 +35,7 @@ namespace SME.AE.Worker.Service
         public static IServiceCollection AdicionarWorkerCasosDeUso(this IServiceCollection services)
         {
             return services
-                //.AddSingleton<IHostedService, TransferirEventoSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarAdesaoEOLWorker>()
-                .AddSingleton<IHostedService, TransferirFrequenciaSgpWorker>()
-                .AddSingleton<IHostedService, TransferirNotaSgpWorker>()
                 .AddSingleton<IHostedService, ConsolidarLeituraNotificacaoWorker>()
                 .AddSingleton<IHostedService, EnviarNotificacaoDataFuturaWorker>()
                 .AddSingleton<IHostedService, RemoverConexaoIdleWorker>()
@@ -46,21 +48,68 @@ namespace SME.AE.Worker.Service
         {
             return services
                 .AddTransient<IParametrosEscolaAquiRepositorio, ParametroEscolaAquiRepositorio>()
-                .AddTransient<IEventoRepositorio, EventoRepositorio>()
-                .AddTransient<IEventoSgpRepositorio, EventoSgpRepositorio>()
-                .AddTransient<IResponsavelEOLRepositorio, ResponsavelEOLRepositorio>()
                 .AddTransient<IDashboardAdesaoRepositorio, DashboardAdesaoRepositorio>()
                 .AddTransient<IWorkerProcessoAtualizacaoRepositorio, WorkerProcessoAtualizacaoRepositorio>()
                 .AddTransient<IUsuarioRepository, UsuarioRepository>()
-                .AddTransient<IFrequenciaAlunoRepositorio, FrequenciaAlunoRepositorio>()
-                .AddTransient<IFrequenciaAlunoSgpRepositorio, FrequenciaAlunoSgpRepositorio>()
-                .AddTransient<INotaAlunoRepositorio, NotaAlunoRepositorio>()
-                .AddTransient<INotaAlunoSgpRepositorio, NotaAlunoSgpRepositorio>()
                 .AddTransient<IConsolidarLeituraNotificacaoRepositorio, ConsolidarLeituraNotificacaoRepositorio>()
-                .AddTransient<IConsolidarLeituraNotificacaoSgpRepositorio, ConsolidarLeituraNotificacaoSgpRepositorio>()
                 .AddTransient<INotificacaoRepositorio, NotificacaoRepositorio>()
-                .AddTransient<IDreSgpRepositorio, DreSgpRepositorio>()
                 .AddTransient<IRemoverConexaoIdleRepository, RemoverConexaoIdleRepository>();
+        }
+
+        public static IServiceCollection AdicionarPoliticas(this IServiceCollection services)
+        {
+            IPolicyRegistry<string> registry = services.AddPolicyRegistry();
+
+            Random jitterer = new Random();
+            var policyFila = Policy.Handle<Exception>()
+              .WaitAndRetryAsync(3,
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                      + TimeSpan.FromMilliseconds(jitterer.Next(0, 30)));
+
+            registry.Add(PoliticaPolly.PublicaFila, policyFila);
+
+            return services;
+        }
+        #endregion
+
+        #region Clientes HTTP
+        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions, VariaveisGlobaisOptions variaveisGlobaisOptions)
+        {
+            var policy = ObterPolicyBaseHttp();
+
+            var basicAuth = $"{servicoProdamOptions.Usuario}:{servicoProdamOptions.Senha}".EncodeTo64();
+
+            services.AddHttpClient(name: "servicoAtualizacaoCadastralProdam", c =>
+            {
+                c.BaseAddress = new Uri(servicoProdamOptions.Url);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiSgpChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiEolChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiEol);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-api-eol-key", variaveisGlobaisOptions.ChaveIntegracaoEolApi);
+            }).AddPolicyHandler(policy);
+
+            return services;
+        }
+
+        static IAsyncPolicy<HttpResponseMessage> ObterPolicyBaseHttp()
+        {
+            return HttpPolicyExtensions
+                 .HandleTransientHttpError()
+                 .OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
+                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
+                                                                             retryAttempt)));
         }
         #endregion
     }

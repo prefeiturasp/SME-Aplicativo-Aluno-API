@@ -16,6 +16,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new System.ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
+
         private NpgsqlConnection CriaConexao() => new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
 
         public async Task IncluiOuAtualizaPorDreUeTurmaEmBatch(IEnumerable<DashboardAdesaoDto> listaAdesao)
@@ -59,6 +60,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     conn.Dispose();
                 }
             }
+
             await Task.CompletedTask;
         }
     }

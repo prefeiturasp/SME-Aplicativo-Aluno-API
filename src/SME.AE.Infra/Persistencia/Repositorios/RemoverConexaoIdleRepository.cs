@@ -2,6 +2,7 @@
 using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum;
 using System;
 using System.Text;
@@ -12,11 +13,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
     public class RemoverConexaoIdleRepository : IRemoverConexaoIdleRepository
     {
         private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public RemoverConexaoIdleRepository(VariaveisGlobaisOptions variaveisGlobaisOptions)
+        public RemoverConexaoIdleRepository(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria)
         {
             this.variaveisGlobaisOptions = variaveisGlobaisOptions;
+            this.servicoTelemetria = servicoTelemetria;
         }
+
         public async Task RemoverConexoesIdle()
         {
             try
@@ -32,8 +37,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 sqlQuery.AppendLine(@"	  ""state"" = 'idle' and");
                 sqlQuery.AppendLine("	  pid <> pg_backend_pid();");
 
-                await conexao.ExecuteAsync(sqlQuery.ToString(), new { databaseName = conexao.Database });
+                var parametros = new { databaseName = conexao.Database };
 
+                await servicoTelemetria.RegistrarAsync(async () =>
+                    await SqlMapper.ExecuteAsync(conexao, sqlQuery.ToString(), parametros), "query", "Query AE", sqlQuery.ToString(), parametros.ToString());
 
                 SentrySdk.CaptureMessage("Limpando pool de conexões idle do banco.");
             }

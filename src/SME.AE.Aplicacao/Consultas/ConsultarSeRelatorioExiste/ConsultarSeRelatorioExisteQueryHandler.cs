@@ -21,8 +21,8 @@ namespace SME.AE.Aplicacao
             try
             {
                 bool existe = false;
-                var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
-                
+                var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");//"servicoApiSgp"
+
                 var resposta = await httpClient.GetAsync($"v1/relatorios/integracoes/existe?codigoRelatorio={request.CodigoCorrelacao}");
                 if (resposta.IsSuccessStatusCode)
                 {
@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao
                 }
                 return existe;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

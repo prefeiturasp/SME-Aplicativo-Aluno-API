@@ -18,10 +18,14 @@ namespace SME.AE.Aplicacao
         public async Task<IEnumerable<ComponenteCurricularDto>> Executar(AlunoBimestresTurmaDto notaAlunoDto)
         {
             var notasConceitosBimestreComponente = await mediator.Send(new ObterNotasPorBimestresUeAlunoTurmaQuery(notaAlunoDto.Bimestres,
-                                                                                                                  notaAlunoDto.TurmaCodigo,
-                                                                                                                  notaAlunoDto.UeCodigo,
-                                                                                                                  notaAlunoDto.AlunoCodigo));
-            var componentes = notasConceitosBimestreComponente.Select(a => new ComponenteCurricularDto(a.ComponenteCurricularCodigo, a.ComponenteCurricularNome)).ToList();
+                                                                                                                   notaAlunoDto.TurmaCodigo,
+                                                                                                                   notaAlunoDto.UeCodigo,
+                                                                                                                   notaAlunoDto.AlunoCodigo));
+
+            var componentes = notasConceitosBimestreComponente
+                .Select(a => new ComponenteCurricularDto(a.ComponenteCurricularCodigo, a.ComponenteCurricularNome))
+                .ToList();
+
             return componentes.Distinct();
         }
     }

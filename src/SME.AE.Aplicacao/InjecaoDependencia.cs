@@ -6,15 +6,15 @@ using Polly;
 using Polly.Registry;
 using SME.AE.Aplicacao.CasoDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Aluno;
-using SME.AE.Aplicacao.CasoDeUso.Frequencia;
 using SME.AE.Aplicacao.CasoDeUso.Notificacao;
+using SME.AE.Aplicacao.CasoDeUso.Recomendacoes;
 using SME.AE.Aplicacao.CasoDeUso.TermosDeUso;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.CasoDeUso.UsuarioNotificacaoMensagemLida;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Frequencia;
+using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Recomendacao;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.UltimaAtualizacaoWorker;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
@@ -57,12 +57,14 @@ namespace SME.AE.Aplicacao
         private static void AddServices(this IServiceCollection services)
         {
             services.TryAddScoped(typeof(IEmailServico), typeof(EmailServico));
+            services.TryAddScoped(typeof(IServicoLog), typeof(ServicoLog));
         }
 
-        private static void AddFiltros(this IServiceCollection services)
+       private static void AddFiltros(this IServiceCollection services)
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidacaoRequisicaoMiddleware<,>));
         }
+
         public static void AddPolicies(this IServiceCollection services)
         {
             IPolicyRegistry<string> registry = services.AddPolicyRegistry();
@@ -107,9 +109,6 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterTotaisAdesaoAgrupadosPorDreUseCase, ObterTotaisAdesaoAgrupadosPorDreUseCase>();
             services.TryAddScoped<IObterUltimaAtualizacaoPorProcessoUseCase, ObterUltimaAtualizacaoPorProcessoUseCase>();
             services.TryAddScoped<IAtualizarDadosUsuarioUseCase, AtualizarDadosUsuarioUseCase>();
-            services.TryAddScoped<IObterFrequenciaAlunoPorComponenteCurricularUseCase, ObterFrequenciaAlunoPorComponenteCurricularUseCase>();
-            services.TryAddScoped<IObterFrequenciaAlunoUseCase, ObterFrequenciaAlunoUseCase>();
-            services.TryAddScoped<IObterNotasAlunoUseCase, ObterNotasAlunoUseCase>();
             services.TryAddScoped<ISolicitarBoletimAlunoUseCase, SolicitarBoletimAlunoUseCase>();
             services.TryAddScoped<ISolicitarRelatorioRaaUseCase, SolicitarRelatorioRaaUseCase>();
             services.TryAddScoped<IRelatorioImpressaoUseCase, RelatorioImpressaoUseCase>();
@@ -131,6 +130,7 @@ namespace SME.AE.Aplicacao
             services.TryAddScoped<IObterComponentesCurricularesIdsUseCase, ObterComponentesCurricularesIdsUseCase>();
 
             services.TryAddScoped<IObterDadosUsuarioPorCpfUseCase, ObterDadosUsuarioPorCpfUseCase>();
+            services.TryAddScoped<IObterRecomendacaoAlunoUseCase, ObterRecomendacaoAlunoUseCase>();
         }
     }
 }

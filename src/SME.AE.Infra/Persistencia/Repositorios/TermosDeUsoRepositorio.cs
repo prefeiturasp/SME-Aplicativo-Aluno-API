@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
@@ -11,8 +12,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class TermosDeUsoRepositorio : BaseRepositorio<TermosDeUso>, ITermosDeUsoRepositorio
     {
-        public TermosDeUsoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        private readonly IServicoTelemetria servicoTelemetria;
+
+        public TermosDeUsoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
+            this.servicoTelemetria = servicoTelemetria;
         }
 
         public async Task<TermosDeUso> ObterTermosDeUsoPorCpf(string cpf)
@@ -20,8 +25,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = InstanciarConexao();
+
                 conexao.Open();
-                var termosDeUso = await conexao.QueryFirstAsync<TermosDeUso>($"{TermosDeUsoConsultas.ObterTermosDeUsoPorCpf}", new { cpf });
+
+                var parametros = new { cpf };
+
+                var termosDeUso = await servicoTelemetria.RegistrarComRetornoAsync<TermosDeUso>(async () =>
+                    await SqlMapper.QueryFirstAsync<TermosDeUso>(conexao, TermosDeUsoConsultas.ObterTermosDeUsoPorCpf, parametros), "query", "Query AE",
+                        TermosDeUsoConsultas.ObterTermosDeUsoPorCpf, parametros.ToString());
+
                 conexao.Close();
 
                 return termosDeUso;
@@ -43,8 +55,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = InstanciarConexao();
+
                 conexao.Open();
-                var termosDeUso = await conexao.QueryFirstAsync<TermosDeUso>($"{TermosDeUsoConsultas.ObterTermosDeUso} WHERE Id = @TermoDeUsoId", new { id });
+
+                var sql = $"{TermosDeUsoConsultas.ObterTermosDeUso} WHERE Id = @TermoDeUsoId";
+                var parametros = new { id };
+
+                var termosDeUso = await servicoTelemetria.RegistrarComRetornoAsync<TermosDeUso>(async () =>
+                    await SqlMapper.QueryFirstAsync<TermosDeUso>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
                 conexao.Close();
 
                 return termosDeUso;
@@ -56,15 +75,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             }
         }
 
-
-
         public async Task<TermosDeUso> ObterUltimaVersaoTermosDeUso()
         {
             try
             {
                 using var conexao = InstanciarConexao();
+
                 conexao.Open();
-                var termosDeUso = await conexao.QueryFirstAsync<TermosDeUso>(TermosDeUsoConsultas.ObterUltimaVersaoDosTermosDeUso);
+
+                var termosDeUso = await servicoTelemetria.RegistrarComRetornoAsync<TermosDeUso>(async () =>
+                    await SqlMapper.QueryFirstAsync<TermosDeUso>(conexao, TermosDeUsoConsultas.ObterUltimaVersaoDosTermosDeUso),
+                        "query", "Query AE", TermosDeUsoConsultas.ObterUltimaVersaoDosTermosDeUso);
+
                 conexao.Close();
 
                 return termosDeUso;

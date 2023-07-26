@@ -8,10 +8,6 @@
 
         public string AEConnection { get; set; }
 
-        public string EolConnection { get; set; }
-
-        public string SgpConnection { get; set; }
-
         public string CoreSSOConnection { get; set; }
 
         public string ChaveIntegracao { get; set; }
@@ -25,6 +21,7 @@
 
         public string ApiSgp { get; set; }
         public string ChaveIntegracaoSgpApi { get; set; }
-
+        public string ApiEol { get; set; }
+        public string ChaveIntegracaoEolApi { get; set; }
     }
 }

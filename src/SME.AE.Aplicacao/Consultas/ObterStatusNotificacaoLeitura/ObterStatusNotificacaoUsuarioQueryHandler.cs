@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -14,22 +15,22 @@ namespace SME.AE.Aplicacao.Consultas
     {
         private readonly IDadosLeituraRepositorio dadosLeituraRepositorio;
         private readonly IUsuarioRepository usuarioRepositorio;
-        private readonly IAlunoRepositorio alunoRepositorio;
+        private readonly IMediator mediator;
 
         public ObterStatusNotificacaoUsuarioQueryHandler(IDadosLeituraRepositorio dadosLeituraRepositorio,
                                                          IUsuarioRepository usuarioRepositorio,
-                                                         IAlunoRepositorio alunoRepositorio)
+                                                         IMediator mediator)
         {
             this.dadosLeituraRepositorio = dadosLeituraRepositorio ?? throw new ArgumentNullException(nameof(dadosLeituraRepositorio));
             this.usuarioRepositorio = usuarioRepositorio ?? throw new ArgumentNullException(nameof(usuarioRepositorio));
-            this.alunoRepositorio = alunoRepositorio ?? throw new ArgumentNullException(nameof(alunoRepositorio));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public async Task<IEnumerable<StatusNotificacaoUsuario>> Handle(ObterStatusNotificacaoUsuarioQuery request, CancellationToken cancellationToken)
         {
             var statusNotificacaoUsuario = new List<StatusNotificacaoUsuario>();
 
-            var aluno = await alunoRepositorio.ObterDadosAlunoPorCodigo(request.CodigoAluno);
+            var aluno = (await mediator.Send(new ObterDadosAlunosQuery(null, request.CodigoAluno, null, null)))?.FirstOrDefault();
 
             Usuario usuario = null;
             if (aluno != null)

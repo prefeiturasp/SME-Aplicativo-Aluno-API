@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SME.AE.Aplicacao.Comum.Modelos;
 
 namespace SME.AE.Aplicacao
 {
@@ -72,5 +73,33 @@ namespace SME.AE.Aplicacao
 
         [JsonProperty("dt_nascimento_responsavel")]
         public string DataNascimentoMae { get; set; }
+
+        public static ResponsavelAlunoDetalhadoEolDto Converter(DadosResponsavelAluno dadosResponsavel)
+        {
+            return new ResponsavelAlunoDetalhadoEolDto()
+            {
+                AutorizaEnvioSMS = dadosResponsavel.AutorizaEnvioSMS,
+                CodigoAluno = dadosResponsavel.CodigoAluno,
+                CPF = dadosResponsavel.Cpf,
+                CPFConfere = dadosResponsavel.CPFConfere,
+                DataNascimentoMae = dadosResponsavel.DataNascimentoMae?.ToString("yyyyMMdd"),
+                DDDCelular = dadosResponsavel.DDDCelular,
+                DDDTelefoneComercial = dadosResponsavel.DDDTelefoneComercial,
+                DDDTelefoneFixo = dadosResponsavel.DDDTelefoneFixo,
+                DigitoRG = dadosResponsavel.DigitoRG,
+                Email = dadosResponsavel.Email,
+                Nome = dadosResponsavel.Nome,
+                NomeMae = dadosResponsavel.NomeMae,
+                NumeroCelular = dadosResponsavel.NumeroCelular,
+                NumeroRG = dadosResponsavel.NumeroRG,
+                NumeroTelefoneComercial = dadosResponsavel.NumeroTelefoneComercial,
+                NumeroTelefoneFixo = dadosResponsavel.NumeroTelefoneFixo,
+                TipoPessoa = ((int)dadosResponsavel.TipoResponsavel).ToString(),
+                TipoTurnoCelular = dadosResponsavel.TipoTurnoCelular,
+                TipoTurnoTelefoneComercial = dadosResponsavel.TipoTurnoTelefoneComercial,
+                TipoTurnoTelefoneFixo = dadosResponsavel.TipoTurnoTelefoneFixo,
+                UfRG = dadosResponsavel.UfRG
+            };
+        }
     }
 }

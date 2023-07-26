@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\src\SME.AE.Infra\SME.AE.Infra.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistencia\Repositorios\" />
+  </ItemGroup>
+
 </Project>
