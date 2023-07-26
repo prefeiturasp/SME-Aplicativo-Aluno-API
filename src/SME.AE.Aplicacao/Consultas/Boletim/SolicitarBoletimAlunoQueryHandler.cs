@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao
         public async Task<bool> Handle(SolicitarBoletimAlunoQuery request, CancellationToken cancellationToken)
         {
             bool sucesso = false;
-            var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");//"servicoApiSgp"
             var body = JsonConvert.SerializeObject(request);
             var resposta = await httpClient.PostAsync($"v1/relatorios/integracoes/boletim", new StringContent(body, Encoding.UTF8, "application/json"));
             if (resposta.IsSuccessStatusCode)

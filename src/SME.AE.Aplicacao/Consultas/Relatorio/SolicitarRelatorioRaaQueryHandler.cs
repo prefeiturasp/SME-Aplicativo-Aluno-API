@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao
 
         public async Task<bool> Handle(SolicitarRelatorioRaaQuery request, CancellationToken cancellationToken)
         {
-            var httpClient = httpClientFactory.CreateClient("servicoApiSgp");
+            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");//"servicoApiSgp"
             var body = JsonConvert.SerializeObject(request);
             var resposta = await httpClient.PostAsync($"v1/relatorios/integracoes/raa", new StringContent(body, Encoding.UTF8, "application/json"));
             bool sucesso;
