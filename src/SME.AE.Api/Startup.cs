@@ -72,14 +72,14 @@ namespace SME.AE.Api
             ConfiguraVariaveisAmbiente(services);
             ConfiguraTelemetria(services);
 
-            services.AddInfrastructure(variaveisGlobais);
+            services.AddInfrastructure(variaveisGlobais); 
             services.AddApplication();
-            services.AdicionarValidadoresFluentValidation();
+            services.AdicionarValidadoresFluentValidation();  
 
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>
                 {
-                    builder.WithOrigins("*");
+                        builder.WithOrigins("*");
                 })
             );
 
