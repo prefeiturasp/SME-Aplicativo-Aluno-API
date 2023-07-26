@@ -55,7 +55,7 @@ namespace SME.AE.Api
             Configuration.GetSection(nameof(ServicoProdamOptions)).Bind(servicoProdam, c => c.BindNonPublicProperties = true);
 
             var jwtVariaveis = new SgpJwtOptions();
-            Configuration.GetSection(nameof(SgpJwtOptions)).Bind(jwtVariaveis, c => c.BindNonPublicProperties = true);
+            Configuration.GetSection(nameof(SgpJwtOptions)).Bind(jwtVariaveis, c => c.BindNonPublicProperties = true );
 
             services.AddSingleton(variaveisGlobais);
             services.AddSingleton(servicoProdam);
