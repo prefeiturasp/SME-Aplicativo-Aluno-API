@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.14.1" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     <PackageReference Include="Sentry" Version="2.1.1" />
