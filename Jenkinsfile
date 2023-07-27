@@ -30,7 +30,7 @@ pipeline {
       }
 
         stage('Testes de integração') {
-	when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch '_release';  branch '_release-r2'; branch 'homolog';  } } 
+	when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch '_release';  branch 'release-r2'; branch 'homolog';  } } 
         steps {
           //Executa os testes gerando um relatorio formato trx
             sh 'dotnet test --logger "trx;LogFileName=TestResults.trx"'
