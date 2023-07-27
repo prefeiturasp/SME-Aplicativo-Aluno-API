@@ -10,12 +10,10 @@ namespace SME.AE.Aplicacao.Servicos
 {
     public class ServicoTelemetria : IServicoTelemetria
     {
-        private readonly TelemetryClient insightsClient;
         private readonly TelemetriaOptions telemetriaOptions;
 
-        public ServicoTelemetria(TelemetryClient insightsClient, TelemetriaOptions telemetriaOptions)
+        public ServicoTelemetria(TelemetriaOptions telemetriaOptions)
         {
-            this.insightsClient = insightsClient;
             this.telemetriaOptions = telemetriaOptions ?? throw new ArgumentNullException(nameof(telemetriaOptions));
         }
 
@@ -23,12 +21,6 @@ namespace SME.AE.Aplicacao.Servicos
         {
             DateTime inicioOperacao = default;
             Stopwatch temporizador = default;
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                inicioOperacao = DateTime.UtcNow;
-                temporizador = Stopwatch.StartNew();
-            }
 
             if (telemetriaOptions.Apm)
             {
@@ -44,24 +36,12 @@ namespace SME.AE.Aplicacao.Servicos
             {
                 acao();
             }
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                temporizador.Stop();
-                insightsClient?.TrackDependency(acaoNome, telemetriaNome, telemetriaValor, inicioOperacao, temporizador.Elapsed, true);
-            }
         }
 
         public async Task RegistrarAsync(Func<Task> acao, string acaoNome, string telemetriaNome, string telemetriaValor, string parametros = "")
         {
             DateTime inicioOperacao = default;
             Stopwatch temporizador = default;
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                inicioOperacao = DateTime.UtcNow;
-                temporizador = Stopwatch.StartNew();
-            }
 
             if (telemetriaOptions.Apm)
             {
@@ -79,24 +59,12 @@ namespace SME.AE.Aplicacao.Servicos
             {
                 await acao();
             }
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                temporizador.Stop();
-                insightsClient?.TrackDependency(acaoNome, telemetriaNome, telemetriaValor, inicioOperacao, temporizador.Elapsed, true);
-            }
         }
 
         public async Task RegistrarAsync(Func<Task> acao, string acaoNome, string telemetriaNome)
         {
             DateTime inicioOperacao = default;
             Stopwatch temporizador = default;
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                inicioOperacao = DateTime.UtcNow;
-                temporizador = Stopwatch.StartNew();
-            }
 
             if (telemetriaOptions.Apm)
             {
@@ -111,12 +79,6 @@ namespace SME.AE.Aplicacao.Servicos
             {
                 await acao();
             }
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                temporizador.Stop();
-                insightsClient?.TrackDependency(acaoNome, telemetriaNome, string.Empty, inicioOperacao, temporizador.Elapsed, true);
-            }
         }
 
         public dynamic RegistrarComRetorno<T>(Func<object> acao, string acaoNome, string telemetriaNome, string telemetriaValor, string parametros = "")
@@ -125,12 +87,6 @@ namespace SME.AE.Aplicacao.Servicos
             Stopwatch temporizador = default;
 
             dynamic result = default;
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                inicioOperacao = DateTime.UtcNow;
-                temporizador = Stopwatch.StartNew();
-            }
 
             if (telemetriaOptions.Apm)
             {
@@ -148,14 +104,6 @@ namespace SME.AE.Aplicacao.Servicos
             {
                 result = acao();
             }
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                temporizador.Stop();
-
-                insightsClient?.TrackDependency(acaoNome, telemetriaNome, telemetriaValor, inicioOperacao, temporizador.Elapsed, true);
-            }
-
             return result;
         }
 
@@ -165,12 +113,6 @@ namespace SME.AE.Aplicacao.Servicos
             Stopwatch temporizador = default;
 
             dynamic result = default;
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                inicioOperacao = DateTime.UtcNow;
-                temporizador = Stopwatch.StartNew();
-            }
 
             if (telemetriaOptions.Apm)
             {
@@ -188,14 +130,6 @@ namespace SME.AE.Aplicacao.Servicos
             {
                 result = await acao();
             }
-
-            if (telemetriaOptions.ApplicationInsights)
-            {
-                temporizador.Stop();
-
-                insightsClient?.TrackDependency(acaoNome, telemetriaNome, telemetriaValor, inicioOperacao, temporizador.Elapsed, true);
-            }
-
             return result;
         }
     }
