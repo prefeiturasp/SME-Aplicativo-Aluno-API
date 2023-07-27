@@ -70,11 +70,13 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(retornoUsuarioCoreSSO);
 
-            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEol);
 
             mediator.Setup(a => a.Send(It.IsAny<AssociarGrupoUsuarioCommand>(), It.IsAny<CancellationToken>()));
 
             mediator.Setup(a => a.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()));
+
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelResumidoQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
         }
 
         private Dominio.Entidades.Usuario usuario { get; set; } = new Dominio.Entidades.Usuario
@@ -94,7 +96,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             UsuId = Guid.NewGuid()
         };
 
-        private DadosResponsavelAluno[] responsavelAlunoEolResumido { get; set; } = new DadosResponsavelAluno[]
+        private DadosResponsavelAluno[] responsavelAlunoEol { get; set; } = new DadosResponsavelAluno[]
         {
             new DadosResponsavelAluno {  NumeroCelular = "999999999",
                 DDDCelular = "99",
@@ -102,6 +104,12 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
                 Nome = "Teste"
             }
         };
+
+        private DadosResponsavelAlunoResumido responsavelAlunoEolResumido { get; set; } = new DadosResponsavelAlunoResumido {  NumeroCelular = "999999999",
+                DDDCelular = "99",
+                Email = "Teste@teste.com",
+                Nome = "Teste"
+          };
 
         private NovaSenhaDto novaSenhaDtoCerta { get; set; } = new NovaSenhaDto
         {
