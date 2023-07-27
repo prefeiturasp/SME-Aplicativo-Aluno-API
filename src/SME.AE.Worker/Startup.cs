@@ -55,7 +55,6 @@ namespace SME.AE.Worker
                 .AdicionarPoliticas()
                 .AdicionarClientesHttp(servicoProdam, variaveisGlobais)
                 .AddMemoryCache()
-                .AddApplicationInsightsTelemetry(Configuration)
                 .AddHostedService<WorkerRabbitMQ>();
 
             services.AddControllers();

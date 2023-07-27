@@ -63,8 +63,6 @@ namespace SME.AE.Api
 
             AddAuthentication(services, variaveisGlobais);
 
-            services.AddApplicationInsightsTelemetry(Configuration);
-
             RegistrarMapeamentos.Registrar();
             RegistrarMvc.Registrar(services, variaveisGlobais);
             RegistrarClientesHttp.Registrar(services, servicoProdam, variaveisGlobais);

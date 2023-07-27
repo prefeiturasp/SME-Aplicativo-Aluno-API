@@ -65,7 +65,6 @@ namespace SME.AE.Worker.Service
                     hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
 
                     services
-                        .AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration)
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso()
