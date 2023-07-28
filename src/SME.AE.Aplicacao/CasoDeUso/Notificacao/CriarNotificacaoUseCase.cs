@@ -37,14 +37,19 @@ namespace SME.AE.Aplicacao
                 var hoje = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now).Date;
 
                 notificacao.EnviadoPushNotification = (hoje >= dataEnvio);
-
-                await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
-
                 if (notificacao.EnviadoPushNotification)
                 {
-                    notificacao.InserirCategoria();
-                    await EnviarNotificacaoImediataAsync(notificacao);
+                    try
+                    {
+                        notificacao.InserirCategoria();
+                        await EnviarNotificacaoImediataAsync(notificacao);
+                    }
+                    catch (Exception)
+                    {
+                        notificacao.EnviadoPushNotification = false;
+                    }
                 }
+                await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
 
                 return notificacao;
             }
