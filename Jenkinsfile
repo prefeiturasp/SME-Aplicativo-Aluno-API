@@ -66,7 +66,7 @@ pipeline {
               dockerImage2.push()
               dockerImage3.push()
               }
-              sh "docker rmi $imagename1 $imagename2 $imagename3"
+             // sh "docker rmi $imagename1 $imagename2 $imagename3"
               //sh "docker rmi $imagename2"
             }
           }
@@ -116,6 +116,7 @@ pipeline {
     unstable { sendTelegram("💣 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Unstable \nLog: \n${env.BUILD_URL}console") }
     failure { sendTelegram("💥 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Failure \nLog: \n${env.BUILD_URL}console") }
     aborted { sendTelegram ("😥 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Aborted \nLog: \n${env.BUILD_URL}console") }
+    always { sh "docker rmi $imagename1 $imagename2 $imagename3" }	  
   }
 }
 def sendTelegram(message) {
