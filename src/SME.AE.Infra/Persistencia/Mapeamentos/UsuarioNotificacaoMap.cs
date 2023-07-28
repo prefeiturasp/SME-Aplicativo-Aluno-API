@@ -9,7 +9,6 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
             ToTable("usuario_notificacao_leitura");
             Map(a => a.UsuarioId).ToColumn("usuario_id");
             Map(a => a.CodigoEolAluno).ToColumn("codigo_eol_aluno");
-            Map(a => a.CodigoEolTurma).ToColumn("codigo_eol_turma");
             Map(a => a.NotificacaoId).ToColumn("notificacao_id");
             Map(a => a.DreCodigoEol).ToColumn("dre_codigoeol");
             Map(a => a.UeCodigoEol).ToColumn("ue_codigoeol");

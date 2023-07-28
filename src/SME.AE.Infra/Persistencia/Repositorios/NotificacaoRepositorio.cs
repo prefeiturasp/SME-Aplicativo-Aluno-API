@@ -268,8 +268,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    			   unl.codigo_eol_aluno = @codigoAluno
                    where (unl.mensagemexcluida is null or (unl.mensagemexcluida is not null and not unl.mensagemexcluida)) and
                    	     (tmp.dataexpiracao is null or tmp.dataexpiracao::date >= current_date) and
-                   	     tmp.dataenvio::date <= current_date and
-                   	     tmp.enviadopushnotification;";
+                   	     tmp.dataenvio::date <= current_date;";
         }
 
         private string MontarQueryListagemCompletaNaoEnviadoPushNotification()
