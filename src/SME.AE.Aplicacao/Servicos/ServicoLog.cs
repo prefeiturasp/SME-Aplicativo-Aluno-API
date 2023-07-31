@@ -10,7 +10,7 @@ namespace SME.AE.Aplicacao.Servicos
     {
         private readonly string sentryDSN;
 
-        public ServicoLog(IConfiguration configuration, TelemetryClient insightsClient)
+        public ServicoLog(IConfiguration configuration)
         {
             if (configuration == null)
             {
