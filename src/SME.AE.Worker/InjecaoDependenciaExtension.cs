@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
@@ -9,9 +8,11 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.HandlerExtensions;
 using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using SME.AE.Comum.Utilitarios;
+using SME.AE.Infra;
 using SME.AE.Infra.Autenticacao;
 using SME.AE.Infra.Persistencia;
 using SME.AE.Infra.Persistencia.Repositorios;
@@ -47,37 +48,23 @@ namespace SME.AE.Worker
         public static IServiceCollection AdicionarRepositorios(this IServiceCollection services)
         {
             services.AddTransient(typeof(IUsuarioRepository), typeof(UsuarioRepository));
-            services.AddTransient(typeof(IAutenticacaoRepositorio), typeof(AutenticacaoRepositorio));
-            services.AddTransient(typeof(INotificacaoRepository), typeof(NotificacaoRepository));
-            services.AddTransient(typeof(IAlunoRepositorio), typeof(AlunoRepositorio));
-            services.AddTransient(typeof(IGrupoComunicadoRepository), typeof(GrupoComunicadoRepository));
+            services.AddTransient(typeof(INotificacaoRepositorio), typeof(NotificacaoRepositorio));
             services.AddTransient(typeof(IUsuarioNotificacaoRepositorio), typeof(UsuarioNotificacaoRepositorio));
             services.AddTransient(typeof(IUsuarioCoreSSORepositorio), typeof(UsuarioCoreSSORepositorio));
             services.AddTransient(typeof(IUsuarioGrupoRepositorio), typeof(UsuarioGrupoRepositorio));
             services.AddTransient(typeof(IUsuarioSenhaHistoricoCoreSSORepositorio), typeof(UsuarioSenhaHistoricoCoreSSORepositorio));
             services.AddTransient(typeof(IConfiguracaoEmailRepositorio), typeof(ConfiguracaoEmailRepositorio));
-            services.AddTransient(typeof(IResponsavelEOLRepositorio), typeof(ResponsavelEOLRepositorio));
             services.AddTransient(typeof(ITermosDeUsoRepositorio), typeof(TermosDeUsoRepositorio));
             services.AddTransient(typeof(IAceiteTermosDeUsoRepositorio), typeof(AceiteTermosDeUsoRepositorio));
             services.AddTransient(typeof(IAdesaoRepositorio), typeof(AdesaoRepositorio));
             services.AddTransient(typeof(IParametrosEscolaAquiRepositorio), (typeof(ParametroEscolaAquiRepositorio)));
-            services.AddTransient(typeof(IEventoRepositorio), (typeof(EventoRepositorio)));
-            services.AddTransient(typeof(IEventoSgpRepositorio), (typeof(EventoSgpRepositorio)));
             services.AddTransient(typeof(IWorkerProcessoAtualizacaoRepositorio), typeof(WorkerProcessoAtualizacaoRepositorio));
-            services.AddTransient(typeof(IFrequenciaAlunoRepositorio), typeof(FrequenciaAlunoRepositorio));
-            services.AddTransient(typeof(INotaAlunoRepositorio), typeof(NotaAlunoRepositorio));
-            services.AddTransient(typeof(INotaAlunoSgpRepositorio), typeof(NotaAlunoSgpRepositorio));
-            services.AddTransient(typeof(ITurmaRepositorio), typeof(TurmaRepositorio));
             services.AddTransient(typeof(INotaAlunoCorRepositorio), typeof(NotaAlunoCorRepositorio));
             services.AddTransient(typeof(IDadosLeituraRepositorio), typeof(DadosLeituraRepositorio));
-            services.AddTransient(typeof(IUnidadeEscolarRepositorio), typeof(UnidadeEscolarRepositorio));
-            services.AddTransient(typeof(IDreSgpRepositorio), typeof(DreSgpRepositorio));
             services.AddTransient(typeof(IRemoverConexaoIdleRepository), typeof(RemoverConexaoIdleRepository));
             services.AddTransient(typeof(ICacheRepositorio), typeof(CacheRepositorio));
             services.AddTransient(typeof(IServicoLog), typeof(ServicoLog));
-            services.AddTransient(typeof(IUeSgpRepositorio), typeof(UeSgpRepositorio));
-            services.AddTransient(typeof(IFrequenciaAlunoSgpRepositorio), typeof(FrequenciaAlunoSgpRepositorio));
-            
+            services.AddTransient(typeof(IOutroServicoRepositorio), typeof(OutroServicoRepositorio));
 
             return services;
         }
@@ -113,7 +100,7 @@ namespace SME.AE.Worker
         #endregion
 
         #region Clientes HTTP
-        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions)
+        public static IServiceCollection AdicionarClientesHttp(this IServiceCollection services, ServicoProdamOptions servicoProdamOptions, VariaveisGlobaisOptions variaveisGlobaisOptions)
         {
             var policy = ObterPolicyBaseHttp();
 
@@ -125,6 +112,20 @@ namespace SME.AE.Worker
                  c.DefaultRequestHeaders.Add("Accept", "application/json");
                  c.DefaultRequestHeaders.Add("Authorization", $"Basic {basicAuth}");
              }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiSgpChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiSgp);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-sgp-api-key", variaveisGlobaisOptions.ChaveIntegracaoSgpApi);
+            }).AddPolicyHandler(policy);
+
+            services.AddHttpClient(name: "servicoApiEolChave", c =>
+            {
+                c.BaseAddress = new Uri(variaveisGlobaisOptions.ApiEol);
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("x-api-eol-key", variaveisGlobaisOptions.ChaveIntegracaoEolApi);
+            }).AddPolicyHandler(policy);
 
             return services;
         }

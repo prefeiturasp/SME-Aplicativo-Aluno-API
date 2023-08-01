@@ -9,7 +9,8 @@
         TURMA = 5,
         ALUNO = 6,
         SME_ANO = 7,
-        DRE_ANO = 8
+        DRE_ANO = 8,
+        MENSAGEM_AUTOMATICA = 9
     }
 }
 

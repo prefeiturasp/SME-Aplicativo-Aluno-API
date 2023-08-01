@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SME.AE.Dominio.Entidades
+﻿namespace SME.AE.Dominio.Entidades
 {
-    [Table("usuario_notificacao_leitura")]
     public class UsuarioNotificacao : EntidadeBase
     {
         public long UsuarioId { get; set; }

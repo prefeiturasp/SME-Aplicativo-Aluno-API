@@ -26,5 +26,6 @@ RUN apt-get update -y \
     
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 EXPOSE 5000-5001
 ENTRYPOINT ["dotnet", "SME.AE.Api.dll"]

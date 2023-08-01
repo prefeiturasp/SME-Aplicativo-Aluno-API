@@ -1,5 +1,8 @@
-﻿using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Consultas;
+using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Concurrent;
@@ -11,29 +14,32 @@ namespace SME.AE.Aplicacao.CasoDeUso
 {
     public class ConsolidarLeituraNotificacaoCasoDeUso
     {
-        private readonly IResponsavelEOLRepositorio responsavelEOLRepositorio;
         private readonly IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio;
         private readonly IConsolidarLeituraNotificacaoRepositorio consolidarLeituraNotificacaoRepositorio;
-        private readonly IConsolidarLeituraNotificacaoSgpRepositorio consolidarLeituraNotificacaoSgpRepositorio;
+        private readonly IMediator mediator;
 
         public ConsolidarLeituraNotificacaoCasoDeUso(
-                                            IResponsavelEOLRepositorio responsavelEOLRepositorio,
                                             IWorkerProcessoAtualizacaoRepositorio workerProcessoAtualizacaoRepositorio,
                                             IConsolidarLeituraNotificacaoRepositorio consolidarLeituraNotificacaoRepositorio,
-                                            IConsolidarLeituraNotificacaoSgpRepositorio consolidarLeituraNotificacaoSgpRepositorio
+                                            IMediator mediator
                                             )
         {
-            this.responsavelEOLRepositorio = responsavelEOLRepositorio ?? throw new ArgumentNullException(nameof(responsavelEOLRepositorio));
             this.workerProcessoAtualizacaoRepositorio = workerProcessoAtualizacaoRepositorio ?? throw new ArgumentNullException(nameof(workerProcessoAtualizacaoRepositorio));
             this.consolidarLeituraNotificacaoRepositorio = consolidarLeituraNotificacaoRepositorio ?? throw new ArgumentNullException(nameof(consolidarLeituraNotificacaoRepositorio));
-            this.consolidarLeituraNotificacaoSgpRepositorio = consolidarLeituraNotificacaoSgpRepositorio ?? throw new ArgumentNullException(nameof(consolidarLeituraNotificacaoSgpRepositorio));
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public async Task ExecutarAsync()
         {
-            var comunicadosAtivos = await ObterComunicadosAtivos();
-            var usuariosAlunos = await ObterUsuariosAlunos();
-            await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivos);
+            var comunicadosAtivos = await mediator.Send(new ObterComunicadosAnoAtualQuery());
+            var anoLetivoAtual = DateTime.Now.Year;
+            var dresDoSistema = (await mediator.Send(new ObterDresQuery())).Select(d => long.Parse(d.CodigoDre));
+            foreach (var dreCodigo in dresDoSistema)
+            {
+                var comunicadosAtivosDre = comunicadosAtivos.Where(c => c.CodigoDre == dreCodigo.ToString());
+                var usuariosAlunos = await ObterUsuariosAlunos(anoLetivoAtual, dreCodigo.ToString());
+                await ConsolidarComunicadosUsuariosAlunos(usuariosAlunos, comunicadosAtivosDre);
+            }
             await workerProcessoAtualizacaoRepositorio.IncluiOuAtualizaUltimaAtualizacao("ConsolidarLeituraNotificacao");
         }
 
@@ -267,34 +273,22 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (series.Any())
                 alunosComunicado = alunosComunicado.Where(aluno => series.Contains(aluno.SerieResumida));
 
-            var tipoEscolaId = comunicado.TipoEscolaId.ToShortEnumerable();
-            var tipoCicloId = comunicado.TipoCicloId.ToShortEnumerable();
-            var etapaEnsinoId = comunicado.EtapaEnsinoId.ToShortEnumerable();
-
-            if (tipoEscolaId.Any())
+            var tipoEscola = comunicado.TipoEscola.ToShortEnumerable();
+            
+            if (tipoEscola.Any())
             {
-                alunosComunicado = alunosComunicado.Where(aluno => tipoEscolaId.Contains(aluno.CodigoTipoEscola));
+                alunosComunicado = alunosComunicado.Where(aluno => tipoEscola.Contains(aluno.CodigoTipoEscola));
 
                 return
                     alunosComunicado
                     .Distinct()
                     .ToArray();
 
-            }
-            else if (tipoCicloId.Any() && etapaEnsinoId.Any())
-            {
-                alunosComunicado = alunosComunicado.Where(aluno => tipoCicloId.Contains(aluno.CodigoCicloEnsino) && etapaEnsinoId.Contains(aluno.CodigoEtapaEnsino));
-
-                return
-                    alunosComunicado
-                    .Distinct()
-                    .ToArray();
-
-            }
+            };
             return new ResponsavelAlunoEOLDto[] { };
         }
 
-        private async Task<IEnumerable<ResponsavelAlunoEOLDto>> ObterUsuariosAlunos()
+        private async Task<IEnumerable<ResponsavelAlunoEOLDto>> ObterUsuariosAlunos(int anoLetivo, string codigoDre)
         {
             var usuariosComApp =
                 (await ObterUsuariosAlunosNotificacoesApp())
@@ -304,7 +298,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 .ToArray();
 
             var responsaveisEOL =
-                (await responsavelEOLRepositorio.ListarCpfResponsavelAlunoDaDreUeTurma())
+                (await mediator.Send(new ObterResponsaveisPorDreEUeQuery(codigoDre, null, anoLetivo)))
                 .AsParallel()
                 .Where(resp => ValidacaoCpf.Valida(resp.CpfResponsavel.ToString("00000000000")))
                 .Select(usuarioAluno =>
@@ -318,11 +312,5 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 .ToArray();
             return responsaveisEOL;
         }
-
-        private async Task<IEnumerable<ComunicadoSgpDto>> ObterComunicadosAtivos()
-        {
-            return (await consolidarLeituraNotificacaoSgpRepositorio.ObterComunicadosSgp());
-        }
-
     }
 }

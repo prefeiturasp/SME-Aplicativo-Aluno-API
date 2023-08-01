@@ -2,7 +2,6 @@
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
@@ -18,6 +17,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
     public class ParametrosMensagensUsuarioLogado
     {
         public string ModalidadesId { get; set; }
+        public string TiposEscolas { get; set; }
         public string CodigoUE { get; set; }
         public string CodigoDRE { get; set; }
         public string CodigoTurma { get; set; }

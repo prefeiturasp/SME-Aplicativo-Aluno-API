@@ -6,7 +6,8 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
 {
     public class ListarNotificacaoAlunoQuery : IRequest<IEnumerable<NotificacaoResposta>>
     {
-        public string ModalidadesCodigo { get; set; }
+        public string Modalidades { get; set; }
+        public string TiposEscolas { get; set; }
         public string CodigoUE { get; set; }
         public string CodigoDRE { get; set; }
         public string CodigoTurma { get; set; }

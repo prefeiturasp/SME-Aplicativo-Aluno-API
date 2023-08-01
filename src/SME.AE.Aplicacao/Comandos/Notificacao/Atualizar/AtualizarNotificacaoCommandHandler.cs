@@ -10,9 +10,9 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Atualizar
 {
     public class AtualizarNotificacaoCommandHandler : IRequestHandler<AtualizarNotificacaoCommand, AtualizacaoNotificacaoResposta>
     {
-        private readonly INotificacaoRepository _repository;
+        private readonly INotificacaoRepositorio _repository;
 
-        public AtualizarNotificacaoCommandHandler(INotificacaoRepository repository)
+        public AtualizarNotificacaoCommandHandler(INotificacaoRepositorio repository)
         {
             this._repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }

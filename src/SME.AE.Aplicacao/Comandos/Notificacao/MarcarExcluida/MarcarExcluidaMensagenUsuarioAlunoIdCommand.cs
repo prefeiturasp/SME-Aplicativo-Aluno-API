@@ -39,9 +39,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
             var usuario = await usuarioRepository
                 .ObterUsuarioNaoExcluidoPorCpf(request.Cpf) ?? throw new ArgumentException($"CPF não encontrado {request.Cpf}");
 
-            var usuarioNotificacao = await usuarioNotificacaoRepositorio
-                .ObterPorUsuarioAlunoNotificacao(usuario.Id, request.CodigoAluno, request.NotificacaoId);
-
+            var usuarioNotificacao = await usuarioNotificacaoRepositorio.ObterPorUsuarioAlunoNotificacao(usuario.Id, request.CodigoAluno, request.NotificacaoId);
             if (usuarioNotificacao == null)
             {
                 var resposta = await mediator.Send(new DadosAlunoCommand(request.Cpf));
@@ -66,9 +64,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Remover
                     MensagemExcluida = true,
                     MensagemVisualizada = true
                 };
-
-                return await usuarioNotificacaoRepositorio
-                    .Criar(usuarioNotificacao);
+                return await usuarioNotificacaoRepositorio.Criar(usuarioNotificacao);
             }
             else
             {

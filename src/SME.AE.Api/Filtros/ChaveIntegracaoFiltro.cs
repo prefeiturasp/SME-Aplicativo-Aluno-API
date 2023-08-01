@@ -12,7 +12,7 @@ namespace SME.AE.Api.Filtros
     {
         private const string ChaveIntegracaoHeader = "x-integration-key";
         private VariaveisGlobaisOptions variaveisGlobais;
-        
+
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {

@@ -1,12 +1,15 @@
 ﻿using MediatR;
+using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Comum.Utilitarios;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso
@@ -27,11 +30,13 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(cpf));
 
-            await mediator.Send(new ObterDadosAlunosPorDreUeCpfResponsavelQuery(codigoDre, codigoUe, cpf));
+            var alunos = await mediator.Send(new ObterDadosAlunosQuery(cpf, null, codigoDre, codigoUe == 0 ? "" : codigoUe.ToString()));
+            if (alunos == null || !alunos.Any())
+                throw new NegocioException("Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");
 
             var usuarioApp = await mediator.Send(new ObterUsuarioNaoExcluidoPorCpfQuery(cpf));
 
-            var usuarioEol = await mediator.Send(new ObterDadosResumidosReponsavelPorCpfQuery(cpf));
+            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf));
 
             if (usuarioCoreSSO == null)
                 throw new NegocioException($"Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");

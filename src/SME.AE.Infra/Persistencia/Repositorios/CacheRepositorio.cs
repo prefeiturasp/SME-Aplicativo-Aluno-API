@@ -15,7 +15,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public CacheRepositorio(IServicoLog servicoLog, IMemoryCache memoryCache)
         {
-
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         }
@@ -29,8 +28,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 var cacheParaRetorno = memoryCache.Get<string>(nomeChave);
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (utilizarGZip)
                 {
                     cacheParaRetorno = UtilGZip.Descomprimir(Convert.FromBase64String(cacheParaRetorno));
@@ -43,8 +40,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 //Caso o cache esteja indisponível a aplicação precisa continuar funcionando mesmo sem o cache
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return null;
             }
         }
@@ -59,8 +54,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var stringCache = memoryCache.Get<string>(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
@@ -80,13 +73,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return default;
             }
         }
-
-
 
         public async Task<T> ObterAsync<T>(string nomeChave, Func<Task<T>> buscarDados, int minutosParaExpirar = 720, bool utilizarGZip = false)
         {
@@ -98,8 +87,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var stringCache = memoryCache.Get<string>(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
@@ -119,8 +106,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return default;
             }
         }
@@ -135,8 +120,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var stringCache = memoryCache.Get<string>(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
@@ -153,8 +136,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return default;
             }
         }
@@ -169,13 +150,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 memoryCache.Remove(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
             }
             catch (Exception ex)
             {
                 //Caso o cache esteja indisponível a aplicação precisa continuar funcionando mesmo sem o cache
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }
@@ -187,7 +166,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             try
             {
-
                 if (utilizarGZip)
                 {
                     var valorComprimido = UtilGZip.Comprimir(valor);
@@ -197,13 +175,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 memoryCache.Set(nomeChave, valor, TimeSpan.FromMinutes(minutosParaExpirar));
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
-
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Salvar", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }
@@ -227,13 +202,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     memoryCache.Set(nomeChave, valor, TimeSpan.FromMinutes(minutosParaExpirar));
 
                     timer.Stop();
-                    servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
                 }
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Salvar", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }

@@ -4,6 +4,6 @@ namespace SME.AE.Infra.Autenticacao
 {
     public class UsuarioAplicacao : IdentityUser
     {
-        
+
     }
 }

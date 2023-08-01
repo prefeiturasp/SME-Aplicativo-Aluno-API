@@ -23,6 +23,6 @@ namespace SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso
         public IEnumerable<FrequenciaAlunoCor> FrequenciaAlunoCores { get; set; }
         public IEnumerable<FrequenciaAlunoFaixa> FrequenciaAlunoFaixas { get; set; }
 
-        
+
     }
 }

@@ -6,25 +6,27 @@ namespace SME.AE.Infra.Persistencia
 {
     public class AplicacaoDapperContext<T> : IAplicacaoDapperContext<T> where T : IDbConnection
     {
-        private readonly IDbConnection conexao;
+        private readonly T conexao;
 
         public AplicacaoDapperContext(T connection)
         {
             conexao = connection;
         }
 
-        public IDbConnection Conexao
+        public T Conexao
         {
             get
             {
-                if (conexao.State != ConnectionState.Open)
-                    Open();
-
+                Open();
                 return conexao;
             }
         }
 
-        public string ConnectionString { get { return Conexao.ConnectionString; } set { Conexao.ConnectionString = value; } }
+        public string ConnectionString 
+        { 
+            get => Conexao.ConnectionString;  
+            set => Conexao.ConnectionString = value;
+        }
 
         public int ConnectionTimeout => Conexao.ConnectionTimeout;
 
@@ -63,6 +65,6 @@ namespace SME.AE.Infra.Persistencia
             return Conexao.CreateCommand();
         }
 
-        public void Dispose() => Conexao.Close();
+        public void Dispose() => Conexao?.Dispose();
     }
 }

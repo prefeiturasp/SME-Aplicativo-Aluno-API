@@ -15,7 +15,7 @@ namespace SME.AE.Aplicacao.Teste
             mediator = new Mock<IMediator>();
             mapper = new Mock<IMapper>();
         }
-                
+
         protected void MediatorSetup<T>(object retorno = default)
         {
             var m = mediator.Setup(a => a.Send(It.IsAny<T>(), It.IsAny<CancellationToken>()));

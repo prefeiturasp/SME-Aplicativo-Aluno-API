@@ -5,8 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using SME.AE.Aplicacao.Servicos;
 using RabbitMQ.Client;
 using SME.AE.Comum;
+using SME.AE.Dominio.Options;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
 using System.Reflection;
@@ -52,15 +55,21 @@ namespace SME.AE.Worker.Service
 
                     AdicionarAutoMapper(services);
                     AdicionarMediatr(services);
+                    var telemetriaOptions = new TelemetriaOptions();
+                    hostContext.Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
+
+                    services.AddSingleton(telemetriaOptions);
+                    services.AddSingleton<IServicoTelemetria, ServicoTelemetria>();
+
+                    var variaveisGlobais = new VariaveisGlobaisOptions();
+                    hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+
                     services
                         .AdicionarRepositorios()
                         .AdicionarCasosDeUso()
                         .AdicionarWorkerCasosDeUso()
                         .AdicionarPoliticas()
-                        .AdicionarClientesHttp(servicoProdam);
-
-                    var variaveisGlobais = new VariaveisGlobaisOptions();
-                    hostContext.Configuration.GetSection(nameof(VariaveisGlobaisOptions)).Bind(variaveisGlobais, c => c.BindNonPublicProperties = true);
+                        .AdicionarClientesHttp(servicoProdam, variaveisGlobais);
 
                     services.AddSingleton(variaveisGlobais);
 
@@ -74,10 +83,9 @@ namespace SME.AE.Worker.Service
                         Password = configuracaoRabbitOptions.Password,
                         VirtualHost = configuracaoRabbitOptions.VirtualHost
                     };
-
                     services.AddSingleton(rabbitConn);
-
-                }).ConfigureLogging((context, logging) =>
+                })
+                .ConfigureLogging((context, logging) =>
                 {
                     logging.AddConfiguration(context.Configuration);
                     logging.AddSentry();

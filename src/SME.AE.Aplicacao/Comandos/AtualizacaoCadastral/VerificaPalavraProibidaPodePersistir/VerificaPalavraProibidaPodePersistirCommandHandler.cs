@@ -27,21 +27,21 @@ namespace SME.AE.Aplicacao
             var chaveCache = $"palavras-bloqueadas";
             var cachePalavrasBloqueadas = cacheRepositorio.Obter(chaveCache);
 
-            if(cachePalavrasBloqueadas == null)
+            if (cachePalavrasBloqueadas == null)
             {
                 palavrasBloqueadas = await mediator.Send(new ObterPalavrasProibidasQuery());
 
                 if (palavrasBloqueadas == null || !palavrasBloqueadas.Any())
                     return true;
 
-                await cacheRepositorio.SalvarAsync(chaveCache, palavrasBloqueadas);                
+                await cacheRepositorio.SalvarAsync(chaveCache, palavrasBloqueadas);
             }
             else
                 palavrasBloqueadas = JsonConvert.DeserializeObject<string[]>(cachePalavrasBloqueadas);
 
-            var palavrasTratadas = request.Texto.ToLower();                        
+            var palavrasTratadas = request.Texto.ToLower();
 
-            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).ToList();
+            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).Where(x => x != "").ToList();
 
             var palavrasProibidas = string.Join("|", listaPalavrasBloqueadas);
 
@@ -49,7 +49,7 @@ namespace SME.AE.Aplicacao
             var m = Regex.Matches(palavrasTratadas, pattern, RegexOptions.IgnoreCase);
 
             if (m.Count() > 0)
-                return false;            
+                return false;
 
             return true;
         }

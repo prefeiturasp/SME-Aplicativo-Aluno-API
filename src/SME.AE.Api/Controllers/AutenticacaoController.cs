@@ -22,7 +22,8 @@ namespace SME.AE.Api.Controllers
             }
             catch (System.Exception ex)
             {
-                return BadRequest(ex);
+                string[] erro = { ex.Message };
+                return BadRequest(new RespostaApi() { Erros = erro });
             }
         }
 

@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.AE.Api.Controllers
 {
-    public class EventoController: ApiController
+    public class EventoController : ApiController
     {
         [HttpGet("AlunoLogado/{ano}/{mes}/{codigoAluno}")]
         [Authorize]

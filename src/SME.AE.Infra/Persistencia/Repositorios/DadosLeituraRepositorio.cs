@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
@@ -14,8 +15,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class DadosLeituraRepositorio : BaseRepositorio<Adesao>, IDadosLeituraRepositorio
     {
-        public DadosLeituraRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        private readonly IServicoTelemetria servicoTelemetria;
+
+        public DadosLeituraRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
+            this.servicoTelemetria = servicoTelemetria;
         }
 
         public async Task<IEnumerable<DataLeituraAluno>> ObterDadosLeituraAlunos(long notificacaoId, string codigosAlunos)
@@ -31,12 +36,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                notificacao_id = {notificacaoId} and 
 	                codigo_eol_aluno in ({codigosAlunos})
                 ";
+
             try
             {
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados =
-                    await conexao.QueryAsync<DataLeituraAluno>(sql);
+
+                var dadosLeituraComunicados = await servicoTelemetria.RegistrarComRetornoAsync<DataLeituraAluno>(async () => await SqlMapper.QueryAsync<DataLeituraAluno>(conexao,
+                    sql), "query", "Query AE", sql);
+
                 conexao.Close();
 
                 return dadosLeituraComunicados;
@@ -50,7 +58,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraTurma(string codigoDre, string codigoUe, long notificacaoId, short[] modalidades, long[] codigosTurmas, bool porResponsavel)
         {
-
             var sqlResponsavel = new StringBuilder(@"
                 select
 	                da.dre_nome NomeAbreviadoDre,
@@ -69,11 +76,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
                 left join 
                 (
-	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, unl.codigo_eol_turma, count(distinct usuario_cpf) leram
+	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, nt.codigo_eol_turma, count(distinct usuario_cpf) leram
 	                from usuario_notificacao_leitura unl 
 	                left join notificacao n on n.id = unl.notificacao_id
 	                left join notificacao_turma nt on nt.notificacao_id = unl.notificacao_id 
-	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), unl.codigo_eol_turma 
+	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), nt.codigo_eol_turma 
                 ) ul on ul.notificacao_id = cn.notificacao_id and 
                   ul.dre_codigoeol::varchar = cn.dre_codigo and 
                   ul.ue_codigoeol = cn.ue_codigo and 
@@ -121,11 +128,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 left join (select distinct dre_codigo, dre_nome from dashboard_adesao) da on da.dre_codigo = cn.dre_codigo
                 left join 
                 (
-	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, unl.codigo_eol_turma, count(distinct codigo_eol_aluno) leram
+	                select unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')) modalidade, nt.codigo_eol_turma, count(distinct codigo_eol_aluno) leram
 	                from usuario_notificacao_leitura unl 
 	                left join notificacao n on n.id = unl.notificacao_id
 	                left join notificacao_turma nt on nt.notificacao_id = unl.notificacao_id 
-	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), unl.codigo_eol_turma 
+	                group by unl.notificacao_id, unl.dre_codigoeol, unl.ue_codigoeol, unnest(string_to_array(n.modalidades,',')), nt.codigo_eol_turma 
                 ) ul on ul.notificacao_id = cn.notificacao_id and 
                   ul.dre_codigoeol::varchar = cn.dre_codigo and 
                   ul.ue_codigoeol = cn.ue_codigo and 
@@ -159,11 +166,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados =
-                    await conexao.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(
-                        porResponsavel ? sqlResponsavel.ToString() : sqlAluno.ToString(),
-                        new { notificacaoId, codigoDre, codigoUe, modalidades, codigosTurmas }
-                        );
+
+                var sql = porResponsavel ? sqlResponsavel.ToString() : sqlAluno.ToString();
+                var parametros = new { notificacaoId, codigoDre, codigoUe, modalidades, codigosTurmas };
+
+                var dadosLeituraComunicados = await servicoTelemetria.RegistrarComRetornoAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(async () =>
+                    await SqlMapper.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(conexao, sql, parametros), "query", "Query AE", parametros.ToString());
+
                 conexao.Close();
 
                 return dadosLeituraComunicados;
@@ -174,6 +183,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 throw ex;
             }
         }
+
         public async Task<IEnumerable<DadosLeituraComunicadosPorModalidadeTurmaResultado>> ObterDadosLeituraModalidade(string codigoDre, string codigoUe, long notificacaoId, bool porResponsavel)
         {
             var sqlResponsavel =
@@ -202,6 +212,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 	                cn.turma_codigo = 0 and
 	                cn.modalidade_codigo <> 0
                 ";
+
             var sqlAluno =
                 @"
                 select
@@ -233,11 +244,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var dadosLeituraComunicados =
-                    await conexao.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(
-                        porResponsavel ? sqlResponsavel : sqlAluno,
-                        new { notificacaoId, codigoDre, codigoUe }
-                        );
+
+                var sql = porResponsavel ? sqlResponsavel : sqlAluno;
+                var parametros = new { notificacaoId, codigoDre, codigoUe };
+
+                var dadosLeituraComunicados = await servicoTelemetria.RegistrarComRetornoAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(async () => await
+                    SqlMapper.QueryAsync<DadosLeituraComunicadosPorModalidadeTurmaResultado>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
                 conexao.Close();
 
                 return dadosLeituraComunicados;
@@ -254,7 +267,9 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 var sql = "";
+
                 if (string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
+                {
                     sql = @"SELECT 
                                 ano_letivo as AnoLetivo,
                                 notificacao_id as NotificacaoId,
@@ -273,8 +288,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and modalidade_codigo = 0 
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
+                }
 
                 if (!string.IsNullOrEmpty(codigoDre) && string.IsNullOrEmpty(codigoUe))
+                {
                     sql = @"SELECT 
                                 ano_letivo as AnoLetivo,
                                 notificacao_id as NotificacaoId,
@@ -293,8 +310,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and modalidade_codigo = 0 
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
+                }
 
                 if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe) && modalidade == 0)
+                {
                     sql = @"SELECT 
                                 ano_letivo as AnoLetivo,
                                 notificacao_id as NotificacaoId,
@@ -313,8 +332,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and modalidade_codigo = 0
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
+                }
 
                 if (!string.IsNullOrEmpty(codigoDre) && !string.IsNullOrEmpty(codigoUe) && modalidade > 0)
+                {
                     sql = @"SELECT 
                                 ano_letivo as AnoLetivo,
                                 notificacao_id as NotificacaoId,
@@ -333,11 +354,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and modalidade_codigo <> 0
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
+                }
 
-                using var conexao = InstanciarConexao();
-                conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId, codigoDre, codigoUe, modalidade });
-                conexao.Close();
+                var dadosLeituraComunicados = Enumerable.Empty<DadosConsolidacaoNotificacaoResultado>();
+
+                if (!string.IsNullOrEmpty(sql))
+                {
+                    using var conexao = InstanciarConexao();
+                    conexao.Open();
+
+                    var parametros = new { notificacaoId, codigoDre, codigoUe, modalidade };
+
+                    dadosLeituraComunicados = await servicoTelemetria.RegistrarComRetornoAsync<DadosConsolidacaoNotificacaoResultado>(async () => await
+                        SqlMapper.QueryAsync<DadosConsolidacaoNotificacaoResultado>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
+                    conexao.Close();
+                }
 
                 return dadosLeituraComunicados;
             }
@@ -372,10 +404,17 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                             and turma_codigo = 0 
                             and notificacao_id = @notificacaoId ";
 
+                var parametros = new { notificacaoId };
+
                 using var conexao = InstanciarConexao();
+
                 conexao.Open();
-                var dadosLeituraComunicados = await conexao.QueryAsync<DadosConsolidacaoNotificacaoResultado>(sql, new { notificacaoId });
+
+                var dadosLeituraComunicados = await servicoTelemetria.RegistrarComRetornoAsync<DadosConsolidacaoNotificacaoResultado>(async () => await
+                    SqlMapper.QueryAsync<DadosConsolidacaoNotificacaoResultado>(conexao, sql, parametros), "query", "Query AE", sql, parametros.ToString());
+
                 conexao.Close();
+
                 return dadosLeituraComunicados;
             }
             catch (Exception ex)

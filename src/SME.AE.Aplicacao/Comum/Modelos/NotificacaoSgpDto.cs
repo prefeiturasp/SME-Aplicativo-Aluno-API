@@ -23,10 +23,17 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public string CategoriaNotificacao { get; set; }
         public bool EnviadoPushNotification { get; set; }
         public string Modalidades { get; set; }
+        public string[] ModalidadesId { get; set; }
+
+        public string TiposEscolas { get; set; }
 
         public void InserirCategoria()
         {
-            if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
+            if (TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)
+            {
+                CategoriaNotificacao = "UE";
+            }
+            else if (string.IsNullOrWhiteSpace(CodigoDre) && string.IsNullOrWhiteSpace(CodigoUe))
             {
                 CategoriaNotificacao = "SME";
             }
@@ -44,5 +51,6 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         }
         public IEnumerable<string> ObterSeriesResumidas() => SeriesResumidas.ToStringEnumerable();
         public IEnumerable<int> ObterModalidades() => Modalidades.ToIntEnumerable();
+        public IEnumerable<int> ObterTiposEscolas() => TiposEscolas.ToIntEnumerable();
     }
 }

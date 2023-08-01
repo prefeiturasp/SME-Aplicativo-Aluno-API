@@ -11,7 +11,6 @@ using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
-using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -60,8 +59,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             await Assert.ThrowsAsync<NegocioException>(async () => await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDtoCerta));
         }
-        
-        private void InstanciarComandos() 
+
+        private void InstanciarComandos()
         {
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(usuario);
 
@@ -71,16 +70,18 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             mediator.Setup(a => a.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(retornoUsuarioCoreSSO);
 
-            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResumidosReponsavelPorCpfQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEol);
 
             mediator.Setup(a => a.Send(It.IsAny<AssociarGrupoUsuarioCommand>(), It.IsAny<CancellationToken>()));
 
             mediator.Setup(a => a.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()));
+
+            mediator.Setup(a => a.Send(It.IsAny<ObterDadosResponsavelResumidoQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(responsavelAlunoEolResumido);
         }
 
         private Dominio.Entidades.Usuario usuario { get; set; } = new Dominio.Entidades.Usuario
         {
-            Cpf = "00000000000",         
+            Cpf = "00000000000",
             Id = 1,
             PrimeiroAcesso = true,
             UltimoLogin = DateTime.Now
@@ -95,13 +96,20 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             UsuId = Guid.NewGuid()
         };
 
-        private ResponsavelAlunoEolResumidoDto responsavelAlunoEolResumido { get; set; } = new ResponsavelAlunoEolResumidoDto
+        private DadosResponsavelAluno[] responsavelAlunoEol { get; set; } = new DadosResponsavelAluno[]
         {
-            Celular = "999999999",
-            DDD = "99",
-            Email = "Teste@teste.com",
-            Nome = "Teste"
+            new DadosResponsavelAluno {  NumeroCelular = "999999999",
+                DDDCelular = "99",
+                Email = "Teste@teste.com",
+                Nome = "Teste"
+            }
         };
+
+        private DadosResponsavelAlunoResumido responsavelAlunoEolResumido { get; set; } = new DadosResponsavelAlunoResumido {  NumeroCelular = "999999999",
+                DDDCelular = "99",
+                Email = "Teste@teste.com",
+                Nome = "Teste"
+          };
 
         private NovaSenhaDto novaSenhaDtoCerta { get; set; } = new NovaSenhaDto
         {

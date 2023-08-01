@@ -1,7 +1,7 @@
 ﻿using Dapper;
-using Npgsql;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
+using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
@@ -11,21 +11,23 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class AceiteTermosDeUsoRepositorio : BaseRepositorio<AceiteTermosDeUso>, IAceiteTermosDeUsoRepositorio
     {
-        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
+        private readonly IServicoTelemetria servicoTelemetria;
 
-        public AceiteTermosDeUsoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions) : base(variaveisGlobaisOptions.AEConnection)
+        public AceiteTermosDeUsoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions,
+            IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
-            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
+            this.servicoTelemetria = servicoTelemetria;
         }
 
         public async Task<bool> RegistrarAceite(AceiteTermosDeUso aceiteTermosDeUso)
         {
             try
             {
-                await using var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection);
+                await using var conn = InstanciarConexao();
                 conn.Open();
                 var dataAtual = DateTime.Now;
                 aceiteTermosDeUso.InserirAuditoria();
+
                 var retorno = await conn.ExecuteAsync(
                     @"INSERT INTO public.aceite_termos_de_uso 
                     (termos_de_uso_id,
@@ -82,16 +84,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 using var conexao = InstanciarConexao();
                 conexao.Open();
-                var aceiteExiste = await conexao.QueryFirstOrDefaultAsync<int>($"SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao", new { cpfUsuario, versao });
+
+                var consulta = $"SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao";
+                var parametros = new { cpfUsuario, versao };
+
+                var aceiteExiste = await servicoTelemetria.RegistrarComRetornoAsync<int>(async () => await SqlMapper.QueryFirstOrDefaultAsync<int>(conexao,
+                    consulta, parametros), "query", "Query AE", consulta, parametros.ToString()); 
+
                 conexao.Close();
-                return aceiteExiste >= 1 ? true : false;
+                return aceiteExiste >= 1;
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
                 return false;
             }
-
         }
     }
 }

@@ -1,7 +1,12 @@
-﻿namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre
+﻿using System;
+
+namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre
 {
     public class DreResposta
     {
-        public string NomeAbreviado { get; set; }
+        public string Abreviacao { get; set; }
+        public string CodigoDre { get; set; }
+        public long Id { get; set; }
+        public string Nome { get; set; }
     }
 }

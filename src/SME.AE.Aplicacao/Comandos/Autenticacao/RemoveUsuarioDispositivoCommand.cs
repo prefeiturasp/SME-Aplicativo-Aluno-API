@@ -1,15 +1,11 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Modelos;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Autenticacao
 {
-   public class RemoveUsuarioDispositivoCommand : IRequest<bool>
+    public class RemoveUsuarioDispositivoCommand : IRequest<bool>
     {
         public RemoveUsuarioDispositivoCommand(string cpf, string dispositivoId)
         {
@@ -40,5 +36,5 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao
             }
         }
     }
-   
+
 }

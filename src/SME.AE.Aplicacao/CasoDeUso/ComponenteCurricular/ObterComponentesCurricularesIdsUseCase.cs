@@ -1,7 +1,5 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta.NotasDoAluno;
-using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +23,7 @@ namespace SME.AE.Aplicacao
                                                                                                                    notaAlunoDto.AlunoCodigo));
 
             var componentes = notasConceitosBimestreComponente
-                .Select(a => new ComponenteCurricularDto(a.ComponenteCurricularCodigo, mediator.Send(new ObterNomeComponenteCurricularQuery(a.ComponenteCurricularCodigo)).Result))
+                .Select(a => new ComponenteCurricularDto(a.ComponenteCurricularCodigo, a.ComponenteCurricularNome))
                 .ToList();
 
             return componentes.Distinct();

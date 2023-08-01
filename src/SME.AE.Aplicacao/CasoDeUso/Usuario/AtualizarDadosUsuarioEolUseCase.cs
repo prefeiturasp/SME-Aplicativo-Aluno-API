@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces;
+using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
 using System;
@@ -34,7 +35,7 @@ namespace SME.AE.Aplicacao
             if (usuarioApp == null)
                 return false;
 
-            var usuariosEol = await mediator.Send(new ObterDadosReponsavelPorCpfQuery(usuarioApp.Cpf));
+            var usuariosEol = await mediator.Send(new ObterDadosResponsavelQuery(usuarioApp.Cpf));
 
             if (usuariosEol == null || !usuariosEol.Any())
                 return false;
@@ -43,13 +44,13 @@ namespace SME.AE.Aplicacao
 
             foreach (var usuarioEol in usuariosEol)
             {
-                await mediator.Send(new AtualizarDadosResponsavelEolCommand(usuarioEol.CodigoAluno, long.Parse(usuarioEol.CPF), usuarioEol.Email, filtroDadosUsuario.DataNascimentoResponsavel, usuarioEol.NomeMae, usuarioEol.NumeroCelular, usuarioEol.DDDCelular));
+                await mediator.Send(new AtualizarDadosResponsavelEolCommand(usuarioEol.CodigoAluno, long.Parse(usuarioEol.Cpf), usuarioEol.Email, filtroDadosUsuario.DataNascimentoResponsavel, usuarioEol.NomeMae, usuarioEol.NumeroCelular, usuarioEol.DDDCelular));
             }
 
             return true;
         }
 
-        private void MapearAlteracoes(IEnumerable<ResponsavelAlunoDetalhadoEolDto> lstUsuarioEol, AtualizarDadosUsuarioDto dto)
+        private void MapearAlteracoes(IEnumerable<DadosResponsavelAluno> lstUsuarioEol, AtualizarDadosUsuarioDto dto)
         {
             foreach (var usuarioEol in lstUsuarioEol)
             {
