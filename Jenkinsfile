@@ -30,13 +30,12 @@ pipeline {
       }
 
         stage('Testes de integração') {
+	when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch '_release';  branch '_release-r2'; branch 'homolog';  } } 
         steps {
-          
           //Executa os testes gerando um relatorio formato trx
             sh 'dotnet test --logger "trx;LogFileName=TestResults.trx"'
           //Publica o relatorio de testes
-            mstest failOnError: false
-          
+            mstest failOnError: false         
         }
      }
 
@@ -106,7 +105,7 @@ pipeline {
             steps{ 
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
                  checkout scm 
-                 sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts boxfuse/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
+                 sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts registry.sme.prefeitura.sp.gov.br/devops/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
               } 
             }
           }    
@@ -137,5 +136,6 @@ def getKubeconf(branchName) {
     else if ("master".equals(branchName)) { return "config_prd"; }
     else if ("homolog".equals(branchName)) { return "config_hom"; }
     else if ("release".equals(branchName)) { return "config_hom"; }
+    else if ("release-r2".equals(branchName)) { return "config_hom"; }
     else if ("development".equals(branchName)) { return "config_dev"; }
 }
