@@ -14,7 +14,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public int tipo_evento { get; set; }
         public string turma_id { get; set; }
         public int ano_letivo { get; set; }
-        public int modalidade { get; set; }
+        public int modalidade_turma { get; set; }
+        public int modalidade_calendario { get; set; }
         public DateTime ultima_alteracao_sgp { get; set; }
         public bool excluido { get; set; }
         public string componente_curricular { get; set; }
