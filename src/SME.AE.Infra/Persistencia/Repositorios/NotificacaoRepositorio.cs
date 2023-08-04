@@ -215,7 +215,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return
                 $@"drop table if exists tmp_lista_notificacoes;
                    create temporary table tmp_lista_notificacoes as
-                   select *
+                   select {CamposConsultaNotificacao("n")}
                    	from notificacao n		
                    where ((n.tipocomunicado = {(int)TipoComunicado.SME} or
                    	      (n.tipocomunicado = {(int)TipoComunicado.DRE} and n.dre_codigoeol = @codigoDre) or
@@ -226,7 +226,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    
                    union
                    
-                   select n.*
+                   select {CamposConsultaNotificacao("n")}
                    	from notificacao n 
                    		inner join notificacao_turma nt 
                    			on n.id = nt.notificacao_id 
@@ -235,13 +235,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    	
                    union
                    
-                   select n.*
+                   select {CamposConsultaNotificacao("n")}
                    	from notificacao n 
                    		inner join notificacao_aluno na 
                    			on n.id = na.notificacao_id
                    where n.tipocomunicado = {(int)TipoComunicado.ALUNO} and
-                   	na.codigo_eol_aluno = @codigoAluno;
+                   	na.codigo_eol_aluno = @codigoAluno
                    
+                   union
+
+                   select {CamposConsultaNotificacao("n")}
+                    from notificacao n 
+                        inner join notificacao_aluno na 
+                         on na.notificacao_id = n.id
+                        where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido  
+                              and na.codigo_eol_aluno =@codigoAluno;
+
                    select tmp.id,
                           tmp.mensagem,
                           tmp.titulo,
@@ -286,88 +295,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 ";
         }
 
-        private string QueryComunicadosSME()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                        from notificacao n 
-                        where n.tipocomunicado = {(int)TipoComunicado.SME} and not n.excluido 
-                        and string_to_array(n.modalidades,',') 
-                        && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
-                        && string_to_array(@tiposEscolas,',')";
-        }
-
-        private string QueryComunicadosAutomaticos()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                        from notificacao n 
-                        inner join notificacao_aluno na 
-                         on na.notificacao_id = n.id
-                        where n.tipocomunicado = {(int)TipoComunicado.MENSAGEM_AUTOMATICA} and not n.excluido  and na.codigo_eol_aluno =@codigoAluno";
-        }
-
-        private string QueryComunicadosSME_ANO()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                        from notificacao n 
-                        where n.tipocomunicado = {(int)TipoComunicado.SME_ANO} and not n.excluido 
-                        and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
-                        && string_to_array(@tiposEscolas,',')";
-        }
-
-        private string QueryComunicadosDRE()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                    from notificacao n 
-                    where n.tipocomunicado = {(int)TipoComunicado.DRE} and not n.excluido 
-                    and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
-                        && string_to_array(@tiposEscolas,',') and n.dre_codigoeol = @codigoDre";
-        }
-
-        private string QueryComunicadosDRE_ANO()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                    from notificacao n 
-                    where n.tipocomunicado = {(int)TipoComunicado.DRE_ANO} and not n.excluido 
-                    and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') 
-                        && string_to_array(@tiposEscolas,',') and n.dre_codigoeol = @codigoDre";
-        }
-
-        private string QueryComunicadosUE()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                      from notificacao n
-                      where n.tipocomunicado = {(int)TipoComunicado.UE} and not n.excluido 
-                      and n.ue_codigoeol = @codigoUe";
-        }
-
-        private string QueryComunicadosUEMOD()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                    from notificacao n
-                    where n.tipocomunicado = {(int)TipoComunicado.UEMOD} and not excluido 
-                    and n.ue_codigoeol = @codigoUe 
-                    and string_to_array(n.modalidades,',') && string_to_array(@modalidades,',') and string_to_array(n.tipos_escolas,',') && string_to_array(@tiposEscolas,',')";
-        }
-
-        private string QueryComunicadosTurmas()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                    from notificacao n
-                    inner join notificacao_turma nt on nt.notificacao_id = n.id
-                    where n.tipocomunicado = {(int)TipoComunicado.TURMA} and not n.excluido 
-                    and nt.codigo_eol_turma = @codigoTurma";
-        }
-
-        private string QueryComunicadosAlunos()
-        {
-            return $@"select {CamposConsultaNotificacao("n")}
-                    from notificacao n
-                    inner join notificacao_aluno na 
-                    on na.notificacao_id = n.id
-                    where n.tipocomunicado = {(int)TipoComunicado.ALUNO} and not n.excluido 
-                    and na.codigo_eol_aluno = @codigoAluno";
-        }
-
+    
         private string CamposConsultaNotificacao(string abreviacao, bool camposGeral = false)
         {
             return $@"{abreviacao}.Id,
