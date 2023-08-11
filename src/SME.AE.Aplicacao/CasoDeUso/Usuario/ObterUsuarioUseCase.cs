@@ -23,14 +23,14 @@ namespace SME.AE.Aplicacao.CasoDeUso
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<UsuarioDto> Executar(string codigoDre, long codigoUe, string cpf)
+        public async Task<UsuarioDto> Executar(string codigoDre, string codigoUe, string cpf)
         {
             if (ValidacaoCpf.Valida(cpf) == false)
                 throw new NegocioException($"CPF inválido!");
 
             var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(cpf));
 
-            var alunos = await mediator.Send(new ObterDadosAlunosQuery(cpf, null, codigoDre, codigoUe == 0 ? "" : codigoUe.ToString()));
+            var alunos = await mediator.Send(new ObterDadosAlunosQuery(cpf, null, codigoDre, string.IsNullOrEmpty(codigoUe) ? "" : codigoUe));
             if (alunos == null || !alunos.Any())
                 throw new NegocioException("Este CPF não consta como responsável de um estudante ativo nesta Unidade Escolar.");
 
