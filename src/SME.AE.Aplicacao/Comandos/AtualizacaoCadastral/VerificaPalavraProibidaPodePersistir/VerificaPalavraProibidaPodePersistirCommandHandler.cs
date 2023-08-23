@@ -20,6 +20,7 @@ namespace SME.AE.Aplicacao
             this.cacheRepositorio = cacheRepositorio ?? throw new ArgumentNullException(nameof(cacheRepositorio));
         }
 
+        //TODO servicoAtualizacaoCadastral está retornando dados que não são palavras bloqueadas 
         public async Task<bool> Handle(VerificaPalavraProibidaPodePersistirCommand request, CancellationToken cancellationToken)
         {
             var palavrasBloqueadas = new string[] { };
@@ -41,14 +42,14 @@ namespace SME.AE.Aplicacao
 
             var palavrasTratadas = request.Texto.ToLower();
 
-            var listaPalavrasBloqueadas = palavrasBloqueadas.Select(i => i.ToLower()).Where(x => x != "").ToList();
+            var listaPalavrasBloqueadas = palavrasBloqueadas.Where(x => !string.IsNullOrEmpty(x)).ToList().Select(i => i.ToLower());
 
             var palavrasProibidas = string.Join("|", listaPalavrasBloqueadas);
 
-            string pattern = $@"\b(\w*({palavrasProibidas})\w*)\b";
-            var m = Regex.Matches(palavrasTratadas, pattern, RegexOptions.IgnoreCase);
+            var pattern = $@"\b(\w*({palavrasProibidas})\w*)\b";
+            var match = Regex.Matches(palavrasTratadas, pattern, RegexOptions.IgnoreCase);
 
-            if (m.Count() > 0)
+            if (match.Any())
                 return false;
 
             return true;

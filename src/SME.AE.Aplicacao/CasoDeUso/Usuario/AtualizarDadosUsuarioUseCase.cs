@@ -25,11 +25,6 @@ namespace SME.AE.Aplicacao
         {
             var usuarioApp = await mediator.Send(new ObterUsuarioQuery(usuarioDto.Id));
 
-            bool podePersistirTexto = await PodePersistirTexto(usuarioDto);
-
-            if (!podePersistirTexto)
-                return RespostaApi.Falha("Conteúdo inadequado nos campos de cadastro, por favor revise e tente novamente.");
-
             var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuarioApp.Cpf));
             
             if (usuarioEol == null)
@@ -50,16 +45,9 @@ namespace SME.AE.Aplicacao
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, correlacaoCodigo));
             await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, correlacaoCodigo));
         }
-
-        private async Task<bool> PodePersistirTexto(AtualizarDadosUsuarioDto usuarioDto)
-        {
-            var podePersistir = await mediator.Send(new VerificaPalavraProibidaPodePersistirCommand(usuarioDto.TextoParaVerificarPersistencia()));
-            return podePersistir;
-        }
-
         private RespostaApi MapearResposta(Usuario usuarioApp)
         {
-            RespostaAutenticar usuario = new RespostaAutenticar
+            var usuario = new RespostaAutenticar
             {
                 Cpf = usuarioApp.Cpf,
                 Id = usuarioApp.Id,
