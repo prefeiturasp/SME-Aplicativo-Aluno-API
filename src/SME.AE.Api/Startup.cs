@@ -108,7 +108,6 @@ namespace SME.AE.Api
         private void ConfiguraTelemetria(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var clientTelemetry = serviceProvider.GetService<TelemetryClient>();
 
             var telemetriaOptions = new TelemetriaOptions();
             Configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);

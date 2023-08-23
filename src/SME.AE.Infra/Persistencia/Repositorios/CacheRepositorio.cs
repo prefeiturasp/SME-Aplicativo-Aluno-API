@@ -28,8 +28,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 var cacheParaRetorno = memoryCache.Get<string>(nomeChave);
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (utilizarGZip)
                 {
                     cacheParaRetorno = UtilGZip.Descomprimir(Convert.FromBase64String(cacheParaRetorno));
@@ -42,8 +40,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 //Caso o cache esteja indisponível a aplicação precisa continuar funcionando mesmo sem o cache
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return null;
             }
         }
@@ -58,8 +54,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var stringCache = memoryCache.Get<string>(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
@@ -79,8 +73,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return default;
             }
         }
@@ -95,8 +87,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var stringCache = memoryCache.Get<string>(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
@@ -116,8 +106,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return default;
             }
         }
@@ -132,8 +120,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var stringCache = memoryCache.Get<string>(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
@@ -150,8 +136,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 servicoLog.Registrar(ex);
                 timer.Stop();
-
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, $"Obtendo - Erro {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 return default;
             }
         }
@@ -166,13 +150,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 memoryCache.Remove(nomeChave);
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
             }
             catch (Exception ex)
             {
                 //Caso o cache esteja indisponível a aplicação precisa continuar funcionando mesmo sem o cache
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }
@@ -193,13 +175,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 memoryCache.Set(nomeChave, valor, TimeSpan.FromMinutes(minutosParaExpirar));
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
-
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Salvar", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }
@@ -223,13 +202,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                     memoryCache.Set(nomeChave, valor, TimeSpan.FromMinutes(minutosParaExpirar));
 
                     timer.Stop();
-                    servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
                 }
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Salvar", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }
