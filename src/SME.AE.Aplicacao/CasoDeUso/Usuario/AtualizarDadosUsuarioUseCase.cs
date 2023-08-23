@@ -9,6 +9,7 @@ using SME.AE.Dominio.Entidades;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao
 {
@@ -23,16 +24,23 @@ namespace SME.AE.Aplicacao
 
         public async Task<RespostaApi> Executar(AtualizarDadosUsuarioDto usuarioDto)
         {
-            var usuarioApp = await mediator.Send(new ObterUsuarioQuery(usuarioDto.Id));
+            try
+            {
+                var usuarioApp = await mediator.Send(new ObterUsuarioQuery(usuarioDto.Id));
 
-            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuarioApp.Cpf));
+                var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuarioApp.Cpf));
             
-            if (usuarioEol == null)
-                return RespostaApi.Falha("Usuário não encontrado!");
+                if (usuarioEol == null)
+                    return RespostaApi.Falha("Usuário não encontrado!");
 
-            await AtualizaUsuario(usuarioApp, usuarioDto);
+                await AtualizaUsuario(usuarioApp, usuarioDto);
 
-            return MapearResposta(usuarioApp);
+                return MapearResposta(usuarioApp);
+            }
+            catch (Exception e)
+            {
+                throw new NegocioException(e.Message);
+            }
         }
 
         private async Task AtualizaUsuario(Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
