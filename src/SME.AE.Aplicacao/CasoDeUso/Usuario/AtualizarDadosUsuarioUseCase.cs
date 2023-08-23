@@ -45,13 +45,20 @@ namespace SME.AE.Aplicacao
 
         private async Task AtualizaUsuario(Usuario usuarioApp, AtualizarDadosUsuarioDto usuarioDto)
         {
-            usuarioApp.AtualizarAuditoria();
-            await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
+            try
+            {
+                usuarioApp.AtualizarAuditoria();
+                await mediator.Send(new SalvarUsuarioCommand(usuarioApp));
 
-            var correlacaoCodigo = Guid.NewGuid();
+                var correlacaoCodigo = Guid.NewGuid();
 
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, correlacaoCodigo));
-            await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, correlacaoCodigo));
+                await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralEol, usuarioDto, correlacaoCodigo));
+                await mediator.Send(new PublicarFilaAeCommand(RotasRabbitAe.RotaAtualizacaoCadastralProdam, usuarioDto, correlacaoCodigo));
+            }
+            catch (Exception e)
+            {
+                throw new NegocioException(e.Message);
+            }
         }
         private RespostaApi MapearResposta(Usuario usuarioApp)
         {
