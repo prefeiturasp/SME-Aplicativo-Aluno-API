@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum.Excecoes;
 using SME.AE.Dominio.Entidades;
@@ -19,14 +20,21 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
         public async Task<Usuario> Handle(ObterUsuarioQuery request, CancellationToken cancellationToken)
         {
 
-            Usuario usuario = default;
+            try
+            {
+                Usuario usuario = default;
 
-            if (!string.IsNullOrWhiteSpace(request.Cpf))
-                usuario = await usuarioRepository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf);
-            else
-                usuario = await usuarioRepository.ObterPorIdAsync(request.Id);
+                if (!string.IsNullOrWhiteSpace(request.Cpf))
+                    usuario = await usuarioRepository.ObterUsuarioNaoExcluidoPorCpf(request.Cpf);
+                else
+                    usuario = await usuarioRepository.ObterPorIdAsync(request.Id);
 
-            return usuario ?? throw new NegocioException($"Usuário não encontrado");
+                return usuario ?? throw new NegocioException($"Usuário não encontrado");
+            }
+            catch (Exception e)
+            {
+                throw new NegocioException(e.Message);
+            }
         }
     }
 }

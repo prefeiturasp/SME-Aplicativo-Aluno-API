@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 {
@@ -20,18 +22,25 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 
         public async Task<DadosResponsavelAlunoResumido> Handle(ObterDadosResponsavelResumidoQuery request, CancellationToken cancellationToken)
         {
-            var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
-            var url = $"alunos/responsaveis/{request.CpfResponsavel}/resumido";
+            try
+            {
+                var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
+                var url = $"alunos/responsaveis/{request.CpfResponsavel}/resumido";
 
-            var resposta = await httpClient.GetAsync(url);
-            if (resposta.IsSuccessStatusCode)
-            {
-                var json = await resposta.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<DadosResponsavelAlunoResumido>(json);
+                var resposta = await httpClient.GetAsync(url);
+                if (resposta.IsSuccessStatusCode)
+                {
+                    var json = await resposta.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<DadosResponsavelAlunoResumido>(json);
+                }
+                else
+                {
+                    throw new Exception($"Não foi possível obter dados do responsável");
+                }
             }
-            else
+            catch (Exception e)
             {
-                throw new System.Exception($"Não foi possível obter dados do responsável");
+                throw new NegocioException(e.Message);
             }
         }
     }
