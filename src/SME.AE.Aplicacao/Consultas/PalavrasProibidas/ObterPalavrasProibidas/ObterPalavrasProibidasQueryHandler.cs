@@ -17,6 +17,7 @@ namespace SME.AE.Aplicacao
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
+        //TODO servicoAtualizacaoCadastral está retornando dados que não são palavras bloqueadas 
         public async Task<string[]> Handle(ObterPalavrasProibidasQuery request, CancellationToken cancellationToken)
         {
             var palavrasBloqueadas = new string[] { };
