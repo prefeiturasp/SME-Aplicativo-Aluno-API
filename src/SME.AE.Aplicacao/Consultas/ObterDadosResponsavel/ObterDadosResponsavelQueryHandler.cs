@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -32,7 +31,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             }
             else
             {
-                throw new Exception($"Não foi possível obter dados do responsável. {resposta.ReasonPhrase}, {httpClient.BaseAddress}, {((string[])httpClient.DefaultRequestHeaders.GetValues("x-api-eol-key"))[0]}");
+                throw new System.Exception($"Não foi possível obter dados do responsável");
             }
         }
     }
