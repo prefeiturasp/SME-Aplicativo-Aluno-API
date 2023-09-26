@@ -90,7 +90,7 @@ pipeline {
                     else{
                         withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
                             sh('cp $config '+"$home"+'/.kube/config')
-                            sh 'kubectl -n sme-appaluno rollout restart deploy'
+                            sh 'kubectl -n ${namespace} rollout restart deploy'
                             sh('rm -f '+"$home"+'/.kube/config')
                         }
                     }
