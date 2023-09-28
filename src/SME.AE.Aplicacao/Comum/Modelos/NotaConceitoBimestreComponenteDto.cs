@@ -26,7 +26,7 @@
             if (conceitoId == 1)
                 return "P";
             else if (conceitoId == 2)
-                return "N";
+                return "S";
             else return "NS";
         }
     }
