@@ -55,7 +55,12 @@ pipeline {
         }        
 
         stage('Build') {
-          when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'testejenkins2';  } } 
+          when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'testejenkins2';  } }
+           agent { kubernetes { 
+              label 'builder'
+              defaultContainer 'builder'
+            }
+          }
           steps {
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
