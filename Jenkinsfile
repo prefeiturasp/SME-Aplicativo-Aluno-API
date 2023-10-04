@@ -6,9 +6,11 @@ pipeline {
       namespace = "${env.branchname == 'release-r2' ? 'appaluno-hom2' : env.branchname == 'release' ? 'appaluno-hom' : env.branchname == 'development' ? 'appaluno-dev' : 'sme-appaluno' }"
     }
   
-    agent {
-      node { label 'dotnet31-appaluno-rc' }
-    }
+    agent { kubernetes { 
+              label 'dotnet-3-rc'
+              defaultContainer 'dotnet-3-rc'
+            }
+          }
 
     options {
       buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
@@ -41,7 +43,7 @@ pipeline {
      }
 
         stage('AnaliseCodigo') {
-	      when { branch 'homolog' }
+	      when { branch 'testejenkins2' }
           steps {
               withSonarQubeEnv('sonarqube-local'){
                 sh 'echo "[ INFO ] Iniciando analise Sonar..." && dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno"'
@@ -53,7 +55,7 @@ pipeline {
         }        
 
         stage('Build') {
-          when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'homolog';  } } 
+          when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'testejenkins2';  } } 
           steps {
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
@@ -74,7 +76,7 @@ pipeline {
         }
 	    
         stage('Deploy'){
-            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }        
+            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'testejenkins2';  } }        
             steps {
                 script{
                     if ( env.branchname == 'main' ||  env.branchname == 'master' || env.branchname == 'homolog' || env.branchname == 'release' ) {
@@ -101,8 +103,12 @@ pipeline {
         }
 
           stage('Flyway') { 
-            agent { label 'master' }
-            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }     
+            agent { kubernetes { 
+              label 'flyway'
+              defaultContainer 'flyway'
+            }
+          }
+            when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'testejenkins2';  } }     
             steps{ 
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
                  checkout scm 
