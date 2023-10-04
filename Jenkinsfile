@@ -45,6 +45,7 @@ pipeline {
         stage('AnaliseCodigo') {
 	      when { branch 'testejenkins2' }
           steps {
+              checkout scm
               withSonarQubeEnv('sonarqube-local'){
                 sh 'echo "[ INFO ] Iniciando analise Sonar..." && dotnet-sonarscanner begin /k:"SME-Aplicativo-Aluno"'
                 sh 'dotnet build'
