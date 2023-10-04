@@ -57,7 +57,7 @@ pipeline {
         stage('Build') {
           when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'testejenkins2';  } }
            agent { kubernetes { 
-              label 'dotnet-3-rc'
+              label 'builder'
               defaultContainer 'builder'
             }
           }
