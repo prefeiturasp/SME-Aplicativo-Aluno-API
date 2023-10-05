@@ -118,7 +118,6 @@ pipeline {
             steps{
 		checkout scm 
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
-                 checkout scm 
                  sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts boxfuse/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
               } 
             }
