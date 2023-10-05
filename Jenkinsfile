@@ -6,9 +6,11 @@ pipeline {
       namespace = "${env.branchname == 'release-r2' ? 'appaluno-hom2' : env.branchname == 'release' ? 'appaluno-hom' : env.branchname == 'development' ? 'appaluno-dev' : 'sme-appaluno' }"
     }
   
-    agent {
-      node { label 'dotnet31-appaluno-rc' }
-    }
+    agent { kubernetes { 
+              label 'dotnet-3-rc'
+              defaultContainer 'dotnet-3-rc'
+            }
+          }
 
     options {
       buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
@@ -53,7 +55,13 @@ pipeline {
 
         stage('Build') {
           when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'homolog';  } } 
+          agent { kubernetes { 
+              label 'builder'
+              defaultContainer 'builder'
+            }
+          }
           steps {
+	    checkout scm	
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
               imagename2 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/appaluno-worker"
@@ -81,23 +89,35 @@ pipeline {
                         timeout(time: 24, unit: "HOURS") {
                             input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato, luiz_araujo, marcos_lobo, rafael_losi, robson_silva'
                         }
-                    }		
-                     withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
-                         sh('cp $config '+"$home"+'/.kube/config')
-                         sh "kubectl -n ${namespace} rollout restart deploy"
-                         sh('rm -f '+"$home"+'/.kube/config')
+                        withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
+                            sh('cp $config '+"$home"+'/.kube/config')
+                            sh "kubectl -n ${namespace} rollout restart deploy"
+                            sh('rm -f '+"$home"+'/.kube/config')
+                        }
+                    }
+                    else{
+                        withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
+                            sh('cp $config '+"$home"+'/.kube/config')
+                            sh 'kubectl -n ${namespace} rollout restart deploy'
+                            sh('rm -f '+"$home"+'/.kube/config')
+                        }
                     }
                 }
             }           
         }
 
           stage('Flyway') { 
-            agent { label 'master' }
+            agent { kubernetes { 
+              label 'flyway'
+              defaultContainer 'flyway'
+            }
+          }
             when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }     
-            steps{ 
+            steps{
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
                  checkout scm 
-                 sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts registry.sme.prefeitura.sp.gov.br/devops/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
+                 //sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts registry.sme.prefeitura.sp.gov.br/devops/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate'
+                 sh 'flyway -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate'
               } 
             }
           }    
