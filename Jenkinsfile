@@ -62,6 +62,7 @@ pipeline {
             }
           }
           steps {
+	      checkout scm
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
               imagename2 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/appaluno-worker"
