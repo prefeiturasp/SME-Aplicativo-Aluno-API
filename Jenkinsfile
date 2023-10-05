@@ -6,9 +6,11 @@ pipeline {
       namespace = "${env.branchname == 'release-r2' ? 'appaluno-hom2' : env.branchname == 'release' ? 'appaluno-hom' : env.branchname == 'development' ? 'appaluno-dev' : 'sme-appaluno' }"
     }
   
-    agent {
-      node { label 'dotnet31-appaluno-rc' }
-    }
+    agent { kubernetes { 
+              label 'dotnet-3-rc'
+              defaultContainer 'dotnet-3-rc'
+            }
+          }
 
     options {
       buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
@@ -53,6 +55,11 @@ pipeline {
 
         stage('Build') {
           when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'homolog';  } } 
+          agent { kubernetes { 
+              label 'builder'
+              defaultContainer 'builder'
+            }
+          }
           steps {
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
@@ -99,7 +106,11 @@ pipeline {
         }
 
           stage('Flyway') { 
-            agent { label 'master' }
+            agent { kubernetes { 
+              label 'flyway'
+              defaultContainer 'flyway'
+            }
+          }
             when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }     
             steps{ 
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
