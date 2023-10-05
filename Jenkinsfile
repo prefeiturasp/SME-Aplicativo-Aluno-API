@@ -113,9 +113,10 @@ pipeline {
             }
           }
             when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }     
-            steps{ 
+            steps{
+              checkout scm 
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
-                 checkout scm 
+                 //checkout scm 
                  sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts registry.sme.prefeitura.sp.gov.br/devops/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
               } 
             }
