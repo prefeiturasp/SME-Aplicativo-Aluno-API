@@ -66,7 +66,7 @@ pipeline {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
               imagename2 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/appaluno-worker"
               imagename3 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-ea-worker"
-   	      sh 'pwd'
+   	      sh 'dotnet build'
               dockerImage1 = docker.build(imagename1, "-f src/SME.AE.Api/Dockerfile .")
               dockerImage2 = docker.build(imagename2, "-f src/SME.AE.Worker.Service/Dockerfile .")
               dockerImage3 = docker.build(imagename3, "-f src/SME.AE.Worker/Dockerfile .")
