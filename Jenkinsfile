@@ -6,9 +6,11 @@ pipeline {
       namespace = "${env.branchname == 'release-r2' ? 'appaluno-hom2' : env.branchname == 'release' ? 'appaluno-hom' : env.branchname == 'development' ? 'appaluno-dev' : 'sme-appaluno' }"
     }
   
-    agent {
-      node { label 'dotnet31-appaluno-rc' }
-    }
+    agent { kubernetes { 
+              label 'dotnet-3-rc'
+              defaultContainer 'dotnet-3-rc'
+            }
+          }
 
     options {
       buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
@@ -30,13 +32,12 @@ pipeline {
       }
 
         stage('Testes de integração') {
+	when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch '_release';  branch 'release-r2'; branch 'homolog';  } } 
         steps {
-          
           //Executa os testes gerando um relatorio formato trx
             sh 'dotnet test --logger "trx;LogFileName=TestResults.trx"'
           //Publica o relatorio de testes
-            mstest failOnError: false
-          
+            mstest failOnError: false         
         }
      }
 
@@ -54,7 +55,13 @@ pipeline {
 
         stage('Build') {
           when { anyOf { branch 'master'; branch 'main'; branch "story/*"; branch 'development'; branch 'release';  branch 'release-r2'; branch 'homolog';  } } 
+          agent { kubernetes { 
+              label 'builder'
+              defaultContainer 'builder'
+            }
+          }
           steps {
+	    checkout scm	
             script {
               imagename1 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/sme-appaluno-api"
               imagename2 = "registry.sme.prefeitura.sp.gov.br/${env.branchname}/appaluno-worker"
@@ -67,7 +74,7 @@ pipeline {
               dockerImage2.push()
               dockerImage3.push()
               }
-              //sh "docker rmi $imagename1 $imagename2 $imagename3"
+             // sh "docker rmi $imagename1 $imagename2 $imagename3"
               //sh "docker rmi $imagename2"
             }
           }
@@ -78,11 +85,10 @@ pipeline {
             steps {
                 script{
                     if ( env.branchname == 'main' ||  env.branchname == 'master' || env.branchname == 'homolog' || env.branchname == 'release' ) {
-                        withCredentials([string(credentialsId: 'aprovadores-appaluno', variable: 'aprovadores')]) {
+                        sendTelegram("🤩 [Deploy ${env.branchname}] Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nMe aprove! \nLog: \n${env.BUILD_URL}")
                         timeout(time: 24, unit: "HOURS") {
-                            input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: "${aprovadores}"
+                            input message: 'Deseja realizar o deploy?', ok: 'SIM', submitter: 'marlon_goncalves, bruno_alevato, luiz_araujo, marcos_lobo, rafael_losi, robson_silva'
                         }
-			}
                         withCredentials([file(credentialsId: "${kubeconfig}", variable: 'config')]){
                             sh('cp $config '+"$home"+'/.kube/config')
                             sh "kubectl -n ${namespace} rollout restart deploy"
@@ -101,12 +107,17 @@ pipeline {
         }
 
           stage('Flyway') { 
-            agent { label 'master' }
+            agent { kubernetes { 
+              label 'flyway'
+              defaultContainer 'flyway'
+            }
+          }
             when { anyOf {  branch 'master'; branch 'main'; branch 'development'; branch 'release'; branch 'release-r2'; branch 'homolog';  } }     
-            steps{ 
+            steps{
               withCredentials([string(credentialsId: "flyway_appaluno_${branchname}", variable: 'url')]) { 
                  checkout scm 
-                 sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts boxfuse/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate' 
+                 //sh 'docker run --rm -v $(pwd)/scripts:/opt/scripts registry.sme.prefeitura.sp.gov.br/devops/flyway:5.2.4 -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate'
+                 sh 'flyway -url=$url -locations="filesystem:/opt/scripts" -outOfOrder=true migrate'
               } 
             }
           }    
@@ -117,7 +128,7 @@ pipeline {
     unstable { sendTelegram("💣 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Unstable \nLog: \n${env.BUILD_URL}console") }
     failure { sendTelegram("💥 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Failure \nLog: \n${env.BUILD_URL}console") }
     aborted { sendTelegram ("😥 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Aborted \nLog: \n${env.BUILD_URL}console") }
-    always  { sh "docker rmi $imagename1 $imagename2 $imagename3" }	  
+    always  { sh "docker rmi $imagename1 $imagename2 $imagename3" }
   }
 }
 def sendTelegram(message) {
@@ -137,5 +148,6 @@ def getKubeconf(branchName) {
     else if ("master".equals(branchName)) { return "config_prd"; }
     else if ("homolog".equals(branchName)) { return "config_release"; }
     else if ("release".equals(branchName)) { return "config_release"; }
+    else if ("release-r2".equals(branchName)) { return "config_release"; }
     else if ("development".equals(branchName)) { return "config_release"; }
 }
