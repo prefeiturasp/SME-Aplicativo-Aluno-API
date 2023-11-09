@@ -13,6 +13,14 @@ namespace SME.AE.Aplicacao.Comum.Modelos
             Data = data;
         }
 
+        internal RespostaApi(bool ok, IEnumerable<string> erros, object data, string email)
+        {
+            Ok = ok;
+            Erros = erros.ToArray();
+            Data = null;
+            Email = email;
+        }
+
         internal RespostaApi(bool ok, IList<ValidationFailure> erros)
         {
             Ok = ok;
@@ -27,6 +35,8 @@ namespace SME.AE.Aplicacao.Comum.Modelos
         public bool Ok { get; set; }
 
         public string[] Erros { get; set; }
+
+        public string Email { get; set; }
 
         public IDictionary<string, string[]> ValidacaoErros { get; set; }
 
