@@ -51,7 +51,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
             await mediator.Send(new SalvarUsuarioCommand(usuario));
 
-            return RespostaApi.Sucesso(usuarioEol.Email);
+            return new RespostaApi(true, new string[] { }, null, usuarioEol.Email);
         }
 
         private async Task<Dominio.Entidades.Usuario> ObterUsuario(GerarTokenDto gerarTokenDto)
