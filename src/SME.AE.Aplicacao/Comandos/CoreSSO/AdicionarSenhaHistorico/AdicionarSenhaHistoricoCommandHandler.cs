@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico
 {
-    public class AdicionarSenhaHistoricoCommandHandler : IRequestHandler<AdicionarSenhaHistoricoCommand>
+    public class AdicionarSenhaHistoricoCommandHandler : IRequestHandler<AdicionarSenhaHistoricoCommand, Unit>
     {
         private readonly IUsuarioSenhaHistoricoCoreSSORepositorio usuarioSenhaHistoricoCoreSSORepositorio;
 
@@ -28,7 +28,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico
 
             await usuarioSenhaHistoricoCoreSSORepositorio.AdicionarSenhaHistorico(historico);
 
-            return default;
+            return Unit.Value;
         }
     }
 }

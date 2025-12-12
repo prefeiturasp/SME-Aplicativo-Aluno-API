@@ -2,6 +2,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Registry;
 using SME.AE.Aplicacao.CasoDeUso;
@@ -31,7 +32,7 @@ namespace SME.AE.Aplicacao
         private static void AdicionarMediatr(this IServiceCollection services)
         {
             var assembly = AppDomain.CurrentDomain.Load("SME.AE.Aplicacao");
-            services.AddMediatR(assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
         }
 
         public static void AddApplication(this IServiceCollection services)
@@ -46,12 +47,15 @@ namespace SME.AE.Aplicacao
 
         private static void AdicionarAutoMapper(this IServiceCollection services)
         {
-            var configuration = new MapperConfiguration(cfg =>
+            services.AddSingleton(provider =>
             {
-                cfg.AddMaps(AppDomain.CurrentDomain.Load("SME.AE.Aplicacao"));
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var configuration = new MapperConfiguration(cfg =>
+                {
+                    cfg.AddMaps(AppDomain.CurrentDomain.Load("SME.AE.Aplicacao"));
+                }, loggerFactory);
+                return configuration.CreateMapper();
             });
-
-            services.AddSingleton(configuration.CreateMapper());
         }
 
         private static void AddServices(this IServiceCollection services)

@@ -4,7 +4,7 @@
 
 Api do aplicativo Escola Aqui utiliza as tecnologias abaixo:
 
-- Dotnet Core 3.1
+- Dotnet 10
 - C#
 - CQRS (Commands and Queries)
 - FluentValitation

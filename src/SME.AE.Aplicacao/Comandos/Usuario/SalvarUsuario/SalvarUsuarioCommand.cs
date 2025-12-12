@@ -2,7 +2,7 @@
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario
 {
-    public class SalvarUsuarioCommand : IRequest
+    public class SalvarUsuarioCommand : IRequest<Unit>
     {
         public SalvarUsuarioCommand(Dominio.Entidades.Usuario usuario)
         {

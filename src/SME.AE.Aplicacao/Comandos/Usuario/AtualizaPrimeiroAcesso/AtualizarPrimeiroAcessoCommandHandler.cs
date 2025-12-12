@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso
 {
-    public class AtualizarPrimeiroAcessoCommandHandler : IRequestHandler<AtualizarPrimeiroAcessoCommand>
+    public class AtualizarPrimeiroAcessoCommandHandler : IRequestHandler<AtualizarPrimeiroAcessoCommand, Unit>
     {
         private readonly IUsuarioRepository usuarioRepository;
 

@@ -1,4 +1,4 @@
-﻿using IdentityServer4.EntityFramework.Options;
+﻿using Duende.IdentityServer.EntityFramework.Options;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,7 +16,7 @@ namespace SME.AE.Infra.Persistencia
     {
         public AplicacaoContext(
             DbContextOptions options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
+            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, (IOptions<Duende.IdentityServer.EntityFramework.Options.OperationalStoreOptions>)operationalStoreOptions)
         {
         }
         protected override void OnModelCreating(ModelBuilder builder)

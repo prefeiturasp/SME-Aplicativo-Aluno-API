@@ -3,7 +3,7 @@ using System;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO
 {
-    public class AlterarSenhaUsuarioCoreSSOCommand : IRequest
+    public class AlterarSenhaUsuarioCoreSSOCommand : IRequest<Unit>
     {
         public AlterarSenhaUsuarioCoreSSOCommand(Guid usuarioId, string senhaCriptograda)
         {

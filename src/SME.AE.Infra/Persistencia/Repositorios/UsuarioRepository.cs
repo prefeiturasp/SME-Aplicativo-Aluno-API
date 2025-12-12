@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Dapper.Dommel;
 using Dommel;
 using Npgsql;
 using Sentry;

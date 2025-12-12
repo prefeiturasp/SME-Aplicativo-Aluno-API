@@ -80,7 +80,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             result.ShouldHaveValidationErrorFor(x => x.Usuario);
         }
 
-        private TestValidationResult<CriarUsuarioCoreSSOCommand, CriarUsuarioCoreSSOCommand> ExecutarValidacaoCommand()
+        private TestValidationResult<CriarUsuarioCoreSSOCommand> ExecutarValidacaoCommand()
         {
             var validator = new CriarUsuarioCoreSSOCommandValidator();
 

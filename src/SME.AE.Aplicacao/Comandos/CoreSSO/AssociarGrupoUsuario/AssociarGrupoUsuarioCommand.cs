@@ -3,7 +3,7 @@ using SME.AE.Aplicacao.Comum.Modelos;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
 {
-    public class AssociarGrupoUsuarioCommand : IRequest
+    public class AssociarGrupoUsuarioCommand : IRequest<Unit>
     {
         public AssociarGrupoUsuarioCommand(RetornoUsuarioCoreSSO usuarioCoreSSO)
         {

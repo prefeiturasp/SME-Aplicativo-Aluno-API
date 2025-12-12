@@ -1,22 +1,20 @@
 using Elastic.Apm.AspNetCore;
 using Elastic.Apm.DiagnosticSource;
-using Elastic.Apm.SqlClient;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Servicos;
-using SME.AE.Aplicacao.CasoDeUso;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Comum;
 using SME.AE.Dominio.Options;
 using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
+using Microsoft.OpenApi;
+using Elastic.Apm.SqlClient;
 
 namespace SME.AE.Worker
 {
