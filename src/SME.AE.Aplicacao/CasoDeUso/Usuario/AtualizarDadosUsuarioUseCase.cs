@@ -25,6 +25,9 @@ namespace SME.AE.Aplicacao
         {
             var usuarioApp = await mediator.Send(new ObterUsuarioQuery(usuarioDto.Id));
 
+            if (usuarioApp == null)
+                return RespostaApi.Falha("Usuário não encontrado na base de dados da aplicação!");
+
             var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuarioApp.Cpf));
             
             if (usuarioEol == null)
