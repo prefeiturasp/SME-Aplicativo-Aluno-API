@@ -1,9 +1,9 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic as build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY ["src/SME.AE.Api/SME.AE.Api.csproj", "src/SME.AE.Api/"]
 COPY ["src/SME.AE.Infra/SME.AE.Infra.csproj", "src/SME.AE.Infra/"]
