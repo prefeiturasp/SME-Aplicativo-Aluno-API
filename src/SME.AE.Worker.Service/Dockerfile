@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-WORKDIR /app
+WORKDIR /src
 
 COPY . ./
 
 RUN dotnet restore
-RUN dotnet publish -c Release -o /src/out
+RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
