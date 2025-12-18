@@ -1,28 +1,29 @@
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY . ./
+COPY ["src/SME.AE.Worker.Service/SME.AE.Worker.Service.csproj", "src/SME.AE.Worker.Service/"]
+RUN dotnet restore "src/SME.AE.Worker.Service/SME.AE.Worker.Service.csproj"
 
-RUN dotnet restore
-RUN dotnet publish -c Release -o out
+COPY . .
+RUN dotnet publish "src/SME.AE.Worker.Service/SME.AE.Worker.Service.csproj" -c Release -o /app/out
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-COPY --from=base /src/out .
+
+COPY --from=build /app/out .
 
 ARG SME_AE_ENVIRONMENT=dev
-
+ENV ASPNETCORE_ENVIRONMENT=${SME_AE_ENVIRONMENT}
 ENV TZ=America/Sao_Paulo
-ENV DEBIAN_FRONTEND=noninteractive
 
 ARG AEConnection
 ARG EolConnection
 ARG SgpConnection
 ARG CoreSSOConnection
 
-ENV AEConnection=$AEConnection
-ENV EolConnection=$EolConnection
-ENV SgpConnection=$SgpConnection
-ENV CoreSSOConnection=$CoreSSOConnection
+ENV AEConnection=${AEConnection}
+ENV EolConnection=${EolConnection}
+ENV SgpConnection=${SgpConnection}
+ENV CoreSSOConnection=${CoreSSOConnection}
 
-CMD ["dotnet", "SME.AE.Worker.Service.dll"]
+ENTRYPOINT ["dotnet", "SME.AE.Worker.Service.dll"]
