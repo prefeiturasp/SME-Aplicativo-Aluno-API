@@ -77,7 +77,9 @@ namespace SME.AE.Api
             services.AddCors(options => options.AddDefaultPolicy(
                 builder =>
                 {
-                    builder.WithOrigins("*");
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
                 })
             );
 
