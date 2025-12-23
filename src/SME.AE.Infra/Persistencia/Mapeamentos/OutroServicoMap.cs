@@ -7,6 +7,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         public OutroServicoMap() : base()
         {
             ToTable("outroservico");
+            Map(x => x.Id).ToColumn("id").IsKey().IsIdentity();
             Map(x => x.Titulo).ToColumn("titulo");
             Map(x => x.Descricao).ToColumn("descricao");
             Map(x => x.Categoria).ToColumn("categoria");
