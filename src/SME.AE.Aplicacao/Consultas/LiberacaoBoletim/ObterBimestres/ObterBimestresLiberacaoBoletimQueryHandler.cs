@@ -27,11 +27,11 @@ namespace SME.AE.Aplicacao.Consultas.ObterBimestres
                 var json = await resposta.Content.ReadAsStringAsync();
                 bimestres = JsonConvert.DeserializeObject<int[]>(json);
                 if (json.Contains("-99"))
-                    bimestres = new int[] { 1, 2, 3, 4, 0 };
+                    bimestres = [1, 2, 3, 4, 0];
             }
             else
             {
-                throw new Exception($"Não foi possível localizar os bimetres da liberação de boletim da turma do aluno.");
+                return [1, 2, 3, 4];
             }
 
             return bimestres;
