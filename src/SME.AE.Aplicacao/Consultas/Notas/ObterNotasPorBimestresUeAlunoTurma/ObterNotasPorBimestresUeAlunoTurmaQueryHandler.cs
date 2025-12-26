@@ -25,10 +25,10 @@ namespace SME.AE.Aplicacao
             IEnumerable<NotaConceitoBimestreComponenteDto> notasConceitos;
 
             var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
-            var resposta = await httpClient.GetAsync($"v1/avaliacoes/notas/integracoes/ues/{request.UeCodigo}/turmas/{request.TurmaCodigo}/alunos/{request.AlunoCodigo}?bimestres={string.Join("&bimestres=", request.Bimestres)}");
+            var resposta = await httpClient.GetAsync($"v1/avaliacoes/notas/integracoes/ues/{request.UeCodigo}/turmas/{request.TurmaCodigo}/alunos/{request.AlunoCodigo}?bimestres={string.Join("&bimestres=", request.Bimestres)}", cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 notasConceitos = JsonConvert.DeserializeObject<IEnumerable<NotaConceitoBimestreComponenteDto>>(json);
             }
             else

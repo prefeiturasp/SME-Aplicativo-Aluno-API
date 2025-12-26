@@ -26,8 +26,9 @@ namespace SME.AE.Aplicacao
             if (resposta.IsSuccessStatusCode)
             {
                 frequenciaGlobal = new FrequenciaGlobalDto();
-                var json = await resposta.Content.ReadAsStringAsync();
-                frequenciaGlobal.Frequencia = JsonConvert.DeserializeObject<double>(json.Replace(',', '.'));
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
+                if(!string.IsNullOrEmpty(json.Replace("\"", "")))
+                   frequenciaGlobal.Frequencia = JsonConvert.DeserializeObject<double>(json.Replace(',', '.'));
             }
             else
             {
