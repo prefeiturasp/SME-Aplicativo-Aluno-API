@@ -1,5 +1,4 @@
 ﻿using Elastic.Apm;
-using Microsoft.ApplicationInsights;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Dominio.Options;
 using System;

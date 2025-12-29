@@ -8,7 +8,6 @@ using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios.Externos;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
-using SME.AE.Aplicacao.HandlerExtensions;
 using SME.AE.Aplicacao.Servicos;
 using SME.AE.Comum;
 using SME.AE.Comum.Utilitarios;

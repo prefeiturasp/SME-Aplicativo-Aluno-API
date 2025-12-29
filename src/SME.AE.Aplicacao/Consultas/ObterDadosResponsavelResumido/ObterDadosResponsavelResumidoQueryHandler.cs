@@ -23,10 +23,10 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
             var url = $"alunos/responsaveis/{request.CpfResponsavel}/resumido";
 
-            var resposta = await httpClient.GetAsync(url);
+            var resposta = await httpClient.GetAsync(url, cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<DadosResponsavelAlunoResumido>(json);
             }
             else

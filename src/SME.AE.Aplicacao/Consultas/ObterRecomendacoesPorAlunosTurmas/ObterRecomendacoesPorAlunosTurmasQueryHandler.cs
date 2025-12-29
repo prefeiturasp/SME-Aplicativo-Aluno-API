@@ -1,14 +1,8 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
-using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Comum.Utilitarios;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

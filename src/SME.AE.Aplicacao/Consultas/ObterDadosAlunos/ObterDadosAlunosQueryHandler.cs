@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
-using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -27,10 +26,10 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             var paramQueryResponsavel = $"cpfResponsavel={request.CpfResponsavel}";
             var url = $"alunos/dados-acompanhamento-escolar?{paramQueryResponsavel}&{paramQueryDre}&{paramQueryUe}&{paramQueryAluno}";
 
-            var resposta = await httpClient.GetAsync(url);
+            var resposta = await httpClient.GetAsync(url, cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<IEnumerable<AlunoRespostaEol>>(json);
             }
             else

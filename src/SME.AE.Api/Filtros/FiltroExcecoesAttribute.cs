@@ -23,7 +23,7 @@ namespace SME.AE.Api.Filtros
         {
             using (SentrySdk.Init(sentryDSN))
             {
-                var internalIP = Dns.GetHostEntry(Dns.GetHostName()).AddressList?.FirstOrDefault(c => c.AddressFamily == AddressFamily.InterNetwork).ToString();
+                var internalIP = Dns.GetHostEntry(Dns.GetHostName()).AddressList?.FirstOrDefault(c => c.AddressFamily == AddressFamily.InterNetwork)?.ToString();
 
                 SentrySdk.AddBreadcrumb($"{Environment.MachineName ?? string.Empty} - {internalIP ?? string.Empty }", "Machine Identification");
 

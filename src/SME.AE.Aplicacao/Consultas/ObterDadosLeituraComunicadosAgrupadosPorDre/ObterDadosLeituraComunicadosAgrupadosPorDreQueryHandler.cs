@@ -2,7 +2,6 @@
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,11 +40,17 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
                 var dadosLeituraComunicadosResultado = new DadosLeituraComunicadosResultado();
                 dadosLeituraComunicadosResultado.NomeAbreviadoDre = dres?.Where(d => d.CodigoDre == dadosLeituraDre.DreCodigo).FirstOrDefault()?.Abreviacao;
 
-                if (request.ModoVisualizacao == ModoVisualizacao.Responsavel)
-                    await ObterTotaisDeLeituraPorResponsavel(request, dadosLeituraDre, dadosLeituraComunicadosResultado);
-
-                if (request.ModoVisualizacao == ModoVisualizacao.Aluno)
-                    await ObterTotaisDeLeituraPorAluno(request, dadosLeituraDre, dadosLeituraComunicadosResultado);
+                switch (request.ModoVisualizacao)
+                {
+                    case ModoVisualizacao.Responsavel:
+                        await ObterTotaisDeLeituraPorResponsavel(request, dadosLeituraDre, dadosLeituraComunicadosResultado);
+                        break;
+                    case ModoVisualizacao.Aluno:
+                        await ObterTotaisDeLeituraPorAluno(request, dadosLeituraDre, dadosLeituraComunicadosResultado);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
 
                 retornoDadosLeituraComunicadosResultado.Add(dadosLeituraComunicadosResultado);
             }

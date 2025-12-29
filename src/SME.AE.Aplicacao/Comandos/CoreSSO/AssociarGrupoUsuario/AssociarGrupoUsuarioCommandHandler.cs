@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario
 {
-    public class AssociarGrupoUsuarioCommandHandler : IRequestHandler<AssociarGrupoUsuarioCommand>
+    public class AssociarGrupoUsuarioCommandHandler : IRequestHandler<AssociarGrupoUsuarioCommand, Unit>
     {
         private readonly IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio;
 

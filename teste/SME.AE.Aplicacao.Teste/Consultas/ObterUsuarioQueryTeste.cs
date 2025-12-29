@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao.Teste.Consultas
             result.ShouldNotHaveAnyValidationErrors();
         }
 
-        private TestValidationResult<ObterUsuarioQuery, ObterUsuarioQuery> ValidarObjeto()
+        private TestValidationResult<ObterUsuarioQuery> ValidarObjeto()
         {
             var validator = new ObterUsuarioQueryValidator();
 

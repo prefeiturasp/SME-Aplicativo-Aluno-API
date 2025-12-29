@@ -27,7 +27,8 @@ namespace SME.AE.Aplicacao.Consultas
         {
             var aluno = (await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null))).Where(a => a.CodigoEol == request.CodigoAluno).FirstOrDefault();
 
-            var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { aluno.CodigoTurma.ToString() }));
+            var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery([aluno.CodigoTurma.ToString()
+            ]), cancellationToken);
             if (turmasModalidade.Any())
             {
                 var modalidadeDaTurma = turmasModalidade.FirstOrDefault();
@@ -35,25 +36,14 @@ namespace SME.AE.Aplicacao.Consultas
                 aluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
             }
 
-            var modalidade = 0;
-
-            switch (aluno.ModalidadeCodigo)
+            var modalidade = aluno.ModalidadeCodigo switch
             {
-                case 1:
-                    modalidade = 3;
-                    break;
-                case 3:
-                    modalidade = 2;
-                    break;
-                case 5:
-                case 6:
-                    modalidade = 1;
-                    break;
-                default:
-                    modalidade = aluno.ModalidadeCodigo;
-                    break;
-            }
-            var eventos = await mediator.Send(new ObterEventosPorDreUeTurmaMesQuery(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno));
+                1 => 3,
+                3 => 2,
+                5 or 6 => 1,
+                _ => aluno.ModalidadeCodigo
+            };
+            var eventos = await mediator.Send(new ObterEventosPorDreUeTurmaMesQuery(aluno.CodigoDre, aluno.CodigoEscola, aluno.CodigoTurma.ToString(), modalidade, request.MesAno), cancellationToken);
 
             var mesInicial = parametrosEscolaAquiRepositorio.ObterInt("MesInicioTransferenciaEventos", 3);
             var diaInicial = parametrosEscolaAquiRepositorio.ObterInt("DiaInicioTransferenciaEventos", 1);

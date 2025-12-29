@@ -1,8 +1,5 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore.Internal;
-using Rocket.Core.Plugins.NuGet;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao

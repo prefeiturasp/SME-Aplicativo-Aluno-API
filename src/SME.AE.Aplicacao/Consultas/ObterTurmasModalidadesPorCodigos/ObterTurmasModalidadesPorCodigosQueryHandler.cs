@@ -21,10 +21,10 @@ namespace SME.AE.Aplicacao
 
             var turmasCodigos = string.Join("&turmasCodigo=", request.TurmaCodigo);
 
-            var resposta = await httpClient.GetAsync($"v1/turma/integracoes/modalidades?turmasCodigo={turmasCodigos}");
+            var resposta = await httpClient.GetAsync($"v1/turma/integracoes/modalidades?turmasCodigo={turmasCodigos}", cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<IEnumerable<TurmaModalidadeCodigoDto>>(json);
             }
             else

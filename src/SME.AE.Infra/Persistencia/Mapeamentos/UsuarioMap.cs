@@ -7,6 +7,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         public UsuarioMap() : base()
         {
             ToTable("usuario");
+            Map(x => x.Id).ToColumn("id").IsKey().IsIdentity();
             Map(x => x.Cpf).ToColumn("cpf");
             Map(x => x.Excluido).ToColumn("excluido");
             Map(x => x.UltimoLogin).ToColumn("ultimologin");

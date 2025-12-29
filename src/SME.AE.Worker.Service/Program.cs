@@ -1,6 +1,5 @@
 using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,12 +25,15 @@ namespace SME.AE.Worker.Service
 
         private static void AdicionarAutoMapper(IServiceCollection services)
         {
-            var configuration = new MapperConfiguration(cfg =>
+            services.AddSingleton(provider =>
             {
-                cfg.AddMaps(AppDomain.CurrentDomain.Load("SME.AE.Aplicacao"));
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var configuration = new MapperConfiguration(cfg =>
+                {
+                    cfg.AddMaps(AppDomain.CurrentDomain.Load("SME.AE.Aplicacao"));
+                }, loggerFactory);
+                return configuration.CreateMapper();
             });
-
-            services.AddSingleton(configuration.CreateMapper());
         }
         private static void AdicionarMediatr(IServiceCollection services)
         {

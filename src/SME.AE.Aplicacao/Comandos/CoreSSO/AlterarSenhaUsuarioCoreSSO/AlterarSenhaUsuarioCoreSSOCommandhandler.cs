@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO
 {
-    public class AlterarSenhaUsuarioCoreSSOCommandhandler : IRequestHandler<AlterarSenhaUsuarioCoreSSOCommand>
+    public class AlterarSenhaUsuarioCoreSSOCommandhandler : IRequestHandler<AlterarSenhaUsuarioCoreSSOCommand, Unit>
     {
         private readonly IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio;
 
@@ -19,7 +19,7 @@ namespace SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO
         {
             await usuarioCoreSSORepositorio.AlterarSenha(request.UsuarioId, request.SenhaCriptograda);
 
-            return default;
+            return Unit.Value;
         }
     }
 }

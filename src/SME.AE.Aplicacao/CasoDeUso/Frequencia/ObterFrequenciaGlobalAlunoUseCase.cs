@@ -23,22 +23,20 @@ namespace SME.AE.Aplicacao
         {
             var frequenciaGlobal = await mediator.Send(new ObterFrequenciaGlobalAlunoQuery(filtro.TurmaCodigo, filtro.AlunoCodigo));
 
-            if (frequenciaGlobal != null)
-            {
-                var turmaModalidadeDeEnsino = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { filtro.TurmaCodigo }));
-                var modalidadeDeEnsino = (ModalidadeDeEnsino)turmaModalidadeDeEnsino.FirstOrDefault().ModalidadeCodigo;
+            if (frequenciaGlobal == null) return frequenciaGlobal;
+            var turmaModalidadeDeEnsino = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(new string[] { filtro.TurmaCodigo }));
+            var modalidadeDeEnsino = (ModalidadeDeEnsino)turmaModalidadeDeEnsino.FirstOrDefault().ModalidadeCodigo;
 
-                var parametros = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
+            var parametros = modalidadeDeEnsino == ModalidadeDeEnsino.Infantil
                 ? await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametrosParaEnsinoInfantil()))
                 : await mediator.Send(new ObterParametrosSistemaPorChavesQuery(FrequenciaAlunoCor.ObterChavesDosParametros()));
 
-                var obterFrequenciaAlunoCores = await mediator.Send(new ObterFrequenciaAlunoCorPorParametroQuery(parametros));
-                var obterFrequenciaAlunoFaixa = await mediator.Send(new ObterFrequenciaAlunoFaixaPorParametroQuery(parametros));
+            var obterFrequenciaAlunoCores = await mediator.Send(new ObterFrequenciaAlunoCorPorParametroQuery(parametros));
+            var obterFrequenciaAlunoFaixa = await mediator.Send(new ObterFrequenciaAlunoFaixaPorParametroQuery(parametros));
 
-                frequenciaGlobal.CorDaFrequencia = await mediator.Send(new ObterCorQuery(parametros, frequenciaGlobal.Frequencia,
-                    obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa,
-                    modalidadeDeEnsino));
-            }
+            frequenciaGlobal.CorDaFrequencia = await mediator.Send(new ObterCorQuery(parametros, frequenciaGlobal.Frequencia,
+                obterFrequenciaAlunoCores, obterFrequenciaAlunoFaixa,
+                modalidadeDeEnsino));
 
             return frequenciaGlobal;
         }

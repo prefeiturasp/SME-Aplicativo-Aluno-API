@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 namespace SME.AE.Api
 {
@@ -20,6 +19,6 @@ namespace SME.AE.Api
             })
             .UseStartup<Startup>()
             .UseSentry()
-            .UseUrls("http://0.0.0.0:5000;");
+            .UseUrls("http://0.0.0.0:9000;");
     }
 }
