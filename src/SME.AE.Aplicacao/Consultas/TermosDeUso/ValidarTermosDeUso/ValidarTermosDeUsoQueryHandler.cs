@@ -18,9 +18,7 @@ namespace SME.AE.Aplicacao.Consultas.TermosDeUso
         public async Task<bool> Handle(ValidarTermosDeUsoQuery request, CancellationToken cancellationToken)
         {
             var termosDeUso = await _termosDeUsoRepositorio.ObterPorIdAsync(request.TermoDeUsoId);
-            if (termosDeUso == null)
-                throw new NegocioException("Não foi possível encontrar os Termos de Uso.");
-            return true;
+            return termosDeUso == null ? throw new NegocioException("Não foi possível encontrar os Termos de Uso.") : true;
         }
 
     }

@@ -15,7 +15,7 @@ namespace SME.AE.Aplicacao.HandlerExtensions
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = await mediator.Send(new ObterSgpTokenQuery());
+            var token = await mediator.Send(new ObterSgpTokenQuery(), cancellationToken);
 
             request.Headers.Clear();
             request.Headers.Add("Authorization", $"Bearer {token}");

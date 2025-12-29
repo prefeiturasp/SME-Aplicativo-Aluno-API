@@ -20,7 +20,7 @@ namespace SME.AE.Aplicacao.Servicos
 
         public async Task Enviar(string nomeDestinatario, string destinatario, string assunto, string mensagemHtml)
         {
-            ConfiguracaoEmail configuracaoEmail = await ObterConfiguracoes();
+            var configuracaoEmail = await ObterConfiguracoes();
 
             var message = Montarmensagem(nomeDestinatario, destinatario, assunto, mensagemHtml, configuracaoEmail);
 
@@ -29,16 +29,14 @@ namespace SME.AE.Aplicacao.Servicos
 
         private static async Task ExecutarEnvio(ConfiguracaoEmail configuracaoEmail, MimeMessage message)
         {
-            using (var client = new SmtpClient())
-            {
-                await client.ConnectAsync(configuracaoEmail.ServidorSmtp, configuracaoEmail.Porta, configuracaoEmail.UsarTls);
+            using var client = new SmtpClient();
+            await client.ConnectAsync(configuracaoEmail.ServidorSmtp, configuracaoEmail.Porta, configuracaoEmail.UsarTls);
 
-                await client.AuthenticateAsync(configuracaoEmail.Usuario, configuracaoEmail.Senha);
+            await client.AuthenticateAsync(configuracaoEmail.Usuario, configuracaoEmail.Senha);
 
-                await client.SendAsync(message);
+            await client.SendAsync(message);
 
-                await client.DisconnectAsync(true);
-            }
+            await client.DisconnectAsync(true);
         }
 
         private static MimeMessage Montarmensagem(string nomeDestinatario, string destinatario, string assunto, string mensagemHtml, ConfiguracaoEmail configuracaoEmail)

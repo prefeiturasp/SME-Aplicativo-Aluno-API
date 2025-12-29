@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario.Dashboard;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterTotalUsuariosComAcessoIncompleto;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using System;

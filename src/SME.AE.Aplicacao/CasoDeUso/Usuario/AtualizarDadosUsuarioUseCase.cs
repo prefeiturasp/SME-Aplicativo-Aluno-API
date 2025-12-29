@@ -2,12 +2,10 @@
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao

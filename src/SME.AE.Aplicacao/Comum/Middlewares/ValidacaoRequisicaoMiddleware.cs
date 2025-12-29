@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using MediatR;
-using Microsoft.IdentityModel.Tokens;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;

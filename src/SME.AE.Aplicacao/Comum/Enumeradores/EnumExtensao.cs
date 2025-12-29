@@ -29,15 +29,12 @@ namespace SME.AE.Aplicacao.Comum.Enumeradores
 
         public static ModalidadeTipoCalendario ObterModalidadeTipoCalendario(this ModalidadeDeEnsino modalidade)
         {
-            switch (modalidade)
+            return modalidade switch
             {
-                case ModalidadeDeEnsino.Infantil:
-                    return ModalidadeTipoCalendario.Infantil;
-                case ModalidadeDeEnsino.EJA:
-                    return ModalidadeTipoCalendario.EJA;
-                default:
-                    return ModalidadeTipoCalendario.FundamentalMedio;
-            }
+                ModalidadeDeEnsino.Infantil => ModalidadeTipoCalendario.Infantil,
+                ModalidadeDeEnsino.EJA => ModalidadeTipoCalendario.EJA,
+                _ => ModalidadeTipoCalendario.FundamentalMedio
+            };
         }
 
 

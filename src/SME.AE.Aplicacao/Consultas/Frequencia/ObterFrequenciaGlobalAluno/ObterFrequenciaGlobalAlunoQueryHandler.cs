@@ -22,7 +22,7 @@ namespace SME.AE.Aplicacao
         {
             FrequenciaGlobalDto frequenciaGlobal;
             var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
-            var resposta = await httpClient.GetAsync($"v1/calendarios/frequencias/integracoes/alunos/{request.AlunoCodigo}/turmas/{request.TurmaCodigo}/geral");
+            var resposta = await httpClient.GetAsync($"v1/calendarios/frequencias/integracoes/alunos/{request.AlunoCodigo}/turmas/{request.TurmaCodigo}/geral", cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
                 frequenciaGlobal = new FrequenciaGlobalDto();

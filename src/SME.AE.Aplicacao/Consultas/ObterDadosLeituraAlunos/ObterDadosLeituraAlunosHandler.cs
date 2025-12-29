@@ -31,13 +31,13 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         public async Task<IEnumerable<DadosLeituraAlunosComunicado>> Handle(ObterDadosLeituraAlunosQuery request, CancellationToken cancellationToken)
         {
-            var alunosTurma = await mediator.Send(new ObterAlunosPorTurmaQuery(request.CodigoTurma));
+            var alunosTurma = await mediator.Send(new ObterAlunosPorTurmaQuery(request.CodigoTurma), cancellationToken);
 
             var notificacaoAlunos = await notificacaoRepository.ObterNotificacoesAlunoPorId(request.NotificaoId);
 
             if (!alunosTurma.Any())
                 throw new NegocioException("Não foi possível localizar alunos para a turma informada");
-            string codigosAlunos = "";
+            var codigosAlunos = "";
 
             if (notificacaoAlunos != null && notificacaoAlunos.Any())
                 codigosAlunos = string.Join(',', notificacaoAlunos.Select(at => at.CodigoAluno).ToArray());
@@ -98,13 +98,27 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
                         var usuario = usuarioRepository.ObterPorCpf(cpf).Result;
                         var possueApp = usuario != null;
-                        var usuarioEol = (mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf))).Result;
+                        var usuarioEol = (mediator.Send(new ObterDadosResponsavelResumidoQuery(cpf), cancellationToken)).Result;
                         var telefone = possueApp ? usuarioEol.NumeroCelular : "";
-                        if (string.IsNullOrWhiteSpace(telefone))
-                            if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
+                        if (!string.IsNullOrWhiteSpace(telefone))
+                            return new DadosLeituraAlunosComunicado
                             {
-                                telefone = $"{aluno.DDDCelular.Trim()}{aluno.Celular.Trim()}";
-                            }
+                                CodigoAluno = aluno.CodigoEOLAluno,
+                                LeuComunicado = dataleitura.HasValue,
+                                DataLeitura = dataleitura,
+                                NomeAluno = $"{aluno.NomeAluno.Trim()} ({aluno.CodigoEOLAluno})",
+                                NomeResponsavel =
+                                    $"{aluno.NomeResponsavel.Trim()} ({TipoFiliacao(aluno.TipoResponsavel)})",
+                                NumeroChamada = short.Parse(aluno.NumeroChamada ?? "0"),
+                                PossueApp = possueApp,
+                                TelefoneResponsavel = telefone,
+                                SituacaoAluno = aluno.SituacaoAluno,
+                                DataSituacaoAluno = aluno.DataSituacaoAluno
+                            };
+                        if (!string.IsNullOrEmpty(aluno.DDDCelular) && !string.IsNullOrEmpty(aluno.Celular))
+                        {
+                            telefone = $"{aluno.DDDCelular.Trim()}{aluno.Celular.Trim()}";
+                        }
 
                         return new DadosLeituraAlunosComunicado
                         {
@@ -126,14 +140,14 @@ namespace SME.AE.Aplicacao.Consultas.ObterDadosLeituraComunicados
 
         string TipoFiliacao(int tipoResponsavel)
         {
-            switch (tipoResponsavel)
+            return tipoResponsavel switch
             {
-                case 1: return "Filiação 1";
-                case 2: return "Filiação 2";
-                case 3: return "Responsável Legal";
-                case 4: return "Próprio estudante";
-            }
-            return "";
+                1 => "Filiação 1",
+                2 => "Filiação 2",
+                3 => "Responsável Legal",
+                4 => "Próprio estudante",
+                _ => ""
+            };
         }
     }
 }

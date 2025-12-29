@@ -23,10 +23,10 @@ namespace SME.AE.Aplicacao
             IEnumerable<FrequenciaAlunoDto> frequencias;
 
             var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
-            var resposta = await httpClient.GetAsync($"v1/calendarios/frequencias/integracoes/turmas/{request.TurmaCodigo}/alunos/{request.AlunoCodigo}/componentes-curriculares/{request.ComponenteCurricularId}?bimestres={string.Join("&bimestres=", request.Bimestres)}");
+            var resposta = await httpClient.GetAsync($"v1/calendarios/frequencias/integracoes/turmas/{request.TurmaCodigo}/alunos/{request.AlunoCodigo}/componentes-curriculares/{request.ComponenteCurricularId}?bimestres={string.Join("&bimestres=", request.Bimestres)}", cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 frequencias = JsonConvert.DeserializeObject<IEnumerable<FrequenciaAlunoDto>>(json);
             }
             else
