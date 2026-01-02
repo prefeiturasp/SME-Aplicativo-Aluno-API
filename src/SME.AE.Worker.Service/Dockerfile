@@ -16,6 +16,17 @@ ARG SME_AE_ENVIRONMENT=dev
 ENV ASPNETCORE_ENVIRONMENT=${SME_AE_ENVIRONMENT}
 ENV TZ=America/Sao_Paulo
 
+# Configuração OpenSSL para suportar TLS 1.0/1.1 (necessário para SQL Server 2014 em Windows Server 2012 R2)
+RUN echo "\n[openssl_init]" >> /etc/ssl/openssl.cnf
+RUN sed -i '/[openssl_init]/a ssl_conf = ssl_configuration' /etc/ssl/openssl.cnf
+
+RUN echo "\n[ssl_configuration]" >> /etc/ssl/openssl.cnf \ 
+    && echo "system_default = tls_system_default" >> /etc/ssl/openssl.cnf
+
+RUN echo "\n[tls_system_default]" >> /etc/ssl/openssl.cnf \ 
+    && echo "MinProtocol = TLSv1" >> /etc/ssl/openssl.cnf \
+    && echo "CipherString = DEFAULT@SECLEVEL=0" >> /etc/ssl/openssl.cnf``
+
 ARG AEConnection
 ARG EolConnection
 ARG SgpConnection

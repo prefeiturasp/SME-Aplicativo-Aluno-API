@@ -20,10 +20,6 @@ namespace SME.AE.Aplicacao.CasoDeUso.Aluno
         public async Task<RespostaApi> Executar(string cpf)
         {
             RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpf));
-
-            if (!resposta.Ok)
-                throw new NegocioException(string.Join(',', resposta.Erros));
-
             return resposta;
         }
     }
