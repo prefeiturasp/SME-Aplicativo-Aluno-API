@@ -23,6 +23,18 @@ ENV TZ=America/Sao_Paulo
 RUN apt-get update -y \
     && apt-get install -y tzdata \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+
+# Configuração OpenSSL para suportar TLS 1.0/1.1 (necessário para SQL Server 2014 em Windows Server 2012 R2)
+RUN echo "\n[openssl_init]" >> /etc/ssl/openssl.cnf
+RUN sed -i '/[openssl_init]/a ssl_conf = ssl_configuration' /etc/ssl/openssl.cnf
+
+RUN echo "\n[ssl_configuration]" >> /etc/ssl/openssl.cnf \ 
+    && echo "system_default = tls_system_default" >> /etc/ssl/openssl.cnf
+
+RUN echo "\n[tls_system_default]" >> /etc/ssl/openssl.cnf \ 
+    && echo "MinProtocol = TLSv1" >> /etc/ssl/openssl.cnf \
+    && echo "CipherString = DEFAULT@SECLEVEL=0" >> /etc/ssl/openssl.cnf``
     
 WORKDIR /app
 COPY --from=publish /app/publish .

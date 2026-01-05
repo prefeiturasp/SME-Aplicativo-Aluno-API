@@ -24,4 +24,16 @@ RUN dotnet publish "SME.AE.Worker.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Configuração OpenSSL para suportar TLS 1.0/1.1 (necessário para SQL Server 2014 em Windows Server 2012 R2)
+RUN echo "\n[openssl_init]" >> /etc/ssl/openssl.cnf
+RUN sed -i '/[openssl_init]/a ssl_conf = ssl_configuration' /etc/ssl/openssl.cnf
+
+RUN echo "\n[ssl_configuration]" >> /etc/ssl/openssl.cnf \ 
+    && echo "system_default = tls_system_default" >> /etc/ssl/openssl.cnf
+
+RUN echo "\n[tls_system_default]" >> /etc/ssl/openssl.cnf \ 
+    && echo "MinProtocol = TLSv1" >> /etc/ssl/openssl.cnf \
+    && echo "CipherString = DEFAULT@SECLEVEL=0" >> /etc/ssl/openssl.cnf``
+
 ENTRYPOINT ["dotnet", "SME.AE.Worker.dll"]
