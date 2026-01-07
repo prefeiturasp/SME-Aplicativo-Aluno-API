@@ -12,9 +12,12 @@ namespace SME.AE.Api.Controllers
     public class AlunoController : ApiController
     {
         [HttpGet]
-        public async Task<ObjectResult> ObterDadosAlunos([FromQuery] string cpf, [FromServices] IDadosDoAlunoUseCase dadosDoAlunoUseCase)
+        public async Task<IActionResult> ObterDadosAlunos([FromQuery] string cpf, [FromServices] IDadosDoAlunoUseCase dadosDoAlunoUseCase)
         {
-            return Ok(await dadosDoAlunoUseCase.Executar(cpf));
+            var resposta = await dadosDoAlunoUseCase.Executar(cpf);
+            if(resposta.Ok)
+               return Ok(resposta);
+            return BadRequest(resposta);
         }
 
         [HttpGet("frequencia-global")]

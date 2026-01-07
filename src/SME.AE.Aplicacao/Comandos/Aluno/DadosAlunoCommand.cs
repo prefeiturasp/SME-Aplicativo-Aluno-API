@@ -6,9 +6,11 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Excecoes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sentry;
 
 namespace SME.AE.Aplicacao.Comandos.Aluno
 {
@@ -31,7 +33,9 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             }
             public async Task<RespostaApi> Handle(DadosAlunoCommand request, CancellationToken cancellationToken)
             {
-                    var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null));
+                try
+                {
+                       var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null));
 
                     if (dadosDosAlunos == null || !dadosDosAlunos.Any())
                         throw new NegocioException(
@@ -88,6 +92,12 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                             });
 
                     return RespostaApi.Sucesso(tipoEscola);
+                }
+                catch (Exception ex)
+                {
+                    SentrySdk.CaptureException(ex);
+                    return RespostaApi.Falha(ex.Message);
+                }
             }
         }
     }

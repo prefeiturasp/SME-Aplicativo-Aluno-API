@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo;
@@ -22,19 +23,27 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 
         public async Task<RespostaApi> Executar(string cpf, string senha, string dispositivoId)
         {
-            var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
+            try
+            {
+                var resposta = await mediator.Send(new AutenticarUsuarioCommand(cpf, senha));
 
-            if (!resposta.Ok)
-                throw new NegocioException(string.Join("", resposta.Erros));
+                if (!resposta.Ok)
+                    throw new NegocioException(string.Join("", resposta.Erros));
 
-            var token = await mediator.Send(new CriarTokenCommand(cpf));
-            await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
+                var token = await mediator.Send(new CriarTokenCommand(cpf));
+                await mediator.Send(new UsuarioDispositivoCommand(cpf, dispositivoId));
 
-            var data = ((RespostaAutenticar)resposta.Data);
-            data.Token = token;
-            resposta.Data = data;
+                var data = ((RespostaAutenticar)resposta.Data);
+                data.Token = token;
+                resposta.Data = data;
 
-            return resposta;
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return RespostaApi.Falha(ex.Message);
+            }
         }
     }
 }
