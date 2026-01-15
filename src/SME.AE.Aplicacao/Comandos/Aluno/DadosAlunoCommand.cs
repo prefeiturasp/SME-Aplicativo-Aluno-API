@@ -95,6 +95,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
                 }
                 catch (Exception ex)
                 {
+                    SentrySdk.CaptureMessage(ex.Message,SentryLevel.Fatal);
                     SentrySdk.CaptureException(ex);
                     return RespostaApi.Falha(ex.Message);
                 }
