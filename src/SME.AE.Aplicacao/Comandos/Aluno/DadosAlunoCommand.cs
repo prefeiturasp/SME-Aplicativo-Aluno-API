@@ -35,7 +35,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             {
                 try
                 {
-                       var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null));
+                    var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null), cancellationToken);
 
                     if (dadosDosAlunos == null || !dadosDosAlunos.Any())
                         throw new NegocioException(
@@ -47,7 +47,7 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
 
                     var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(turmasCodigo), cancellationToken);
                     if (turmasModalidade == null || !turmasModalidade.Any())
-                        throw new NegocioException($"Não foi possível obter a(s) modalidade(s) das turma(s) {string.Join(',',turmasCodigo)} no SGP ");
+                        throw new NegocioException($"Não foi possível obter a(s) modalidade(s) da(s) turma(s) no SGP ");
 
                     dadosDosAlunos.ForEach(dadoDoAluno =>
                     {
