@@ -8,7 +8,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         {
             ToTable("notificacao");
 
-            Map(x => x.Id).ToColumn("id").IsKey();
+            Map(x => x.Id).ToColumn("id");
             Map(x => x.Titulo).ToColumn("titulo");
             Map(x => x.Mensagem).ToColumn("mensagem");
             Map(x => x.DataEnvio).ToColumn("dataenvio");
@@ -21,6 +21,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
             Map(x => x.SeriesResumidas).ToColumn("seriesresumidas");
             Map(x => x.Modalidades).ToColumn("modalidades");
             Map(x => x.TiposEscolas).ToColumn("tipos_escolas");
+            Map(x => x.EnviadoPushNotification).ToColumn("enviadopushnotification");
         }
     }
 }
