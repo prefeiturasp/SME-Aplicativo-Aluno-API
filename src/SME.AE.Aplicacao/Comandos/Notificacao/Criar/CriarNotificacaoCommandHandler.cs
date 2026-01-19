@@ -37,7 +37,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
