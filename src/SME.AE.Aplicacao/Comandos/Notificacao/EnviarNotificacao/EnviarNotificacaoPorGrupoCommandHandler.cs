@@ -2,7 +2,9 @@
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using MediatR;
+using Sentry;
 using SME.AE.Comum;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,20 +20,28 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo
         }
         public async Task<bool> Handle(EnviarNotificacaoPorGrupoCommand request, CancellationToken cancellationToken)
         {
-            var firebaseToken = variaveisGlobaisOptions.FirebaseToken;
-            var firebaseCredential = GoogleCredential.FromJson(firebaseToken);
-            FirebaseApp app = FirebaseApp.DefaultInstance;
-
-            if (app == null)
+            try
             {
-                app = FirebaseApp.Create(new AppOptions()
+                var firebaseToken = variaveisGlobaisOptions.FirebaseToken;
+                var firebaseCredential = GoogleCredential.FromJson(firebaseToken);
+                FirebaseApp app = FirebaseApp.DefaultInstance;
+
+                if (app == null)
                 {
-                    Credential = firebaseCredential,
-                    ProjectId = variaveisGlobaisOptions.FirebaseProjectId
-                });
+                    app = FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = firebaseCredential,
+                        ProjectId = variaveisGlobaisOptions.FirebaseProjectId
+                    });
+                }
+                var resultado = await FirebaseMessaging.DefaultInstance.SendAsync(request.Mensagem).ConfigureAwait(true);
+                return resultado != null;
             }
-            var resultado = await FirebaseMessaging.DefaultInstance.SendAsync(request.Mensagem).ConfigureAwait(true);
-            return resultado != null;
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                throw;
+            }
         }
     }
 }
