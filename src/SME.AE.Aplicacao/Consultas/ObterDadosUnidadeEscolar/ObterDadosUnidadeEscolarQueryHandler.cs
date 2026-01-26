@@ -21,10 +21,10 @@ namespace SME.AE.Aplicacao.Consultas.UnidadeEscolar
         public async Task<UnidadeEscolarResposta> Handle(ObterDadosUnidadeEscolarQuery request, CancellationToken cancellationToken)
         {
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
-            var resposta = await httpClient.GetAsync($"escolas/dados/{request.CodigoUe}");
+            var resposta = await httpClient.GetAsync($"escolas/dados/{request.CodigoUe}", cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<UnidadeEscolarResposta>(json);
             }
             else

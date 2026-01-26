@@ -1,23 +1,40 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-copy . ./
+COPY ["src/SME.AE.Worker.Service/SME.AE.Worker.Service.csproj", "src/SME.AE.Worker.Service/"]
+RUN dotnet restore "src/SME.AE.Worker.Service/SME.AE.Worker.Service.csproj"
 
-run dotnet restore
-run dotnet publish -c Release -o out
+COPY . .
+RUN dotnet publish "src/SME.AE.Worker.Service/SME.AE.Worker.Service.csproj" -c Release -o /app/out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-bionic
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-COPY --from=build-env /src/out .
+
+COPY --from=build /app/out .
 
 ARG SME_AE_ENVIRONMENT=dev
-
+ENV ASPNETCORE_ENVIRONMENT=${SME_AE_ENVIRONMENT}
 ENV TZ=America/Sao_Paulo
-ENV DEBIAN_FRONTEND=noninteractive
 
-ENV AEConnection=$AEConnection
-ENV EolConnection=$EolConnection
-ENV SgpConnection=$SgpConnection
-ENV CoreSSOConnection=$CoreSSOConnection
+# Configuração OpenSSL para suportar TLS 1.0/1.1 (necessário para SQL Server 2014 em Windows Server 2012 R2)
+RUN echo "\n[openssl_init]" >> /etc/ssl/openssl.cnf
+RUN sed -i '/[openssl_init]/a ssl_conf = ssl_configuration' /etc/ssl/openssl.cnf
 
-CMD ["dotnet", "SME.AE.Worker.Service.dll"]
+RUN echo "\n[ssl_configuration]" >> /etc/ssl/openssl.cnf \ 
+    && echo "system_default = tls_system_default" >> /etc/ssl/openssl.cnf
+
+RUN echo "\n[tls_system_default]" >> /etc/ssl/openssl.cnf \ 
+    && echo "MinProtocol = TLSv1" >> /etc/ssl/openssl.cnf \
+    && echo "CipherString = DEFAULT@SECLEVEL=0" >> /etc/ssl/openssl.cnf``
+
+ARG AEConnection
+ARG EolConnection
+ARG SgpConnection
+ARG CoreSSOConnection
+
+ENV AEConnection=${AEConnection}
+ENV EolConnection=${EolConnection}
+ENV SgpConnection=${SgpConnection}
+ENV CoreSSOConnection=${CoreSSOConnection}
+
+ENTRYPOINT ["dotnet", "SME.AE.Worker.Service.dll"]

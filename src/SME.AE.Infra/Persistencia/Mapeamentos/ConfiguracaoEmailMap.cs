@@ -7,6 +7,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         public ConfiguracaoEmailMap()
         {
             ToTable("configuracao_email");
+            Map(x => x.Id).ToColumn("id").IsKey().IsIdentity();
             Map(x => x.EmailRemetente).ToColumn("email_remetente");
             Map(x => x.NomeRemetente).ToColumn("nome_remetente");
             Map(x => x.Porta).ToColumn("porta");

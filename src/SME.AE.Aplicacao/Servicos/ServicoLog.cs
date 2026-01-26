@@ -1,8 +1,6 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Sentry;
 using System;
-using System.Collections.Generic;
 
 namespace SME.AE.Aplicacao.Servicos
 {

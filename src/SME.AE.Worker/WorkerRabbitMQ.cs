@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sentry;
-using Sentry.Protocol;
 using SME.AE.Aplicacao;
 using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Comum;

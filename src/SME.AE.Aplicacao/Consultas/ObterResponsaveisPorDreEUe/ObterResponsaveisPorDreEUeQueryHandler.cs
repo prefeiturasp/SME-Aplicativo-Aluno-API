@@ -1,9 +1,6 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Excecoes;
 using System.Collections.Generic;
 using System.Linq;

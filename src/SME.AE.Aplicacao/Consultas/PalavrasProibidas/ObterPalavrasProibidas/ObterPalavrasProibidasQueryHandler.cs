@@ -20,12 +20,12 @@ namespace SME.AE.Aplicacao
         //TODO servicoAtualizacaoCadastral está retornando dados que não são palavras bloqueadas 
         public async Task<string[]> Handle(ObterPalavrasProibidasQuery request, CancellationToken cancellationToken)
         {
-            var palavrasBloqueadas = new string[] { };
+            var palavrasBloqueadas = Array.Empty<string>();
             var httpClient = httpClientFactory.CreateClient("servicoAtualizacaoCadastral");
-            var resposta = await httpClient.GetAsync("palavras-bloqueadas");
+            var resposta = await httpClient.GetAsync("palavras-bloqueadas", cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 palavrasBloqueadas = JsonConvert.DeserializeObject<string[]>(json);
             }
             else

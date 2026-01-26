@@ -29,10 +29,7 @@ namespace SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno
                 retorno.AddRange(resultado);
             }
 
-            if (retorno != null || retorno.Any())
-                return retorno;
-            else 
-                return default;
+            return retorno;
         }
     }
 }

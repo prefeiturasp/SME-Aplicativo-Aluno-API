@@ -4,9 +4,7 @@ using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Recomendacao;
 using SME.AE.Aplicacao.Comum.Modelos.Entrada;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas;
-using SME.AE.Aplicacao.Consultas.ObterRecomendacoesPorAlunosTurmas;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

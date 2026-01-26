@@ -7,6 +7,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         public AceiteTermosDeUsoMap() : base()
         {
             ToTable("aceite_termos_de_uso");
+            Map(x => x.Id).ToColumn("id").IsKey().IsIdentity();
             Map(x => x.CpfUsuario).ToColumn("cpf_usuario");
             Map(x => x.Device).ToColumn("device");
             Map(x => x.Ip).ToColumn("ip");

@@ -4,7 +4,6 @@ using SME.AE.Aplicacao.Comum.Modelos;
 using System;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Comum.Excecoes;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Aluno
 {
@@ -19,11 +18,7 @@ namespace SME.AE.Aplicacao.CasoDeUso.Aluno
 
         public async Task<RespostaApi> Executar(string cpf)
         {
-            RespostaApi resposta = await mediator.Send(new DadosAlunoCommand(cpf));
-
-            if (!resposta.Ok)
-                throw new NegocioException(string.Join(',', resposta.Erros));
-
+            var resposta = await mediator.Send(new DadosAlunoCommand(cpf));
             return resposta;
         }
     }

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Practices.ObjectBuilder2;
 using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sentry;
 
 namespace SME.AE.Aplicacao.Comandos.Aluno
 {
@@ -33,59 +33,72 @@ namespace SME.AE.Aplicacao.Comandos.Aluno
             }
             public async Task<RespostaApi> Handle(DadosAlunoCommand request, CancellationToken cancellationToken)
             {
-                var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null));
-                
-                if (dadosDosAlunos == null || !dadosDosAlunos.Any())
-                    throw new NegocioException("Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
-
-                var turmasCodigo = dadosDosAlunos.Select(a => a.CodigoTurma.ToString())
-                                                 .Distinct()
-                                                 .ToArray();
-
-                var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(turmasCodigo));
-
-                dadosDosAlunos.ForEach(dadoDoAluno =>
+                try
                 {
-                    var modalidadeDaTurma = turmasModalidade.FirstOrDefault(a => a.TurmaCodigo == dadoDoAluno.CodigoTurma);
-                    dadoDoAluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
-                    dadoDoAluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
-                });
+                    var dadosDosAlunos = await mediator.Send(new ObterDadosAlunosQuery(request.Cpf, null, null, null), cancellationToken);
 
-                var tipoEscola =
-                    dadosDosAlunos
-                    .GroupBy(g => new { g.ModalidadeCodigo, g.ModalidadeDescricao })
-                    .Select(s => new ListaEscola
+                    if (dadosDosAlunos == null || !dadosDosAlunos.Any())
+                        throw new NegocioException(
+                            "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal.");
+
+                    var turmasCodigo = dadosDosAlunos.Select(a => a.CodigoTurma.ToString())
+                        .Distinct()
+                        .ToArray();
+
+                    var turmasModalidade = await mediator.Send(new ObterTurmasModalidadesPorCodigosQuery(turmasCodigo), cancellationToken);
+                    if (turmasModalidade == null || !turmasModalidade.Any())
+                        throw new NegocioException($"Não foi possível obter a(s) modalidade(s) da(s) turma(s) no SGP ");
+
+                    dadosDosAlunos.ForEach(dadoDoAluno =>
                     {
-                        Modalidade = s.Key.ModalidadeDescricao,
-                        ModalidadeCodigo = s.Key.ModalidadeCodigo,
-                        Alunos = dadosDosAlunos
-                                .Where(w => w.ModalidadeCodigo == s.Key.ModalidadeCodigo)
-                                .Select(a => new Dominio.Entidades.Aluno
-                                {
-                                    CodigoEol = a.CodigoEol,
-                                    Nome = a.Nome,
-                                    NomeResponsavel = a.TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno &&
-                                                        !string.IsNullOrWhiteSpace(a.NomeSocial) ?
-                                                        a.NomeSocial.Trim() :
-                                                        a.NomeResponsavel.Trim(),
-                                    CpfResponsavel = a.CpfResponsavel,
-                                    NomeSocial = a.NomeSocial,
-                                    DataNascimento = a.DataNascimento.Date,
-                                    CodigoTipoEscola = a.CodigoTipoEscola,
-                                    CodigoEscola = a.CodigoEscola,
-                                    DescricaoTipoEscola = a.DescricaoTipoEscola,
-                                    Escola = a.Escola,
-                                    CodigoDre = a.CodigoDre,
-                                    SiglaDre = a.SiglaDre,
-                                    CodigoTurma = a.CodigoTurma,
-                                    Turma = a.Turma,
-                                    SituacaoMatricula = a.SituacaoMatricula,
-                                    DataSituacaoMatricula = a.DataSituacaoMatricula,
-                                    SerieResumida = a.SerieResumida
-                                })
+                        var modalidadeDaTurma =
+                            turmasModalidade.FirstOrDefault(a => a.TurmaCodigo == dadoDoAluno.CodigoTurma);
+                        dadoDoAluno.ModalidadeCodigo = modalidadeDaTurma.ModalidadeCodigo;
+                        dadoDoAluno.ModalidadeDescricao = modalidadeDaTurma.ModalidadeDescricao;
                     });
 
-                return RespostaApi.Sucesso(tipoEscola);
+                    var tipoEscola =
+                        dadosDosAlunos
+                            .GroupBy(g => new { g.ModalidadeCodigo, g.ModalidadeDescricao })
+                            .Select(s => new ListaEscola
+                            {
+                                Modalidade = s.Key.ModalidadeDescricao,
+                                ModalidadeCodigo = s.Key.ModalidadeCodigo,
+                                Alunos = dadosDosAlunos
+                                    .Where(w => w.ModalidadeCodigo == s.Key.ModalidadeCodigo)
+                                    .Select(a => new Dominio.Entidades.Aluno
+                                    {
+                                        CodigoEol = a.CodigoEol,
+                                        Nome = a.Nome,
+                                        NomeResponsavel = a.TipoResponsavel == TipoResponsavelEnum.Proprio_Aluno &&
+                                                          !string.IsNullOrWhiteSpace(a.NomeSocial)
+                                            ? a.NomeSocial.Trim()
+                                            : a.NomeResponsavel.Trim(),
+                                        CpfResponsavel = a.CpfResponsavel,
+                                        NomeSocial = a.NomeSocial,
+                                        DataNascimento = a.DataNascimento.Date,
+                                        CodigoTipoEscola = a.CodigoTipoEscola,
+                                        CodigoEscola = a.CodigoEscola,
+                                        DescricaoTipoEscola = a.DescricaoTipoEscola,
+                                        Escola = a.Escola,
+                                        CodigoDre = a.CodigoDre,
+                                        SiglaDre = a.SiglaDre,
+                                        CodigoTurma = a.CodigoTurma,
+                                        Turma = a.Turma,
+                                        SituacaoMatricula = a.SituacaoMatricula,
+                                        DataSituacaoMatricula = a.DataSituacaoMatricula,
+                                        SerieResumida = a.SerieResumida
+                                    })
+                            });
+
+                    return RespostaApi.Sucesso(tipoEscola);
+                }
+                catch (Exception ex)
+                {
+                    SentrySdk.CaptureMessage(ex.Message,SentryLevel.Fatal);
+                    SentrySdk.CaptureException(ex);
+                    return RespostaApi.Falha(ex.Message);
+                }
             }
         }
     }

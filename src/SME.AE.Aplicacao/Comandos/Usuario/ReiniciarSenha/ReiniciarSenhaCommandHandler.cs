@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso
 {
-    public class ReiniciarSenhaCommandHandler : IRequestHandler<ReiniciarSenhaCommand>
+    public class ReiniciarSenhaCommandHandler : IRequestHandler<ReiniciarSenhaCommand, Unit>
     {
         private readonly IUsuarioRepository usuarioRepository;
 

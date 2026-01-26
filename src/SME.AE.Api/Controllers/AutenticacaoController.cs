@@ -16,15 +16,12 @@ namespace SME.AE.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<RespostaApi>> AutenticarUsuario([FromBody] AutenticacaoDTO autenticacao, [FromServices] IAutenticarUsuarioUseCase autenticarUsuarioUseCase)
         {
-            try
-            {
-                return Ok(await autenticarUsuarioUseCase.Executar(autenticacao.Cpf, autenticacao.Senha, autenticacao.DispositivoId));
-            }
-            catch (System.Exception ex)
-            {
-                string[] erro = { ex.Message };
-                return BadRequest(new RespostaApi() { Erros = erro });
-            }
+            var resposta =
+                await autenticarUsuarioUseCase.Executar(autenticacao.Cpf, autenticacao.Senha,
+                    autenticacao.DispositivoId);
+            if (resposta.Ok)
+                return Ok(resposta);
+            return BadRequest(resposta);
         }
 
         [HttpPost("Logout")]

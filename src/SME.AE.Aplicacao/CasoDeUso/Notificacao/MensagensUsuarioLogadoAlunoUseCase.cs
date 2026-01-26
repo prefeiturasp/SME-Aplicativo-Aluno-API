@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comandos.Aluno;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
-using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.Notificacao.ListarNotificacaoAluno;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;

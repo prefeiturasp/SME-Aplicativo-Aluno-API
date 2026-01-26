@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito
 {
-    public class ValidarAlunoInativoRestritoCommandHandler : IRequestHandler<ValidarAlunoInativoRestritoCommand>
+    public class ValidarAlunoInativoRestritoCommandHandler : IRequestHandler<ValidarAlunoInativoRestritoCommand, Unit>
     {
         private readonly IMediator mediator;
         private readonly IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio;

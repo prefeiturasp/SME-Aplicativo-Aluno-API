@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Newtonsoft.Json;
-using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -20,23 +20,17 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
 
         public async Task<IEnumerable<AlunoRespostaEol>> Handle(ObterDadosAlunosQuery request, CancellationToken cancellationToken)
         {
-            var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
-            var paramQueryDre = $"codigoDre={request.CodigoDre}";
-            var paramQueryUe = $"codigoUe={request.CodigoUe}";
-            var paramQueryAluno = $"codigoAluno={request.CodigoAluno}";
-            var paramQueryResponsavel = $"cpfResponsavel={request.CpfResponsavel}";
-            var url = $"alunos/dados-acompanhamento-escolar?{paramQueryResponsavel}&{paramQueryDre}&{paramQueryUe}&{paramQueryAluno}";
+                var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
+                var paramQueryDre = $"codigoDre={request.CodigoDre}";
+                var paramQueryUe = $"codigoUe={request.CodigoUe}";
+                var paramQueryAluno = $"codigoAluno={request.CodigoAluno}";
+                var paramQueryResponsavel = $"cpfResponsavel={request.CpfResponsavel}";
+                var url = $"alunos/dados-acompanhamento-escolar?{paramQueryResponsavel}&{paramQueryDre}&{paramQueryUe}&{paramQueryAluno}";
 
-            var resposta = await httpClient.GetAsync(url);
-            if (resposta.IsSuccessStatusCode)
-            {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var resposta = await httpClient.GetAsync(url, cancellationToken);
+                if (!resposta.IsSuccessStatusCode) return null;
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<IEnumerable<AlunoRespostaEol>>(json);
-            }
-            else
-            {
-                throw new System.Exception($"Não foi possível obter dados do aluno");
-            }
         }
     }
 }

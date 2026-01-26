@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Messaging;
 using MediatR;
+using Sentry;
 using SME.AE.Aplicacao.Comandos.Notificacao.Criar;
 using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.Comum.Enumeradores;
@@ -11,8 +12,8 @@ using SME.AE.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao
 {
@@ -55,7 +56,7 @@ namespace SME.AE.Aplicacao
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                SentrySdk.CaptureException(ex);
                 throw;
             }
         }

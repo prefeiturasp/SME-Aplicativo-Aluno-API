@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -17,20 +18,14 @@ namespace SME.AE.Aplicacao
         }
         public async Task<IEnumerable<TurmaModalidadeCodigoDto>> Handle(ObterTurmasModalidadesPorCodigosQuery request, CancellationToken cancellationToken)
         {
-            var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
-
-            var turmasCodigos = string.Join("&turmasCodigo=", request.TurmaCodigo);
-
-            var resposta = await httpClient.GetAsync($"v1/turma/integracoes/modalidades?turmasCodigo={turmasCodigos}");
-            if (resposta.IsSuccessStatusCode)
-            {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
+                var turmasCodigos = string.Join("&turmasCodigo=", request.TurmaCodigo);
+                var url = $"v1/turma/integracoes/modalidades?turmasCodigo={turmasCodigos}";
+                var resposta = await httpClient.GetAsync(url,cancellationToken);
+                if (!resposta.IsSuccessStatusCode) return null;
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<IEnumerable<TurmaModalidadeCodigoDto>>(json);
-            }
-            else
-            {
-                throw new System.Exception($"Não foi possível obter as modalidades das turmas {turmasCodigos}");
-            }
+
         }
     }
 }

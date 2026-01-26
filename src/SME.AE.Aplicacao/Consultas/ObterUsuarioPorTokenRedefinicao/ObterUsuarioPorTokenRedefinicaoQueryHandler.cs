@@ -21,10 +21,7 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuarioPorTokenRedefinicao
         {
             var retorno = await usuarioRepository.ObterUsuarioPorTokenAutenticacao(request.Token);
 
-            if (retorno == null)
-                throw new NegocioException("Codigo de Verificação inválido");
-
-            return retorno;
+            return retorno ?? throw new NegocioException("Codigo de Verificação inválido");
         }
     }
 }

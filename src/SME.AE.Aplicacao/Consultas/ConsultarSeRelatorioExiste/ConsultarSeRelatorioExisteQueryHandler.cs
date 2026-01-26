@@ -20,15 +20,13 @@ namespace SME.AE.Aplicacao
         {
             try
             {
-                bool existe = false;
-                var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");//"servicoApiSgp"
+                var existe = false;
+                var httpClient = httpClientFactory.CreateClient("servicoApiSgpChave");
 
-                var resposta = await httpClient.GetAsync($"v1/relatorios/integracoes/existe?codigoRelatorio={request.CodigoCorrelacao}");
-                if (resposta.IsSuccessStatusCode)
-                {
-                    var json = await resposta.Content.ReadAsStringAsync();
-                    existe = json != null && JsonConvert.DeserializeObject<bool>(json);
-                }
+                var resposta = await httpClient.GetAsync($"v1/relatorios/integracoes/existe?codigoRelatorio={request.CodigoCorrelacao}", cancellationToken);
+                if (!resposta.IsSuccessStatusCode) return false;
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
+                existe = JsonConvert.DeserializeObject<bool>(json);
                 return existe;
             }
             catch (Exception)

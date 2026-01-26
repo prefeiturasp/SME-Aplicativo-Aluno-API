@@ -26,7 +26,7 @@ namespace SME.AE.Aplicacao
 
             if (filtroDadosUsuario == null)
             {
-                SentrySdk.CaptureMessage($"Não foi possível realizar a atualização dos dados do responsável do aluno no eol", Sentry.Protocol.SentryLevel.Error);
+                SentrySdk.CaptureMessage($"Não foi possível realizar a atualização dos dados do responsável do aluno no eol", Sentry.SentryLevel.Error);
                 return false;
             }
 

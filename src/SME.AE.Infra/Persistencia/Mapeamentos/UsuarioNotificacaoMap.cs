@@ -7,6 +7,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         public UsuarioNotificacaoMap()
         {
             ToTable("usuario_notificacao_leitura");
+            Map(x => x.Id).ToColumn("id").IsKey().IsIdentity();
             Map(a => a.UsuarioId).ToColumn("usuario_id");
             Map(a => a.CodigoEolAluno).ToColumn("codigo_eol_aluno");
             Map(a => a.NotificacaoId).ToColumn("notificacao_id");

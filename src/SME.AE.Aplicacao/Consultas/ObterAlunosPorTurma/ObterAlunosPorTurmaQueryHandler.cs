@@ -23,10 +23,10 @@ namespace SME.AE.Aplicacao.Consultas.ObterUsuario
             var httpClient = httpClientFactory.CreateClient("servicoApiEolChave");
             var url = $"turmas/{request.CodigoTurma}/acompanhamento-escolar/todos-alunos";
 
-            var resposta = await httpClient.GetAsync(url);
+            var resposta = await httpClient.GetAsync(url, cancellationToken);
             if (resposta.IsSuccessStatusCode)
             {
-                var json = await resposta.Content.ReadAsStringAsync();
+                var json = await resposta.Content.ReadAsStringAsync(cancellationToken);
                 return JsonConvert.DeserializeObject<IEnumerable<AlunoTurmaEol>>(json);
             }
             else

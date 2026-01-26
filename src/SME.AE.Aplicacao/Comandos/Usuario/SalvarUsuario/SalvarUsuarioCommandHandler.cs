@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario
 {
-    public class SalvarUsuarioCommandHandler : IRequestHandler<SalvarUsuarioCommand>
+    public class SalvarUsuarioCommandHandler : IRequestHandler<SalvarUsuarioCommand, Unit>
     {
         private readonly IUsuarioRepository usuarioRepository;
 

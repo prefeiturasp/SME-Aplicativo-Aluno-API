@@ -4,13 +4,10 @@ using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Extensoes;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Aplicacao.Consultas.ObterUltimaAtualizacaoPorProcesso;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
-using SME.AE.Comum.Excecoes;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -22,14 +19,12 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 {
     public class AutenticarUsuarioCommandHandler : IRequestHandler<AutenticarUsuarioCommand, RespostaApi>
     {
-        private readonly IAutenticacaoService _autenticacaoService;
         private readonly IUsuarioRepository _repository;
         private readonly IUsuarioCoreSSORepositorio _repositoryCoreSSO;
         private readonly IMediator mediator;
 
-        public AutenticarUsuarioCommandHandler(IAutenticacaoService autenticacaoService, IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO, IMediator mediator)
+        public AutenticarUsuarioCommandHandler(IUsuarioRepository repository, IUsuarioCoreSSORepositorio repositoryCoreSSO, IMediator mediator)
         {
-            _autenticacaoService = autenticacaoService;
             _repositoryCoreSSO = repositoryCoreSSO;
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _repository = repository;
@@ -37,20 +32,18 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         public async Task<RespostaApi> Handle(AutenticarUsuarioCommand request, CancellationToken cancellationToken)
         {
-            bool primeiroAcesso = false;
+            var primeiroAcesso = false;
 
             var validator = new AutenticarUsuarioUseCaseValidatior();
-            var validacao = validator.Validate(request);
+            var validacao = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validacao.IsValid)
                 return RespostaApi.Falha(validacao.Errors);
 
-            //verificar se o usuário está cadastrado no CoreSSO
-            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(request.Cpf));
+            var usuarioCoreSSO = await mediator.Send(new ObterUsuarioCoreSSOQuery(request.Cpf), cancellationToken);
 
-            string senhaCriptografada = string.Empty;
+            var senhaCriptografada = string.Empty;
 
-            //se for primeiro acesso
             if (usuarioCoreSSO == null)
             {
                 primeiroAcesso = true;
@@ -67,10 +60,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 }
             }
 
-            //buscar o usuario 
             var usuarioRetorno = await _repository.ObterPorCpf(request.Cpf);
                 
-            //verificar se as senhas são iguais
             if (usuarioRetorno != null)
             {
                 primeiroAcesso = usuarioRetorno.PrimeiroAcesso;
@@ -114,10 +105,8 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 }
             }
 
-            //selecionar alunos do responsável buscando apenas pelo cpf
             var usuarioAlunos = await mediator.Send(new ObterDadosResponsavelQuery(request.Cpf));
 
-            //caso nao tenha nenhum filho matriculado, retornar falha e inativá-lo no coresso
             if (usuarioAlunos == null || !usuarioAlunos.Any())
             {
                 validacao.Errors.Add(new ValidationFailure("Usuário", "Este CPF não está relacionado como responsável de um aluno ativo na rede municipal."));
@@ -129,21 +118,16 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
                 return RespostaApi.Falha(validacao.Errors);
             }
 
-            //se for primeiro acesso, a senha validar se a senha inputada é alguma data de nascimento de algum aluno do responsável
-            if (primeiroAcesso && (!usuarioAlunos.Any(w => w.DataNascimentoAluno == request.DataNascimento)))
+            switch (primeiroAcesso)
             {
-                validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
-                //ExcluiUsuarioSeExistir(request, usuarioRetorno);
-                return RespostaApi.Falha(validacao.Errors);
+                case true when (!usuarioAlunos.Any(w => w.DataNascimentoAluno == request.DataNascimento)):
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Data de Nascimento inválida."));
+                    return RespostaApi.Falha(validacao.Errors);
+                case true when (usuarioAlunos.Any(w => w.DataNascimentoAluno == request.DataNascimento && w.TipoSigilo == (int)AlunoTipoSigilo.Restricao)):
+                    validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
+                    return RespostaApi.Falha(validacao.Errors);
             }
 
-            if (primeiroAcesso && (usuarioAlunos.Any(w => w.DataNascimentoAluno == request.DataNascimento && w.TipoSigilo == (int)AlunoTipoSigilo.Restricao)))
-            {
-                validacao.Errors.Add(new ValidationFailure("Usuário", "Usuário não cadastrado, qualquer dúvida procure a unidade escolar."));
-                return RespostaApi.Falha(validacao.Errors);
-            }
-
-            //necessário implementar unit of work para transacionar essas operações
             var grupos = await _repositoryCoreSSO.SelecionarGrupos();
 
             var usuarioParaSeBasear = usuarioAlunos
@@ -152,7 +136,6 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
             primeiroAcesso = primeiroAcesso || !grupos.Any(x => usuarioCoreSSO.Grupos.Any(z => z.Equals(x)));
 
-            //verificar se o usuário está incluído em todos os grupos            
             if (usuarioCoreSSO != null && usuarioCoreSSO.Status == (int)StatusUsuarioCoreSSO.Inativo)
                 await _repositoryCoreSSO.AlterarStatusUsuario(usuarioCoreSSO.UsuId, StatusUsuarioCoreSSO.Ativo);
 
@@ -172,7 +155,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             return MapearResposta(usuarioParaSeBasear, usuarioRetorno, primeiroAcesso, atualizarDadosCadastrais || primeiroAcesso);
         }
 
-        private bool VerificarAtualizacaoCadastral(DadosResponsavelAluno usuario)
+        private static bool VerificarAtualizacaoCadastral(DadosResponsavelAluno usuario)
         {
             return usuario.DataNascimento == null || string.IsNullOrWhiteSpace(usuario.NomeMae) ||
                    string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.NumeroCelular);
@@ -217,7 +200,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         private RespostaApi MapearResposta(DadosResponsavelAluno usuarioEol, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso, bool atualizarDadosCadastrais)
         {
-            RespostaAutenticar usuario = new RespostaAutenticar
+            var usuario = new RespostaAutenticar
             {
                 Cpf = usuarioEol.Cpf,
                 Email = usuarioEol.Email,
