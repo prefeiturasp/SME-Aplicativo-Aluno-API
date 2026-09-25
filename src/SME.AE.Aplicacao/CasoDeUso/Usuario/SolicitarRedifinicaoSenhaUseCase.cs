@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Elasticsearch.Net;
+using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito;
@@ -32,24 +33,33 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
         {
 
-            var usuario = await ObterUsuario(gerarTokenDto);
+            try
+            {
+                var usuario = await ObterUsuario(gerarTokenDto);
 
-            var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
+                var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
 
-            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
+                var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
 
-            await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
+                await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 
-            usuario.IniciarRedefinicaoSenha();
+                usuario.IniciarRedefinicaoSenha();
 
-            if (string.IsNullOrEmpty(usuarioEol.Email))
-                throw new NegocioException("Usuário não possui e-mail cadastrado");
+                if (string.IsNullOrEmpty(usuarioEol.Email))
+                    throw new NegocioException("Usuário não possui e-mail cadastrado");
 
-            await EnvioEmail(usuarioEol, usuario);
+                await EnvioEmail(usuarioEol, usuario);
 
-            await mediator.Send(new SalvarUsuarioCommand(usuario));
+                await mediator.Send(new SalvarUsuarioCommand(usuario));
 
-            return RespostaApi.Sucesso(usuarioEol.Email);
+                return RespostaApi.Sucesso(usuarioEol.Email);
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureMessage($"Não foi possivel realizar a redefinicação de senha, {gerarTokenDto.CPF}, {ex.Message}, {ex.StackTrace} {ex.InnerException}", SentryLevel.Error);
+                throw new NegocioException("Não foi possivel realizar a redefinicação de senha, por favor contate o suporte");
+            }
         }
 
         private async Task<Dominio.Entidades.Usuario> ObterUsuario(GerarTokenDto gerarTokenDto)
