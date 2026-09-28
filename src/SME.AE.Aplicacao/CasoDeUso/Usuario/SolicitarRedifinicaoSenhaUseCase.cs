@@ -59,7 +59,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 var tags = new Dictionary<string, string> { { "CPF", gerarTokenDto.CPF } };
                 var mensagem = $"Não foi possivel realizar a redefinição de senha, CPF: {gerarTokenDto.CPF} , {ex.Message}, {ex.StackTrace} {ex.InnerException}";
                 await mediator.Send(new SalvarLogErroCommand(ex, mensagem, tags));
-                throw new NegocioException("Não foi possivel realizar a redefinição de senha, por favor contate o suporte");
+                throw new NegocioException($"Não foi possivel realizar a redefinição de senha, por favor contate o suporte ${mensagem}");
             }
         }
 
