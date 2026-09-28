@@ -1,6 +1,5 @@
-﻿using Elasticsearch.Net;
-using MediatR;
-using Sentry;
+﻿using MediatR;
+using SME.AE.Aplicacao.Comandos.Logs;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
@@ -12,6 +11,7 @@ using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -56,9 +56,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
-                SentrySdk.CaptureMessage($"Não foi possivel realizar a redefinicação de senha, {gerarTokenDto.CPF}, {ex.Message}, {ex.StackTrace} {ex.InnerException}", SentryLevel.Error);
-                throw new NegocioException("Não foi possivel realizar a redefinicação de senha, por favor contate o suporte");
+                var tags = new Dictionary<string, string> { { "CPF", gerarTokenDto.CPF } };
+                var mensagem = $"Não foi possivel realizar a redefinição de senha, CPF: {gerarTokenDto.CPF} , {ex.Message}, {ex.StackTrace} {ex.InnerException}";
+                await mediator.Send(new SalvarLogErroCommand(ex, mensagem, tags));
+                throw new NegocioException("Não foi possivel realizar a redefinição de senha, por favor contate o suporte");
             }
         }
 
@@ -69,8 +70,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 var usuario = await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
                 return usuario;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                await mediator.Send(new SalvarLogErroCommand(ex));
                 throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
             }
         }
@@ -104,7 +106,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                await mediator.Send(new SalvarLogErroCommand(ex));
                 throw new NegocioException("Não foi possivel realizar o envio de email, por favor contate o suporte");
             }
         }
