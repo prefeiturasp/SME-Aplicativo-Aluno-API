@@ -17,12 +17,13 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito
         private readonly IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio;
         private readonly IUsuarioRepository usuarioRepository;
 
-        public ValidarAlunoInativoRestritoCommandHandler(IMediator autenticamediatorcaoService, IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio, IUsuarioRepository usuarioRepository)
+        public ValidarAlunoInativoRestritoCommandHandler(IMediator mediator, IUsuarioCoreSSORepositorio usuarioCoreSSORepositorio, IUsuarioRepository usuarioRepository)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.usuarioCoreSSORepositorio = usuarioCoreSSORepositorio ?? throw new ArgumentNullException(nameof(usuarioCoreSSORepositorio));
             this.usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
         }
+
 
 
         public async Task<Unit> Handle(ValidarAlunoInativoRestritoCommand request, CancellationToken cancellationToken)
