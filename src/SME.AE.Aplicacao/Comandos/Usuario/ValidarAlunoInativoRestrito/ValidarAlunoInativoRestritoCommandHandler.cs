@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
-using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum.Excecoes;
 using System;
@@ -25,10 +24,9 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito
         }
 
 
-
         public async Task<Unit> Handle(ValidarAlunoInativoRestritoCommand request, CancellationToken cancellationToken)
         {
-            var usuarioAlunos = await mediator.Send(new ObterDadosResponsavelQuery(request.UsuarioCoreSSO.Cpf));
+            var usuarioAlunos = await mediator.Send(new ObterDadosResponsavelQuery(request.UsuarioCoreSSO.Cpf), cancellationToken);
 
             if (usuarioAlunos is null || !usuarioAlunos.Any())
                 await NenhumAlunoAtivo(request);
