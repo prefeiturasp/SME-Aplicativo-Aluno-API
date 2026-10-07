@@ -5,6 +5,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.UseCase
 {
     public interface IObterUsuarioUseCase
     {
-        Task<UsuarioDto> Executar(string codigoDre, long codigoUe, string cpf);
+        Task<UsuarioDto> Executar(string codigoDre, string codigoUe, string cpf);
     }
 }

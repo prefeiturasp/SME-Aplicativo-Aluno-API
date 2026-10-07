@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
@@ -8,7 +8,7 @@ using SME.AE.Comum;
 using SME.AE.Infra.Persistencia.Comandos;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,7 +28,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
-                conn.Open();
+                await conn.OpenAsync();
                 using var transaction = conn.BeginTransaction();
 
                 int status = (int)novoStatus;
@@ -36,13 +36,13 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 await conn.ExecuteAsync(CoreSSOComandos.AtualizarStatusUsuario, new { usuId, status }, transaction);
                 await conn.ExecuteAsync(CoreSSOComandos.AtualizarStatusUsuarioGrupo, new { usuId, status }, transaction);
 
-                transaction.Commit();
-                conn.Close();
+                await transaction.CommitAsync();
+
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -51,18 +51,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conexao = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
-                conexao.Open();
+                await conexao.OpenAsync();
                 var sql = @"update SYS_Usuario 
                                set usu_senha = @senhaCriptografada, usu_dataAlteracaoSenha = @dataAtual, usu_dataAlteracao = @dataAtual
                                 where usu_id = @usuarioId;";
 
                 await conexao.ExecuteAsync(sql, new { usuarioId, senhaCriptografada, dataAtual = DateTime.Now });
-                conexao.Close();
+
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -71,14 +71,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
-                conn.Open();
+                await conn.OpenAsync();
                 await conn.ExecuteAsync(CoreSSOComandos.AtualizarCriptografia, new { usuId, senha });
-                conn.Close();
+
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -87,7 +87,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
-                conn.Open();
+                await conn.OpenAsync();
                 using var transaction = conn.BeginTransaction();
 
                 var pessoaId = Guid.NewGuid();
@@ -103,15 +103,15 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 foreach (var grupo in usuario.Grupos)
                     await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
 
-                transaction.Commit();
-                conn.Close();
+                await transaction.CommitAsync();
+
 
                 return usuId;
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -121,19 +121,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
 
-                conn.Open();
+                await conn.OpenAsync();
                 using var transaction = conn.BeginTransaction();
 
                 foreach (var grupo in gruposNaoIncluidos)
                     await conn.ExecuteAsync(CoreSSOComandos.InserirUsuarioGrupo, new { gruId = grupo, usuId }, transaction);
 
-                transaction.Commit();
-                conn.Close();
+                await transaction.CommitAsync();
+
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -142,7 +142,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
-                conn.Open();
+                await conn.OpenAsync();
 
                 var consulta = @"
                     SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, u.usu_login as Cpf
@@ -154,7 +154,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -162,24 +162,19 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                RetornoUsuarioCoreSSO usuarioCoreSSO = new RetornoUsuarioCoreSSO();
-
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
 
-                conn.Open();
-                usuarioCoreSSO = await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
+                await conn.OpenAsync();
+                return await conn.QueryFirstOrDefaultAsync<RetornoUsuarioCoreSSO>(@"
                             SELECT u.usu_id usuId,u.usu_senha as senha, u.usu_situacao as status, u.usu_criptografia as TipoCriptografia, u.usu_login as Cpf
                             FROM sys_usuario u
                             WHERE u.usu_login = @cpf "
                     , new { cpf });
-                conn.Close();
-                return usuarioCoreSSO;
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureMessage(ex.Message, Sentry.SentryLevel.Error);
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
 
@@ -188,18 +183,18 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 using var conn = new SqlConnection(variaveisGlobaisOptions.CoreSSOConnection);
-                conn.Open();
+                await conn.OpenAsync();
                 var listaIdGrupoQry = await conn.QueryAsync<Guid>(@"
                     SELECT gru_id
                     FROM sys_grupo 
                         WHERE sis_id = 1001");
-                conn.Close();
+
                 return listaIdGrupoQry.ToList();
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
-                throw ex;
+                throw;
             }
         }
     }

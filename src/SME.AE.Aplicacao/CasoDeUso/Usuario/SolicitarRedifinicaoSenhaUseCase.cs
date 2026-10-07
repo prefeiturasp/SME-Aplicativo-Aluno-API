@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Sentry;
+using SME.AE.Aplicacao.Comandos.Logs;
 using SME.AE.Aplicacao.Comandos.Usuario.SalvarUsuario;
 using SME.AE.Aplicacao.Comandos.Usuario.ValidarAlunoInativoRestrito;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
@@ -11,6 +11,7 @@ using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum;
 using SME.AE.Comum.Excecoes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -32,24 +33,34 @@ namespace SME.AE.Aplicacao.CasoDeUso
         public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
         {
 
-            var usuario = await ObterUsuario(gerarTokenDto);
+            try
+            {
+                var usuario = await ObterUsuario(gerarTokenDto);
 
-            var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
+                var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
 
-            var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
+                var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
 
-            await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
+                await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 
-            usuario.IniciarRedefinicaoSenha();
+                usuario.IniciarRedefinicaoSenha();
 
-            if (string.IsNullOrEmpty(usuarioEol.Email))
-                throw new NegocioException("Usuário não possui e-mail cadastrado");
+                if (string.IsNullOrEmpty(usuarioEol.Email))
+                    throw new NegocioException("Usuário não possui e-mail cadastrado");
 
-            await EnvioEmail(usuarioEol, usuario);
+                await EnvioEmail(usuarioEol, usuario);
 
-            await mediator.Send(new SalvarUsuarioCommand(usuario));
+                await mediator.Send(new SalvarUsuarioCommand(usuario));
 
-            return RespostaApi.Sucesso(usuarioEol.Email);
+                return RespostaApi.Sucesso(usuarioEol.Email);
+            }
+            catch (Exception ex)
+            {
+                var tags = new Dictionary<string, string> { { "CPF", gerarTokenDto.CPF } };
+                var mensagem = $"Não foi possivel realizar a redefinição de senha, CPF: {gerarTokenDto.CPF} , {ex.Message}, {ex.StackTrace} {ex.InnerException}";
+                await mediator.Send(new SalvarLogErroCommand(ex, mensagem, tags));
+                throw new NegocioException($"Não foi possivel realizar a redefinição de senha, por favor contate o suporte  = {mensagem}");
+            }
         }
 
         private async Task<Dominio.Entidades.Usuario> ObterUsuario(GerarTokenDto gerarTokenDto)
@@ -59,8 +70,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 var usuario = await mediator.Send(new ObterUsuarioQuery(gerarTokenDto.CPF));
                 return usuario;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                await mediator.Send(new SalvarLogErroCommand(ex));
                 throw new NegocioException("Este CPF não existe na base do Escola Aqui. Você deve realizar o login utilizando a senha padrão.");
             }
         }
@@ -94,7 +106,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                await mediator.Send(new SalvarLogErroCommand(ex));
                 throw new NegocioException("Não foi possivel realizar o envio de email, por favor contate o suporte");
             }
         }
