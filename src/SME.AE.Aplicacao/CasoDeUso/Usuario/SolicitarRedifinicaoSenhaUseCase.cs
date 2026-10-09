@@ -32,15 +32,11 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
         public async Task<RespostaApi> Executar(GerarTokenDto gerarTokenDto)
         {
-
             try
             {
-                var usuario = await ObterUsuario(gerarTokenDto);
-
-                var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto);
-
-                var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf));
-
+                var usuario = await ObterUsuario(gerarTokenDto) ?? throw new NegocioException("Usuário não encontrado na base do Escola Aqui.");
+                var usuarioCoreSSO = await ObterUsuarioCoreSSO(gerarTokenDto) ?? throw new NegocioException("Usuário não encontrado no CoreSSO.");
+                var usuarioEol = await mediator.Send(new ObterDadosResponsavelResumidoQuery(usuario.Cpf)) ?? throw new NegocioException("Dados do responsável não encontrados no EOL.");
                 await mediator.Send(new ValidarAlunoInativoRestritoCommand(usuarioCoreSSO));
 
                 usuario.IniciarRedefinicaoSenha();
@@ -59,6 +55,10 @@ namespace SME.AE.Aplicacao.CasoDeUso
                 var tags = new Dictionary<string, string> { { "CPF", gerarTokenDto.CPF } };
                 var mensagem = $"Não foi possivel realizar a redefinição de senha, CPF: {gerarTokenDto.CPF} , {ex.Message}, {ex.StackTrace} {ex.InnerException}";
                 await mediator.Send(new SalvarLogErroCommand(ex, mensagem, tags));
+
+                if (ex is NegocioException)
+                    throw;
+
                 throw new NegocioException($"Não foi possivel realizar a redefinição de senha, por favor contate o suporte  = {mensagem}");
             }
         }
@@ -101,6 +101,8 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     .Replace("#CODIGO", usuario.Token)
                     .Replace("#URL_BASE#", urlFrontEnd)
                     .Replace("#VALIDADE", usuario.ValidadeToken?.ToString("dd/MM/yyyy HH:mm"));
+
+                usuarioEol.Email = "thiago.procorio@spassu.com.br";
 
                 await emailServico.Enviar(usuarioEol.Nome, usuarioEol.Email, "Redefinição de Senha Escola Aqui", textoEmail);
             }
