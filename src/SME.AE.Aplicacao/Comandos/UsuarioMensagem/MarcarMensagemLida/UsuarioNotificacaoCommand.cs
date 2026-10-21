@@ -12,7 +12,7 @@ namespace SME.AE.Aplicacao.Comandos.Usuario.MarcarMensagemLida
         {
             UsuarioNotificacao = usuarioNotificacao;
         }
-        private UsuarioNotificacao UsuarioNotificacao { get; set; }
+        public UsuarioNotificacao UsuarioNotificacao { get; set; }
 
         public class UsuarioMensagemCommandHandler : IRequestHandler<UsuarioNotificacaoCommand, bool>
         {
