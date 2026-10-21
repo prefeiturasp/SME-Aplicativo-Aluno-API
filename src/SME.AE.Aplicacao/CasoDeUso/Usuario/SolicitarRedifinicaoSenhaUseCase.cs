@@ -102,8 +102,6 @@ namespace SME.AE.Aplicacao.CasoDeUso
                     .Replace("#URL_BASE#", urlFrontEnd)
                     .Replace("#VALIDADE", usuario.ValidadeToken?.ToString("dd/MM/yyyy HH:mm"));
 
-                usuarioEol.Email = "thiago.procorio@spassu.com.br";
-
                 await emailServico.Enviar(usuarioEol.Nome, usuarioEol.Email, "Redefinição de Senha Escola Aqui", textoEmail);
             }
             catch (Exception ex)
