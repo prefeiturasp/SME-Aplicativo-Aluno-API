@@ -8,7 +8,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         {
             ToTable("notificacao");
 
-            Map(x => x.Id).ToColumn("id");
+            Map(x => x.Id).ToColumn("id").IsKey();
             Map(x => x.Titulo).ToColumn("titulo");
             Map(x => x.Mensagem).ToColumn("mensagem");
             Map(x => x.DataEnvio).ToColumn("dataenvio");

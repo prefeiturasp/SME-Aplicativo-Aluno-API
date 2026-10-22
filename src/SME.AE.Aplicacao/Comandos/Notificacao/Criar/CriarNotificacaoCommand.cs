@@ -2,7 +2,7 @@
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 {
-    public class CriarNotificacaoCommand : IRequest<Unit>
+    public class CriarNotificacaoCommand : IRequest<Dominio.Entidades.Notificacao>
     {
         public Dominio.Entidades.Notificacao Notificacao { get; set; }
 
