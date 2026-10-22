@@ -29,7 +29,7 @@ namespace SME.AE.Aplicacao
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
+        public async Task<Notificacao> Executar(NotificacaoSgpDto notificacao)
         {
             try
             {
@@ -50,9 +50,9 @@ namespace SME.AE.Aplicacao
                         notificacao.EnviadoPushNotification = false;
                     }
                 }
-                await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+                var notificacaoCriada = await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
 
-                return notificacao;
+                return notificacaoCriada;
             }
             catch (Exception ex)
             {
