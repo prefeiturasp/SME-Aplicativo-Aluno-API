@@ -51,9 +51,6 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public async Task<Notificacao> Criar(Notificacao notificacao)
         {
-            await using var conn = InstanciarConexao();
-            await conn.OpenAsync();
-
             notificacao.InserirCategoria();
 
             var existe = await NotificacaoExiste(notificacao.Id);
@@ -61,15 +58,123 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             if (existe)
             {
                 notificacao.AtualizarAuditoria();
-                await conn.UpdateAsync(notificacao);
+                await AtualizarNotificacao(notificacao);
             }
             else
             {
                 notificacao.InserirAuditoria();
-                await conn.InsertAsync(notificacao);
+                await InserirNotificacao(notificacao);
             }
-            var notificacaoCriada = await conn.GetAsync<Notificacao>(notificacao.Id);
-            return notificacaoCriada;
+
+            return await ObterNotificacaoPorId(notificacao.Id);
+        }
+        private async Task<Notificacao> ObterNotificacaoPorId(long id)
+        {
+            const string sql = @"
+                            SELECT 
+                                id AS Id, 
+                                titulo AS Titulo, 
+                                mensagem AS Mensagem, 
+                                dataenvio AS DataEnvio, 
+                                dataexpiracao AS DataExpiracao, 
+                                dre_codigoeol AS CodigoDre, 
+                                ue_codigoeol AS CodigoUe, 
+                                ano_letivo AS AnoLetivo, 
+                                tipocomunicado AS TipoComunicado, 
+                                categorianotificacao AS CategoriaNotificacao, 
+                                seriesresumidas AS SeriesResumidas, 
+                                modalidades AS Modalidades, 
+                                tipos_escolas AS TiposEscolas, 
+                                enviadopushnotification AS EnviadoPushNotification,
+                                criadoem AS CriadoEm, 
+                                criadopor AS CriadoPor, 
+                                alteradoem AS AlteradoEm, 
+                                alteradopor AS AlteradoPor
+                            FROM public.notificacao
+                            WHERE id = @Id AND NOT excluido;";
+
+            await using var conn = InstanciarConexao();
+            return await conn.QueryFirstOrDefaultAsync<Notificacao>(sql, new { Id = id });
+        }
+
+        private async Task AtualizarNotificacao(Notificacao notificacao)
+        {
+            const string sql = @"
+                                UPDATE public.notificacao
+                                SET 
+                                    titulo = @Titulo,
+                                    mensagem = @Mensagem,
+                                    dataenvio = @DataEnvio,
+                                    dataexpiracao = @DataExpiracao,
+                                    criadoem = @CriadoEm,
+                                    criadopor = @CriadoPor,
+                                    alteradoem = @AlteradoEm,
+                                    alteradopor = @AlteradoPor,
+                                    dre_codigoeol = @CodigoDre,
+                                    ue_codigoeol = @CodigoUe,
+                                    ano_letivo = @AnoLetivo,
+                                    tipocomunicado = @TipoComunicado,
+                                    categorianotificacao = @CategoriaNotificacao,
+                                    seriesresumidas = @SeriesResumidas,
+                                    enviadopushnotification = @EnviadoPushNotification,
+                                    modalidades = @Modalidades,
+                                    tipos_escolas = @TiposEscolas,
+                                    excluido = false
+                                WHERE 
+                                    id = @Id;";
+
+            await using var conn = InstanciarConexao();
+
+            await conn.ExecuteAsync(sql, notificacao);
+        }
+
+        private async Task InserirNotificacao(Notificacao notificacao)
+        {
+            const string sql = @"
+                                INSERT INTO public.notificacao (
+                                    id, 
+                                    titulo, 
+                                    mensagem, 
+                                    dataenvio, 
+                                    dataexpiracao, 
+                                    criadoem, 
+                                    criadopor, 
+                                    alteradoem, 
+                                    alteradopor, 
+                                    dre_codigoeol, 
+                                    ue_codigoeol, 
+                                    ano_letivo, 
+                                    tipocomunicado, 
+                                    categorianotificacao, 
+                                    seriesresumidas, 
+                                    enviadopushnotification, 
+                                    modalidades, 
+                                    tipos_escolas,
+                                    excluido
+                                ) VALUES (
+                                    @Id, 
+                                    @Titulo, 
+                                    @Mensagem, 
+                                    @DataEnvio, 
+                                    @DataExpiracao, 
+                                    @CriadoEm, 
+                                    @CriadoPor, 
+                                    @AlteradoEm, 
+                                    @AlteradoPor, 
+                                    @CodigoDre, 
+                                    @CodigoUe, 
+                                    @AnoLetivo, 
+                                    @TipoComunicado, 
+                                    @CategoriaNotificacao, 
+                                    @SeriesResumidas, 
+                                    @EnviadoPushNotification, 
+                                    @Modalidades, 
+                                    @TiposEscolas,
+                                    false
+                                );";
+
+            await using var conn = InstanciarConexao();
+            await conn.ExecuteAsync(sql, notificacao);
         }
 
         public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)

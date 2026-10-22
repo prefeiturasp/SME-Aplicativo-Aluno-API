@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Dominio.Entidades;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 {
