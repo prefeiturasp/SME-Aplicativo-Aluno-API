@@ -1,4 +1,5 @@
 ﻿using SME.AE.Dominio.Entidades;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos
 {
@@ -8,7 +9,11 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
         {
             ToTable("notificacao");
 
-            Map(x => x.Id).ToColumn("id").IsKey();
+            Map(x => x.Id)
+                .ToColumn("id")
+                .IsKey()
+                .SetGeneratedOption(DatabaseGeneratedOption.None);
+
             Map(x => x.Titulo).ToColumn("titulo");
             Map(x => x.Mensagem).ToColumn("mensagem");
             Map(x => x.DataEnvio).ToColumn("dataenvio");
