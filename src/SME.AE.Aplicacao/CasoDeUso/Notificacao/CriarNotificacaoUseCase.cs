@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Utilitarios;
 using SME.AE.Dominio.Entidades;
 using System;
@@ -21,7 +22,7 @@ namespace SME.AE.Aplicacao
     {
         private readonly IMediator mediator;
         private readonly IMapper mapper;
-        public List<Dictionary<String, String>> listaDicionario = new List<Dictionary<String, String>>();
+        public List<Dictionary<String, String>> listaDicionario = [];
 
         public CriarNotificacaoUseCase(IMediator mediator, IMapper mapper)
         {
