@@ -4,6 +4,7 @@ using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using System;
@@ -16,6 +17,8 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
 {
     public class AutenticarUsuarioCommandHandlerTests
     {
+        private const string CpfValido = "12345678909";
+
         private readonly Mock<IUsuarioRepository> _repositoryMock;
         private readonly Mock<IUsuarioCoreSSORepositorio> _repositoryCoreSSOMock;
         private readonly Mock<IMediator> _mediatorMock;
@@ -38,7 +41,7 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
         public async Task Handle_PrimeiroAcesso_DataNascimentoInvalidaNaSenha_DeveRetornarFalha()
         {
             // Arrange
-            var request = new AutenticarUsuarioCommand("12345678900", "00000000"); // Data inválida ex: 00/00/0000
+            var request = new AutenticarUsuarioCommand(CpfValido, "00000000");
 
             _mediatorMock
                 .Setup(m => m.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>()))
@@ -59,7 +62,7 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
         public async Task Handle_PrimeiroAcesso_SemAlunosRelacionados_DeveDesativarEExcluirUsuario()
         {
             // Arrange
-            var request = new AutenticarUsuarioCommand("12345678900", "20140524"); // Data válida: 24/05/2014
+            var request = new AutenticarUsuarioCommand(CpfValido, "20140524");
 
             _mediatorMock
                 .Setup(m => m.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>()))
@@ -71,7 +74,7 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
 
             _mediatorMock
                 .Setup(m => m.Send(It.IsAny<ObterDadosResponsavelQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<DadosResponsavelAluno>()); // Nenhum aluno retornado
+                .ReturnsAsync(new List<DadosResponsavelAluno>());
 
             // Act
             var resultado = await _handler.Handle(request, CancellationToken.None);
@@ -84,7 +87,7 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
         public async Task Handle_PrimeiroAcesso_DataNascimentoAlunoDivergente_DeveRetornarFalha()
         {
             // Arrange
-            var request = new AutenticarUsuarioCommand("12345678900", "20140524"); // Data na senha: 24/05/2014
+            var request = new AutenticarUsuarioCommand(CpfValido, "20140524");
 
             _mediatorMock
                 .Setup(m => m.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>()))
@@ -96,7 +99,7 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
 
             var alunos = new List<DadosResponsavelAluno>
             {
-                new DadosResponsavelAluno { DataNascimentoAluno = new DateTime(2010, 1, 1) } // Data diferente
+                new DadosResponsavelAluno { DataNascimentoAluno = new DateTime(2010, 1, 1) }
             };
 
             _mediatorMock
@@ -111,12 +114,12 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
         }
 
         [Theory]
-        [InlineData("20140524")] // yyyyMMdd
-        [InlineData("24052014")] // ddMMyyyy
+        [InlineData("20140524")]
+        [InlineData("24052014")]
         public async Task Handle_PrimeiroAcesso_FormatosDeDataValidos_DeveAutenticarComSucesso(string senhaData)
         {
             // Arrange
-            var request = new AutenticarUsuarioCommand("12345678900", senhaData);
+            var request = new AutenticarUsuarioCommand(CpfValido, senhaData);
             var dataNascimentoEsperada = new DateTime(2014, 5, 24);
 
             _mediatorMock
@@ -154,7 +157,6 @@ namespace SME.AE.Aplicacao.Testes.Comandos.Autenticacao
 
             // Assert
             Assert.True(resultado.Ok);
-
             _repositoryMock.Verify(r => r.SalvarAsync(It.IsAny<Dominio.Entidades.Usuario>()), Times.Once);
         }
     }
