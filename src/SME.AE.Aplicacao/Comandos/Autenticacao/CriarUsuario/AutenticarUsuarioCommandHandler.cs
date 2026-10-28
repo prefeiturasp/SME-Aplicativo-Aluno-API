@@ -66,7 +66,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             await AtualizarCoreSSOSenecessarioAsync(usuarioCoreSSO, request.Senha);
 
             var usuarioParaSeBasear = usuarioAlunos.OrderByDescending(a => a.DataAtualizacao).First();
-            usuarioApp = await CriaOuAtualizaUsuarioAppAsync(request.Cpf, usuarioApp, usuarioParaSeBasear, primeiroAcesso);
+            usuarioApp = await CriaOuAtualizaUsuarioAppAsync(request.Cpf, usuarioApp, primeiroAcesso);
             usuarioApp.PrimeiroAcesso = usuarioApp.PrimeiroAcesso || primeiroAcesso;
 
             var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
@@ -164,7 +164,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
         }
 
-        private async Task<Dominio.Entidades.Usuario> CriaOuAtualizaUsuarioAppAsync(string cpf, Dominio.Entidades.Usuario usuarioApp, DadosResponsavelAluno usuarioEol, bool primeiroAcesso)
+        private async Task<Dominio.Entidades.Usuario> CriaOuAtualizaUsuarioAppAsync(string cpf, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso)
         {
             if (usuarioApp != null)
             {
