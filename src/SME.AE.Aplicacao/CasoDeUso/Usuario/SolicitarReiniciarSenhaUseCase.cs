@@ -1,4 +1,5 @@
-﻿using MediatR;
+using MediatR;
+using SME.AE.Aplicacao.Comandos.TermosDeUso;
 using SME.AE.Aplicacao.Comandos.Usuario.ReiniciarSenha;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -41,6 +42,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
             if (usuario.PrimeiroAcesso == true)
                 throw new NegocioException($"O usuário {Formatacao.FormatarCpf(solicitarReiniciarSenhaDto.Cpf)} - {usuarioEol.Nome} deverá informar a data de nascimento de um dos estudantes que é responsável no campo de senha!");
 
+            await mediator.Send(new ExcluirAceiteTermosDeUsoPorCpfCommand(usuario.Cpf));
             await mediator.Send(new ReiniciarSenhaCommand() { Id = usuario.Id, PrimeiroAcesso = true });
             var mensagemSucesso = $"A senha do usuário {Formatacao.FormatarCpf(usuario.Cpf)} - {usuarioEol.Nome} foi reiniciada com sucesso. No próximo acesso ao aplicativo o usuário deverá informar a data de nascimento de um dos estudantes que é responsável!";
             return RespostaApi.Sucesso(mensagemSucesso);

@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
@@ -85,7 +85,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 using var conexao = InstanciarConexao();
                 conexao.Open();
 
-                var consulta = $"SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao";
+                var consulta = $"SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao AND excluido = false";
                 var parametros = new { cpfUsuario, versao };
 
                 var aceiteExiste = await servicoTelemetria.RegistrarComRetornoAsync<int>(async () => await SqlMapper.QueryFirstOrDefaultAsync<int>(conexao,
@@ -98,6 +98,28 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             {
                 SentrySdk.CaptureException(ex);
                 return false;
+            }
+        }
+
+        public async Task<bool> ExcluirLogicamentePorCpf(string cpfUsuario)
+        {
+            try
+            {
+                await using var conn = InstanciarConexao();
+                conn.Open();
+                var dataAtual = DateTime.Now;
+                await conn.ExecuteAsync(
+                    @"UPDATE public.aceite_termos_de_uso 
+                      SET excluido = true, alterado_em = @dataAtual, alterado_por = 'Sistema' 
+                      WHERE cpf_usuario = @cpfUsuario AND excluido = false",
+                    new { cpfUsuario, dataAtual });
+                conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureMessage(ex.Message);
+                throw ex;
             }
         }
     }
