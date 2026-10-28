@@ -1,4 +1,4 @@
-﻿namespace SME.AE.Infra.Persistencia.Consultas
+namespace SME.AE.Infra.Persistencia.Consultas
 {
     public static class TermosDeUsoConsultas
     {
@@ -38,7 +38,7 @@
             tdu.alterado_em, 
             tdu.alterado_por
         FROM termos_de_uso tdu 
-        WHERE tdu.Id NOT IN (select termos_de_uso_id from aceite_termos_de_uso atdu where cpf_usuario = @cpf)
+        WHERE tdu.Id NOT IN (select termos_de_uso_id from aceite_termos_de_uso atdu where cpf_usuario = @cpf and excluido = false)
         ORDER BY tdu.versao DESC limit 1 ";
 
     }

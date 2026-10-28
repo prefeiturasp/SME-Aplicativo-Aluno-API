@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -13,6 +13,7 @@ namespace SME.AE.Dominio.Entidades
         public DateTime DataHoraAceite { get; private set; }
         public double Versao { get; private set; }
         public byte[] Hash { get; private set; }
+        public bool Excluido { get; private set; }
 
         public AceiteTermosDeUso(long termosDeUsoId, string cpfUsuario, string device, string ip, double versao)
         {
@@ -23,6 +24,12 @@ namespace SME.AE.Dominio.Entidades
             DataHoraAceite = DateTime.Now;
             Versao = versao;
             Hash = GerarHash($"{termosDeUsoId}{cpfUsuario}{device}{ip}{versao}");
+        }
+
+        public void MarcarComoExcluido()
+        {
+            Excluido = true;
+            AtualizarAuditoria();
         }
 
         private byte[] GerarHash(string valor)
