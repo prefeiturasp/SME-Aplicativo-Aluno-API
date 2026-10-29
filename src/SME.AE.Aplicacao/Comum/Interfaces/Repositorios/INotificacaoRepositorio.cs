@@ -13,7 +13,7 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
     {
         public Task<IEnumerable<NotificacaoPorUsuario>> ObterPorGrupoUsuario(string grupo, string cpf);
 
-        public Task Criar(Notificacao notificacao);
+        public Task<Notificacao> Criar(Notificacao notificacao);
 
         public Task Atualizar(AtualizarNotificacaoDto notificacao);
 
@@ -28,5 +28,6 @@ namespace SME.AE.Aplicacao.Comum.Interfaces.Repositorios
         Task<NotificacaoResposta> NotificacaoPorId(long Id);
         Task<IEnumerable<NotificacaoSgpDto>> ListarNotificacoesNaoEnviadas();
         Task<IEnumerable<NotificacaoAlunoResposta>> ObterNotificacoesAlunoPorId(long id);
+        Task<bool> NotificacaoExiste(long id);
     }
 }

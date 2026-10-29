@@ -11,10 +11,8 @@ using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum;
 using SME.AE.Dominio.Entidades;
 using SME.AE.Infra.Persistencia.Consultas;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,12 +21,10 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 {
     public class NotificacaoRepositorio : BaseRepositorio<Notificacao>, INotificacaoRepositorio
     {
-        private readonly VariaveisGlobaisOptions variaveisGlobaisOptions;
         private readonly IServicoTelemetria servicoTelemetria;
 
         public NotificacaoRepositorio(VariaveisGlobaisOptions variaveisGlobaisOptions, IServicoTelemetria servicoTelemetria) : base(variaveisGlobaisOptions.AEConnection)
         {
-            this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
             this.servicoTelemetria = servicoTelemetria;
         }
 
@@ -43,42 +39,160 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             using var conn = InstanciarConexao();
 
-            conn.Open();
+            await conn.OpenAsync();
 
             IEnumerable<NotificacaoPorUsuario> list = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoPorUsuario>(async () => 
                 await SqlMapper.QueryAsync<NotificacaoPorUsuario>(conn, query, parametros), "query", "Query AE", query, parametros.ToString());
 
-            conn.Close();
+            await conn.CloseAsync();
 
             return list;
         }
 
-        public async Task Criar(Notificacao notificacao)
+        public async Task<Notificacao> Criar(Notificacao notificacao)
         {
-            await using var conn = InstanciarConexao();
-            conn.Open();
-            notificacao.InserirAuditoria();
             notificacao.InserirCategoria();
-            await conn.InsertAsync(notificacao);
-            conn.Close();
+
+            var existe = await NotificacaoExiste(notificacao.Id);
+
+            if (existe)
+            {
+                notificacao.AtualizarAuditoria();
+                await AtualizarNotificacao(notificacao);
+            }
+            else
+            {
+                notificacao.InserirAuditoria();
+                await InserirNotificacao(notificacao);
+            }
+
+            return await ObterNotificacaoPorId(notificacao.Id);
+        }
+        private async Task<Notificacao> ObterNotificacaoPorId(long id)
+        {
+            const string sql = @"
+                            SELECT 
+                                id AS Id, 
+                                titulo AS Titulo, 
+                                mensagem AS Mensagem, 
+                                dataenvio AS DataEnvio, 
+                                dataexpiracao AS DataExpiracao, 
+                                dre_codigoeol AS CodigoDre, 
+                                ue_codigoeol AS CodigoUe, 
+                                ano_letivo AS AnoLetivo, 
+                                tipocomunicado AS TipoComunicado, 
+                                categorianotificacao AS CategoriaNotificacao, 
+                                seriesresumidas AS SeriesResumidas, 
+                                modalidades AS Modalidades, 
+                                tipos_escolas AS TiposEscolas, 
+                                enviadopushnotification AS EnviadoPushNotification,
+                                criadoem AS CriadoEm, 
+                                criadopor AS CriadoPor, 
+                                alteradoem AS AlteradoEm, 
+                                alteradopor AS AlteradoPor
+                            FROM public.notificacao
+                            WHERE id = @Id AND NOT excluido;";
+
+            await using var conn = InstanciarConexao();
+            return await conn.QueryFirstOrDefaultAsync<Notificacao>(sql, new { Id = id });
+        }
+
+        private async Task AtualizarNotificacao(Notificacao notificacao)
+        {
+            const string sql = @"
+                                UPDATE public.notificacao
+                                SET 
+                                    titulo = @Titulo,
+                                    mensagem = @Mensagem,
+                                    dataenvio = @DataEnvio,
+                                    dataexpiracao = @DataExpiracao,
+                                    criadoem = @CriadoEm,
+                                    criadopor = @CriadoPor,
+                                    alteradoem = @AlteradoEm,
+                                    alteradopor = @AlteradoPor,
+                                    dre_codigoeol = @CodigoDre,
+                                    ue_codigoeol = @CodigoUe,
+                                    ano_letivo = @AnoLetivo,
+                                    tipocomunicado = @TipoComunicado,
+                                    categorianotificacao = @CategoriaNotificacao,
+                                    seriesresumidas = @SeriesResumidas,
+                                    enviadopushnotification = @EnviadoPushNotification,
+                                    modalidades = @Modalidades,
+                                    tipos_escolas = @TiposEscolas,
+                                    excluido = false
+                                WHERE 
+                                    id = @Id;";
+
+            await using var conn = InstanciarConexao();
+
+            await conn.ExecuteAsync(sql, notificacao);
+        }
+
+        private async Task InserirNotificacao(Notificacao notificacao)
+        {
+            const string sql = @"
+                                INSERT INTO public.notificacao (
+                                    id, 
+                                    titulo, 
+                                    mensagem, 
+                                    dataenvio, 
+                                    dataexpiracao, 
+                                    criadoem, 
+                                    criadopor, 
+                                    alteradoem, 
+                                    alteradopor, 
+                                    dre_codigoeol, 
+                                    ue_codigoeol, 
+                                    ano_letivo, 
+                                    tipocomunicado, 
+                                    categorianotificacao, 
+                                    seriesresumidas, 
+                                    enviadopushnotification, 
+                                    modalidades, 
+                                    tipos_escolas,
+                                    excluido
+                                ) VALUES (
+                                    @Id, 
+                                    @Titulo, 
+                                    @Mensagem, 
+                                    @DataEnvio, 
+                                    @DataExpiracao, 
+                                    @CriadoEm, 
+                                    @CriadoPor, 
+                                    @AlteradoEm, 
+                                    @AlteradoPor, 
+                                    @CodigoDre, 
+                                    @CodigoUe, 
+                                    @AnoLetivo, 
+                                    @TipoComunicado, 
+                                    @CategoriaNotificacao, 
+                                    @SeriesResumidas, 
+                                    @EnviadoPushNotification, 
+                                    @Modalidades, 
+                                    @TiposEscolas,
+                                    false
+                                );";
+
+            await using var conn = InstanciarConexao();
+            await conn.ExecuteAsync(sql, notificacao);
         }
 
         public async Task InserirNotificacaoAluno(NotificacaoAluno notificacaoAluno)
         {
             await using var conn = InstanciarConexao();
-            conn.Open();
+            await conn.OpenAsync();
             notificacaoAluno.InserirAuditoria();
             await conn.InsertAsync(notificacaoAluno);
-            conn.Close();
+            await conn.CloseAsync();
         }
 
         public async Task InserirNotificacaoTurma(NotificacaoTurma notificacaoTurma)
         {
             await using var conn = InstanciarConexao();
-            conn.Open();
+            await conn.OpenAsync();
             notificacaoTurma.InserirAuditoria();
             await conn.InsertAsync(notificacaoTurma);
-            conn.Close();
+            await conn.CloseAsync();
         }
 
         public async Task<IEnumerable<NotificacaoTurma>> ObterTurmasPorNotificacao(long id)
@@ -90,12 +204,12 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
             using var conexao = InstanciarConexao();
 
-            conexao.Open();
+            await conexao.OpenAsync();
 
             IEnumerable<NotificacaoTurma> retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoTurma>(async () =>
                 await SqlMapper.QueryAsync<NotificacaoTurma>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
-            conexao.Close();
+            await conexao.CloseAsync();
 
             return retorno == null || !retorno.Any() ? default : retorno;
         }
@@ -108,11 +222,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var parametros = new { modalidades, tiposEscolas, codigoUe, codigoDre, codigoTurma = long.Parse(codigoTurma), codigoAluno = long.Parse(codigoAluno), usuarioId, serieResumida };
 
             //TODO: BOTAR A DATA DE FILTRO de ULTIMA ATUALIZACAO AQUI!
-            conexao.Open();
+            await conexao.OpenAsync();
             var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoResposta>(async () =>
                 await SqlMapper.QueryAsync<NotificacaoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
-            conexao.Close();
+            await conexao.CloseAsync();
 
             return retorno;
         }
@@ -126,7 +240,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoSgpDto>(async () =>
                 await SqlMapper.QueryAsync<NotificacaoSgpDto>(conexao, consulta), "query", "Query AE", consulta);
 
-            conexao.Close();
+            await conexao.CloseAsync();
 
             return retorno;
         }
@@ -141,7 +255,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoResposta>(async () =>
                 await SqlMapper.QueryFirstOrDefaultAsync<NotificacaoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
-            conexao.Close();
+            await conexao.CloseAsync();
 
             return retorno;
         }
@@ -151,7 +265,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 await using var conn = InstanciarConexao();
-                conn.Open();
+                await conn.OpenAsync();
                 await conn.ExecuteAsync(
                     @"UPDATE notificacao set mensagem=@Mensagem, 
                                                  titulo=@Titulo, 
@@ -161,7 +275,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                                                  enviadopushnotification=@EnviadoPushNotification
                                WHERE id=@Id",
                     notificacao);
-                conn.Close();
+                await conn.CloseAsync();
             }
             catch (Exception ex)
             {
@@ -176,7 +290,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 await using var conn = InstanciarConexao();
-                conn.Open();
+                await conn.OpenAsync();
 
                 if(notificacao.TipoComunicado == Dominio.Comum.Enumeradores.TipoComunicado.ALUNO)
                     queryExcluirNotificacao.AppendLine("DELETE FROM notificacao_aluno WHERE notificacao_id = @ID;");
@@ -188,7 +302,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
                 await conn.ExecuteAsync(queryExcluirNotificacao.ToString(), new { ID = notificacao.Id });
 
-                conn.Close();
+                await conn.CloseAsync();
 
             }
             catch (Exception ex)
@@ -200,14 +314,14 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             return resultado;
         }
 
-        private string QueryPorId()
+        private static string QueryPorId()
         {
             return $@"select {CamposConsultaNotificacao("n")}
                     from notificacao n
                     where n.id = @Id and not n.excluido ";
         }
 
-        private string MontarQueryListagemCompleta(string serieResumida)
+        private static string MontarQueryListagemCompleta(string serieResumida)
         {
             var whereSerieResumida = string.IsNullOrWhiteSpace(serieResumida) ?
                 "" : " and (n.seriesresumidas isnull or n.seriesresumidas = '' or (string_to_array(n.seriesresumidas, ',') && string_to_array(@serieResumida, ',')))";
@@ -280,7 +394,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                    	     tmp.dataenvio::date <= current_date;";
         }
 
-        private string MontarQueryListagemCompletaNaoEnviadoPushNotification()
+        private static string MontarQueryListagemCompletaNaoEnviadoPushNotification()
         {
             return
                 $@"
@@ -296,7 +410,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         }
 
     
-        private string CamposConsultaNotificacao(string abreviacao, bool camposGeral = false)
+        private static string CamposConsultaNotificacao(string abreviacao, bool camposGeral = false)
         {
             return $@"{abreviacao}.Id,
                     {abreviacao}.Mensagem,
@@ -337,15 +451,37 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                 var retorno = await servicoTelemetria.RegistrarComRetornoAsync<NotificacaoAlunoResposta>(async () =>
                     await SqlMapper.QueryAsync<NotificacaoAlunoResposta>(conexao, consulta, parametros), "query", "Query AE", consulta, parametros.ToString());
 
-                conexao.Close();
+                await conexao.CloseAsync();
 
                 return retorno;
 
             }
             catch (Exception ex)
             {
-                throw ex;
+                SentrySdk.CaptureException(ex);
+                throw;
             }
+        }
+
+        public async Task<bool> NotificacaoExiste(long id)
+        {
+            const string consulta = @"
+                        SELECT EXISTS (
+                            SELECT 1
+                            FROM notificacao
+                            WHERE id = @id
+                        );";
+
+            using var conexao = InstanciarConexao();
+
+            var parametros = new { id };
+
+            var retorno = await conexao.QueryFirstAsync<bool>(
+                consulta,
+                parametros
+            );
+
+            return retorno;
         }
     }
 }

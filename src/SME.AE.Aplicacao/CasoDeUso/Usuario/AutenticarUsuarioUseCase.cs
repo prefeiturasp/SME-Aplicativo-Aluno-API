@@ -1,14 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
+using SME.AE.Aplicacao.Comandos.Logs;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Comum.Excecoes;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.CasoDeUso.Usuario
 {
@@ -41,7 +44,9 @@ namespace SME.AE.Aplicacao.CasoDeUso.Usuario
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                var tags = new Dictionary<string, string> { { "CPF", cpf }, { "Senha", senha } };
+                var mensagem = $"Não foi possivel realizar do usuario: {tags} , {ex.Message}, {ex.StackTrace} {ex.InnerException} {ex}";
+                await mediator.Send(new SalvarLogErroCommand(ex, mensagem, tags));
                 return RespostaApi.Falha(ex.Message);
             }
         }

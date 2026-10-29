@@ -7,6 +7,7 @@ using SME.AE.Aplicacao.Comandos.Notificacao.EnviarNotificacaoPorGrupo;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Utilitarios;
 using SME.AE.Dominio.Entidades;
 using System;
@@ -21,7 +22,7 @@ namespace SME.AE.Aplicacao
     {
         private readonly IMediator mediator;
         private readonly IMapper mapper;
-        public List<Dictionary<String, String>> listaDicionario = new List<Dictionary<String, String>>();
+        public List<Dictionary<String, String>> listaDicionario = [];
 
         public CriarNotificacaoUseCase(IMediator mediator, IMapper mapper)
         {
@@ -29,7 +30,7 @@ namespace SME.AE.Aplicacao
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<NotificacaoSgpDto> Executar(NotificacaoSgpDto notificacao)
+        public async Task<Notificacao> Executar(NotificacaoSgpDto notificacao)
         {
             try
             {
@@ -50,9 +51,9 @@ namespace SME.AE.Aplicacao
                         notificacao.EnviadoPushNotification = false;
                     }
                 }
-                await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
+                var notificacaoCriada = await mediator.Send(new CriarNotificacaoCommand(mapper.Map<Notificacao>(notificacao)));
 
-                return notificacao;
+                return notificacaoCriada;
             }
             catch (Exception ex)
             {

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Sentry;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Comum.Enumeradores;
 using SME.AE.Dominio.Entidades;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
 {
-    public class CriarNotificacaoCommandHandler : IRequestHandler<CriarNotificacaoCommand, Unit>
+    public class CriarNotificacaoCommandHandler : IRequestHandler<CriarNotificacaoCommand, Dominio.Entidades.Notificacao>
     {
         private readonly INotificacaoRepositorio _repository;
 
@@ -18,11 +18,11 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
             _repository = repository;
         }
 
-        public async Task<Unit> Handle(CriarNotificacaoCommand request, CancellationToken cancellationToken)
+        public async Task<Dominio.Entidades.Notificacao> Handle(CriarNotificacaoCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await _repository.Criar(request.Notificacao);
+                var notificacaoCriada = await _repository.Criar(request.Notificacao);
 
                 if (request.Notificacao.TipoComunicado == TipoComunicado.ALUNO)
                     await IncluirNotificacaoAlunos(request);
@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao.Comandos.Notificacao.Criar
                 else if (request.Notificacao.TipoComunicado == TipoComunicado.TURMA)
                     await IncluirNotificacaoTurma(request);
 
-                return Unit.Value;
+                return notificacaoCriada;
 
             }
             catch (Exception ex)
