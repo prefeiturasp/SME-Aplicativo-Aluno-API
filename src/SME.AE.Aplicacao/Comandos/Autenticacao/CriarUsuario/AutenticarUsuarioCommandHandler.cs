@@ -66,7 +66,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             await AtualizarCoreSSOSenecessarioAsync(usuarioCoreSSO, request.Senha);
 
             var usuarioParaSeBasear = usuarioAlunos.OrderByDescending(a => a.DataAtualizacao).First();
-            usuarioApp = await CriaOuAtualizaUsuarioAppAsync(request.Cpf, usuarioApp, usuarioParaSeBasear, primeiroAcesso);
+            usuarioApp = await CriaOuAtualizaUsuarioAppAsync(request.Cpf, usuarioApp, primeiroAcesso);
             usuarioApp.PrimeiroAcesso = usuarioApp.PrimeiroAcesso || primeiroAcesso;
 
             var atualizarDadosCadastrais = VerificarAtualizacaoCadastral(usuarioParaSeBasear);
@@ -95,7 +95,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
 
         private static RespostaApi ValidarRegrasParaPrimeiroAcesso(AutenticarUsuarioCommand request, IEnumerable<DadosResponsavelAluno> usuarioAlunos)
         {
-            var alunoCorrespondente = usuarioAlunos.FirstOrDefault(w => w.DataNascimentoAluno == request.DataNascimento);
+            var alunoCorrespondente = usuarioAlunos.FirstOrDefault(w => w.DataNascimentoAluno.Date == request.DataNascimento.Date);
 
             if (alunoCorrespondente == null)
                 return RespostaApi.Falha("Data de Nascimento inválida.");
@@ -109,6 +109,9 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
         private static bool VerificarSeUsuarioEstaSemGrupo(RetornoUsuarioCoreSSO usuarioCoreSSO, IEnumerable<Guid> grupos)
         {
             if (usuarioCoreSSO?.Grupos == null || !usuarioCoreSSO.Grupos.Any())
+                return true;
+
+            if (grupos == null || !grupos.Any())
                 return true;
 
             return !grupos.Any(g => usuarioCoreSSO.Grupos.Contains(g));
@@ -126,7 +129,16 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
         private static bool TentarExtrairDataNascimentoDaSenha(string senha, out DateTime dataNascimento)
         {
             var senhaLimpa = new string((senha ?? string.Empty).Where(char.IsDigit).ToArray());
-            return DateTime.TryParseExact(senhaLimpa, "ddMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataNascimento);
+
+            string[] formatosPermitidos = { "yyyyMMdd", "ddMMyyyy" };
+
+            return DateTime.TryParseExact(
+                senhaLimpa,
+                formatosPermitidos,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out dataNascimento
+            );
         }
 
         private async Task ExcluirEDesativarUsuarioInvalidoAsync(string cpf, Dominio.Entidades.Usuario usuarioApp, RetornoUsuarioCoreSSO usuarioCoreSSO)
@@ -152,7 +164,7 @@ namespace SME.AE.Aplicacao.Comandos.Autenticacao.CriarUsuario
             }
         }
 
-        private async Task<Dominio.Entidades.Usuario> CriaOuAtualizaUsuarioAppAsync(string cpf, Dominio.Entidades.Usuario usuarioApp, DadosResponsavelAluno usuarioEol, bool primeiroAcesso)
+        private async Task<Dominio.Entidades.Usuario> CriaOuAtualizaUsuarioAppAsync(string cpf, Dominio.Entidades.Usuario usuarioApp, bool primeiroAcesso)
         {
             if (usuarioApp != null)
             {

@@ -1,4 +1,4 @@
-﻿using SME.AE.Dominio.Entidades;
+using SME.AE.Dominio.Entidades;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos
 {
@@ -14,6 +14,7 @@ namespace SME.AE.Infra.Persistencia.Mapeamentos
             Map(x => x.Versao).ToColumn("versao");
             Map(x => x.DataHoraAceite).ToColumn("data_hora_aceite");
             Map(x => x.Hash).ToColumn("hash");
+            Map(x => x.Excluido).ToColumn("excluido");
         }
     }
 }
