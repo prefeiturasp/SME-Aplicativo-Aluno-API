@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
+using SME.AE.Comum.Excecoes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace SME.AE.Aplicacao.Consultas.TermosDeUso
         {
             var retorno = await _termosDeUsoRepositorio.ObterTermosDeUsoPorCpf(request.CPF);
             if (retorno == null)
-                return null;
+                throw new NegocioException("Nenhum termo de uso encontrado para o CPF informado");
 
             var termosDeUsoDto = MapearObjetoParaDto(retorno);
             return termosDeUsoDto;
