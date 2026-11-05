@@ -1,4 +1,5 @@
-﻿using Moq;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AssociarGrupoUsuario;
@@ -7,7 +8,6 @@ using SME.AE.Aplicacao.Comandos.Usuario.AtualizaPrimeiroAcesso;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Usuario;
-using SME.AE.Aplicacao.Consultas;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Comum.Excecoes;
@@ -17,15 +17,56 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
+namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao.PrimeiroAcesso
 {
-    public class PrimeiroAcessoUseCaseTeste : BaseTeste
+    [Trait("Autenticacao", "PrimeiroAcesso")]
+    public class PrimeiroAcessoControllerTeste : AutenticacaoTesteBase
     {
         private readonly IPrimeiroAcessoUseCase criarUsuarioPrimeiroAcessoUseCase;
-
-        public PrimeiroAcessoUseCaseTeste()
+        public PrimeiroAcessoControllerTeste()
         {
             criarUsuarioPrimeiroAcessoUseCase = new PrimeiroAcessoUseCase(mediator.Object);
+        }
+        [Fact]
+        public async Task Deve_Retornar_Ok_Em_Primeiro_Acesso()
+        {
+            var dto = new NovaSenhaDto { Id = 1, NovaSenha = "nova" };
+            var resposta = Sucesso();
+            var useCase = new Mock<IPrimeiroAcessoUseCase>();
+            useCase.Setup(x => x.Executar(dto)).ReturnsAsync(resposta);
+            var resultado = await Controller.PrimeiroAcesso(dto, useCase.Object);
+            Assert.Same(resposta, Assert.IsType<OkObjectResult>(resultado.Result).Value);
+        }
+
+        [Fact]
+        public async Task Deve_Retornar_Falha_Em_Primeiro_Acesso()
+        {
+            var dto = new NovaSenhaDto();
+            var resposta = Falha();
+            var useCase = new Mock<IPrimeiroAcessoUseCase>();
+            useCase.Setup(x => x.Executar(dto)).ReturnsAsync(resposta);
+            var resultado = await Controller.PrimeiroAcesso(dto, useCase.Object);
+            Assert.Same(resposta, Assert.IsType<OkObjectResult>(resultado.Result).Value);
+        }
+
+        [Fact]
+        public async Task Deve_Encaminhar_Id_Ao_Caso_De_Uso()
+        {
+            var dto = new NovaSenhaDto { Id = 42 };
+            var useCase = new Mock<IPrimeiroAcessoUseCase>();
+            useCase.Setup(x => x.Executar(It.IsAny<NovaSenhaDto>())).ReturnsAsync(Sucesso());
+            await Controller.PrimeiroAcesso(dto, useCase.Object);
+            useCase.Verify(x => x.Executar(It.Is<NovaSenhaDto>(d => d.Id == 42)), Times.Once);
+        }
+
+        [Fact]
+        public async Task Deve_Encaminhar_Nova_Senha_Ao_Caso_De_Uso()
+        {
+            var dto = new NovaSenhaDto { NovaSenha = "senha-especifica" };
+            var useCase = new Mock<IPrimeiroAcessoUseCase>();
+            useCase.Setup(x => x.Executar(It.IsAny<NovaSenhaDto>())).ReturnsAsync(Sucesso());
+            await Controller.PrimeiroAcesso(dto, useCase.Object);
+            useCase.Verify(x => x.Executar(It.Is<NovaSenhaDto>(d => d.NovaSenha == "senha-especifica")), Times.Once);
         }
 
         [Fact(DisplayName = "Deve Criar usuário no primeiro acesso")]
@@ -35,7 +76,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 
             InstanciarComandos();
 
-            await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDtoCerta);
+            var resultado = await criarUsuarioPrimeiroAcessoUseCase.Executar(novaSenhaDtoCerta);
+            Assert.True(resultado.Ok);
         }
 
         [Fact(DisplayName = "Deve Informar usuário não esta em primeiro acesso")]
@@ -105,11 +147,13 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             }
         };
 
-        private DadosResponsavelAlunoResumido responsavelAlunoEolResumido { get; set; } = new DadosResponsavelAlunoResumido {  NumeroCelular = "999999999",
-                DDDCelular = "99",
-                Email = "Teste@teste.com",
-                Nome = "Teste"
-          };
+        private DadosResponsavelAlunoResumido responsavelAlunoEolResumido { get; set; } = new DadosResponsavelAlunoResumido
+        {
+            NumeroCelular = "999999999",
+            DDDCelular = "99",
+            Email = "Teste@teste.com",
+            Nome = "Teste"
+        };
 
         private NovaSenhaDto novaSenhaDtoCerta { get; set; } = new NovaSenhaDto
         {
