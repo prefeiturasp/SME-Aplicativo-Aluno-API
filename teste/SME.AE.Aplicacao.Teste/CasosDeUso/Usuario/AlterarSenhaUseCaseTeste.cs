@@ -2,9 +2,11 @@
 using SME.AE.Aplicacao.CasoDeUso.Usuario;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AdicionarSenhaHistorico;
 using SME.AE.Aplicacao.Comandos.CoreSSO.AlterarSenhaUsuarioCoreSSO;
+using SME.AE.Aplicacao.Comandos.Token.Criar;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase.Usuario;
 using SME.AE.Aplicacao.Comum.Modelos;
+using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas.ObterUsuarioCoreSSO;
 using SME.AE.Aplicacao.Consultas.VerificarSenha;
 using SME.AE.Comum.Excecoes;
@@ -18,10 +20,18 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
     public class AlterarSenhaUseCaseTeste : BaseTeste
     {
         private readonly IAlterarSenhaUseCase alterarSenhaUseCase;
+        private const string TokenMock = "token-jwt-valido-mock";
 
         public AlterarSenhaUseCaseTeste()
         {
             alterarSenhaUseCase = new AlterarSenhaUseCase(mediator.Object);
+        }
+
+        [Fact(DisplayName = "Deve lançar ArgumentNullException quando o mediator for nulo")]
+        public void Deve_Lancar_ArgumentNullException_Quando_Mediator_Nulo()
+        {
+            var excecao = Assert.Throws<ArgumentNullException>(() => new AlterarSenhaUseCase(null));
+            Assert.Equal("mediator", excecao.ParamName);
         }
 
         [Theory(DisplayName = "Deve Alterar a Senha")]
@@ -39,7 +49,54 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
 
             var dto = new AlterarSenhaDto(cpf, senha);
 
-            await alterarSenhaUseCase.Executar(dto, senhaAnterior);
+            var resposta = await alterarSenhaUseCase.Executar(dto, senhaAnterior);
+
+            Assert.NotNull(resposta);
+            Assert.True(resposta.Ok);
+            Assert.Empty(resposta.Erros);
+
+            var retornoToken = Assert.IsType<RetornoToken>(resposta.Data);
+            Assert.NotNull(retornoToken);
+
+            mediator.Verify(x => x.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+            mediator.Verify(x => x.Send(It.IsAny<VerificarUltimasSenhasQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+            mediator.Verify(x => x.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            mediator.Verify(x => x.Send(It.IsAny<AdicionarSenhaHistoricoCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            mediator.Verify(x => x.Send(It.IsAny<CriarTokenCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact(DisplayName = "Deve lançar NegocioException quando usuário não for encontrado no CoreSSO")]
+        public async Task Deve_Lancar_NegocioException_Quando_Usuario_Nao_Encontrado()
+        {
+            InstanciarSetup();
+            var cpf = "23891476159";
+            var dto = new AlterarSenhaDto(cpf, "Sgp@1234");
+
+            mediator.Setup(x => x.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync((RetornoUsuarioCoreSSO)null);
+
+            var excecao = await Assert.ThrowsAsync<NegocioException>(
+                async () => await alterarSenhaUseCase.Executar(dto, "Ab#12345"));
+
+            Assert.Equal($"Usuário com o CPF '{cpf}' não encontrado", excecao.Message);
+            mediator.Verify(x => x.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact(DisplayName = "Deve lançar NegocioException quando a nova senha estiver entre as últimas 5 utilizadas")]
+        public async Task Deve_Lancar_NegocioException_Quando_Senha_Estiver_Nas_Ultimas_5_Utilizadas()
+        {
+            InstanciarSetup();
+            var dto = new AlterarSenhaDto("23891476159", "Sgp@1234");
+
+            mediator.Setup(x => x.Send(It.IsAny<VerificarUltimasSenhasQuery>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(true);
+
+            var excecao = await Assert.ThrowsAsync<NegocioException>(
+                async () => await alterarSenhaUseCase.Executar(dto, "Ab#12345"));
+
+            Assert.Equal("A sua nova senha deve ser diferente das últimas 5 senhas utilizadas.", excecao.Message);
+            mediator.Verify(x => x.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+            mediator.Verify(x => x.Send(It.IsAny<AdicionarSenhaHistoricoCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Theory(DisplayName = "Deve Validar a Senha Anterior")]
@@ -76,6 +133,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
             mediator.Setup(x => x.Send(It.IsAny<VerificarUltimasSenhasQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
             mediator.Setup(x => x.Send(It.IsAny<AdicionarSenhaHistoricoCommand>(), It.IsAny<CancellationToken>()));
             mediator.Setup(x => x.Send(It.IsAny<AlterarSenhaUsuarioCoreSSOCommand>(), It.IsAny<CancellationToken>()));
+            mediator.Setup(x => x.Send(It.IsAny<CriarTokenCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(TokenMock);
             mediator.Setup(x => x.Send(It.IsAny<ObterUsuarioCoreSSOQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new RetornoUsuarioCoreSSO
             {
                 Cpf = "76565938105",
