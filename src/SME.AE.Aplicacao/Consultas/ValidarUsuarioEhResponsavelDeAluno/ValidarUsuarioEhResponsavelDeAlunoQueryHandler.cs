@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using System.Linq;
 using System.Threading;

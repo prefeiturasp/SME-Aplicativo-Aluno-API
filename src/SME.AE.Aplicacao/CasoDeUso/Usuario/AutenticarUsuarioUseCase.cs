@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Sentry;
 using SME.AE.Aplicacao.Comandos.Autenticacao.AutenticarUsuario;
 using SME.AE.Aplicacao.Comandos.Logs;
 using SME.AE.Aplicacao.Comandos.Token.Criar;
@@ -7,7 +6,6 @@ using SME.AE.Aplicacao.Comandos.Usuario.InseriDispositivo;
 using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
-using SME.AE.Aplicacao.Comum.Modelos.Usuario;
 using SME.AE.Comum.Excecoes;
 using System;
 using System.Collections.Generic;

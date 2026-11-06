@@ -24,5 +24,12 @@ namespace SME.AE.Aplicacao.Teste
                 m.ReturnsAsync(retorno);
 
         }
+
+        protected void MediatorSetup<TRequest, TResponse>(TResponse retorno)
+        where TRequest : IRequest<TResponse>
+            {
+                mediator.Setup(a => a.Send(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(retorno);
+            }
     }
 }

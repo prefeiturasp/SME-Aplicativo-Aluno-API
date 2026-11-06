@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;

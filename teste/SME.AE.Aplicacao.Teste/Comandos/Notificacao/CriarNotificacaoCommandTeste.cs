@@ -13,8 +13,8 @@ namespace SME.AE.Aplicacao.Teste.Comandos
 {
     public class CriarNotificacaoCommandTeste
     {
-        public Mock<INotificacaoRepositorio> notificacaoRepository;
-        public CriarNotificacaoCommandHandler handler;
+        private readonly Mock<INotificacaoRepositorio> notificacaoRepository;
+        private readonly CriarNotificacaoCommandHandler handler;
 
         public CriarNotificacaoCommandTeste()
         {
@@ -25,61 +25,162 @@ namespace SME.AE.Aplicacao.Teste.Comandos
         [Fact(DisplayName = "Deve Criar a Notificação do tipo SME")]
         public async Task Deve_Criar_Notificacao_SME()
         {
+            // Arrange
             InstanciarSetup();
+            var notificacao = NotificacaoSME;
 
-            await handler.Handle(new CriarNotificacaoCommand(NotificacaoSME), new CancellationToken());
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.SME, resultado.TipoComunicado);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.SME)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()), Times.Never);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()), Times.Never);
         }
 
         [Fact(DisplayName = "Deve Criar a Notificação do tipo DRE")]
         public async Task Deve_Criar_Notificacao_DRE()
         {
+            // Arrange
             InstanciarSetup();
+            var notificacao = NotificacaoDRE;
 
-            await handler.Handle(new CriarNotificacaoCommand(NotificacaoDRE), new CancellationToken());
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.DRE, resultado.TipoComunicado);
+            Assert.Equal("000000", resultado.CodigoDre);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.DRE)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()), Times.Never);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()), Times.Never);
         }
 
         [Fact(DisplayName = "Deve Criar a Notificação do tipo UE")]
         public async Task Deve_Criar_Notificacao_UE()
         {
+            // Arrange
             InstanciarSetup();
+            var notificacao = NotificacaoUE;
 
-            await handler.Handle(new CriarNotificacaoCommand(NotificacaoUE), new CancellationToken());
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.UE, resultado.TipoComunicado);
+            Assert.Equal("0000000", resultado.CodigoUe);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.UE)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()), Times.Never);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()), Times.Never);
         }
 
         [Fact(DisplayName = "Deve Criar a Notificação do tipo UEMOD")]
         public async Task Deve_Criar_Notificacao_UEMOD()
         {
+            // Arrange
             InstanciarSetup();
+            var notificacao = NotificacaoUEMOD;
 
-            await handler.Handle(new CriarNotificacaoCommand(NotificacaoUEMOD), new CancellationToken());
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.UEMOD, resultado.TipoComunicado);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.UEMOD)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()), Times.Never);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Deve Criar a Notificação do tipo TURMA")]
+        [Fact(DisplayName = "Deve Criar a Notificação do tipo TURMA e vincular as turmas")]
         public async Task Deve_Criar_Notificacao_TURMA()
         {
+            // Arrange
             InstanciarSetup();
+            var notificacao = NotificacaoTurma;
 
-            await handler.Handle(new CriarNotificacaoCommand(NotificacaoTurma), new CancellationToken());
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.TURMA, resultado.TipoComunicado);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.TURMA)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.Is<NotificacaoTurma>(t => t.NotificacaoId == notificacao.Id && t.CodigoTurma == 12345)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Deve Criar a Notificação do tipo ALUNO")]
+        [Fact(DisplayName = "Deve Criar a Notificação do tipo ALUNO e vincular os alunos")]
         public async Task Deve_Criar_Notificacao_ALUNO()
         {
+            // Arrange
             InstanciarSetup();
+            var notificacao = NotificacaoAluno;
 
-            await handler.Handle(new CriarNotificacaoCommand(NotificacaoAluno), new CancellationToken());
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.ALUNO, resultado.TipoComunicado);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.ALUNO)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.Is<NotificacaoAluno>(a => a.NotificacaoId == notificacao.Id && a.CodigoAluno == 54321)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()), Times.Never);
         }
 
+        [Fact(DisplayName = "Deve Criar a Notificação do tipo MENSAGEM_AUTOMATICA e vincular os alunos")]
+        public async Task Deve_Criar_Notificacao_MENSAGEM_AUTOMATICA()
+        {
+            // Arrange
+            InstanciarSetup();
+            var notificacao = NotificacaoMensagemAutomatica;
+
+            // Act
+            var resultado = await handler.Handle(new CriarNotificacaoCommand(notificacao), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(resultado);
+            Assert.Equal(TipoComunicado.MENSAGEM_AUTOMATICA, resultado.TipoComunicado);
+            notificacaoRepository.Verify(x => x.Criar(It.Is<Dominio.Entidades.Notificacao>(n => n.TipoComunicado == TipoComunicado.MENSAGEM_AUTOMATICA)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoAluno(It.Is<NotificacaoAluno>(a => a.NotificacaoId == notificacao.Id && a.CodigoAluno == 54321)), Times.Once);
+            notificacaoRepository.Verify(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()), Times.Never);
+        }
+
+        [Fact(DisplayName = "Deve propagar exceção quando ocorrer erro ao criar notificação")]
+        public async Task Deve_Propagar_Excecao_Quando_Falhar_Ao_Criar()
+        {
+            // Arrange
+            notificacaoRepository
+                .Setup(x => x.Criar(It.IsAny<Dominio.Entidades.Notificacao>()))
+                .ThrowsAsync(new InvalidOperationException("Falha simulada no banco"));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                handler.Handle(new CriarNotificacaoCommand(NotificacaoSME), CancellationToken.None));
+        }
 
         private void InstanciarSetup()
         {
-            notificacaoRepository.Setup(x => x.Criar(It.IsAny<Notificacao>()));
-            notificacaoRepository.Setup(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()));
-            notificacaoRepository.Setup(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()));
+            notificacaoRepository
+                .Setup(x => x.Criar(It.IsAny<Dominio.Entidades.Notificacao>()))
+                .ReturnsAsync((Dominio.Entidades.Notificacao n) => n);
+
+            notificacaoRepository
+                .Setup(x => x.InserirNotificacaoAluno(It.IsAny<NotificacaoAluno>()))
+                .Returns(Task.CompletedTask);
+
+            notificacaoRepository
+                .Setup(x => x.InserirNotificacaoTurma(It.IsAny<NotificacaoTurma>()))
+                .Returns(Task.CompletedTask);
         }
 
-        private Notificacao NotificacaoSME => new Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoSME => new()
         {
+            Id = 1,
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
             TipoComunicado = TipoComunicado.SME,
@@ -89,8 +190,9 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Notificacao NotificacaoDRE => new Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoDRE => new()
         {
+            Id = 2,
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
             TipoComunicado = TipoComunicado.DRE,
@@ -100,8 +202,9 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Notificacao NotificacaoUE => new Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoUE => new()
         {
+            Id = 3,
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
             TipoComunicado = TipoComunicado.UE,
@@ -112,8 +215,9 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Notificacao NotificacaoUEMOD => new Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoUEMOD => new()
         {
+            Id = 4,
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
             TipoComunicado = TipoComunicado.UEMOD,
@@ -125,8 +229,9 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Notificacao NotificacaoTurma => new Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoTurma => new()
         {
+            Id = 5,
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
             TipoComunicado = TipoComunicado.TURMA,
@@ -135,12 +240,13 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             CodigoDre = "0000000",
             CodigoUe = "0000000",
             Modalidades = "1,2,3,4,5,6",
-            Turmas = new List<string> { "0000000" },
+            Turmas = new List<string> { "12345" },
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Notificacao NotificacaoAluno => new Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoAluno => new()
         {
+            Id = 6,
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
             TipoComunicado = TipoComunicado.ALUNO,
@@ -149,8 +255,20 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             CodigoDre = "0000000",
             CodigoUe = "0000000",
             Modalidades = "1,2,3,4,5,6",
-            Turmas = new List<string> { "0000000" },
-            Alunos = new List<string> { "0000000" },
+            Turmas = new List<string> { "12345" },
+            Alunos = new List<string> { "54321" },
+            DataExpiracao = DateTime.Now.AddDays(7)
+        };
+
+        private static Dominio.Entidades.Notificacao NotificacaoMensagemAutomatica => new()
+        {
+            Id = 7,
+            Titulo = "Teste Automático",
+            AnoLetivo = DateTime.Now.Year,
+            TipoComunicado = TipoComunicado.MENSAGEM_AUTOMATICA,
+            DataEnvio = DateTime.Now,
+            Mensagem = "Teste Mensagem Automática",
+            Alunos = new List<string> { "54321" },
             DataExpiracao = DateTime.Now.AddDays(7)
         };
     }

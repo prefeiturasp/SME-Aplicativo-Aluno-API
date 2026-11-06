@@ -1,5 +1,4 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 using Newtonsoft.Json;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using System.Collections.Generic;

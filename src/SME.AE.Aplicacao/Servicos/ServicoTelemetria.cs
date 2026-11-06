@@ -2,7 +2,6 @@
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
 using SME.AE.Dominio.Options;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SME.AE.Aplicacao.Servicos
@@ -18,9 +17,6 @@ namespace SME.AE.Aplicacao.Servicos
 
         public void Registrar(Action acao, string acaoNome, string telemetriaNome, string telemetriaValor)
         {
-            DateTime inicioOperacao = default;
-            Stopwatch temporizador = default;
-
             if (telemetriaOptions.Apm)
             {
                 var transactionElk = Agent.Tracer.CurrentTransaction;
@@ -39,9 +35,6 @@ namespace SME.AE.Aplicacao.Servicos
 
         public async Task RegistrarAsync(Func<Task> acao, string acaoNome, string telemetriaNome, string telemetriaValor, string parametros = "")
         {
-            DateTime inicioOperacao = default;
-            Stopwatch temporizador = default;
-
             if (telemetriaOptions.Apm)
             {
                 var transactionElk = Agent.Tracer.CurrentTransaction;
@@ -62,9 +55,6 @@ namespace SME.AE.Aplicacao.Servicos
 
         public async Task RegistrarAsync(Func<Task> acao, string acaoNome, string telemetriaNome)
         {
-            DateTime inicioOperacao = default;
-            Stopwatch temporizador = default;
-
             if (telemetriaOptions.Apm)
             {
                 var transactionElk = Agent.Tracer.CurrentTransaction;
@@ -82,9 +72,6 @@ namespace SME.AE.Aplicacao.Servicos
 
         public dynamic RegistrarComRetorno<T>(Func<object> acao, string acaoNome, string telemetriaNome, string telemetriaValor, string parametros = "")
         {
-            DateTime inicioOperacao = default;
-            Stopwatch temporizador = default;
-
             dynamic result = default;
 
             if (telemetriaOptions.Apm)
@@ -108,9 +95,6 @@ namespace SME.AE.Aplicacao.Servicos
 
         public async Task<dynamic> RegistrarComRetornoAsync<T>(Func<Task<object>> acao, string acaoNome, string telemetriaNome, string telemetriaValor, string parametros = "")
         {
-            DateTime inicioOperacao = default;
-            Stopwatch temporizador = default;
-
             dynamic result = default;
 
             if (telemetriaOptions.Apm)
