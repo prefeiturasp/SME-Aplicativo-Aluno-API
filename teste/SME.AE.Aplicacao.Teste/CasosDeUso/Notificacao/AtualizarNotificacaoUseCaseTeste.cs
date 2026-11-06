@@ -1,7 +1,6 @@
 ﻿using Moq;
 using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
 using SME.AE.Aplicacao.Comum.Enumeradores;
-using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Comum.Excecoes;
@@ -15,7 +14,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
 {
     public class AtualizarNotificacaoUseCaseTeste : BaseTeste
     {
-        private readonly IAtualizarNotificacaoUseCase atualizarNotificacaoUseCase;
+        private readonly AtualizarNotificacaoUseCase atualizarNotificacaoUseCase;
 
         public AtualizarNotificacaoUseCaseTeste()
         {
@@ -143,7 +142,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
                 It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        private NotificacaoSgpDto NotificacaoSME => new NotificacaoSgpDto
+        private static NotificacaoSgpDto NotificacaoSME => new()
         {
             Id = 1001,
             Titulo = "Teste SME",
@@ -157,7 +156,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             AlteradoPor = "UsuarioSME"
         };
 
-        private NotificacaoSgpDto NotificacaoDRE => new NotificacaoSgpDto
+        private static NotificacaoSgpDto NotificacaoDRE => new()
         {
             Id = 1002,
             Titulo = "Teste DRE",
@@ -170,7 +169,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             AlteradoPor = "UsuarioDRE"
         };
 
-        private NotificacaoSgpDto NotificacaoUE => new NotificacaoSgpDto
+        private static NotificacaoSgpDto NotificacaoUE => new()
         {
             Id = 1003,
             Titulo = "Teste UE",
@@ -184,7 +183,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             AlteradoPor = "UsuarioUE"
         };
 
-        private NotificacaoSgpDto NotificacaoUEMOD => new NotificacaoSgpDto
+        private static NotificacaoSgpDto NotificacaoUEMOD => new()
         {
             Id = 1004,
             Titulo = "Teste UEMOD",
@@ -199,7 +198,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             AlteradoPor = "UsuarioUEMOD"
         };
 
-        private NotificacaoSgpDto NotificacaoTurma => new NotificacaoSgpDto
+        private static NotificacaoSgpDto NotificacaoTurma => new()
         {
             Id = 1005,
             Titulo = "Teste Turma",
@@ -215,7 +214,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             AlteradoPor = "UsuarioTurma"
         };
 
-        private NotificacaoSgpDto NotificacaoAluno => new NotificacaoSgpDto
+        private static NotificacaoSgpDto NotificacaoAluno => new()
         {
             Id = 1006,
             Titulo = "Teste Aluno",
@@ -226,8 +225,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             CodigoDre = "0000000",
             CodigoUe = "0000000",
             ModalidadesId = new[] { "1", "2", "3", "4", "5", "6" },
-            Turmas = new List<string> { "0000000" },
-            Alunos = new List<string> { "0000000" },
+            Turmas = ["0000000"],
+            Alunos = ["0000000"],
             DataExpiracao = DateTime.Now.AddDays(7),
             AlteradoPor = "UsuarioAluno"
         };

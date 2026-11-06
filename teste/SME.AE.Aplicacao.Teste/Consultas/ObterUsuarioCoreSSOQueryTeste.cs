@@ -94,7 +94,6 @@ namespace SME.AE.Aplicacao.Teste.Consultas
         }
 
 
-        // CPF gerado aleatoriamente para fins de testes
         private void InstanciarSetup(string cpf = "77500711050", Guid usuId = default)
         {
             usuarioCoreSSORepositorio.Setup(x => x.ObterPorCPF(It.IsAny<string>())).ReturnsAsync(new RetornoUsuarioCoreSSO { Cpf = cpf });

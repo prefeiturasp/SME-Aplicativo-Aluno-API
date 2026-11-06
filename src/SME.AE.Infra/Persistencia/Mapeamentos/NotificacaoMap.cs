@@ -1,5 +1,4 @@
 ﻿using SME.AE.Dominio.Entidades;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SME.AE.Infra.Persistencia.Mapeamentos
 {

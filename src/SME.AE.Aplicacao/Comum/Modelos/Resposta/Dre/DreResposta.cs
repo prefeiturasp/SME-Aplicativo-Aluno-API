@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre
+﻿namespace SME.AE.Aplicacao.Comum.Modelos.Resposta.Dre
 {
     public class DreResposta
     {

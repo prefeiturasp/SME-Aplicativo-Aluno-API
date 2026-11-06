@@ -84,7 +84,6 @@ namespace SME.AE.Aplicacao.Teste.Consultas
             usuarioRepository.Setup(x => x.ObterPorIdAsync(It.IsAny<long>())).ReturnsAsync(new Usuario());
         }
 
-        //CPF gerado aleatoriamente por uma ferramenta que gera CPF
         public ObterUsuarioQuery obterUsuarioQuery { get; set; } = new ObterUsuarioQuery
         {
             Cpf = "84989162080",

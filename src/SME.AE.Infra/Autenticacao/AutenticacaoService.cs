@@ -1,13 +1,8 @@
 ﻿using SME.AE.Aplicacao.Comum.Modelos;
-using SME.AE.Aplicacao.Comum.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
-using System.Collections.Generic;
-using MediatR;
-using SME.AE.Aplicacao.Consultas.ObterUsuario;
-using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 
 namespace SME.AE.Infra.Autenticacao
 {

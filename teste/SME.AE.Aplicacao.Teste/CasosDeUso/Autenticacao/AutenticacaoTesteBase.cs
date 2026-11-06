@@ -10,7 +10,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
 {
     public abstract class AutenticacaoTesteBase : BaseTeste
     {
-        protected AutenticacaoController Controller => new AutenticacaoController();
+        protected static AutenticacaoController Controller => new AutenticacaoController();
 
         protected static RespostaApi Sucesso() => RespostaApi.Sucesso();
 
