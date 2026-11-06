@@ -130,7 +130,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             Assert.Equal("UE", result.CategoriaNotificacao);
         }
 
-        private NotificacaoSgpDto NotificacaoSME => new()
+        private static NotificacaoSgpDto NotificacaoSME => new()
         {
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
@@ -141,7 +141,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private NotificacaoSgpDto NotificacaoDRE => new()
+        private static NotificacaoSgpDto NotificacaoDRE => new()
         {
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
@@ -152,7 +152,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private NotificacaoSgpDto NotificacaoUE => new()
+        private static NotificacaoSgpDto NotificacaoUE => new()
         {
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
@@ -164,7 +164,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private NotificacaoSgpDto NotificacaoUEMOD => new()
+        private static NotificacaoSgpDto NotificacaoUEMOD => new()
         {
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
@@ -177,7 +177,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private NotificacaoSgpDto NotificacaoTurma => new()
+        private static NotificacaoSgpDto NotificacaoTurma => new()
         {
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
@@ -191,7 +191,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private NotificacaoSgpDto NotificacaoAluno => new()
+        private static NotificacaoSgpDto NotificacaoAluno => new()
         {
             Titulo = "Teste",
             AnoLetivo = DateTime.Now.Year,
