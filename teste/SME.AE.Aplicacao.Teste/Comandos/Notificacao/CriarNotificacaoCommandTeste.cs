@@ -178,7 +178,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
                 .Returns(Task.CompletedTask);
         }
 
-        private Dominio.Entidades.Notificacao NotificacaoSME => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoSME => new()
         {
             Id = 1,
             Titulo = "Teste",
@@ -190,7 +190,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Dominio.Entidades.Notificacao NotificacaoDRE => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoDRE => new()
         {
             Id = 2,
             Titulo = "Teste",
@@ -202,7 +202,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Dominio.Entidades.Notificacao NotificacaoUE => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoUE => new()
         {
             Id = 3,
             Titulo = "Teste",
@@ -215,7 +215,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Dominio.Entidades.Notificacao NotificacaoUEMOD => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoUEMOD => new()
         {
             Id = 4,
             Titulo = "Teste",
@@ -229,7 +229,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Dominio.Entidades.Notificacao NotificacaoTurma => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoTurma => new()
         {
             Id = 5,
             Titulo = "Teste",
@@ -244,7 +244,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Dominio.Entidades.Notificacao NotificacaoAluno => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoAluno => new()
         {
             Id = 6,
             Titulo = "Teste",
@@ -260,7 +260,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos
             DataExpiracao = DateTime.Now.AddDays(7)
         };
 
-        private Dominio.Entidades.Notificacao NotificacaoMensagemAutomatica => new Dominio.Entidades.Notificacao
+        private static Dominio.Entidades.Notificacao NotificacaoMensagemAutomatica => new()
         {
             Id = 7,
             Titulo = "Teste Automático",
