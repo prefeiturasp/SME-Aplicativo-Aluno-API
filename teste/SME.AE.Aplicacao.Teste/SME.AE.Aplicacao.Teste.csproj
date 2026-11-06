@@ -36,4 +36,8 @@
     <ProjectReference Include="..\..\src\SME.AE.Infra\SME.AE.Infra.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Comandos\TermosDeUso\" />
+  </ItemGroup>
+
 </Project>
