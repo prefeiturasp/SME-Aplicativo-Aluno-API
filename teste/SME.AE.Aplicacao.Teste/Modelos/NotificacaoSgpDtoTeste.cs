@@ -7,6 +7,10 @@ namespace SME.AE.Aplicacao.Teste.Modelos
 {
     public class NotificacaoSgpDtoTeste
     {
+        private static readonly string[] SeriesEsperadas = { "1", "2", "3" };
+        private static readonly int[] ModalidadesEsperadas = { 5, 6 };
+        private static readonly int[] TiposEscolasEsperados = { 10, 12 };
+
         [Fact(DisplayName = "Deve definir categoria como UE quando TipoComunicado for MENSAGEM_AUTOMATICA")]
         public void DeveInserirCategoriaUE_QuandoMensagemAutomatica()
         {
@@ -54,9 +58,9 @@ namespace SME.AE.Aplicacao.Teste.Modelos
                 TiposEscolas = "10,12"
             };
 
-            Assert.Equal(new[] { "1", "2", "3" }, dto.ObterSeriesResumidas().ToArray());
-            Assert.Equal(new[] { 5, 6 }, dto.ObterModalidades().ToArray());
-            Assert.Equal(new[] { 10, 12 }, dto.ObterTiposEscolas().ToArray());
+            Assert.Equal(SeriesEsperadas, dto.ObterSeriesResumidas().ToArray());
+            Assert.Equal(ModalidadesEsperadas, dto.ObterModalidades().ToArray());
+            Assert.Equal(TiposEscolasEsperados, dto.ObterTiposEscolas().ToArray());
         }
     }
 }

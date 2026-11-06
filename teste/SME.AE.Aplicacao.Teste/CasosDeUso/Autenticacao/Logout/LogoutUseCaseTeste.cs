@@ -49,8 +49,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao.Logout
             mediator.Verify(x => x.Send(It.Is<RemoveUsuarioDispositivoCommand>(c => c.DispositivoId == "dispositivo-especifico"), It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        private SME.AE.Api.Controllers.AutenticacaoController ControllerComMediator(bool resposta) => ControllerComMediator(Mediator(resposta));
-        private SME.AE.Api.Controllers.AutenticacaoController ControllerComMediator(Mock<IMediator> mediator)
+        private static Api.Controllers.AutenticacaoController ControllerComMediator(bool resposta) => ControllerComMediator(Mediator(resposta));
+        private static Api.Controllers.AutenticacaoController ControllerComMediator(Mock<IMediator> mediator)
         {
             var controller = Controller;
             controller.ControllerContext = ContextoComMediator(mediator.Object);
