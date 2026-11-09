@@ -2,6 +2,7 @@
 using Npgsql;
 using SME.AE.Aplicacao.Comum.Interfaces.Repositorios;
 using SME.AE.Dominio.Entidades;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task<IEnumerable<T>> ListarAsync()
         {
-            using var conexao = InstanciarConexao();
+            await using var conexao = InstanciarConexao();
             await conexao.OpenAsync();
 
             var retorno = await conexao.GetAllAsync<T>();
@@ -35,7 +36,7 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
-            using var conexao = InstanciarConexao();
+            await using var conexao = InstanciarConexao();
             await conexao.OpenAsync();
 
             var retorno = await conexao.GetAsync<T>(id);
@@ -47,22 +48,24 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         public virtual async Task RemoverAsync(long id)
         {
-            using var conexao = InstanciarConexao();
+            await using var conexao = InstanciarConexao();
             await conexao.OpenAsync();
 
             var entidade = await conexao.GetAsync<T>(id);
-
-            await conexao.DeleteAsync<T>(entidade);
+            if (entidade != null)
+            {
+                await conexao.DeleteAsync(entidade);
+            }
 
             await conexao.CloseAsync();
         }
 
         public virtual async Task RemoverAsync(T entidade)
         {
-            using var conexao = InstanciarConexao();
+            await using var conexao = InstanciarConexao();
             await conexao.OpenAsync();
 
-            await conexao.DeleteAsync<T>(entidade);
+            await conexao.DeleteAsync(entidade);
 
             await conexao.CloseAsync();
         }
@@ -77,26 +80,26 @@ namespace SME.AE.Infra.Persistencia.Repositorios
 
         private async Task<long> InserirAsync(T entidade)
         {
-            using var conexao = InstanciarConexao();
+            await using var conexao = InstanciarConexao();
             await conexao.OpenAsync();
 
             entidade.InserirAuditoria();
 
-            var id = await conexao.InsertAsync<T>(entidade);
+            var id = await conexao.InsertAsync(entidade);
 
             await conexao.CloseAsync();
 
-            return (long)id;
+            return Convert.ToInt64(id);
         }
 
         private async Task<long> AtualizarAsync(T entidade)
         {
-            using var conexao = InstanciarConexao();
+            await using var conexao = InstanciarConexao();
             await conexao.OpenAsync();
 
             entidade.AtualizarAuditoria();
 
-            await conexao.UpdateAsync<T>(entidade);
+            await conexao.UpdateAsync(entidade);
 
             await conexao.CloseAsync();
 
