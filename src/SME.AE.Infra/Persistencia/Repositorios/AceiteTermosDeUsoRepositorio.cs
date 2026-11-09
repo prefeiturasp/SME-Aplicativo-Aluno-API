@@ -24,11 +24,11 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 await using var conn = InstanciarConexao();
-                conn.Open();
+                await conn.OpenAsync();
                 var dataAtual = DateTime.Now;
                 aceiteTermosDeUso.InserirAuditoria();
 
-                var retorno = await conn.ExecuteAsync(
+                await conn.ExecuteAsync(
                     @"INSERT INTO public.aceite_termos_de_uso 
                     (termos_de_uso_id,
                      cpf_usuario,
@@ -61,20 +61,21 @@ namespace SME.AE.Infra.Persistencia.Repositorios
                         aceiteTermosDeUso.Device,
                         aceiteTermosDeUso.Ip,
                         aceiteTermosDeUso.Versao,
-                        dataAtual,
+                        DataAtual = dataAtual,
                         aceiteTermosDeUso.Hash,
                         aceiteTermosDeUso.CriadoEm,
                         aceiteTermosDeUso.CriadoPor,
                         aceiteTermosDeUso.AlteradoEm,
                         aceiteTermosDeUso.AlteradoPor
                     });
-                conn.Close();
+
+                await conn.CloseAsync();
                 return true;
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureMessage(ex.Message);
-                throw ex;
+                throw;
             }
         }
 
@@ -82,16 +83,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
         {
             try
             {
-                using var conexao = InstanciarConexao();
-                conexao.Open();
+                await using var conexao = InstanciarConexao();
+                await conexao.OpenAsync();
 
-                var consulta = $"SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao AND excluido = false";
+                const string consulta = "SELECT count(id) FROM public.aceite_termos_de_uso WHERE cpf_usuario = @cpfUsuario AND versao = @versao AND excluido = false";
                 var parametros = new { cpfUsuario, versao };
 
-                var aceiteExiste = await servicoTelemetria.RegistrarComRetornoAsync<int>(async () => await SqlMapper.QueryFirstOrDefaultAsync<int>(conexao,
-                    consulta, parametros), "query", "Query AE", consulta, parametros.ToString()); 
+                var aceiteExiste = await servicoTelemetria.RegistrarComRetornoAsync<int>(
+                    async () => await SqlMapper.QueryFirstOrDefaultAsync<int>(conexao, consulta, parametros),
+                    "query",
+                    "Query AE",
+                    consulta,
+                    parametros.ToString());
 
-                conexao.Close();
+                await conexao.CloseAsync();
                 return aceiteExiste >= 1;
             }
             catch (Exception ex)
@@ -106,20 +111,22 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             try
             {
                 await using var conn = InstanciarConexao();
-                conn.Open();
+                await conn.OpenAsync();
                 var dataAtual = DateTime.Now;
+
                 await conn.ExecuteAsync(
                     @"UPDATE public.aceite_termos_de_uso 
                       SET excluido = true, alterado_em = @dataAtual, alterado_por = 'Sistema' 
                       WHERE cpf_usuario = @cpfUsuario AND excluido = false",
                     new { cpfUsuario, dataAtual });
-                conn.Close();
+
+                await conn.CloseAsync();
                 return true;
             }
             catch (Exception ex)
             {
                 SentrySdk.CaptureMessage(ex.Message);
-                throw ex;
+                throw;
             }
         }
     }
