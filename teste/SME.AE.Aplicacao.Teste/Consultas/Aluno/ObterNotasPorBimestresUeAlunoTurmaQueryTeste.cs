@@ -22,7 +22,7 @@ namespace SME.AE.Aplicacao.Teste.Consultas.Aluno
             var factory = new HttpClientFactoryTeste(HttpStatusCode.OK, "[{\"ComponenteCurricularCodigo\":10,\"ComponenteCurricularNome\":\"Matemática\",\"Nota\":\"8\"}]");
             var handler = new ObterNotasPorBimestresUeAlunoTurmaQueryHandler(factory.Factory.Object);
 
-            var resultado = await handler.Handle(new ObterNotasPorBimestresUeAlunoTurmaQuery(new[] { 1, 2 }, "T1", "U1", "A1"), CancellationToken.None);
+            var resultado = await handler.Handle(new ObterNotasPorBimestresUeAlunoTurmaQuery([1, 2], "T1", "U1", "A1"), CancellationToken.None);
 
             var nota = Assert.Single(resultado);
             Assert.Equal(10, nota.ComponenteCurricularCodigo);
@@ -37,7 +37,7 @@ namespace SME.AE.Aplicacao.Teste.Consultas.Aluno
             var factory = new HttpClientFactoryTeste(HttpStatusCode.BadRequest, "");
             var handler = new ObterNotasPorBimestresUeAlunoTurmaQueryHandler(factory.Factory.Object);
 
-            var excecao = await Assert.ThrowsAsync<Exception>(() => handler.Handle(new ObterNotasPorBimestresUeAlunoTurmaQuery(new[] { 1 }, "T1", "U1", "A1"), CancellationToken.None));
+            var excecao = await Assert.ThrowsAsync<Exception>(() => handler.Handle(new ObterNotasPorBimestresUeAlunoTurmaQuery([1], "T1", "U1", "A1"), CancellationToken.None));
 
             Assert.Equal("Não foi possível localizar as notas do aluno : A1 da turma T1.", excecao.Message);
         }

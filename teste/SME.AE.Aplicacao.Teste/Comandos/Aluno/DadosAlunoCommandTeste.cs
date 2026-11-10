@@ -43,7 +43,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos.Aluno
 
             _mediatorMock
                 .Setup(m => m.Send(It.IsAny<ObterDadosAlunosQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Enumerable.Empty<AlunoRespostaEol>());
+                .ReturnsAsync([]);
 
             // Act
             var resultado = await _handler.Handle(command, CancellationToken.None);
@@ -148,14 +148,14 @@ namespace SME.AE.Aplicacao.Teste.Comandos.Aluno
             Assert.Empty(resultado.Erros);
             Assert.NotNull(resultado.Data);
 
-            var listaEscolas = Assert.IsAssignableFrom<IEnumerable<ListaEscola>>(resultado.Data).ToList();
+            var listaEscolas = Assert.IsType<IEnumerable<ListaEscola>>(resultado.Data, exactMatch: false).ToList();
             Assert.Equal(2, listaEscolas.Count);
 
             var grupoFundamental = listaEscolas.First(x => x.ModalidadeCodigo == 5);
             Assert.Equal("Ensino Fundamental", grupoFundamental.Modalidade);
             var alunoFundamental = Assert.Single(grupoFundamental.Alunos);
             Assert.Equal("Responsavel Padrao", alunoFundamental.NomeResponsavel);
-            Assert.Equal(new DateTime(2014, 5, 10), alunoFundamental.DataNascimento);
+            Assert.Equal(new DateTime(2014, 5, 10, 0, 0, 0, DateTimeKind.Unspecified), alunoFundamental.DataNascimento);
 
             var grupoMedio = listaEscolas.First(x => x.ModalidadeCodigo == 6);
             Assert.Equal("Ensino Médio", grupoMedio.Modalidade);
@@ -194,7 +194,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos.Aluno
                     NomeSocial = null,
                     TipoResponsavel = TipoResponsavelEnum.Mae,
                     CpfResponsavel = cpf,
-                    DataNascimento = new DateTime(2014, 5, 10, 14, 30, 0),
+                    DataNascimento = new DateTime(2014, 5, 10, 14, 30, 0, DateTimeKind.Unspecified),
                     CodigoTipoEscola = 1,
                     CodigoEscola = "019283",
                     DescricaoTipoEscola = "EMEF",
@@ -204,7 +204,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos.Aluno
                     CodigoTurma = 1001,
                     Turma = "5A",
                     SituacaoMatricula = "Ativo",
-                    DataSituacaoMatricula = new DateTime(2026, 2, 1),
+                    DataSituacaoMatricula = new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Unspecified),
                     SerieResumida = "5"
                 },
                 new AlunoRespostaEol
@@ -215,7 +215,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos.Aluno
                     NomeSocial = "  Nome Social Aluno  ",
                     TipoResponsavel = TipoResponsavelEnum.Proprio_Aluno,
                     CpfResponsavel = cpf,
-                    DataNascimento = new DateTime(2008, 8, 20, 8, 0, 0),
+                    DataNascimento = new DateTime(2008, 8, 20, 8, 0, 0,DateTimeKind.Unspecified),
                     CodigoTipoEscola = 2,
                     CodigoEscola = "019284",
                     DescricaoTipoEscola = "EMEFM",
@@ -225,7 +225,7 @@ namespace SME.AE.Aplicacao.Teste.Comandos.Aluno
                     CodigoTurma = 2002,
                     Turma = "1B",
                     SituacaoMatricula = "Ativo",
-                    DataSituacaoMatricula = new DateTime(2026, 2, 1),
+                    DataSituacaoMatricula = new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Unspecified),
                     SerieResumida = "1"
                 }
             };

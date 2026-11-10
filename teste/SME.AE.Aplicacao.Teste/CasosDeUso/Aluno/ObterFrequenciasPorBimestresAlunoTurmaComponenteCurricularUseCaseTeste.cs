@@ -32,7 +32,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
                 .ReturnsAsync((IEnumerable<FrequenciaAlunoDto>)null);
             var useCase = new ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase(mediator.Object);
 
-            var resultado = await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto("T1", "A1", new[] { 1 }, "C1"));
+            var resultado = await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto("T1", "A1", [1], "C1"));
 
             Assert.Null(resultado);
             mediator.Verify(x => x.Send(It.IsAny<ObterTurmasModalidadesPorCodigosQuery>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -43,8 +43,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
         {
             var frequencias = new List<FrequenciaAlunoDto>
             {
-                new FrequenciaAlunoDto { CodigoAluno = "A1", TotalAulas = 10, TotalAusencias = 1 },
-                new FrequenciaAlunoDto { CodigoAluno = "A1", TotalAulas = 10, TotalAusencias = 2 }
+                new() { CodigoAluno = "A1", TotalAulas = 10, TotalAusencias = 1 },
+                new() { CodigoAluno = "A1", TotalAulas = 10, TotalAusencias = 2 }
             };
             var mediator = new Mock<IMediator>();
             mediator.Setup(x => x.Send(It.IsAny<ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularQuery>(), It.IsAny<CancellationToken>()))
@@ -61,9 +61,9 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
                 .ReturnsAsync("#FF0000");
             var useCase = new ObterFrequenciasPorBimestresAlunoTurmaComponenteCurricularUseCase(mediator.Object);
 
-            var resultado = await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto("T1", "A1", new[] { 1 }, "C1"));
+            var resultado = await useCase.Executar(new FrequenciaPorBimestresAlunoTurmaComponenteCurricularDto("T1", "A1", [1], "C1"));
 
-            Assert.Equal(2, Assert.IsAssignableFrom<IEnumerable<FrequenciaAlunoDto>>(resultado).Count());
+            Assert.Equal(2, Assert.IsType<IEnumerable<FrequenciaAlunoDto>>(resultado, exactMatch: false).Count());
             Assert.All(resultado, frequencia => Assert.Equal("#FF0000", frequencia.CorDaFrequencia));
             mediator.Verify(x => x.Send(It.Is<ObterCorQuery>(q => q.Frequencia == 90 || q.Frequencia == 80), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
