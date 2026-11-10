@@ -31,7 +31,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
                 });
             var useCase = new ObterComponentesCurricularesIdsUseCase(mediator.Object);
 
-            var resultado = (await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", new[] { 1, 2 }))).ToList();
+            var resultado = (await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", [1, 2]))).ToList();
 
             Assert.Equal(2, resultado.Count);
             Assert.Contains(resultado, x => x.Codigo == 10 && x.Descricao == "Matemática");
@@ -47,7 +47,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
                 .ReturnsAsync(Array.Empty<NotaConceitoBimestreComponenteDto>());
             var useCase = new ObterComponentesCurricularesIdsUseCase(mediator.Object);
 
-            var resultado = await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", new[] { 1 }));
+            var resultado = await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", [1]));
 
             Assert.Empty(resultado);
         }

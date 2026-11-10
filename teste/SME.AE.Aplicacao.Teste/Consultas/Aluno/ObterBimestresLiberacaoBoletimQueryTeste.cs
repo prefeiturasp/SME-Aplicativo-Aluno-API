@@ -25,7 +25,7 @@ namespace SME.AE.Aplicacao.Teste.Consultas.Aluno
 
             var resultado = await handler.Handle(new ObterBimestresLiberacaoBoletimQuery("T1"), CancellationToken.None);
 
-            Assert.Equal(new[] { 1, 2, 3, 4, 0 }, resultado);
+            Assert.Equal([1, 2, 3, 4, 0], resultado);
             factory.Verify(x => x.CreateClient(Moq.It.IsAny<string>()), Moq.Times.Never);
         }
     }

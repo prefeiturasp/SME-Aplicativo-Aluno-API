@@ -35,16 +35,16 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
             mediator.Setup(x => x.Send(It.IsAny<ObterNotasPorBimestresUeAlunoTurmaQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(notas);
             mediator.Setup(x => x.Send(It.IsAny<ObterNotaAlunoCoresQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new[]
-                {
+                .ReturnsAsync(
+                [
                     new NotaAlunoCor { Nota = NotaAlunoCor.NotaAbaixo5, Cor = "#111111" },
                     new NotaAlunoCor { Nota = NotaAlunoCor.NotaEntre7e5, Cor = "#222222" },
                     new NotaAlunoCor { Nota = NotaAlunoCor.NotaAcimaDe7, Cor = "#333333" },
                     new NotaAlunoCor { Nota = "P", Cor = "#444444" }
-                });
+                ]);
             var useCase = new ObterNotasPorBimestresUeAlunoTurmaUseCase(mediator.Object);
 
-            var resultado = (await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", new[] { 1, 2 }))).ToList();
+            var resultado = (await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", [1, 2]))).ToList();
 
             Assert.Equal("#111111", resultado[0].CorDaNota);
             Assert.Equal("#222222", resultado[1].CorDaNota);
@@ -65,7 +65,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
                 .ReturnsAsync(Array.Empty<NotaAlunoCor>());
             var useCase = new ObterNotasPorBimestresUeAlunoTurmaUseCase(mediator.Object);
 
-            var resultado = await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", new[] { 1 }));
+            var resultado = await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", [1]));
 
             Assert.Empty(resultado);
         }
