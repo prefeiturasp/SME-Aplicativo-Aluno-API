@@ -71,7 +71,7 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
             }
         }
 
-        private static byte[] ReadBytes(Stream strm)
+        private static byte[] ReadBytes(CryptoStream strm)
         {
             ArgumentNullException.ThrowIfNull(strm);
             int length = 10000000;
