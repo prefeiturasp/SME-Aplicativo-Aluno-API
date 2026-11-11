@@ -337,11 +337,11 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
         {
             MockarAlunosDoResponsavel(CriarEscola(ModalidadeFundamental, CriarAluno(1)));
             MockarNotificacao(CriarNotificacao(tipoComunicado,
-                                               modalidades: new[] { "99" },
+                                               modalidades: ["99"],
                                                codigoDre: "999999",
                                                codigoUe: "999999",
                                                seriesResumidas: "9",
-                                               turmas: new long[] { 999 }));
+                                               turmas: [999]));
 
             var excecao = await Assert.ThrowsAsync<NegocioException>(async () => await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(codigoAlunoEol: 999), CpfUsuario));
 
