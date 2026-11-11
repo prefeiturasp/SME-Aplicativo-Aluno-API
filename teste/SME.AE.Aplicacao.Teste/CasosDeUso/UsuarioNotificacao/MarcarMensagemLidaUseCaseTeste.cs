@@ -34,7 +34,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
         private const string SerieNotificacao = "1";
         private const string OutraSerie = "2";
 
-        private readonly IMarcarMensagemLidaUseCase marcarMensagemLidaUseCase;
+        private readonly MarcarMensagemLidaUseCase marcarMensagemLidaUseCase;
         private readonly List<Dominio.Entidades.UsuarioNotificacao> leiturasGravadas;
 
         public MarcarMensagemLidaUseCaseTeste()
@@ -57,7 +57,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
             MockarAlunosDoResponsavel(
                 CriarEscola(ModalidadeFundamental, CriarAluno(1), CriarAluno(2)),
                 CriarEscola(ModalidadeMedio, CriarAluno(3)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.SME, modalidades: new[] { ModalidadeFundamental.ToString() }));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.SME, modalidades: [ModalidadeFundamental.ToString()]));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -70,7 +70,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
             MockarAlunosDoResponsavel(
                 CriarEscola(ModalidadeFundamental, CriarAluno(1), CriarAluno(2, serieResumida: OutraSerie)),
                 CriarEscola(ModalidadeMedio, CriarAluno(3)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.SME_ANO, modalidades: new[] { ModalidadeFundamental.ToString() }, seriesResumidas: $"{SerieNotificacao},3"));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.SME_ANO, modalidades: [ModalidadeFundamental.ToString()], seriesResumidas: $"{SerieNotificacao},3"));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -83,7 +83,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
             MockarAlunosDoResponsavel(
                 CriarEscola(ModalidadeFundamental, CriarAluno(1), CriarAluno(2, serieResumida: OutraSerie)),
                 CriarEscola(ModalidadeMedio, CriarAluno(3)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.SME_ANO, modalidades: new[] { ModalidadeFundamental.ToString() }));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.SME_ANO, modalidades: [ModalidadeFundamental.ToString()]));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -100,7 +100,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
                 CriarEscola(ModalidadeMedio, CriarAluno(3)),
                 CriarEscola(ModalidadeMedio, CriarAluno(4, codigoDre: OutraDre)));
             var notificacao = CriarNotificacao(TipoComunicado.DRE, codigoDre: DreNotificacao);
-            notificacao.ModalidadesId = modalidadesNulas ? null : new string[] { };
+            notificacao.ModalidadesId = modalidadesNulas ? null : [];
             MockarNotificacao(notificacao);
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
@@ -114,7 +114,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
             MockarAlunosDoResponsavel(
                 CriarEscola(ModalidadeFundamental, CriarAluno(1), CriarAluno(2, codigoDre: OutraDre)),
                 CriarEscola(ModalidadeMedio, CriarAluno(3)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.DRE, modalidades: new[] { ModalidadeFundamental.ToString() }, codigoDre: DreNotificacao));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.DRE, modalidades: [ModalidadeFundamental.ToString()], codigoDre: DreNotificacao));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -130,7 +130,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
                     CriarAluno(2, codigoDre: OutraDre),
                     CriarAluno(3, serieResumida: OutraSerie)),
                 CriarEscola(ModalidadeMedio, CriarAluno(4)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.DRE_ANO, modalidades: new[] { ModalidadeFundamental.ToString() }, codigoDre: DreNotificacao, seriesResumidas: SerieNotificacao));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.DRE_ANO, modalidades: [ModalidadeFundamental.ToString()], codigoDre: DreNotificacao, seriesResumidas: SerieNotificacao));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -175,7 +175,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
                     CriarAluno(2, codigoEscola: OutraUe),
                     CriarAluno(3, serieResumida: OutraSerie)),
                 CriarEscola(ModalidadeMedio, CriarAluno(4)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.UEMOD, modalidades: new[] { ModalidadeFundamental.ToString() }, codigoDre: DreNotificacao, codigoUe: UeNotificacao, seriesResumidas: SerieNotificacao));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.UEMOD, modalidades: [ModalidadeFundamental.ToString()], codigoDre: DreNotificacao, codigoUe: UeNotificacao, seriesResumidas: SerieNotificacao));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -204,7 +204,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
             MockarAlunosDoResponsavel(
                 CriarEscola(ModalidadeFundamental, CriarAluno(1), CriarAluno(2, codigoTurma: OutraTurma)),
                 CriarEscola(ModalidadeMedio, CriarAluno(3, codigoTurma: 300)));
-            MockarNotificacao(CriarNotificacao(TipoComunicado.TURMA, codigoDre: DreNotificacao, codigoUe: UeNotificacao, turmas: new long[] { TurmaNotificacao, 300 }));
+            MockarNotificacao(CriarNotificacao(TipoComunicado.TURMA, codigoDre: DreNotificacao, codigoUe: UeNotificacao, turmas: [TurmaNotificacao, 300]));
 
             await marcarMensagemLidaUseCase.Executar(mediator.Object, GerarUsuarioNotificacaoDto(), CpfUsuario);
 
@@ -421,11 +421,11 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
                 TipoComunicado = tipoComunicado,
                 DataEnvio = DateTime.Now,
                 DataExpiracao = DateTime.Now.AddDays(7),
-                ModalidadesId = modalidades ?? new string[] { },
+                ModalidadesId = modalidades ?? [],
                 CodigoDre = codigoDre,
                 CodigoUe = codigoUe,
                 SeriesResumidas = seriesResumidas,
-                Turmas = (turmas ?? new long[] { }).Select(codigoTurma => new Dominio.Entidades.NotificacaoTurma
+                Turmas = (turmas ?? []).Select(codigoTurma => new Dominio.Entidades.NotificacaoTurma
                 {
                     CodigoTurma = codigoTurma,
                     NotificacaoId = IdNotificacao

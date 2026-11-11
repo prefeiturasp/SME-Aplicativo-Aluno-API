@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Moq;
 using Newtonsoft.Json;
-using SME.AE.Aplicacao.Comum.Interfaces;
 using SME.AE.Aplicacao.Comum.Modelos;
 using SME.AE.Aplicacao.Consultas.ObterUsuario;
 using SME.AE.Comum;
@@ -23,7 +22,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
         private const string OutroCodigoAluno = "7654321";
         private static readonly string MensagemJsonNula = JsonConvert.SerializeObject(null);
 
-        private readonly IAtualizarDadosUsuarioEolUseCase atualizarDadosUsuarioEolUseCase;
+        private readonly AtualizarDadosUsuarioEolUseCase atualizarDadosUsuarioEolUseCase;
         private readonly List<AtualizarDadosResponsavelEolCommand> atualizacoesEnviadas;
 
         public AtualizarDadosUsuarioEolUseCaseTeste()
@@ -57,7 +56,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
             var resultado = await atualizarDadosUsuarioEolUseCase.Executar(CriarMensagem(CriarDto()));
 
             Assert.True(resultado);
-            Assert.Equal(new[] { CodigoAluno, OutroCodigoAluno }, atualizacoesEnviadas.Select(a => a.CodigoAluno));
+            Assert.Equal([CodigoAluno, OutroCodigoAluno], atualizacoesEnviadas.Select(a => a.CodigoAluno));
         }
 
         [Fact(DisplayName = "Deve aplicar no EOL os dados informados pelo responsável")]
@@ -141,7 +140,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
                 Email = "responsavel@teste.com",
                 NomeMae = "Maria da Silva",
                 Celular = "(11) 98765-4321",
-                DataNascimentoResponsavel = new DateTime(1985, 5, 10)
+                DataNascimentoResponsavel = new DateTime(1985, 5, 10, 0, 0, 0, DateTimeKind.Unspecified)
             };
         }
 
