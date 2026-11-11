@@ -22,7 +22,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
         private const string CodigoAluno = "1234567";
         private const string OutroCodigoAluno = "7654321";
 
-        private readonly IAtualizarDadosUsuarioProdamUseCase atualizarDadosUsuarioProdamUseCase;
+        private readonly AtualizarDadosUsuarioProdamUseCase atualizarDadosUsuarioProdamUseCase;
         private readonly List<EnviarAtualizacaoCadastralProdamCommand> atualizacoesEnviadas;
 
         public AtualizarDadosUsuarioProdamUseCaseTeste()
@@ -44,7 +44,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
             var resultado = await atualizarDadosUsuarioProdamUseCase.Executar(CriarMensagem(CriarDto()));
 
             Assert.True(resultado);
-            Assert.Equal(new[] { CodigoAluno, OutroCodigoAluno }, atualizacoesEnviadas.Select(a => a.ResponsavelDto.CodigoAluno));
+            Assert.Equal([CodigoAluno, OutroCodigoAluno], atualizacoesEnviadas.Select(a => a.ResponsavelDto.CodigoAluno));
             mediator.Verify(m => m.Send(It.Is<ObterUsuarioQuery>(q => q.Id == IdUsuario && q.Cpf == null), It.IsAny<CancellationToken>()), Times.Once);
             mediator.Verify(m => m.Send(It.Is<ObterDadosResponsavelQuery>(q => q.CpfResponsavel == CpfUsuario), It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -155,7 +155,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
                 Email = "responsavel@teste.com",
                 NomeMae = "Maria da Silva",
                 Celular = "(11) 98765-4321",
-                DataNascimentoResponsavel = new DateTime(1985, 5, 10)
+                DataNascimentoResponsavel = new DateTime(1985, 5, 10, 0, 0, 0, DateTimeKind.Unspecified)
             };
         }
 
@@ -178,7 +178,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Usuario
                 TipoResponsavel = TipoResponsavelEnum.Responsavel_Legal,
                 Email = "email.antigo@teste.com",
                 NomeMae = "Nome da Mãe Antigo",
-                DataNascimentoMae = new DateTime(1960, 1, 1),
+                DataNascimentoMae = new DateTime(1960, 1, 1, 0, 0, 0, DateTimeKind.Unspecified),
                 DDDCelular = "21",
                 NumeroCelular = "912345678",
                 TipoTurnoCelular = "1",

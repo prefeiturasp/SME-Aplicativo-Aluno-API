@@ -1,6 +1,5 @@
 ﻿using Moq;
 using SME.AE.Aplicacao.CasoDeUso;
-using SME.AE.Aplicacao.Comum.Interfaces.UseCase;
 using SME.AE.Aplicacao.Comum.Modelos.Resposta;
 using SME.AE.Aplicacao.Consultas;
 using System.Collections.Generic;
@@ -18,13 +17,13 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
         private const string SituacaoNaoLida = "Não lida";
         private const string SituacaoNaoTemApp = "Não tem APP";
 
-        private readonly IObterStatusDeLeituraNotificacaoUseCase obterStatusDeLeituraNotificacaoUseCase;
+        private readonly ObterStatusDeLeituraNotificacaoUseCase obterStatusDeLeituraNotificacaoUseCase;
         private readonly List<long> notificacoesId;
 
         public ObterStatusDeLeituraNotificacaoUseCaseTeste()
         {
             obterStatusDeLeituraNotificacaoUseCase = new ObterStatusDeLeituraNotificacaoUseCase(mediator.Object);
-            notificacoesId = new List<long> { IdNotificacao, OutraNotificacao };
+            notificacoesId = [IdNotificacao, OutraNotificacao];
         }
 
         [Fact(DisplayName = "Deve consultar o status de leitura com as notificações e o aluno informados")]
@@ -45,8 +44,8 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.UsuarioNotificacao
         {
             var statusLeitura = new List<StatusNotificacaoUsuario>
             {
-                new StatusNotificacaoUsuario(IdNotificacao, null, SituacaoNaoLida),
-                new StatusNotificacaoUsuario(OutraNotificacao, null, SituacaoNaoTemApp)
+                new(IdNotificacao, null, SituacaoNaoLida),
+                new(OutraNotificacao, null, SituacaoNaoTemApp)
             };
             mediator.Setup(m => m.Send(It.IsAny<ObterStatusNotificacaoUsuarioQuery>(), It.IsAny<CancellationToken>()))
                     .ReturnsAsync(statusLeitura);
