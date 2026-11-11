@@ -22,7 +22,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Autenticacao
             {
                 HttpContext = new DefaultHttpContext
                 {
-                    User = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, nome) }, "teste"))
+                    User = new ClaimsPrincipal(new ClaimsIdentity([ new Claim(ClaimTypes.Name, nome) ], "teste"))
                 }
             };
         }

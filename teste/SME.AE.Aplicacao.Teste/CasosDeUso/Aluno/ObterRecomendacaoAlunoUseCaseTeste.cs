@@ -28,11 +28,11 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
         {
             var mediator = new Mock<IMediator>();
             mediator.Setup(x => x.Send(It.IsAny<ObterRecomendacoesPorAlunosTurmasQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new[]
-                {
+                .ReturnsAsync([
+
                     new RecomendacaoConselhoClasseAluno { AlunoCodigo = "A1", TurmaCodigo = "T1", AnotacoesPedagogicas = "anotação", RecomendacoesAluno = "aluno", RecomendacoesFamilia = "família" },
                     new RecomendacaoConselhoClasseAluno { AlunoCodigo = "A2" }
-                });
+                ]);
             var useCase = new ObterRecomendacaoAlunoUseCase(mediator.Object);
             var filtro = new FiltroRecomendacaoAlunoDto { CodigoAluno = "A1", CodigoTurma = "T1", AnoLetivo = 2025, Modalidade = (int)ModalidadeDeEnsino.Fundamental, Semestre = 1 };
 

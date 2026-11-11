@@ -23,14 +23,14 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
         [Fact]
         public async Task Executar_DeveDefinirCoresParaNotasNumericasEConceitos()
         {
-            var notas = new[]
-            {
+            NotaConceitoBimestreComponenteDto[] notas = [
+
                 new NotaConceitoBimestreComponenteDto { Nota = "4,99" },
                 new NotaConceitoBimestreComponenteDto { Nota = "5,00" },
                 new NotaConceitoBimestreComponenteDto { Nota = "7,00" },
                 new NotaConceitoBimestreComponenteDto { ConceitoId = 1 },
                 new NotaConceitoBimestreComponenteDto { Nota = "desconhecido" }
-            };
+            ];
             var mediator = new Mock<IMediator>();
             mediator.Setup(x => x.Send(It.IsAny<ObterNotasPorBimestresUeAlunoTurmaQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(notas);
@@ -51,7 +51,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
             Assert.Equal("#333333", resultado[2].CorDaNota);
             Assert.Equal("#444444", resultado[3].CorDaNota);
             Assert.Equal(NotaAlunoCor.CorPadrao, resultado[4].CorDaNota);
-            mediator.Verify(x => x.Send(It.Is<ObterNotasPorBimestresUeAlunoTurmaQuery>(q => q.UeCodigo == "U1" && q.TurmaCodigo == "T1" && q.AlunoCodigo == "A1" && q.Bimestres.SequenceEqual(new[] { 1, 2 })), It.IsAny<CancellationToken>()), Times.Once);
+            mediator.Verify(x => x.Send(It.Is<ObterNotasPorBimestresUeAlunoTurmaQuery>(q => q.UeCodigo == "U1" && q.TurmaCodigo == "T1" && q.AlunoCodigo == "A1" && q.Bimestres.Length == 2 && q.Bimestres[0] == 1 && q.Bimestres[1] == 2), It.IsAny<CancellationToken>()), Times.Once);
             mediator.Verify(x => x.Send(It.IsAny<ObterNotaAlunoCoresQuery>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
