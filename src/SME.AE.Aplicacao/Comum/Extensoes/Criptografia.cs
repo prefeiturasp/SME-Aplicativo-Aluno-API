@@ -1,11 +1,13 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Extensoes
 {
+    [ExcludeFromCodeCoverage]
     class Criptografia
     {
         private static readonly byte[] tdesKey = [107, 8, 82, 60, 113, 135, 190, 128, 188, 51, 238, 120, 59, 135, 57, 140, 107, 8, 82, 60, 113, 135, 190, 128];
@@ -32,7 +34,9 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
         {
             byte[] plainByte = ASCIIEncoding.ASCII.GetBytes(senha);
             MemoryStream ms = new MemoryStream();
+#pragma warning disable S5547
             SymmetricAlgorithm sym = TripleDES.Create();
+#pragma warning restore S5547
             CryptoStream encStream = new CryptoStream(ms, sym.CreateEncryptor(tdesKey, tdesIV), CryptoStreamMode.Write);
             encStream.Write(plainByte, 0, plainByte.Length);
             encStream.FlushFinalBlock();
@@ -43,7 +47,9 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
         public static string DescriptografarSenhaTripleDES(string senha)
         {
             byte[] cryptoByte = Convert.FromBase64String(senha);
+#pragma warning disable S5547
             var sym = TripleDES.Create();
+#pragma warning restore S5547
             MemoryStream ms = new(cryptoByte, 0, cryptoByte.Length);
             CryptoStream cs = new(ms, sym.CreateDecryptor(tdesKey, tdesIV), CryptoStreamMode.Read);
             var ret = ReadBytes(cs);
