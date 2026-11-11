@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup Condition="'$(CollectCoverage)' == 'true'">
+	<ExcludeByFile>**/*Dto.cs;**/*DTO.cs;**/*Map.cs;**/RegistrarMapeamentos.cs;**/Program.cs;**/Startup.cs;**/InjecaoDependencia.cs;**/Configuracoes/*.cs</ExcludeByFile>
+  </PropertyGroup>
+</Project>
