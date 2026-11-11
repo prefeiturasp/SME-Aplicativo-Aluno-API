@@ -33,9 +33,9 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
         public static string CriptografarSenhaTripleDES(string senha)
         {
             byte[] plainByte = ASCIIEncoding.ASCII.GetBytes(senha);
-            MemoryStream ms = new MemoryStream();
+            MemoryStream ms = new();
 #pragma warning disable S5547
-            SymmetricAlgorithm sym = TripleDES.Create();
+            var sym = TripleDES.Create();
 #pragma warning restore S5547
             CryptoStream encStream = new CryptoStream(ms, sym.CreateEncryptor(tdesKey, tdesIV), CryptoStreamMode.Write);
             encStream.Write(plainByte, 0, plainByte.Length);
