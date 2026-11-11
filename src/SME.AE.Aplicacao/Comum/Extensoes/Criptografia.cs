@@ -71,15 +71,16 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
             }
         }
 
-        private static byte[] ReadBytes(Stream s)
+        private static byte[] ReadBytes(Stream strm)
         {
+            ArgumentNullException.ThrowIfNull(strm);
             int length = 10000000;
             byte[] buffer = new byte[length];
             int bytesLidos = length;
             using MemoryStream ms = new();
             while (bytesLidos == length)
             {
-                bytesLidos = s.Read(buffer, 0, length);
+                bytesLidos = strm.Read(buffer, 0, length);
                 ms.Write(buffer, 0, bytesLidos);
             }
 
