@@ -18,11 +18,13 @@ using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Infra.Persistencia.Repositorios.Externos;
 using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 
 namespace SME.AE.Worker
 {
+    [ExcludeFromCodeCoverage]
     public static class InjecaoDependenciaExtension
     {
         #region Casos de Uso

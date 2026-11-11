@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using SME.AE.Aplicacao.Comum.Interfaces.Servicos;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SME.AE.Infra.Autenticacao
 {
+    [ExcludeFromCodeCoverage]
     public class AutenticacaoService : IAutenticacaoService
     {
         private readonly UserManager<UsuarioAplicacao> _userManager;

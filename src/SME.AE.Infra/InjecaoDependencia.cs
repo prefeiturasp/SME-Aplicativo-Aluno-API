@@ -13,9 +13,11 @@ using SME.AE.Infra.Persistencia;
 using SME.AE.Infra.Persistencia.Repositorios;
 using SME.AE.Infra.Persistencia.Repositorios.Externos;
 using SME.AE.Infra.Persistencia.Repositorios.Externos.CoreSSO;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SME.AE.Infra
 {
+    [ExcludeFromCodeCoverage]
     public static class InjecaoDependencia
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, VariaveisGlobaisOptions variaveisGlobais)

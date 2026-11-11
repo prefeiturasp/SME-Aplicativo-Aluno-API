@@ -15,9 +15,11 @@ using SME.AE.Infra.Persistencia.Mapeamentos;
 using System;
 using Microsoft.OpenApi;
 using Elastic.Apm.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SME.AE.Worker
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         public Startup(IConfiguration configuration)
