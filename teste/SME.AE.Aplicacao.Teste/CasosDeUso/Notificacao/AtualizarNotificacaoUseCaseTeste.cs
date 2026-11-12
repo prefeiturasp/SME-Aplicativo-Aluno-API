@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using SME.AE.Aplicacao.Comandos.Notificacao.Atualizar;
 using SME.AE.Aplicacao.Comum.Enumeradores;
 using SME.AE.Aplicacao.Comum.Modelos;
@@ -150,7 +150,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             TipoComunicado = TipoComunicado.SME,
             DataEnvio = DateTime.Now,
             Mensagem = "Teste Mensagem SME",
-            ModalidadesId = new[] { "1", "2", "3", "4", "5", "6" },
+            ModalidadesId = [ "1", "2", "3", "4", "5", "6" ],
             DataExpiracao = DateTime.Now.AddDays(7),
             CriadoPor = "Sistema",
             AlteradoPor = "UsuarioSME"
@@ -193,7 +193,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             Mensagem = "Teste Mensagem UEMOD",
             CodigoDre = "0000000",
             CodigoUe = "0000000",
-            ModalidadesId = new[] { "1", "2", "3", "4", "5", "6" },
+            ModalidadesId = [ "1", "2", "3", "4", "5", "6" ],
             DataExpiracao = DateTime.Now.AddDays(7),
             AlteradoPor = "UsuarioUEMOD"
         };
@@ -208,7 +208,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             Mensagem = "Teste Mensagem Turma",
             CodigoDre = "0000000",
             CodigoUe = "0000000",
-            ModalidadesId = new[] { "1", "2", "3", "4", "5", "6" },
+            ModalidadesId = [ "1", "2", "3", "4", "5", "6" ],
             Turmas = new List<string> { "0000000" },
             DataExpiracao = DateTime.Now.AddDays(7),
             AlteradoPor = "UsuarioTurma"
@@ -224,7 +224,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Notificacao
             Mensagem = "Teste Mensagem Aluno",
             CodigoDre = "0000000",
             CodigoUe = "0000000",
-            ModalidadesId = new[] { "1", "2", "3", "4", "5", "6" },
+            ModalidadesId = [ "1", "2", "3", "4", "5", "6" ],
             Turmas = ["0000000"],
             Alunos = ["0000000"],
             DataExpiracao = DateTime.Now.AddDays(7),

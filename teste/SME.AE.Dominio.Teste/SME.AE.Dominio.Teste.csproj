@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SME.AE.Dominio\SME.AE.Dominio.csproj" />
+  </ItemGroup>
+
 </Project>

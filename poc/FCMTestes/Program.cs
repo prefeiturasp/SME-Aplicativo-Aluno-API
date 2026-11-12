@@ -1,47 +1,17 @@
-﻿using FirebaseAdmin;
-using FirebaseAdmin.Messaging;
-using Google.Apis.Auth.OAuth2;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace FirebaseCloudMessaging.Example
+namespace FCMTestes
 {
     class Program
     {
-        static async Task Main(string[] args)
+        protected Program()
         {
-            var mensagem = new Message()
-            {
-                Notification = new Notification
-                {
-                    Title = "Título",
-                    Body = "Conteúdo"
-                },
-                Data = new Dictionary<string, string>()
-                {
-                    ["Nome"] = "Bruno",
-                    ["Sobrenome"] = "Alevato"
-                },
-                Topic = "AppAluno"
-            };
-
-            await EnviarPush(mensagem);
+            
         }
-
-        static async Task EnviarPush(Message mensagem)
+        static void Main(string[] args)
         {
-            var defaultApp = FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.FromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "key.json")),
-            });
-
-            Console.WriteLine(defaultApp.Name); // "[DEFAULT]"
-
-            var messaging = FirebaseMessaging.DefaultInstance;
-            var result = await messaging.SendAsync(mensagem);
-            Console.WriteLine(result);
+            ArgumentNullException.ThrowIfNull(args);
+            Console.WriteLine("FCMTestes");
         }
     }
 }

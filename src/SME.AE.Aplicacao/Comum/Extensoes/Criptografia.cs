@@ -1,22 +1,25 @@
 ﻿using SME.AE.Aplicacao.Comum.Enumeradores;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace SME.AE.Aplicacao.Comum.Extensoes
 {
+    [ExcludeFromCodeCoverage]
     class Criptografia
     {
-        private static readonly byte[] tdesKey = new byte[] { 107, 8, 82, 60, 113, 135, 190, 128, 188, 51, 238, 120, 59, 135, 57, 140, 107, 8, 82, 60, 113, 135, 190, 128 };
-        private static readonly byte[] tdesIV = new byte[] { 113, 135, 190, 128, 186, 217, 34, 47 };
+        private static readonly byte[] tdesKey = [107, 8, 82, 60, 113, 135, 190, 128, 188, 51, 238, 120, 59, 135, 57, 140, 107, 8, 82, 60, 113, 135, 190, 128];
+        private static readonly byte[] tdesIV = [113, 135, 190, 128, 186, 217, 34, 47];
+
+        protected Criptografia()
+        {
+        }
 
         public static string CriptografarSenhaSHA512(string senha)
         {
-            using (SHA512 sha512 = SHA512.Create())
-            {
-                return Convert.ToBase64String(sha512.ComputeHash(Encoding.Unicode.GetBytes(senha))).TrimStart('/');
-            }
+            return Convert.ToBase64String(SHA512.HashData(Encoding.Unicode.GetBytes(senha))).TrimStart('/');
         }
 
         public static bool EqualsSenha(string senha1, string senha2, TipoCriptografia tipo)
@@ -30,8 +33,10 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
         public static string CriptografarSenhaTripleDES(string senha)
         {
             byte[] plainByte = ASCIIEncoding.ASCII.GetBytes(senha);
-            MemoryStream ms = new MemoryStream();
-            SymmetricAlgorithm sym = TripleDES.Create();
+            MemoryStream ms = new();
+#pragma warning disable S5547
+            var sym = TripleDES.Create();
+#pragma warning restore S5547
             CryptoStream encStream = new CryptoStream(ms, sym.CreateEncryptor(tdesKey, tdesIV), CryptoStreamMode.Write);
             encStream.Write(plainByte, 0, plainByte.Length);
             encStream.FlushFinalBlock();
@@ -42,10 +47,12 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
         public static string DescriptografarSenhaTripleDES(string senha)
         {
             byte[] cryptoByte = Convert.FromBase64String(senha);
+#pragma warning disable S5547
             var sym = TripleDES.Create();
-            MemoryStream ms = new MemoryStream(cryptoByte, 0, cryptoByte.Length);
-            CryptoStream cs = new CryptoStream(ms, sym.CreateDecryptor(tdesKey, tdesIV), CryptoStreamMode.Read);
-            var ret = _ReadBytes(cs);
+#pragma warning restore S5547
+            MemoryStream ms = new(cryptoByte, 0, cryptoByte.Length);
+            CryptoStream cs = new(ms, sym.CreateDecryptor(tdesKey, tdesIV), CryptoStreamMode.Read);
+            var ret = ReadBytes(cs);
             return Encoding.ASCII.GetString(ret);
         }
 
@@ -64,21 +71,20 @@ namespace SME.AE.Aplicacao.Comum.Extensoes
             }
         }
 
-        private static byte[] _ReadBytes(Stream s)
+        private static byte[] ReadBytes(CryptoStream strm)
         {
+            ArgumentNullException.ThrowIfNull(strm);
             int length = 10000000;
             byte[] buffer = new byte[length];
             int bytesLidos = length;
-            using (MemoryStream ms = new MemoryStream())
+            using MemoryStream ms = new();
+            while (bytesLidos == length)
             {
-                while (bytesLidos == length)
-                {
-                    bytesLidos = s.Read(buffer, 0, length);
-                    ms.Write(buffer, 0, bytesLidos);
-                }
-
-                return ms.ToArray();
+                bytesLidos = strm.Read(buffer, 0, length);
+                ms.Write(buffer, 0, bytesLidos);
             }
+
+            return ms.ToArray();
         }
     }
 }

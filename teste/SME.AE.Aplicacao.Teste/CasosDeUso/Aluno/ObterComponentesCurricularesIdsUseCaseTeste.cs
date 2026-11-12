@@ -23,12 +23,12 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
         {
             var mediator = new Mock<IMediator>();
             mediator.Setup(x => x.Send(It.IsAny<ObterNotasPorBimestresUeAlunoTurmaQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new[]
-                {
+                .ReturnsAsync([
+
                     new NotaConceitoBimestreComponenteDto { ComponenteCurricularCodigo = 10, ComponenteCurricularNome = "Matemática" },
                     new NotaConceitoBimestreComponenteDto { ComponenteCurricularCodigo = 10, ComponenteCurricularNome = "Matemática" },
                     new NotaConceitoBimestreComponenteDto { ComponenteCurricularCodigo = 20, ComponenteCurricularNome = "História" }
-                });
+                ]);
             var useCase = new ObterComponentesCurricularesIdsUseCase(mediator.Object);
 
             var resultado = (await useCase.Executar(new AlunoBimestresTurmaDto("U1", "T1", "A1", [1, 2]))).ToList();
@@ -36,7 +36,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
             Assert.Equal(2, resultado.Count);
             Assert.Contains(resultado, x => x.Codigo == 10 && x.Descricao == "Matemática");
             Assert.Contains(resultado, x => x.Codigo == 20 && x.Descricao == "História");
-            mediator.Verify(x => x.Send(It.Is<ObterNotasPorBimestresUeAlunoTurmaQuery>(q => q.UeCodigo == "U1" && q.TurmaCodigo == "T1" && q.AlunoCodigo == "A1" && q.Bimestres.SequenceEqual(new[] { 1, 2 })), It.IsAny<CancellationToken>()), Times.Once);
+            mediator.Verify(x => x.Send(It.Is<ObterNotasPorBimestresUeAlunoTurmaQuery>(q => q.UeCodigo == "U1" && q.TurmaCodigo == "T1" && q.AlunoCodigo == "A1" && q.Bimestres.Length == 2 && q.Bimestres[0] == 1 && q.Bimestres[1] == 2), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]

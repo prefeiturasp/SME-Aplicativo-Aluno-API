@@ -12,6 +12,7 @@ using SME.AE.Comum.Fila;
 using SME.AE.Comum.Utilitarios;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -19,6 +20,7 @@ using System.Threading.Tasks;
 
 namespace SME.AE.Worker
 {
+    [ExcludeFromCodeCoverage]
     public class WorkerRabbitMQ : IHostedService
     {
         private readonly IModel canalRabbit;

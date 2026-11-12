@@ -66,7 +66,7 @@ namespace SME.AE.Aplicacao.Teste.CasosDeUso.Aluno
             mediator.Setup(x => x.Send(It.IsAny<ObterFrequenciaGlobalAlunoQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FrequenciaGlobalDto { Frequencia = 95 });
             mediator.Setup(x => x.Send(It.IsAny<ObterTurmasModalidadesPorCodigosQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new[] { new TurmaModalidadeCodigoDto { TurmaCodigo = 1, ModalidadeCodigo = (int)modalidade } });
+                .ReturnsAsync([ new TurmaModalidadeCodigoDto { TurmaCodigo = 1, ModalidadeCodigo = (int)modalidade } ]);
             mediator.Setup(x => x.Send(It.IsAny<ObterParametrosSistemaPorChavesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Array.Empty<ParametroEscolaAqui>());
             mediator.Setup(x => x.Send(It.IsAny<ObterFrequenciaAlunoCorPorParametroQuery>(), It.IsAny<CancellationToken>()))
