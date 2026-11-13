@@ -16,26 +16,20 @@ namespace SME.AE.Infra.Persistencia.Repositorios
             this.variaveisGlobaisOptions = variaveisGlobaisOptions ?? throw new ArgumentNullException(nameof(variaveisGlobaisOptions));
         }
 
-        public async Task<bool> RemoverPorNotificacaoId(long notificacaoId)
+        public async Task<bool> RemoverPorNotificacaoId(long id)
         {
-            await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
-            {
-                conn.Open();
-                await conn.ExecuteAsync(
-               @"UPDATE notificacao_turma SET excluido = true where notificacao_id = @notificacaoId", new { notificacaoId });
-                conn.Close();
-            }
-            return true;
+            return await RemoverPorNotificacoesIds([id]);
         }
 
-        public async Task<bool> RemoverPorNotificacoesIds(long[] notificacoesIds)
+        public async Task<bool> RemoverPorNotificacoesIds(long[] id)
         {
             await using (var conn = new NpgsqlConnection(variaveisGlobaisOptions.AEConnection))
             {
-                conn.Open();
+                await conn.OpenAsync();
                 await conn.ExecuteAsync(
-               @"UPDATE notificacao_turma SET excluido = true where notificacao_id = ANY(@notificacoesIds)", new { notificacoesIds });
-                conn.Close();
+                    @"UPDATE notificacao_turma SET excluido = true where notificacao_id = ANY(@notificacoesIds)",
+                    new { id });
+                await conn.CloseAsync();
             }
             return true;
         }
