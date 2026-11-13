@@ -12,15 +12,15 @@ namespace SME.AE.Api.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
+        [ChaveIntegracaoFiltroAttribute]
         public async Task<ObjectResult> Criar([FromBody] NotificacaoSgpDto notificacao, [FromServices] ICriarNotificacaoUseCase criarNotificacaoUseCase)
         {
             return Ok(await criarNotificacaoUseCase.Executar(notificacao));
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
+        [ChaveIntegracaoFiltroAttribute]
         public async Task<ObjectResult> Atualizar([FromBody] NotificacaoSgpDto notificacao, [FromServices] IAtualizarNotificacaoUseCase atualizarNotificacaoUseCase)
         {
             return Ok(await atualizarNotificacaoUseCase.Executar(notificacao));
@@ -28,14 +28,14 @@ namespace SME.AE.Api.Controllers
 
         [HttpDelete]
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
+        [ChaveIntegracaoFiltroAttribute]
         public async Task<ActionResult> Remover([FromBody] long[] ids, [FromServices] IRemoverNotificacaoEmLoteUseCase removerNotificacaoEmLoteUseCase)
         {
             return Ok(await removerNotificacaoEmLoteUseCase.Executar(ids));
         }
 
         [AllowAnonymous]
-        [ChaveIntegracaoFiltro]
+        [ChaveIntegracaoFiltroAttribute]
         [HttpDelete("{id}")]
         public async Task<ActionResult> RemoverPorID(int id, [FromServices] IRemoveNotificacaoPorIdUseCase removeNotificacaoPorIdUseCase)
         {

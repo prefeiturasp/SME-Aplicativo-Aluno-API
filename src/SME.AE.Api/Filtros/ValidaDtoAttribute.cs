@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SME.AE.Aplicacao.Comum.Modelos;
+using System;
 using System.Linq;
 
 namespace SME.AE.Api.Filtros
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class ValidaDtoAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext context)
