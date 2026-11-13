@@ -10,6 +10,7 @@ using System.Net.Sockets;
 
 namespace SME.AE.Api.Filtros
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class FiltroExcecoesAttribute : ExceptionFilterAttribute
     {
         public readonly string sentryDSN;
@@ -25,7 +26,7 @@ namespace SME.AE.Api.Filtros
             {
                 var internalIP = Dns.GetHostEntry(Dns.GetHostName()).AddressList?.FirstOrDefault(c => c.AddressFamily == AddressFamily.InterNetwork)?.ToString();
 
-                SentrySdk.AddBreadcrumb($"{Environment.MachineName ?? string.Empty} - {internalIP ?? string.Empty }", "Machine Identification");
+                SentrySdk.AddBreadcrumb($"{Environment.MachineName ?? string.Empty} {internalIP ?? string.Empty}", "Machine Identification");
 
                 SentrySdk.CaptureException(context.Exception);
             }

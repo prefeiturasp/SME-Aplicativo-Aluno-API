@@ -82,7 +82,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
 
                 var registrosParaTratar = listaDeCpfsUtilizados.Where(a => a.DreCodigo == dreCodigo).ToList();
 
-                var cpfsUnicosDaDre = registrosParaTratar.Where(a => a.CPF != 0).ToList().Select(a => a.CPF).Distinct();
+                List<DashboardAdesaoUnificacaoDto> list = [.. registrosParaTratar.Where(a => a.CPF != 0)];
+
+                var cpfsUnicosDaDre = list.Select(a => a.CPF).Distinct();
 
                 int cpfsInvalidos = 0, primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
@@ -96,7 +98,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                         validos += registroParaSomar.UsuarioValido;
                     });
 
-                cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count();
+                cpfsInvalidos = registrosParaTratar.Where(a => a.DreCodigo == dreCodigo && a.CPF == 0).ToList().Count;
 
                 cpfsInvalidosSME += cpfsInvalidos;
 
@@ -132,7 +134,9 @@ namespace SME.AE.Aplicacao.CasoDeUso
             {
                 var listaDashBoardsParaIncluir = new List<DashboardAdesaoDto>();
 
-                var cpfsUnicosDaSME = listaDeCpfsUtilizados.Where(a => a.CPF != 0).Select(a => a.CPF).ToList().Distinct();
+                List<long> list = [.. from a in listaDeCpfsUtilizados where a.CPF != 0 select a.CPF];
+
+                var cpfsUnicosDaSME = list.Distinct();
 
                 int primeirosAcessos = 0, semAppInstalado = 0, validos = 0;
 
@@ -201,7 +205,7 @@ namespace SME.AE.Aplicacao.CasoDeUso
                         });
 
 
-                    cpfsInvalidos = registrosParaTratar.Where(a => a.UeCodigo == ueParaTratar && a.CPF == 0).Count();
+                    cpfsInvalidos = registrosParaTratar.Count(a => a.UeCodigo == ueParaTratar && a.CPF == 0);
 
                     var registroParaTratarUe = responsaveis.FirstOrDefault(a => a.CodigoUe == ueParaTratar);
 
